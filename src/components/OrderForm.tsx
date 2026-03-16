@@ -48,6 +48,8 @@ export function OrderForm({ locale }: { locale: string }) {
   const [deliverySuggestions, setDeliverySuggestions] = useState<Suggestion[]>([]);
   const [suggestionsOpen, setSuggestionsOpen] = useState<"pickup" | "delivery" | null>(null);
   const [distanceLoading, setDistanceLoading] = useState(false);
+  const [distanceFromRoute, setDistanceFromRoute] = useState(false);
+  const [distanceError, setDistanceError] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const priceCents = calculatePriceCents(data.distanceKm, data.cargoSize);
@@ -82,6 +84,7 @@ export function OrderForm({ locale }: { locale: string }) {
   const fetchRealDistance = useCallback(async () => {
     if (!data.pickupAddress.trim() || !data.deliveryAddress.trim()) return;
     setDistanceLoading(true);
+    setDistanceError(null);
     try {
       const res = await fetch(
         `/api/route-distance?pickup=${encodeURIComponent(data.pickupAddress)}&delivery=${encodeURIComponent(data.deliveryAddress)}`
@@ -89,7 +92,14 @@ export function OrderForm({ locale }: { locale: string }) {
       const json = await res.json();
       if (res.ok && typeof json.distanceKm === "number" && json.distanceKm > 0) {
         update({ distanceKm: Math.round(json.distanceKm * 10) / 10 });
+        setDistanceFromRoute(true);
+      } else {
+        setDistanceFromRoute(false);
+        setDistanceError(json.error || "Could not calculate route");
       }
+    } catch {
+      setDistanceFromRoute(false);
+      setDistanceError("Network error");
     } finally {
       setDistanceLoading(false);
     }
@@ -322,6 +332,26 @@ export function OrderForm({ locale }: { locale: string }) {
               />
             </div>
           </div>
+          {data.pickupAddress.trim() && data.deliveryAddress.trim() && (
+            <div className="rounded-lg border border-[#0d2137]/15 bg-[#0d2137]/5 p-4">
+              <button
+                type="button"
+                onClick={fetchRealDistance}
+                disabled={distanceLoading}
+                className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-70"
+              >
+                {distanceLoading ? "…" : t("calculateDistance")}
+              </button>
+              {distanceFromRoute && (
+                <p className="mt-2 text-sm font-medium text-green-700">
+                  {t("distanceRouteResult")}: {data.distanceKm} km
+                </p>
+              )}
+              {distanceError && !distanceLoading && (
+                <p className="mt-2 text-sm text-amber-700">{t("distanceManualHint")}</p>
+              )}
+            </div>
+          )}
         </div>
       )}
 
@@ -353,19 +383,26 @@ export function OrderForm({ locale }: { locale: string }) {
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
-              {t("distance")} (km)
+              {distanceFromRoute ? t("distanceRoute") : t("distance")} (km)
             </label>
-            <input
-              type="number"
-              min={1}
-              max={500}
-              value={data.distanceKm}
-              onChange={(e) =>
-                update({ distanceKm: Math.max(1, Number(e.target.value) || 1) })
-              }
-              className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-              step={0.1}
-            />
+            {distanceFromRoute ? (
+              <div className="rounded-lg border border-green-200 bg-green-50/50 px-4 py-3 text-sm font-medium text-green-800">
+                {data.distanceKm} km — {t("distanceFromRouteLabel")}
+              </div>
+            ) : (
+              <input
+                type="number"
+                min={1}
+                max={500}
+                value={data.distanceKm}
+                onChange={(e) => {
+                  update({ distanceKm: Math.max(1, Number(e.target.value) || 1) });
+                  setDistanceFromRoute(false);
+                }}
+                className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                step={0.1}
+              />
+            )}
           </div>
           <div className="rounded-lg bg-[#0d2137]/5 p-4">
             <p className="text-sm text-[var(--foreground)]/80">{t("price")}</p>
