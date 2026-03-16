@@ -33,6 +33,7 @@ export function OrderForm({ locale }: { locale: string }) {
   const [data, setData] = useState<OrderFormData>(initial);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [orderConfirmed, setOrderConfirmed] = useState<{ jobId: string; token: string; whatsappLink: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const priceCents = calculatePriceCents(data.distanceKm, data.cargoSize);
@@ -50,11 +51,11 @@ export function OrderForm({ locale }: { locale: string }) {
     if (step > 1) setStep((s) => s - 1);
   };
 
-  const handlePay = async () => {
+  const handleConfirmOrder = async () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch("/api/create-checkout-session", {
+      const res = await fetch("/api/confirm-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -65,13 +66,19 @@ export function OrderForm({ locale }: { locale: string }) {
           cargoSize: data.cargoSize,
           distanceKm: data.distanceKm,
           priceCents,
-          locale,
         }),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error || "Checkout failed");
-      if (json.url) window.location.href = json.url;
-      else throw new Error("No checkout URL");
+      if (!res.ok) throw new Error(json.error || "Failed to confirm order");
+      if (json.jobId && json.confirmationToken && json.whatsappLink) {
+        setOrderConfirmed({
+          jobId: json.jobId,
+          token: json.confirmationToken,
+          whatsappLink: json.whatsappLink,
+        });
+      } else {
+        throw new Error("Invalid response");
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong");
     } finally {
@@ -214,7 +221,7 @@ export function OrderForm({ locale }: { locale: string }) {
         </div>
       )}
 
-      {step === 4 && (
+      {step === 4 && !orderConfirmed && (
         <div className="space-y-4">
           <h2 className="text-lg font-semibold text-[var(--primary)]">
             {t("step4")}
@@ -238,34 +245,59 @@ export function OrderForm({ locale }: { locale: string }) {
         </div>
       )}
 
-      <div className="mt-8 flex justify-between">
-        <button
-          type="button"
-          onClick={back}
-          disabled={step === 1}
-          className="rounded-lg border border-[#0d2137]/20 px-4 py-2 text-sm font-medium text-[var(--foreground)] disabled:opacity-50"
-        >
-          {t("back")}
-        </button>
-        {step < 4 ? (
+      {step === 4 && orderConfirmed && (
+        <div className="space-y-4 rounded-xl border border-green-200 bg-green-50 p-6 text-[var(--primary)]">
+          <p className="font-medium text-green-800">{t("confirmedSuccess")}</p>
+          <p className="text-sm text-green-700">
+            {t("orderRef")}: <code className="rounded bg-green-100 px-1 font-mono text-xs">{orderConfirmed.jobId}</code>
+          </p>
+          <a
+            href={orderConfirmed.whatsappLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg border border-green-300 bg-white px-4 py-2 text-sm font-medium text-green-800 shadow-sm hover:bg-green-50"
+          >
+            {t("shareToDrivers")}
+          </a>
+          <a
+            href={`/${locale}/order/confirm?job_id=${encodeURIComponent(orderConfirmed.jobId)}&token=${encodeURIComponent(orderConfirmed.token)}`}
+            className="inline-flex items-center gap-2 rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
+          >
+            {t("payNow")}
+          </a>
+        </div>
+      )}
+
+      {!orderConfirmed && (
+        <div className="mt-8 flex justify-between">
           <button
             type="button"
-            onClick={next}
-            className="rounded-lg bg-[var(--accent)] px-6 py-2 text-sm font-medium text-white hover:opacity-90"
+            onClick={back}
+            disabled={step === 1}
+            className="rounded-lg border border-[#0d2137]/20 px-4 py-2 text-sm font-medium text-[var(--foreground)] disabled:opacity-50"
           >
-            {t("next")}
+            {t("back")}
           </button>
-        ) : (
-          <button
-            type="button"
-            onClick={handlePay}
-            disabled={loading}
-            className="rounded-lg bg-[var(--accent)] px-6 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-70"
-          >
-            {loading ? "…" : t("payNow")}
-          </button>
-        )}
-      </div>
+          {step < 4 ? (
+            <button
+              type="button"
+              onClick={next}
+              className="rounded-lg bg-[var(--accent)] px-6 py-2 text-sm font-medium text-white hover:opacity-90"
+            >
+              {t("next")}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleConfirmOrder}
+              disabled={loading}
+              className="rounded-lg bg-[var(--accent)] px-6 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-70"
+            >
+              {loading ? "…" : t("confirmOrder")}
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

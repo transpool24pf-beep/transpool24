@@ -11,64 +11,88 @@ function getStripe(): Stripe {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const {
-      companyName,
-      phone,
-      pickupAddress,
-      deliveryAddress,
-      cargoSize,
-      distanceKm,
-      priceCents,
-      locale,
-    } = body;
-
-    if (
-      !companyName ||
-      !phone ||
-      !pickupAddress ||
-      !deliveryAddress ||
-      !cargoSize ||
-      !Number.isFinite(distanceKm) ||
-      !Number.isFinite(priceCents) ||
-      priceCents < 100
-    ) {
-      return NextResponse.json(
-        { error: "Missing or invalid order fields" },
-        { status: 400 }
-      );
-    }
+    const { jobId, token, locale: localeParam } = body;
 
     const supabase = createServerSupabase();
+    let job: { id: string; company_name: string; pickup_address: string; delivery_address: string; cargo_size: string; distance_km: number | null; price_cents: number };
 
-    const { data: job, error: insertError } = await supabase
-      .from("jobs")
-      .insert({
-        company_name: companyName,
+    if (jobId && token) {
+      const { data, error } = await supabase
+        .from("jobs")
+        .select("id, company_name, pickup_address, delivery_address, cargo_size, distance_km, price_cents")
+        .eq("id", jobId)
+        .eq("confirmation_token", token)
+        .eq("payment_status", "pending")
+        .single();
+      if (error || !data) {
+        return NextResponse.json({ error: "Invalid or expired link" }, { status: 400 });
+      }
+      job = data;
+    } else {
+      const {
+        companyName,
         phone,
-        pickup_address: pickupAddress,
-        pickup_city: "Pforzheim",
-        delivery_address: deliveryAddress,
-        delivery_city: null,
-        cargo_size: cargoSize,
-        distance_km: distanceKm,
-        price_cents: priceCents,
-        payment_status: "pending",
-        logistics_status: "draft",
-      })
-      .select("id")
-      .single();
-
-    if (insertError || !job) {
-      console.error("Supabase insert error:", insertError);
-      return NextResponse.json(
-        { error: "Failed to create order" },
-        { status: 500 }
-      );
+        pickupAddress,
+        deliveryAddress,
+        cargoSize,
+        distanceKm,
+        priceCents,
+        locale,
+      } = body;
+      if (
+        !companyName ||
+        !phone ||
+        !pickupAddress ||
+        !deliveryAddress ||
+        !cargoSize ||
+        !Number.isFinite(distanceKm) ||
+        !Number.isFinite(priceCents) ||
+        priceCents < 100
+      ) {
+        return NextResponse.json(
+          { error: "Missing or invalid order fields" },
+          { status: 400 }
+        );
+      }
+      const { data, error: insertError } = await supabase
+        .from("jobs")
+        .insert({
+          company_name: companyName,
+          phone,
+          pickup_address: pickupAddress,
+          pickup_city: "Pforzheim",
+          delivery_address: deliveryAddress,
+          delivery_city: null,
+          cargo_size: cargoSize,
+          distance_km: distanceKm,
+          price_cents: priceCents,
+          payment_status: "pending",
+          logistics_status: "draft",
+        })
+        .select("id, company_name, pickup_address, delivery_address, cargo_size, distance_km, price_cents")
+        .single();
+      if (insertError || !data) {
+        console.error("Supabase insert error:", insertError);
+        if (insertError?.code === "PGRST205") {
+          console.error(
+            "PGRST205: Table 'jobs' not found. Run supabase/schema.sql in Supabase Dashboard → SQL Editor to create tables."
+          );
+        }
+        return NextResponse.json(
+          { error: "Failed to create order" },
+          { status: 500 }
+        );
+      }
+      job = data;
     }
 
+    const locale = localeParam || "de";
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || req.headers.get("origin") || "http://localhost:3000";
     const successUrl = `${baseUrl}/${locale}/order/success?session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = `${baseUrl}/${locale}/order`;
+    const cancelUrl =
+      jobId && token
+        ? `${baseUrl}/${locale}/order/confirm?job_id=${job.id}&token=${encodeURIComponent(token)}`
+        : `${baseUrl}/${locale}/order`;
 
     const stripe = getStripe();
     const session = await stripe.checkout.sessions.create({
@@ -78,10 +102,10 @@ export async function POST(req: Request) {
           price_data: {
             currency: "eur",
             product_data: {
-              name: `TransPool24 – Transport (${cargoSize}, ${distanceKm} km)`,
-              description: `${pickupAddress} → ${deliveryAddress}`,
+              name: `TransPool24 – Transport (${job.cargo_size}, ${job.distance_km ?? 0} km)`,
+              description: `${job.pickup_address} → ${job.delivery_address}`,
             },
-            unit_amount: priceCents,
+            unit_amount: job.price_cents,
           },
           quantity: 1,
         },

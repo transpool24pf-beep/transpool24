@@ -44,8 +44,18 @@
     "total": "Total",
     "next": "Next",
     "back": "Back",
+    "confirmOrder": "Confirm order",
     "payNow": "Pay now",
-    "success": "Payment successful. Your order has been recorded."
+    "success": "Payment successful. Your order has been recorded.",
+    "confirmedSuccess": "Order confirmed. We will contact you after assigning a driver to complete payment.",
+    "shareToDrivers": "Share to drivers group (WhatsApp)",
+    "orderRef": "Order reference",
+    "confirmPageTitle": "Confirm order & pay",
+    "driverInfo": "Driver information",
+    "driverTba": "You will receive driver details and arrival time after assignment.",
+    "invalidLink": "Link invalid or expired.",
+    "backToOrder": "Back to order",
+    "loading": "Loading…"
   },
   "footer": {
     "rights": "All rights reserved.",

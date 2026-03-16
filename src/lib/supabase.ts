@@ -35,11 +35,13 @@ export type Job = {
   delivery_address: string;
   delivery_city: string | null;
   phone: string;
+  customer_email: string | null;
   cargo_size: "XS" | "M" | "L" | "XL";
   distance_km: number | null;
   price_cents: number;
   payment_status: "pending" | "paid" | "refunded" | "failed";
   logistics_status: string;
+  confirmation_token: string | null;
   stripe_session_id: string | null;
   stripe_payment_intent_id: string | null;
   created_at: string;

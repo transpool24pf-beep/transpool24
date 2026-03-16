@@ -44,8 +44,18 @@
     "total": "Toplam",
     "next": "İleri",
     "back": "Geri",
+    "confirmOrder": "Siparişi onayla",
     "payNow": "Şimdi öde",
-    "success": "Ödeme başarılı. Siparişiniz kaydedildi."
+    "success": "Ödeme başarılı. Siparişiniz kaydedildi.",
+    "confirmedSuccess": "Sipariş onaylandı. Sürücü atandıktan sonra ödeme için sizinle iletişime geçeceğiz.",
+    "shareToDrivers": "Sürücü grubuna gönder (WhatsApp)",
+    "orderRef": "Sipariş no",
+    "confirmPageTitle": "Siparişi onayla ve öde",
+    "driverInfo": "Sürücü bilgisi",
+    "driverTba": "Atama sonrası sürücü detayları ve varış saati iletilecektir.",
+    "invalidLink": "Bağlantı geçersiz veya süresi dolmuş.",
+    "backToOrder": "Siparişe dön",
+    "loading": "Yükleniyor…"
   },
   "footer": {
     "rights": "Tüm hakları saklıdır.",

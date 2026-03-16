@@ -44,8 +44,18 @@
     "total": "Gesamtbetrag",
     "next": "Weiter",
     "back": "Zurück",
+    "confirmOrder": "Auftrag bestätigen",
     "payNow": "Jetzt bezahlen",
-    "success": "Zahlung erfolgreich. Ihr Auftrag wurde erfasst."
+    "success": "Zahlung erfolgreich. Ihr Auftrag wurde erfasst.",
+    "confirmedSuccess": "Auftrag bestätigt. Wir melden uns nach Zuweisung eines Fahrers zur Zahlung.",
+    "shareToDrivers": "An Fahrer-Gruppe senden (WhatsApp)",
+    "orderRef": "Auftragsnummer",
+    "confirmPageTitle": "Auftrag bestätigen & bezahlen",
+    "driverInfo": "Fahrerinformationen",
+    "driverTba": "Sie erhalten Fahrerdetails und Ankunftszeit nach Zuweisung.",
+    "invalidLink": "Link ungültig oder abgelaufen.",
+    "backToOrder": "Zurück zur Bestellung",
+    "loading": "Wird geladen…"
   },
   "footer": {
     "rights": "Alle Rechte vorbehalten.",

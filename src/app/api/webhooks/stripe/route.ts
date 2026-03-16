@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createServerSupabase } from "@/lib/supabase";
+import { sendOrderConfirmationEmail } from "@/lib/email";
+import { generateInvoicePdf } from "@/lib/invoice-pdf";
 
 function getStripe(): Stripe {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -50,15 +52,31 @@ export async function POST(req: Request) {
       return NextResponse.json({ received: true });
     }
 
+    const customerEmail =
+      (session.customer_details?.email as string | undefined) ??
+      (session.customer_email as string | undefined);
+
     await supabase
       .from("jobs")
       .update({
         payment_status: "paid",
         logistics_status: "paid",
         stripe_payment_intent_id: session.payment_intent as string | null,
+        ...(customerEmail && { customer_email: customerEmail }),
         updated_at: new Date().toISOString(),
       })
       .eq("id", jobId);
+
+    if (customerEmail) {
+      try {
+        const pdfBuffer = await generateInvoicePdf({ ...job, customer_email: customerEmail });
+        await sendOrderConfirmationEmail(customerEmail, { ...job, customer_email: customerEmail }, pdfBuffer);
+      } catch (e) {
+        console.error("[TransPool24] Confirmation email/PDF failed:", e);
+      }
+    } else {
+      console.warn("[TransPool24] No customer email in session, skipping confirmation email");
+    }
 
     const webhookUrl = process.env.ADMIN_WEBHOOK_URL;
 

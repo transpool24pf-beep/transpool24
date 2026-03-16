@@ -1,5 +1,6 @@
 -- TransPool24 Supabase Schema
--- Run this in Supabase SQL Editor to create tables
+-- Run this in Supabase Dashboard → SQL Editor → New query → paste & Run
+-- Required for checkout (jobs table). Without it you get PGRST205 / "Failed to create order".
 
 -- Enable UUID extension if not already
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -26,11 +27,13 @@ CREATE TABLE IF NOT EXISTS public.jobs (
   delivery_address TEXT NOT NULL,
   delivery_city TEXT,
   phone TEXT NOT NULL,
+  customer_email TEXT,
   cargo_size TEXT NOT NULL CHECK (cargo_size IN ('XS', 'M', 'L', 'XL')),
   distance_km NUMERIC(10, 2),
   price_cents INTEGER NOT NULL,
   payment_status TEXT NOT NULL DEFAULT 'pending' CHECK (payment_status IN ('pending', 'paid', 'refunded', 'failed')),
-  logistics_status TEXT NOT NULL DEFAULT 'draft' CHECK (logistics_status IN ('draft', 'paid', 'assigned', 'in_transit', 'delivered', 'cancelled')),
+  logistics_status TEXT NOT NULL DEFAULT 'draft' CHECK (logistics_status IN ('draft', 'confirmed', 'paid', 'assigned', 'in_transit', 'delivered', 'cancelled')),
+  confirmation_token TEXT UNIQUE,
   stripe_session_id TEXT UNIQUE,
   stripe_payment_intent_id TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),

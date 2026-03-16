@@ -44,8 +44,18 @@
     "total": "Total",
     "next": "Suivant",
     "back": "Retour",
+    "confirmOrder": "Confirmer la commande",
     "payNow": "Payer maintenant",
-    "success": "Paiement réussi. Votre commande a été enregistrée."
+    "success": "Paiement réussi. Votre commande a été enregistrée.",
+    "confirmedSuccess": "Commande confirmée. Nous vous contacterons après attribution d'un chauffeur pour le paiement.",
+    "shareToDrivers": "Envoyer au groupe chauffeurs (WhatsApp)",
+    "orderRef": "Référence commande",
+    "confirmPageTitle": "Confirmer la commande et payer",
+    "driverInfo": "Informations chauffeur",
+    "driverTba": "Vous recevrez les détails du chauffeur et l'heure d'arrivée après attribution.",
+    "invalidLink": "Lien invalide ou expiré.",
+    "backToOrder": "Retour à la commande",
+    "loading": "Chargement…"
   },
   "footer": {
     "rights": "Tous droits réservés.",

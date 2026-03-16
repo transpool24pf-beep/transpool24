@@ -44,8 +44,18 @@
     "total": "Total",
     "next": "Siguiente",
     "back": "Atrás",
+    "confirmOrder": "Confirmar pedido",
     "payNow": "Pagar ahora",
-    "success": "Pago correcto. Tu pedido ha sido registrado."
+    "success": "Pago correcto. Tu pedido ha sido registrado.",
+    "confirmedSuccess": "Pedido confirmado. Te contactaremos tras asignar un conductor para el pago.",
+    "shareToDrivers": "Enviar al grupo de conductores (WhatsApp)",
+    "orderRef": "Referencia de pedido",
+    "confirmPageTitle": "Confirmar pedido y pagar",
+    "driverInfo": "Datos del conductor",
+    "driverTba": "Recibirás los datos del conductor y la hora de llegada tras la asignación.",
+    "invalidLink": "Enlace no válido o caducado.",
+    "backToOrder": "Volver al pedido",
+    "loading": "Cargando…"
   },
   "footer": {
     "rights": "Todos los derechos reservados.",

@@ -36,7 +36,15 @@ Fill in `.env.local` with your Supabase and Stripe keys (see `.env.example`).
 
 - Set `ADMIN_WEBHOOK_URL` to a Zapier/Make/WhatsApp webhook URL. On each successful payment, the app sends a POST with order details so you can forward them to your Pforzheim drivers.
 
-### 5. Run
+### 5. Confirmation email & PDF invoice (Resend)
+
+- Create an API key at [resend.com](https://resend.com) and set `RESEND_API_KEY` in your env.
+- Optional: set `RESEND_FROM_EMAIL` (e.g. `TransPool24 <noreply@transpool24.com>`). Default is `onboarding@resend.dev` for testing.
+- After payment, the customer receives an email with a PDF invoice attached. The customer email is taken from Stripe Checkout.
+
+If the `jobs` table already existed before adding this feature, run `supabase/add_customer_email.sql` in the SQL Editor once to add the `customer_email` column.
+
+### 6. Run
 
 ```bash
 npm run dev
@@ -53,7 +61,7 @@ Default UI language: **German**. Language switcher in header: Arabic, English, T
 1. Customer fills the multi-step order form (company, addresses, cargo size XS–XL, phone).
 2. Price is calculated from distance × cargo category.
 3. Customer clicks “Pay now” → Stripe Checkout.
-4. On success, Stripe webhook marks the job as `paid` in Supabase and triggers the admin webhook (if set).
+4. On success, Stripe webhook marks the job as `paid` in Supabase, sends a confirmation email with PDF invoice (Resend), and triggers the admin webhook (if set).
 5. You assign the job manually to drivers in Pforzheim.
 
 ## Project structure
@@ -63,6 +71,7 @@ Default UI language: **German**. Language switcher in header: Arabic, English, T
 - `src/app/api/` – create-checkout-session, webhooks/stripe
 - `messages/*.json` – translations (de, en, ar, tr, fr, es)
 - `supabase/schema.sql` – tables: profiles, jobs, driver_documents
+- `src/lib/email.ts` – Resend confirmation email; `src/lib/invoice-pdf.ts` – PDF invoice
 
 ## Deploy on Vercel
 
