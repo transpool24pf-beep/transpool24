@@ -27,12 +27,15 @@
     "step4": "Resumen y pago",
     "companyName": "Nombre de la empresa",
     "companyNamePlaceholder": "ej. Ejemplo GmbH",
+    "email": "Correo electrónico",
+    "emailPlaceholder": "ejemplo@empresa.com",
     "phone": "Teléfono",
     "phonePlaceholder": "+49 123 456789",
     "pickup": "Dirección de recogida",
     "pickupPlaceholder": "Pforzheim o alrededores",
     "delivery": "Dirección de entrega",
     "deliveryPlaceholder": "Calle, código postal, ciudad",
+    "pickupTime": "Hora preferida de recogida",
     "cargoSize": "Tamaño de carga",
     "cargoXS": "XS – Cajas pequeñas",
     "cargoM": "M – Hasta 2 palets",
@@ -55,7 +58,9 @@
     "driverTba": "Recibirás los datos del conductor y la hora de llegada tras la asignación.",
     "invalidLink": "Enlace no válido o caducado.",
     "backToOrder": "Volver al pedido",
-    "loading": "Cargando…"
+    "loading": "Cargando…",
+    "confirmMessage": "Verifique sus datos. Le enviaremos una confirmación por correo — espere a que le contactemos.",
+    "confirmCheckboxLabel": "Confirmo la exactitud de los datos y acepto el procesamiento del pedido."
   },
   "footer": {
     "rights": "Todos los derechos reservados.",

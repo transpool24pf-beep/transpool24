@@ -1,28 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { calculatePriceCents, formatPrice } from "@/lib/pricing";
 
-const CARGO_OPTIONS = ["XS", "M", "L", "XL"] as const;
+type Suggestion = { display_name: string; lat: number; lon: number };
+
+const CARGO_OPTIONS = ["XS", "M", "L"] as const;
 type CargoSize = (typeof CARGO_OPTIONS)[number];
 
 const DEFAULT_KM = 50;
 
 export type OrderFormData = {
   companyName: string;
+  email: string;
   phone: string;
   pickupAddress: string;
   deliveryAddress: string;
+  pickupTime: string;
   cargoSize: CargoSize;
   distanceKm: number;
 };
 
 const initial: OrderFormData = {
   companyName: "",
+  email: "",
   phone: "",
   pickupAddress: "Pforzheim",
   deliveryAddress: "",
+  pickupTime: "",
   cargoSize: "M",
   distanceKm: DEFAULT_KM,
 };
@@ -35,8 +41,57 @@ export function OrderForm({ locale }: { locale: string }) {
   const [success, setSuccess] = useState(false);
   const [orderConfirmed, setOrderConfirmed] = useState<{ jobId: string; token: string; whatsappLink: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [confirmChecked, setConfirmChecked] = useState(false);
+  const [pickupSuggestions, setPickupSuggestions] = useState<Suggestion[]>([]);
+  const [deliverySuggestions, setDeliverySuggestions] = useState<Suggestion[]>([]);
+  const [suggestionsOpen, setSuggestionsOpen] = useState<"pickup" | "delivery" | null>(null);
+  const [distanceLoading, setDistanceLoading] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const priceCents = calculatePriceCents(data.distanceKm, data.cargoSize);
+
+  const fetchSuggestions = useCallback((query: string, setter: (s: Suggestion[]) => void) => {
+    if (query.length < 3) {
+      setter([]);
+      return;
+    }
+    fetch(`/api/address-suggestions?q=${encodeURIComponent(query)}`)
+      .then((r) => r.json())
+      .then(setter)
+      .catch(() => setter([]));
+  }, []);
+
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (suggestionsOpen === "pickup") {
+      debounceRef.current = setTimeout(() => {
+        fetchSuggestions(data.pickupAddress, setPickupSuggestions);
+      }, 300);
+    } else if (suggestionsOpen === "delivery") {
+      debounceRef.current = setTimeout(() => {
+        fetchSuggestions(data.deliveryAddress, setDeliverySuggestions);
+      }, 300);
+    }
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [data.pickupAddress, data.deliveryAddress, suggestionsOpen, fetchSuggestions]);
+
+  const fetchRealDistance = useCallback(async () => {
+    if (!data.pickupAddress.trim() || !data.deliveryAddress.trim()) return;
+    setDistanceLoading(true);
+    try {
+      const res = await fetch(
+        `/api/route-distance?pickup=${encodeURIComponent(data.pickupAddress)}&delivery=${encodeURIComponent(data.deliveryAddress)}`
+      );
+      const json = await res.json();
+      if (res.ok && typeof json.distanceKm === "number" && json.distanceKm > 0) {
+        update({ distanceKm: Math.round(json.distanceKm * 10) / 10 });
+      }
+    } finally {
+      setDistanceLoading(false);
+    }
+  }, [data.pickupAddress, data.deliveryAddress]);
 
   const update = (partial: Partial<OrderFormData>) => {
     setData((prev) => ({ ...prev, ...partial }));
@@ -44,7 +99,17 @@ export function OrderForm({ locale }: { locale: string }) {
   };
 
   const next = () => {
-    if (step < 4) setStep((s) => s + 1);
+    if (step < 4) {
+      if (step === 2 && data.pickupAddress.trim() && data.deliveryAddress.trim()) {
+        setDistanceLoading(true);
+        fetchRealDistance().finally(() => {
+          setDistanceLoading(false);
+          setStep((s) => s + 1);
+        });
+      } else {
+        setStep((s) => s + 1);
+      }
+    }
   };
 
   const back = () => {
@@ -60,9 +125,11 @@ export function OrderForm({ locale }: { locale: string }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           companyName: data.companyName,
+          email: data.email,
           phone: data.phone,
           pickupAddress: data.pickupAddress,
           deliveryAddress: data.deliveryAddress,
+          pickupTime: data.pickupTime || null,
           cargoSize: data.cargoSize,
           distanceKm: data.distanceKm,
           priceCents,
@@ -126,6 +193,18 @@ export function OrderForm({ locale }: { locale: string }) {
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
+              {t("email")}
+            </label>
+            <input
+              type="email"
+              value={data.email}
+              onChange={(e) => update({ email: e.target.value })}
+              placeholder={t("emailPlaceholder")}
+              className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
               {t("phone")}
             </label>
             <input
@@ -144,27 +223,87 @@ export function OrderForm({ locale }: { locale: string }) {
           <h2 className="text-lg font-semibold text-[var(--primary)]">
             {t("step2")}
           </h2>
-          <div>
+          <div className="relative">
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
               {t("pickup")}
             </label>
             <input
               type="text"
               value={data.pickupAddress}
-              onChange={(e) => update({ pickupAddress: e.target.value })}
+              onChange={(e) => {
+                update({ pickupAddress: e.target.value });
+                setSuggestionsOpen("pickup");
+              }}
+              onFocus={() => setSuggestionsOpen("pickup")}
+              onBlur={() => setTimeout(() => setSuggestionsOpen(null), 200)}
               placeholder={t("pickupPlaceholder")}
               className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
             />
+            {suggestionsOpen === "pickup" && pickupSuggestions.length > 0 && (
+              <ul className="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-lg border border-[#0d2137]/20 bg-white py-1 shadow-lg">
+                {pickupSuggestions.map((s, i) => (
+                  <li key={i}>
+                    <button
+                      type="button"
+                      className="w-full px-4 py-2 text-left text-sm hover:bg-[#0d2137]/5"
+                      onMouseDown={() => {
+                        update({ pickupAddress: s.display_name });
+                        setPickupSuggestions([]);
+                        setSuggestionsOpen(null);
+                      }}
+                    >
+                      {s.display_name}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
-          <div>
+          <div className="relative">
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
               {t("delivery")}
             </label>
             <input
               type="text"
               value={data.deliveryAddress}
-              onChange={(e) => update({ deliveryAddress: e.target.value })}
+              onChange={(e) => {
+                update({ deliveryAddress: e.target.value });
+                setSuggestionsOpen("delivery");
+              }}
+              onFocus={() => setSuggestionsOpen("delivery")}
+              onBlur={() => setTimeout(() => setSuggestionsOpen(null), 200)}
               placeholder={t("deliveryPlaceholder")}
+              className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+            />
+            {suggestionsOpen === "delivery" && deliverySuggestions.length > 0 && (
+              <ul className="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-lg border border-[#0d2137]/20 bg-white py-1 shadow-lg">
+                {deliverySuggestions.map((s, i) => (
+                  <li key={i}>
+                    <button
+                      type="button"
+                      className="w-full px-4 py-2 text-left text-sm hover:bg-[#0d2137]/5"
+                      onMouseDown={() => {
+                        update({ deliveryAddress: s.display_name });
+                        setDeliverySuggestions([]);
+                        setSuggestionsOpen(null);
+                      }}
+                    >
+                      {s.display_name}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
+              {t("pickupTime")}
+            </label>
+            <input
+              type="datetime-local"
+              value={data.pickupTime}
+              onChange={(e) => update({ pickupTime: e.target.value })}
+              min={new Date().toISOString().slice(0, 16)}
               className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
             />
           </div>
@@ -210,6 +349,7 @@ export function OrderForm({ locale }: { locale: string }) {
                 update({ distanceKm: Math.max(1, Number(e.target.value) || 1) })
               }
               className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+              step={0.1}
             />
           </div>
           <div className="rounded-lg bg-[#0d2137]/5 p-4">
@@ -228,14 +368,34 @@ export function OrderForm({ locale }: { locale: string }) {
           </h2>
           <div className="space-y-2 rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/5 p-4 text-sm">
             <p><strong>{t("companyName")}:</strong> {data.companyName}</p>
+            <p><strong>{t("email")}:</strong> {data.email}</p>
             <p><strong>{t("phone")}:</strong> {data.phone}</p>
             <p><strong>{t("pickup")}:</strong> {data.pickupAddress}</p>
             <p><strong>{t("delivery")}:</strong> {data.deliveryAddress}</p>
+            {data.pickupTime && (
+              <p><strong>{t("pickupTime")}:</strong> {new Date(data.pickupTime).toLocaleString()}</p>
+            )}
             <p><strong>{t("cargoSize")}:</strong> {t(`cargo${data.cargoSize}` as "cargoXS")}</p>
             <p><strong>{t("distance")}:</strong> {data.distanceKm} km</p>
             <p className="pt-2 text-lg font-bold text-[var(--accent)]">
               {t("total")}: {formatPrice(priceCents)}
             </p>
+          </div>
+          <div className="rounded-lg border border-[#0d2137]/15 bg-[#0d2137]/5 p-4">
+            <p className="text-sm text-[var(--foreground)] leading-relaxed">
+              {t("confirmMessage")}
+            </p>
+            <label className="mt-3 flex cursor-pointer items-start gap-3">
+              <input
+                type="checkbox"
+                checked={confirmChecked}
+                onChange={(e) => setConfirmChecked(e.target.checked)}
+                className="mt-1 h-4 w-4 rounded border-[#0d2137]/30 text-[var(--accent)] focus:ring-[var(--accent)]"
+              />
+              <span className="text-sm font-medium text-[var(--foreground)]">
+                {t("confirmCheckboxLabel")}
+              </span>
+            </label>
           </div>
           {error && (
             <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
@@ -282,16 +442,17 @@ export function OrderForm({ locale }: { locale: string }) {
             <button
               type="button"
               onClick={next}
-              className="rounded-lg bg-[var(--accent)] px-6 py-2 text-sm font-medium text-white hover:opacity-90"
+              disabled={distanceLoading}
+              className="rounded-lg bg-[var(--accent)] px-6 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-70"
             >
-              {t("next")}
+              {distanceLoading ? "…" : t("next")}
             </button>
           ) : (
             <button
               type="button"
               onClick={handleConfirmOrder}
-              disabled={loading}
-              className="rounded-lg bg-[var(--accent)] px-6 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-70"
+              disabled={loading || !confirmChecked}
+              className="rounded-lg bg-[var(--accent)] px-6 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {loading ? "…" : t("confirmOrder")}
             </button>

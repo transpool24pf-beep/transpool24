@@ -27,12 +27,15 @@
     "step4": "Zusammenfassung & Zahlung",
     "companyName": "Firmenname",
     "companyNamePlaceholder": "z. B. Muster GmbH",
+    "email": "E-Mail",
+    "emailPlaceholder": "beispiel@firma.de",
     "phone": "Telefonnummer",
     "phonePlaceholder": "+49 123 456789",
     "pickup": "Abholadresse",
     "pickupPlaceholder": "Pforzheim oder Umgebung",
     "delivery": "Lieferadresse",
     "deliveryPlaceholder": "Straße, PLZ, Ort",
+    "pickupTime": "Bevorzugte Abholzeit",
     "cargoSize": "Ladungsgröße",
     "cargoXS": "XS – Kleine Kartons",
     "cargoM": "M – Bis 2 Paletten",
@@ -55,7 +58,9 @@
     "driverTba": "Sie erhalten Fahrerdetails und Ankunftszeit nach Zuweisung.",
     "invalidLink": "Link ungültig oder abgelaufen.",
     "backToOrder": "Zurück zur Bestellung",
-    "loading": "Wird geladen…"
+    "loading": "Wird geladen…",
+    "confirmMessage": "Bitte prüfen Sie Ihre Angaben. Wir senden Ihnen eine Bestätigung per E-Mail — bitte warten Sie auf unsere Kontaktaufnahme.",
+    "confirmCheckboxLabel": "Ich bestätige die Richtigkeit der Angaben und stimme der Bearbeitung des Auftrags zu."
   },
   "footer": {
     "rights": "Alle Rechte vorbehalten.",

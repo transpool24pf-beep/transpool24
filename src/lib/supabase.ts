@@ -36,7 +36,8 @@ export type Job = {
   delivery_city: string | null;
   phone: string;
   customer_email: string | null;
-  cargo_size: "XS" | "M" | "L" | "XL";
+  preferred_pickup_at: string | null;
+  cargo_size: "XS" | "M" | "L";
   distance_km: number | null;
   price_cents: number;
   payment_status: "pending" | "paid" | "refunded" | "failed";

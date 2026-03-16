@@ -27,12 +27,15 @@
     "step4": "Summary & payment",
     "companyName": "Company name",
     "companyNamePlaceholder": "e.g. Example GmbH",
+    "email": "Email",
+    "emailPlaceholder": "example@company.com",
     "phone": "Phone number",
     "phonePlaceholder": "+49 123 456789",
     "pickup": "Pickup address",
     "pickupPlaceholder": "Pforzheim or surrounding area",
     "delivery": "Delivery address",
     "deliveryPlaceholder": "Street, postal code, city",
+    "pickupTime": "Preferred pickup time",
     "cargoSize": "Cargo size",
     "cargoXS": "XS – Small cartons",
     "cargoM": "M – Up to 2 pallets",
@@ -55,7 +58,9 @@
     "driverTba": "You will receive driver details and arrival time after assignment.",
     "invalidLink": "Link invalid or expired.",
     "backToOrder": "Back to order",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "confirmMessage": "Please verify your details. We will send you a confirmation by email — please wait for us to contact you.",
+    "confirmCheckboxLabel": "I confirm the accuracy of the information above and agree to the processing of this order."
   },
   "footer": {
     "rights": "All rights reserved.",

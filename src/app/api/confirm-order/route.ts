@@ -11,9 +11,11 @@ export async function POST(req: Request) {
     const body = await req.json();
     const {
       companyName,
+      email,
       phone,
       pickupAddress,
       deliveryAddress,
+      pickupTime,
       cargoSize,
       distanceKm,
       priceCents,
@@ -43,6 +45,8 @@ export async function POST(req: Request) {
       .insert({
         company_name: companyName,
         phone,
+        customer_email: email || null,
+        preferred_pickup_at: pickupTime || null,
         pickup_address: pickupAddress,
         pickup_city: "Pforzheim",
         delivery_address: deliveryAddress,

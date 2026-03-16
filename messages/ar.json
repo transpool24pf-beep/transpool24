@@ -27,12 +27,15 @@
     "step4": "الملخص والدفع",
     "companyName": "اسم الشركة",
     "companyNamePlaceholder": "مثال: شركة نموذجية",
+    "email": "البريد الإلكتروني",
+    "emailPlaceholder": "example@company.com",
     "phone": "رقم الهاتف",
     "phonePlaceholder": "+49 123 456789",
     "pickup": "عنوان الاستلام",
     "pickupPlaceholder": "بفورتسهايم أو الجوار",
     "delivery": "عنوان التسليم",
     "deliveryPlaceholder": "الشارع، الرمز البريدي، المدينة",
+    "pickupTime": "وقت الاستلام المفضل",
     "cargoSize": "حجم الحمولة",
     "cargoXS": "XS – صناديق صغيرة",
     "cargoM": "M – حتى 2 باليت",
@@ -55,7 +58,9 @@
     "driverTba": "سيتم إبلاغك بمعلومات السائق ووقت الوصول بعد التعيين.",
     "invalidLink": "الرابط غير صالح أو منتهي.",
     "backToOrder": "العودة لصفحة الطلب",
-    "loading": "جاري التحميل…"
+    "loading": "جاري التحميل…",
+    "confirmMessage": "تأكد من صحة معلوماتك. سنراسلك على البريد الإلكتروني للتأكيد — نرجو انتظارنا في أقرب وقت.",
+    "confirmCheckboxLabel": "أؤكد صحة البيانات المذكورة أعلاه وأوافق على معالجة الطلب."
   },
   "footer": {
     "rights": "جميع الحقوق محفوظة.",
