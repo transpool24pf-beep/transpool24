@@ -30,6 +30,10 @@ function FitBounds({ from, to }: { from: { lat: number; lon: number }; to: { lat
   const toLatLng: [number, number] = [to.lat, to.lon];
   useEffect(() => {
     map.fitBounds(L.latLngBounds(fromLatLng, toLatLng), { padding: [40, 40], maxZoom: 10 });
+    const t = setTimeout(() => {
+      map.invalidateSize();
+    }, 100);
+    return () => clearTimeout(t);
   }, [map, from.lat, from.lon, to.lat, to.lon]);
   return null;
 }

@@ -7,7 +7,14 @@ import { calculatePriceCents, formatPrice } from "@/lib/pricing";
 
 const RouteMap = dynamic(
   () => import("@/components/RouteMapInner").then((m) => m.RouteMapInner),
-  { ssr: false }
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-[300px] w-full items-center justify-center rounded-lg border border-[#0d2137]/20 bg-[#0d2137]/5 text-sm text-[var(--foreground)]">
+        Loading map…
+      </div>
+    ),
+  }
 );
 
 type Suggestion = { display_name: string; lat: number; lon: number };
@@ -99,7 +106,7 @@ export function OrderForm({ locale }: { locale: string }) {
     setDistanceError(null);
     try {
       const res = await fetch(
-        `/api/route-distance?pickup=${encodeURIComponent(data.pickupAddress)}&delivery=${encodeURIComponent(data.deliveryAddress)}`
+        `/api/route-distance?pickup=${encodeURIComponent(data.pickupAddress)}&delivery=${encodeURIComponent(data.deliveryAddress)}&_=${Date.now()}`
       );
       const json = await res.json();
       if (res.ok && typeof json.distanceKm === "number" && json.distanceKm > 0) {
@@ -127,6 +134,36 @@ export function OrderForm({ locale }: { locale: string }) {
       setDistanceLoading(false);
     }
   }, [data.pickupAddress, data.deliveryAddress]);
+
+  // If we have distance but no map data (e.g. old API response), refetch once to get from/to for the map
+  useEffect(() => {
+    if (
+      step !== 2 ||
+      !data.pickupAddress.trim() ||
+      !data.deliveryAddress.trim() ||
+      !distanceFromRoute ||
+      routeGeo != null
+    ) {
+      return;
+    }
+    let cancelled = false;
+    fetch(
+      `/api/route-distance?pickup=${encodeURIComponent(data.pickupAddress)}&delivery=${encodeURIComponent(data.deliveryAddress)}&_=${Date.now()}`
+    )
+      .then((r) => r.json())
+      .then((json) => {
+        if (cancelled || !json.from || !json.to) return;
+        setRouteGeo({
+          from: json.from,
+          to: json.to,
+          geometry: json.geometry ?? null,
+        });
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [step, data.pickupAddress, data.deliveryAddress, distanceFromRoute, routeGeo]);
 
   const update = (partial: Partial<OrderFormData>) => {
     setData((prev) => ({ ...prev, ...partial }));
@@ -376,8 +413,9 @@ export function OrderForm({ locale }: { locale: string }) {
                 )}
               </div>
               {routeGeo && (
-                <div className="rounded-lg border border-[#0d2137]/15 bg-[#0d2137]/5 p-2">
+                <div className="min-h-[300px] rounded-lg border border-[#0d2137]/15 bg-[#0d2137]/5 p-2">
                   <RouteMap
+                    key={`${routeGeo.from.lat}-${routeGeo.from.lon}-${routeGeo.to.lat}-${routeGeo.to.lon}`}
                     from={routeGeo.from}
                     to={routeGeo.to}
                     geometry={routeGeo.geometry}
