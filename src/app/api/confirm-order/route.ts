@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
+import { calculatePriceCents } from "@/lib/pricing";
+import { getRouteDistanceKm } from "@/lib/route-distance-server";
 import { randomBytes } from "crypto";
+
+const VALID_CARGO = ["XS", "M", "L"] as const;
 
 function generateToken(): string {
   return randomBytes(24).toString("base64url");
@@ -17,8 +21,6 @@ export async function POST(req: Request) {
       deliveryAddress,
       pickupTime,
       cargoSize,
-      distanceKm,
-      priceCents,
     } = body;
 
     if (
@@ -27,15 +29,23 @@ export async function POST(req: Request) {
       !pickupAddress ||
       !deliveryAddress ||
       !cargoSize ||
-      !Number.isFinite(distanceKm) ||
-      !Number.isFinite(priceCents) ||
-      priceCents < 100
+      !VALID_CARGO.includes(cargoSize)
     ) {
       return NextResponse.json(
         { error: "Missing or invalid order fields" },
         { status: 400 }
       );
     }
+
+    const distanceKm = await getRouteDistanceKm(pickupAddress, deliveryAddress);
+    if (distanceKm === null || distanceKm <= 0) {
+      return NextResponse.json(
+        { error: "Could not calculate route distance for the given addresses" },
+        { status: 400 }
+      );
+    }
+
+    const priceCents = calculatePriceCents(distanceKm, cargoSize);
 
     const supabase = createServerSupabase();
     const confirmationToken = generateToken();
