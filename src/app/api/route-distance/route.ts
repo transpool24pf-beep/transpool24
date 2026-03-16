@@ -32,15 +32,22 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Could not geocode one or both addresses" }, { status: 400 });
     }
     const res = await fetch(
-      `${OSRM_URL}/${from.lon},${from.lat};${to.lon},${to.lat}?overview=false`
+      `${OSRM_URL}/${from.lon},${from.lat};${to.lon},${to.lat}?overview=full&geometries=geojson`
     );
     const data = await res.json();
     if (data.code !== "Ok" || !data.routes?.[0]) {
       return NextResponse.json({ error: "Route not found" }, { status: 400 });
     }
-    const distanceMeters = data.routes[0].distance;
+    const route = data.routes[0];
+    const distanceMeters = route.distance;
     const distanceKm = Math.round((distanceMeters / 1000) * 10) / 10;
-    return NextResponse.json({ distanceKm });
+    const geometry = route.geometry; // GeoJSON LineString
+    return NextResponse.json({
+      distanceKm,
+      from: { lat: from.lat, lon: from.lon },
+      to: { lat: to.lat, lon: to.lon },
+      geometry: geometry ?? null,
+    });
   } catch (e) {
     console.error("[route-distance]", e);
     return NextResponse.json(

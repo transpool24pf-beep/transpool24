@@ -1,10 +1,21 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { calculatePriceCents, formatPrice } from "@/lib/pricing";
 
+const RouteMap = dynamic(
+  () => import("@/components/RouteMapInner").then((m) => m.RouteMapInner),
+  { ssr: false }
+);
+
 type Suggestion = { display_name: string; lat: number; lon: number };
+type RouteGeo = {
+  from: { lat: number; lon: number };
+  to: { lat: number; lon: number };
+  geometry: GeoJSON.LineString | null;
+};
 
 const CARGO_OPTIONS = ["XS", "M", "L"] as const;
 type CargoSize = (typeof CARGO_OPTIONS)[number];
@@ -50,6 +61,7 @@ export function OrderForm({ locale }: { locale: string }) {
   const [distanceLoading, setDistanceLoading] = useState(false);
   const [distanceFromRoute, setDistanceFromRoute] = useState(false);
   const [distanceError, setDistanceError] = useState<string | null>(null);
+  const [routeGeo, setRouteGeo] = useState<RouteGeo | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const priceCents = calculatePriceCents(data.distanceKm, data.cargoSize);
@@ -93,12 +105,23 @@ export function OrderForm({ locale }: { locale: string }) {
       if (res.ok && typeof json.distanceKm === "number" && json.distanceKm > 0) {
         update({ distanceKm: Math.round(json.distanceKm * 10) / 10 });
         setDistanceFromRoute(true);
+        if (json.from && json.to) {
+          setRouteGeo({
+            from: json.from,
+            to: json.to,
+            geometry: json.geometry ?? null,
+          });
+        } else {
+          setRouteGeo(null);
+        }
       } else {
         setDistanceFromRoute(false);
+        setRouteGeo(null);
         setDistanceError(json.error || "Could not calculate route");
       }
     } catch {
       setDistanceFromRoute(false);
+      setRouteGeo(null);
       setDistanceError("Network error");
     } finally {
       setDistanceLoading(false);
@@ -333,24 +356,36 @@ export function OrderForm({ locale }: { locale: string }) {
             </div>
           </div>
           {data.pickupAddress.trim() && data.deliveryAddress.trim() && (
-            <div className="rounded-lg border border-[#0d2137]/15 bg-[#0d2137]/5 p-4">
-              <button
-                type="button"
-                onClick={fetchRealDistance}
-                disabled={distanceLoading}
-                className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-70"
-              >
-                {distanceLoading ? "…" : t("calculateDistance")}
-              </button>
-              {distanceFromRoute && (
-                <p className="mt-2 text-sm font-medium text-green-700">
-                  {t("distanceRouteResult")}: {data.distanceKm} km
-                </p>
+            <>
+              <div className="rounded-lg border border-[#0d2137]/15 bg-[#0d2137]/5 p-4">
+                <button
+                  type="button"
+                  onClick={fetchRealDistance}
+                  disabled={distanceLoading}
+                  className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-70"
+                >
+                  {distanceLoading ? "…" : t("calculateDistance")}
+                </button>
+                {distanceFromRoute && (
+                  <p className="mt-2 text-sm font-medium text-green-700">
+                    {t("distanceRouteResult")}: {data.distanceKm} km
+                  </p>
+                )}
+                {distanceError && !distanceLoading && (
+                  <p className="mt-2 text-sm text-amber-700">{t("distanceManualHint")}</p>
+                )}
+              </div>
+              {routeGeo && (
+                <div className="rounded-lg border border-[#0d2137]/15 bg-[#0d2137]/5 p-2">
+                  <RouteMap
+                    from={routeGeo.from}
+                    to={routeGeo.to}
+                    geometry={routeGeo.geometry}
+                    distanceKm={data.distanceKm}
+                  />
+                </div>
               )}
-              {distanceError && !distanceLoading && (
-                <p className="mt-2 text-sm text-amber-700">{t("distanceManualHint")}</p>
-              )}
-            </div>
+            </>
           )}
         </div>
       )}

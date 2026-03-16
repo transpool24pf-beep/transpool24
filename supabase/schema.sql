@@ -54,21 +54,29 @@ CREATE TABLE IF NOT EXISTS public.driver_documents (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- RLS policies
+-- RLS policies (drop first so script can be re-run safely)
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.jobs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.driver_documents ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Users can insert own profile" ON public.profiles;
 -- Profiles: users can read/update own profile
 CREATE POLICY "Users can view own profile" ON public.profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
 CREATE POLICY "Users can insert own profile" ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users can view own jobs" ON public.jobs;
+DROP POLICY IF EXISTS "Users can insert jobs" ON public.jobs;
+DROP POLICY IF EXISTS "Service role full access" ON public.jobs;
 -- Jobs: customers see own jobs; service role can do everything (for webhook)
 CREATE POLICY "Users can view own jobs" ON public.jobs FOR SELECT USING (auth.uid() = customer_id);
 CREATE POLICY "Users can insert jobs" ON public.jobs FOR INSERT WITH CHECK (true);
 CREATE POLICY "Service role full access" ON public.jobs FOR ALL USING (auth.jwt() ->> 'role' = 'service_role');
 
+DROP POLICY IF EXISTS "Drivers can view own documents" ON public.driver_documents;
+DROP POLICY IF EXISTS "Drivers can insert own documents" ON public.driver_documents;
 -- Driver documents: drivers see own
 CREATE POLICY "Drivers can view own documents" ON public.driver_documents FOR SELECT USING (auth.uid() = driver_id);
 CREATE POLICY "Drivers can insert own documents" ON public.driver_documents FOR INSERT WITH CHECK (auth.uid() = driver_id);
@@ -85,6 +93,9 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS profiles_updated_at ON public.profiles;
+DROP TRIGGER IF EXISTS jobs_updated_at ON public.jobs;
+DROP TRIGGER IF EXISTS driver_documents_updated_at ON public.driver_documents;
 CREATE TRIGGER profiles_updated_at BEFORE UPDATE ON public.profiles FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 CREATE TRIGGER jobs_updated_at BEFORE UPDATE ON public.jobs FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 CREATE TRIGGER driver_documents_updated_at BEFORE UPDATE ON public.driver_documents FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
@@ -99,6 +110,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
