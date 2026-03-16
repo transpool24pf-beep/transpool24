@@ -17,6 +17,7 @@ export type OrderFormData = {
   phone: string;
   pickupAddress: string;
   deliveryAddress: string;
+  pickupDate: string;
   pickupTime: string;
   cargoSize: CargoSize;
   distanceKm: number;
@@ -28,6 +29,7 @@ const initial: OrderFormData = {
   phone: "",
   pickupAddress: "Pforzheim",
   deliveryAddress: "",
+  pickupDate: "",
   pickupTime: "",
   cargoSize: "M",
   distanceKm: DEFAULT_KM,
@@ -129,7 +131,7 @@ export function OrderForm({ locale }: { locale: string }) {
           phone: data.phone,
           pickupAddress: data.pickupAddress,
           deliveryAddress: data.deliveryAddress,
-          pickupTime: data.pickupTime || null,
+          pickupTime: data.pickupDate && data.pickupTime ? `${data.pickupDate}T${data.pickupTime}` : null,
           cargoSize: data.cargoSize,
           distanceKm: data.distanceKm,
           priceCents,
@@ -295,17 +297,30 @@ export function OrderForm({ locale }: { locale: string }) {
               </ul>
             )}
           </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
-              {t("pickupTime")}
-            </label>
-            <input
-              type="datetime-local"
-              value={data.pickupTime}
-              onChange={(e) => update({ pickupTime: e.target.value })}
-              min={new Date().toISOString().slice(0, 16)}
-              className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-            />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
+                {t("pickupDate")}
+              </label>
+              <input
+                type="date"
+                value={data.pickupDate}
+                onChange={(e) => update({ pickupDate: e.target.value })}
+                min={new Date().toISOString().slice(0, 10)}
+                className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
+                {t("pickupTime")}
+              </label>
+              <input
+                type="time"
+                value={data.pickupTime}
+                onChange={(e) => update({ pickupTime: e.target.value })}
+                className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+              />
+            </div>
           </div>
         </div>
       )}
@@ -372,8 +387,8 @@ export function OrderForm({ locale }: { locale: string }) {
             <p><strong>{t("phone")}:</strong> {data.phone}</p>
             <p><strong>{t("pickup")}:</strong> {data.pickupAddress}</p>
             <p><strong>{t("delivery")}:</strong> {data.deliveryAddress}</p>
-            {data.pickupTime && (
-              <p><strong>{t("pickupTime")}:</strong> {new Date(data.pickupTime).toLocaleString()}</p>
+            {(data.pickupDate || data.pickupTime) && (
+              <p><strong>{t("pickupDate")} / {t("pickupTime")}:</strong> {data.pickupDate ? new Date(data.pickupDate).toLocaleDateString() : "—"} {data.pickupTime ? data.pickupTime : ""}</p>
             )}
             <p><strong>{t("cargoSize")}:</strong> {t(`cargo${data.cargoSize}` as "cargoXS")}</p>
             <p><strong>{t("distance")}:</strong> {data.distanceKm} km</p>
