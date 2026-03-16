@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS public.jobs (
   preferred_pickup_at TIMESTAMPTZ,
   cargo_size TEXT NOT NULL CHECK (cargo_size IN ('XS', 'M', 'L')),
   distance_km NUMERIC(10, 2),
+  duration_minutes INTEGER,
   price_cents INTEGER NOT NULL,
   payment_status TEXT NOT NULL DEFAULT 'pending' CHECK (payment_status IN ('pending', 'paid', 'refunded', 'failed')),
   logistics_status TEXT NOT NULL DEFAULT 'draft' CHECK (logistics_status IN ('draft', 'confirmed', 'paid', 'assigned', 'in_transit', 'delivered', 'cancelled')),

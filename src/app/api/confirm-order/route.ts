@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 import { calculatePriceCents } from "@/lib/pricing";
-import { getRouteDistanceKm } from "@/lib/route-distance-server";
+import { getRouteDistanceAndDuration } from "@/lib/route-distance-server";
 import { randomBytes } from "crypto";
 
 const VALID_CARGO = ["XS", "M", "L"] as const;
@@ -37,15 +37,21 @@ export async function POST(req: Request) {
       );
     }
 
-    const distanceKm = await getRouteDistanceKm(pickupAddress, deliveryAddress);
-    if (distanceKm === null || distanceKm <= 0) {
+    const departureTime =
+      pickupTime && !Number.isNaN(Date.parse(pickupTime)) ? new Date(pickupTime) : null;
+    const route = await getRouteDistanceAndDuration(
+      pickupAddress,
+      deliveryAddress,
+      departureTime
+    );
+    if (!route || route.distanceKm <= 0) {
       return NextResponse.json(
         { error: "Could not calculate route distance for the given addresses" },
         { status: 400 }
       );
     }
-
-    const priceCents = calculatePriceCents(distanceKm, cargoSize);
+    const { distanceKm, durationMinutes } = route;
+    const priceCents = calculatePriceCents(distanceKm, cargoSize, durationMinutes);
 
     const supabase = createServerSupabase();
     const confirmationToken = generateToken();
@@ -63,6 +69,7 @@ export async function POST(req: Request) {
         delivery_city: null,
         cargo_size: cargoSize,
         distance_km: distanceKm,
+        duration_minutes: durationMinutes ?? null,
         price_cents: priceCents,
         payment_status: "pending",
         logistics_status: "confirmed",

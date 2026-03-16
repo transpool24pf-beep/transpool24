@@ -44,7 +44,15 @@ Fill in `.env.local` with your Supabase and Stripe keys (see `.env.example`).
 
 If the `jobs` table already existed before adding this feature, run `supabase/add_customer_email.sql` in the SQL Editor once to add the `customer_email` column.
 
-### 6. Run
+### 6. Distance & traffic-aware pricing (optional)
+
+- **Google Maps**: Set `GOOGLE_MAPS_API_KEY` to use the Directions API. When the customer chooses a pickup date/time, the server uses it as `departure_time` for traffic-aware distance and duration. Price then includes a duration-based component (driver hourly rate).
+- **Driver hourly rate**: Set `DRIVER_HOURLY_RATE_CENTS` (e.g. `2500` for 25 EUR/hour). Default is 2500. Used only when duration from Google is available.
+- If `GOOGLE_MAPS_API_KEY` is not set, the app uses OSRM for distance only (no duration, no traffic).
+
+Run `supabase/add_duration_minutes.sql` once if your `jobs` table already exists, to add the `duration_minutes` column.
+
+### 7. Run
 
 ```bash
 npm run dev
@@ -58,11 +66,12 @@ Default UI language: **German**. Language switcher in header: Arabic, English, T
 
 ## Order flow
 
-1. Customer fills the multi-step order form (company, addresses, cargo size XS–XL, phone).
-2. Price is calculated from distance × cargo category.
-3. Customer clicks “Pay now” → Stripe Checkout.
-4. On success, Stripe webhook marks the job as `paid` in Supabase, sends a confirmation email with PDF invoice (Resend), and triggers the admin webhook (if set).
-5. You assign the job manually to drivers in Pforzheim.
+1. Customer fills the multi-step order form (company, email, phone, addresses, pickup date/time, cargo size XS–L).
+2. Distance (and optionally duration with traffic) is calculated server-side; price = distance × cargo rate + duration × driver hourly rate when Google Maps is used.
+3. Customer confirms the order (no payment yet); admin/drivers get notified. Customer receives a link to the confirmation page.
+4. On the confirmation page, customer clicks “Pay now” → Stripe Checkout.
+5. On success, Stripe webhook marks the job as `paid` in Supabase, sends a confirmation email with PDF invoice (Resend), and triggers the admin webhook (if set).
+6. You assign the job manually to drivers in Pforzheim.
 
 ## Project structure
 
