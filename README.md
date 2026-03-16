@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TransPool24
 
-## Getting Started
+Logistics marketplace for **Pforzheim & Region** (Germany). Book transport orders online with pre-payment via Stripe.
 
-First, run the development server:
+## Tech Stack
+
+- **Next.js** (App Router), **Tailwind CSS**
+- **Supabase** (Auth, Database, Storage)
+- **Stripe** (Checkout, Webhooks)
+- **Vercel** (Hosting)
+
+## Setup
+
+### 1. Install & env
+
+```bash
+npm install
+cp .env.example .env.local
+```
+
+Fill in `.env.local` with your Supabase and Stripe keys (see `.env.example`).
+
+### 2. Supabase
+
+- Create a project at [supabase.com](https://supabase.com).
+- In **SQL Editor**, run the contents of `supabase/schema.sql` to create tables and RLS.
+- Create a Storage bucket `driver-documents` if you use driver document uploads.
+- In **Settings → API** copy: Project URL, `anon` key, `service_role` key.
+
+### 3. Stripe
+
+- Create a Stripe account and get **Secret key** and **Publishable key** (test mode for dev).
+- **Webhooks**: add endpoint `https://your-domain.com/api/webhooks/stripe`, event `checkout.session.completed`, copy the **Signing secret** into `STRIPE_WEBHOOK_SECRET`.
+
+### 4. Admin notification (optional)
+
+- Set `ADMIN_WEBHOOK_URL` to a Zapier/Make/WhatsApp webhook URL. On each successful payment, the app sends a POST with order details so you can forward them to your Pforzheim drivers.
+
+### 5. Run
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000); you’ll be redirected to `/de` (default locale).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Languages
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Default UI language: **German**. Language switcher in header: Arabic, English, Turkish, French, Spanish.
 
-## Learn More
+## Order flow
 
-To learn more about Next.js, take a look at the following resources:
+1. Customer fills the multi-step order form (company, addresses, cargo size XS–XL, phone).
+2. Price is calculated from distance × cargo category.
+3. Customer clicks “Pay now” → Stripe Checkout.
+4. On success, Stripe webhook marks the job as `paid` in Supabase and triggers the admin webhook (if set).
+5. You assign the job manually to drivers in Pforzheim.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `src/app/[locale]/` – localized pages (home, order, order/success)
+- `src/components/` – Header, Footer, OrderForm
+- `src/app/api/` – create-checkout-session, webhooks/stripe
+- `messages/*.json` – translations (de, en, ar, tr, fr, es)
+- `supabase/schema.sql` – tables: profiles, jobs, driver_documents
 
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Connect the repo, add the same env vars as in `.env.local`, and set `NEXT_PUBLIC_APP_URL` to your production URL. Use that URL in Stripe for the webhook endpoint.

@@ -1,0 +1,54 @@
+{
+  "common": {
+    "language": "Langue",
+    "order": "Réserver une commande",
+    "contact": "Contact",
+    "slogan": "Actifs à Pforzheim – Connectés worldwide"
+  },
+  "home": {
+    "title": "TransPool24 – Votre partenaire logistique à Pforzheim",
+    "subtitle": "Rapide, fiable, transparent. Réservez vos transports en ligne.",
+    "cta": "Réserver une commande",
+    "features": {
+      "title": "Pourquoi TransPool24 ?",
+      "speed": "Traitement rapide",
+      "speedDesc": "Réservation et paiement en quelques minutes.",
+      "trust": "Prix transparents",
+      "trustDesc": "Prix fixe selon distance et taille de chargement.",
+      "local": "Local et connecté",
+      "localDesc": "Enracinés à Pforzheim, connectés à la région."
+    }
+  },
+  "order": {
+    "title": "Réserver un transport",
+    "step1": "Entreprise et contact",
+    "step2": "Adresses",
+    "step3": "Chargement et prix",
+    "step4": "Récapitulatif et paiement",
+    "companyName": "Nom de l'entreprise",
+    "companyNamePlaceholder": "ex. Exemple GmbH",
+    "phone": "Numéro de téléphone",
+    "phonePlaceholder": "+49 123 456789",
+    "pickup": "Adresse de collecte",
+    "pickupPlaceholder": "Pforzheim ou environs",
+    "delivery": "Adresse de livraison",
+    "deliveryPlaceholder": "Rue, code postal, ville",
+    "cargoSize": "Taille du chargement",
+    "cargoXS": "XS – Petits cartons",
+    "cargoM": "M – Jusqu'à 2 palettes",
+    "cargoL": "L – Sprinter/Van (3–5 palettes)",
+    "cargoXL": "XL – Camion avec grue",
+    "distance": "Distance (approx.)",
+    "km": "km",
+    "price": "Prix",
+    "total": "Total",
+    "next": "Suivant",
+    "back": "Retour",
+    "payNow": "Payer maintenant",
+    "success": "Paiement réussi. Votre commande a été enregistrée."
+  },
+  "footer": {
+    "rights": "Tous droits réservés.",
+    "region": "Pforzheim et région"
+  }
+}

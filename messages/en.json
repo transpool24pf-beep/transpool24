@@ -1,0 +1,54 @@
+{
+  "common": {
+    "language": "Language",
+    "order": "Book order",
+    "contact": "Contact",
+    "slogan": "Active in Pforzheim – Globally connected"
+  },
+  "home": {
+    "title": "TransPool24 – Your logistics partner in Pforzheim",
+    "subtitle": "Fast, reliable, transparent. Book transport orders online.",
+    "cta": "Book order now",
+    "features": {
+      "title": "Why TransPool24?",
+      "speed": "Fast processing",
+      "speedDesc": "Booking and payment in minutes.",
+      "trust": "Transparent pricing",
+      "trustDesc": "Fixed price by distance and cargo size.",
+      "local": "Local & connected",
+      "localDesc": "Rooted in Pforzheim, connected to the region."
+    }
+  },
+  "order": {
+    "title": "Book transport order",
+    "step1": "Company & contact",
+    "step2": "Addresses",
+    "step3": "Cargo & price",
+    "step4": "Summary & payment",
+    "companyName": "Company name",
+    "companyNamePlaceholder": "e.g. Example GmbH",
+    "phone": "Phone number",
+    "phonePlaceholder": "+49 123 456789",
+    "pickup": "Pickup address",
+    "pickupPlaceholder": "Pforzheim or surrounding area",
+    "delivery": "Delivery address",
+    "deliveryPlaceholder": "Street, postal code, city",
+    "cargoSize": "Cargo size",
+    "cargoXS": "XS – Small cartons",
+    "cargoM": "M – Up to 2 pallets",
+    "cargoL": "L – Sprinter/Van (3–5 pallets)",
+    "cargoXL": "XL – Truck with crane",
+    "distance": "Distance (approx.)",
+    "km": "km",
+    "price": "Price",
+    "total": "Total",
+    "next": "Next",
+    "back": "Back",
+    "payNow": "Pay now",
+    "success": "Payment successful. Your order has been recorded."
+  },
+  "footer": {
+    "rights": "All rights reserved.",
+    "region": "Pforzheim & Region"
+  }
+}

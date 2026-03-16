@@ -1,0 +1,54 @@
+{
+  "common": {
+    "language": "Dil",
+    "order": "Sipariş ver",
+    "contact": "İletişim",
+    "slogan": "Pforzheim'da aktif – Dünyaya bağlı"
+  },
+  "home": {
+    "title": "TransPool24 – Pforzheim'da lojistik ortağınız",
+    "subtitle": "Hızlı, güvenilir, şeffaf. Taşıma siparişlerini çevrimiçi verin.",
+    "cta": "Şimdi sipariş ver",
+    "features": {
+      "title": "Neden TransPool24?",
+      "speed": "Hızlı işlem",
+      "speedDesc": "Rezervasyon ve ödeme dakikalar içinde.",
+      "trust": "Şeffaf fiyatlar",
+      "trustDesc": "Mesafe ve yük boyutuna göre sabit fiyat.",
+      "local": "Yerel ve bağlı",
+      "localDesc": "Pforzheim'da köklü, bölgeye bağlı."
+    }
+  },
+  "order": {
+    "title": "Taşıma siparişi ver",
+    "step1": "Şirket ve iletişim",
+    "step2": "Adresler",
+    "step3": "Yük ve fiyat",
+    "step4": "Özet ve ödeme",
+    "companyName": "Şirket adı",
+    "companyNamePlaceholder": "örn. Örnek GmbH",
+    "phone": "Telefon numarası",
+    "phonePlaceholder": "+49 123 456789",
+    "pickup": "Alış adresi",
+    "pickupPlaceholder": "Pforzheim veya çevresi",
+    "delivery": "Teslimat adresi",
+    "deliveryPlaceholder": "Sokak, posta kodu, şehir",
+    "cargoSize": "Yük boyutu",
+    "cargoXS": "XS – Küçük koliler",
+    "cargoM": "M – 2 palete kadar",
+    "cargoL": "L – Sprinter/Van (3–5 palet)",
+    "cargoXL": "XL – Vinçli kamyon",
+    "distance": "Mesafe (yaklaşık)",
+    "km": "km",
+    "price": "Fiyat",
+    "total": "Toplam",
+    "next": "İleri",
+    "back": "Geri",
+    "payNow": "Şimdi öde",
+    "success": "Ödeme başarılı. Siparişiniz kaydedildi."
+  },
+  "footer": {
+    "rights": "Tüm hakları saklıdır.",
+    "region": "Pforzheim ve bölge"
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "common": {
+    "language": "Sprache",
+    "order": "Auftrag buchen",
+    "contact": "Kontakt",
+    "slogan": "Aktiv in Pforzheim – Weltweit verbunden"
+  },
+  "home": {
+    "title": "TransPool24 – Ihr Logistikpartner in Pforzheim",
+    "subtitle": "Schnell, zuverlässig, transparent. Transportaufträge einfach online buchen.",
+    "cta": "Jetzt Auftrag buchen",
+    "features": {
+      "title": "Warum TransPool24?",
+      "speed": "Schnelle Abwicklung",
+      "speedDesc": "Buchung und Zahlung in wenigen Minuten.",
+      "trust": "Transparente Preise",
+      "trustDesc": "Festpreis nach Strecke und Ladungsgröße.",
+      "local": "Lokal & vernetzt",
+      "localDesc": "Verwurzelt in Pforzheim, Verbindung in die Region."
+    }
+  },
+  "order": {
+    "title": "Transportauftrag buchen",
+    "step1": "Unternehmen & Kontakt",
+    "step2": "Adressen",
+    "step3": "Ladung & Preis",
+    "step4": "Zusammenfassung & Zahlung",
+    "companyName": "Firmenname",
+    "companyNamePlaceholder": "z. B. Muster GmbH",
+    "phone": "Telefonnummer",
+    "phonePlaceholder": "+49 123 456789",
+    "pickup": "Abholadresse",
+    "pickupPlaceholder": "Pforzheim oder Umgebung",
+    "delivery": "Lieferadresse",
+    "deliveryPlaceholder": "Straße, PLZ, Ort",
+    "cargoSize": "Ladungsgröße",
+    "cargoXS": "XS – Kleine Kartons",
+    "cargoM": "M – Bis 2 Paletten",
+    "cargoL": "L – Sprinter/Van (3–5 Paletten)",
+    "cargoXL": "XL – LKW mit Kran",
+    "distance": "Entfernung (ca.)",
+    "km": "km",
+    "price": "Preis",
+    "total": "Gesamtbetrag",
+    "next": "Weiter",
+    "back": "Zurück",
+    "payNow": "Jetzt bezahlen",
+    "success": "Zahlung erfolgreich. Ihr Auftrag wurde erfasst."
+  },
+  "footer": {
+    "rights": "Alle Rechte vorbehalten.",
+    "region": "Pforzheim & Region"
+  }
+}
