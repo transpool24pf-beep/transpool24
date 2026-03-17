@@ -4,9 +4,14 @@ import { calculatePriceCents } from "@/lib/pricing";
 import { getPricingSettings } from "@/lib/settings";
 import { getRouteDistanceAndDuration } from "@/lib/route-distance-server";
 import { getLoadUnloadMinutes } from "@/lib/cargo";
-import { randomBytes } from "crypto";
+import { randomBytes, randomInt } from "crypto";
 
 const VALID_CARGO = ["XS", "M", "L"] as const;
+
+/** 6-digit order number for display (e.g. 568364) */
+function generateOrderNumber(): number {
+  return randomInt(100000, 1000000);
+}
 const VALID_SERVICE_TYPES = ["driver_only", "driver_car", "driver_car_assistant"] as const;
 
 function generateToken(): string {
@@ -85,11 +90,18 @@ export async function POST(req: Request) {
 
     const supabase = createServerSupabase();
     const confirmationToken = generateToken();
+    let orderNumber = generateOrderNumber();
+    const maxAttempts = 5;
+    let attempt = 0;
+    let job: { id: string } | null = null;
+    let insertError: unknown = null;
 
-    const { data: job, error: insertError } = await supabase
-      .from("jobs")
-      .insert({
-        company_name: companyName,
+    while (attempt < maxAttempts) {
+      const { data, error } = await supabase
+        .from("jobs")
+        .insert({
+          order_number: orderNumber,
+          company_name: companyName,
         phone,
         customer_email: email || null,
         preferred_pickup_at: pickupTime || null,
@@ -116,9 +128,20 @@ export async function POST(req: Request) {
         payment_status: "pending",
         logistics_status: "confirmed",
         confirmation_token: confirmationToken,
-      })
-      .select("id")
-      .single();
+        })
+        .select("id")
+        .single();
+      job = data;
+      insertError = error;
+      if (!error && data) break;
+      const isUniqueViolation = (error as { code?: string })?.code === "23505";
+      if (error && isUniqueViolation && attempt < maxAttempts - 1) {
+        orderNumber = generateOrderNumber();
+        attempt++;
+        continue;
+      }
+      break;
+    }
 
     if (insertError || !job) {
       console.error("[confirm-order] Supabase insert error:", insertError);

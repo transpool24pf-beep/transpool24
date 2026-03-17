@@ -15,6 +15,11 @@ export function Footer() {
         <p className="mt-2 text-center text-xs text-[var(--foreground)]/60">
           © {new Date().getFullYear()} TransPool24. {t("rights")}
         </p>
+        <p className="mt-1 text-center text-xs text-[var(--foreground)]/70">
+          <a href="https://www.transpool24.com" target="_blank" rel="noopener noreferrer" className="hover:underline">
+            www.transpool24.com
+          </a>
+        </p>
       </div>
     </footer>
   );

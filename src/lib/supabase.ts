@@ -28,6 +28,7 @@ export function createServerSupabase(): SupabaseClient {
 
 export type Job = {
   id: string;
+  order_number: number | null;
   customer_id: string | null;
   company_name: string;
   pickup_address: string;

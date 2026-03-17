@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 -- Jobs: transport orders
 CREATE TABLE IF NOT EXISTS public.jobs (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  order_number INTEGER UNIQUE,
   customer_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
   company_name TEXT NOT NULL,
   pickup_address TEXT NOT NULL,

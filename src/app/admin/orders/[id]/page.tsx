@@ -5,6 +5,7 @@ import Link from "next/link";
 
 type Job = {
   id: string;
+  order_number: number | null;
   company_name: string;
   phone: string;
   customer_email: string | null;
@@ -28,10 +29,11 @@ function buildWhatsAppMessage(o: Job): string {
   const driverPriceEur = o.driver_price_cents != null
     ? (o.driver_price_cents / 100).toFixed(2)
     : DRIVER_INVOICE_DEFAULT_EUR.toFixed(2);
+  const orderRef = o.order_number != null ? String(o.order_number) : o.id;
   const lines = [
     "🚚 TransPool24 – طلب للنقل",
     "",
-    `📋 رقم الطلب: ${o.id}`,
+    `📋 رقم الطلب: ${orderRef}`,
     `📞 الهاتف: ${o.phone}`,
     "",
     "📍 الاستلام:",
@@ -142,7 +144,7 @@ export default function AdminOrderDetailPage({
           <dl className="space-y-3 text-sm">
             <div>
               <dt className="text-[#0d2137]/60">رقم الطلب</dt>
-              <dd className="font-mono text-[#0d2137]">{order.id}</dd>
+              <dd className="font-mono font-semibold text-[#0d2137]">{order.order_number ?? order.id}</dd>
             </div>
             <div>
               <dt className="text-[#0d2137]/60">التاريخ</dt>

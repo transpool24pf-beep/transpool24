@@ -5,6 +5,7 @@ import Link from "next/link";
 
 type Job = {
   id: string;
+  order_number: number | null;
   company_name: string;
   phone: string;
   customer_email: string | null;
@@ -36,10 +37,11 @@ const DRIVER_INVOICE_DEFAULT_EUR = 18;
 /** رسالة واتساب للمجموعة: عنوان + السعر الذي يحدده الأدمن فقط (بدون رابط تأكيد أو سعر عميل) */
 function buildWhatsAppMessage(o: Job): string {
   const driverPrice = o.driver_price_cents != null ? (o.driver_price_cents / 100).toFixed(2) : DRIVER_INVOICE_DEFAULT_EUR.toFixed(2);
+  const orderRef = o.order_number != null ? String(o.order_number) : o.id;
   const lines = [
     "🚚 TransPool24 – طلب للنقل",
     "",
-    `📋 رقم الطلب: ${o.id}`,
+    `📋 رقم الطلب: ${orderRef}`,
     `📞 الهاتف: ${o.phone}`,
     "",
     "📍 الاستلام:",
@@ -60,6 +62,7 @@ function matchSearch(o: Job, q: string): boolean {
   const statusLabel = STATUS_CONFIG[o.logistics_status]?.label ?? "";
   return (
     str(o.id).includes(s) ||
+    (o.order_number != null && str(o.order_number).includes(s)) ||
     str(o.company_name).includes(s) ||
     str(o.phone).includes(s) ||
     str(o.customer_email).includes(s) ||
@@ -190,15 +193,16 @@ export default function AdminOrdersPage() {
             <table className="w-full table-fixed text-left text-sm">
               <thead>
                 <tr className="border-b-2 border-[#0d2137]/10 bg-gradient-to-r from-[#0d2137]/10 to-[#0d2137]/5">
-                  <th className="w-[10%] px-2 py-3 font-semibold text-[#0d2137]">الحالة</th>
-                  <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">التاريخ</th>
+                  <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">رقم الطلب</th>
+                  <th className="w-[9%] px-2 py-3 font-semibold text-[#0d2137]">الحالة</th>
+                  <th className="w-[6%] px-2 py-3 font-semibold text-[#0d2137]">التاريخ</th>
                   <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">الشركة</th>
-                  <th className="w-[12%] px-2 py-3 font-semibold text-[#0d2137]">البريد</th>
-                  <th className="w-[18%] px-2 py-3 font-semibold text-[#0d2137]">الطريق</th>
-                  <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">سعر العميل</th>
-                  <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">سعر السائق</th>
-                  <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">الدفع</th>
-                  <th className="w-[22%] px-2 py-3 font-semibold text-[#0d2137]">إجراءات</th>
+                  <th className="w-[11%] px-2 py-3 font-semibold text-[#0d2137]">البريد</th>
+                  <th className="w-[16%] px-2 py-3 font-semibold text-[#0d2137]">الطريق</th>
+                  <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">سعر العميل</th>
+                  <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">سعر السائق</th>
+                  <th className="w-[6%] px-2 py-3 font-semibold text-[#0d2137]">الدفع</th>
+                  <th className="w-[19%] px-2 py-3 font-semibold text-[#0d2137]">إجراءات</th>
                 </tr>
               </thead>
               <tbody>
@@ -211,6 +215,9 @@ export default function AdminOrdersPage() {
                         idx % 2 === 1 ? "bg-[#0d2137]/[0.02]" : ""
                       }`}
                     >
+                      <td className="min-w-0 px-2 py-2 font-mono text-xs font-semibold text-[#0d2137]">
+                        {o.order_number ?? o.id.slice(0, 8)}
+                      </td>
                       <td className="min-w-0 px-2 py-2">
                         <div className="flex items-center gap-1">
                           <span
@@ -270,7 +277,7 @@ export default function AdminOrdersPage() {
                         </span>
                       </td>
                       <td className="min-w-0 px-2 py-2">
-                        <div className="flex flex-wrap gap-1.5">
+                        <div className="flex flex-row flex-wrap items-center gap-1.5">
                           <Link
                             href={`/admin/orders/${o.id}`}
                             className="inline-flex items-center justify-center rounded-lg bg-[#0d2137] px-2 py-1.5 text-[10px] font-medium text-white hover:bg-[#0d2137]/90"

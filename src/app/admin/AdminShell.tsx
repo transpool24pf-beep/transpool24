@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -63,12 +64,26 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <Link href="/admin/orders" className="text-lg font-semibold tracking-tight">
             TransPool24 – إدارة
           </Link>
+          <div className="relative h-10 w-32 shrink-0">
+            <Image
+              src="/logo.png"
+              alt="TransPool24"
+              fill
+              className="object-contain object-right"
+              priority
+            />
+          </div>
         </div>
       </header>
-      <main className="min-h-screen flex-1 pt-14">
-        <div className={`mx-auto px-4 py-8 ${pathname === "/admin/orders" ? "max-w-[98%] xl:max-w-7xl" : "max-w-4xl"}`}>
+      <main className="flex min-h-screen flex-1 flex-col pt-14">
+        <div className={`mx-auto flex-1 px-4 py-8 ${pathname === "/admin/orders" ? "max-w-[98%] xl:max-w-7xl" : "max-w-4xl"}`}>
           {children}
         </div>
+        <footer className="border-t border-[#0d2137]/10 bg-white py-2 text-center text-xs text-[#0d2137]/60">
+          <a href="https://www.transpool24.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#0d2137]">
+            www.transpool24.com
+          </a>
+        </footer>
       </main>
       <aside className="sticky top-14 h-[calc(100vh-3.5rem)] w-56 shrink-0 border-l border-[#0d2137]/10 bg-white shadow-sm">
         <nav className="flex flex-col gap-1 p-4">
