@@ -22,14 +22,22 @@ export async function GET(req: Request) {
   if (error || !job) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
   }
-  const pdf = await generateInvoicePdf(job, { type });
-  const filename = type === "driver"
-    ? `TransPool24-Gruppe-${String(jobId).slice(0, 8)}.pdf`
-    : `TransPool24-Rechnung-${String(jobId).slice(0, 8)}.pdf`;
-  return new NextResponse(Buffer.from(pdf), {
-    headers: {
-      "Content-Type": "application/pdf",
-      "Content-Disposition": `attachment; filename="${filename}"`,
-    },
-  });
+  try {
+    const pdf = await generateInvoicePdf(job, { type });
+    const filename = type === "driver"
+      ? `TransPool24-Gruppe-${String(jobId).slice(0, 8)}.pdf`
+      : `TransPool24-Rechnung-${String(jobId).slice(0, 8)}.pdf`;
+    return new NextResponse(Buffer.from(pdf), {
+      headers: {
+        "Content-Type": "application/pdf",
+        "Content-Disposition": `attachment; filename="${filename}"`,
+      },
+    });
+  } catch (e) {
+    console.error("[admin/invoice] generateInvoicePdf failed:", e);
+    return NextResponse.json(
+      { error: "Invoice generation failed" },
+      { status: 500 }
+    );
+  }
 }

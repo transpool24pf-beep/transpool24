@@ -132,9 +132,9 @@ export async function generateInvoicePdf(
   const assistantCents = 1630; // 16.30 EUR
   const hasAssistant = job.service_type === "driver_car_assistant";
   if (type === "driver") {
-    drawText(`Fahrerpreis / سعر السائق: € ${(amountCents / 100).toFixed(2)}`);
+    drawText(`Fahrerpreis: € ${(amountCents / 100).toFixed(2)}`);
     if (hasAssistant) {
-      drawText(`Helferpreis / سعر المعاون: € ${(assistantCents / 100).toFixed(2)}`);
+      drawText(`Helferpreis: € ${(assistantCents / 100).toFixed(2)}`);
     }
     y -= 8;
   }
