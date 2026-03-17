@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
-import { calculatePriceCents, formatPrice } from "@/lib/pricing";
+import { calculatePriceCents, formatPrice, type ServiceType } from "@/lib/pricing";
 
 const RouteMap = dynamic(
   () => import("@/components/RouteMapInner").then((m) => m.RouteMapInner),
@@ -27,6 +27,12 @@ type RouteGeo = {
 const CARGO_OPTIONS = ["XS", "M", "L"] as const;
 type CargoSize = (typeof CARGO_OPTIONS)[number];
 
+const SERVICE_OPTIONS: { value: ServiceType; key: "serviceDriverOnly" | "serviceDriverCar" | "serviceDriverCarAssistant" }[] = [
+  { value: "driver_only", key: "serviceDriverOnly" },
+  { value: "driver_car", key: "serviceDriverCar" },
+  { value: "driver_car_assistant", key: "serviceDriverCarAssistant" },
+];
+
 const DEFAULT_KM = 50;
 
 export type OrderFormData = {
@@ -38,6 +44,7 @@ export type OrderFormData = {
   pickupDate: string;
   pickupTime: string;
   cargoSize: CargoSize;
+  serviceType: ServiceType | "";
   distanceKm: number;
 };
 
@@ -50,6 +57,7 @@ const initial: OrderFormData = {
   pickupDate: "",
   pickupTime: "",
   cargoSize: "M",
+  serviceType: "",
   distanceKm: DEFAULT_KM,
 };
 
@@ -71,7 +79,15 @@ export function OrderForm({ locale }: { locale: string }) {
   const [routeGeo, setRouteGeo] = useState<RouteGeo | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const priceCents = calculatePriceCents(data.distanceKm, data.cargoSize);
+  const estimatedDurationMinutes =
+    data.serviceType === "driver_only" ? (data.distanceKm / 50) * 60 : null;
+  const priceCents = calculatePriceCents(
+    data.distanceKm,
+    data.cargoSize,
+    estimatedDurationMinutes,
+    null,
+    data.serviceType || "driver_car"
+  );
 
   const fetchSuggestions = useCallback((query: string, setter: (s: Suggestion[]) => void) => {
     if (query.length < 3) {
@@ -203,6 +219,7 @@ export function OrderForm({ locale }: { locale: string }) {
           deliveryAddress: data.deliveryAddress,
           pickupTime: data.pickupDate && data.pickupTime ? `${data.pickupDate}T${data.pickupTime}` : null,
           cargoSize: data.cargoSize,
+          serviceType: data.serviceType || "driver_car",
           distanceKm: data.distanceKm,
           priceCents,
         }),
@@ -434,6 +451,37 @@ export function OrderForm({ locale }: { locale: string }) {
             {t("step3")}
           </h2>
           <div>
+            <label className="mb-2 block text-sm font-medium text-[var(--foreground)]">
+              {t("serviceType")}
+            </label>
+            <div className="space-y-2">
+              {SERVICE_OPTIONS.map(({ value, key }) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => update({ serviceType: value })}
+                  className={`flex w-full items-center gap-3 rounded-lg border-2 px-4 py-3 text-left transition ${
+                    data.serviceType === value
+                      ? "border-[var(--accent)] bg-[var(--accent)]/10 text-[var(--accent)]"
+                      : "border-[#0d2137]/20 text-[var(--foreground)] hover:border-[#0d2137]/40"
+                  }`}
+                >
+                  <span
+                    className={`h-5 w-5 shrink-0 rounded-full border-2 ${
+                      data.serviceType === value
+                        ? "border-[var(--accent)] bg-[var(--accent)]"
+                        : "border-[#0d2137]/40"
+                    }`}
+                  />
+                  <span className="font-medium">{t(key)}</span>
+                </button>
+              ))}
+            </div>
+            {!data.serviceType && (
+              <p className="mt-1 text-sm text-amber-700">{t("serviceTypeRequired")}</p>
+            )}
+          </div>
+          <div>
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
               {t("cargoSize")}
             </label>
@@ -500,6 +548,7 @@ export function OrderForm({ locale }: { locale: string }) {
             {(data.pickupDate || data.pickupTime) && (
               <p><strong>{t("pickupDate")} / {t("pickupTime")}:</strong> {data.pickupDate ? new Date(data.pickupDate).toLocaleDateString() : "—"} {data.pickupTime ? data.pickupTime : ""}</p>
             )}
+            <p><strong>{t("serviceType")}:</strong> {data.serviceType ? t(SERVICE_OPTIONS.find((o) => o.value === data.serviceType)?.key ?? "serviceDriverCar") : "—"}</p>
             <p><strong>{t("cargoSize")}:</strong> {t(`cargo${data.cargoSize}` as "cargoXS")}</p>
             <p><strong>{t("distance")}:</strong> {data.distanceKm} km</p>
             <p className="pt-2 text-lg font-bold text-[var(--accent)]">
@@ -567,8 +616,8 @@ export function OrderForm({ locale }: { locale: string }) {
             <button
               type="button"
               onClick={next}
-              disabled={distanceLoading}
-              className="rounded-lg bg-[var(--accent)] px-6 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-70"
+              disabled={distanceLoading || (step === 3 && !data.serviceType)}
+              className="rounded-lg bg-[var(--accent)] px-6 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {distanceLoading ? "…" : t("next")}
             </button>

@@ -12,14 +12,33 @@ const DEFAULT_DRIVER_HOURLY_RATE_CENTS =
 export type PricingOptions = {
   price_per_km_cents?: Record<string, number>;
   driver_hourly_rate_cents?: number;
+  driver_only_hourly_cents?: number;
+  assistant_fee_cents?: number;
 };
+
+export type ServiceType = "driver_only" | "driver_car" | "driver_car_assistant";
+
+const DEFAULT_DRIVER_ONLY_HOURLY_CENTS = 4500; // 45 EUR/h
+const DEFAULT_ASSISTANT_FEE_CENTS = 1630;     // 16.30 EUR
 
 export function calculatePriceCents(
   distanceKm: number,
   cargoSize: "XS" | "M" | "L",
   durationMinutes?: number | null,
-  options?: PricingOptions | null
+  options?: PricingOptions | null,
+  serviceType: ServiceType = "driver_car"
 ): number {
+  const driverOnlyHourly = options?.driver_only_hourly_cents ?? DEFAULT_DRIVER_ONLY_HOURLY_CENTS;
+  const assistantFee = options?.assistant_fee_cents ?? DEFAULT_ASSISTANT_FEE_CENTS;
+
+  if (serviceType === "driver_only") {
+    const duration = durationMinutes != null && durationMinutes > 0
+      ? durationMinutes
+      : (distanceKm / 50) * 60;
+    const total = Math.round((duration / 60) * driverOnlyHourly);
+    return Math.max(total, 1000);
+  }
+
   const perKmMap = options?.price_per_km_cents ?? DEFAULT_PRICE_PER_KM_CENTS;
   const hourlyRate = options?.driver_hourly_rate_cents ?? DEFAULT_DRIVER_HOURLY_RATE_CENTS;
   const perKm = perKmMap[cargoSize] ?? 100;
@@ -27,7 +46,10 @@ export function calculatePriceCents(
   if (durationMinutes != null && durationMinutes > 0) {
     total += Math.round((durationMinutes / 60) * hourlyRate);
   }
-  return Math.max(total, 1000); // minimum 10 EUR
+  if (serviceType === "driver_car_assistant") {
+    total += assistantFee;
+  }
+  return Math.max(total, 1000);
 }
 
 export function formatPrice(cents: number): string {

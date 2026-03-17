@@ -6,6 +6,7 @@ import { getRouteDistanceAndDuration } from "@/lib/route-distance-server";
 import { randomBytes } from "crypto";
 
 const VALID_CARGO = ["XS", "M", "L"] as const;
+const VALID_SERVICE_TYPES = ["driver_only", "driver_car", "driver_car_assistant"] as const;
 
 function generateToken(): string {
   return randomBytes(24).toString("base64url");
@@ -22,6 +23,7 @@ export async function POST(req: Request) {
       deliveryAddress,
       pickupTime,
       cargoSize,
+      serviceType = "driver_car",
     } = body;
 
     if (
@@ -52,11 +54,16 @@ export async function POST(req: Request) {
       );
     }
     const { distanceKm, durationMinutes } = route;
+    const st = VALID_SERVICE_TYPES.includes(serviceType as (typeof VALID_SERVICE_TYPES)[number])
+      ? (serviceType as (typeof VALID_SERVICE_TYPES)[number])
+      : "driver_car";
     const pricing = await getPricingSettings();
-    const priceCents = calculatePriceCents(distanceKm, cargoSize, durationMinutes, {
+    const priceCents = calculatePriceCents(distanceKm, cargoSize, durationMinutes ?? null, {
       price_per_km_cents: pricing.price_per_km_cents,
       driver_hourly_rate_cents: pricing.driver_hourly_rate_cents,
-    });
+      driver_only_hourly_cents: pricing.driver_only_hourly_cents,
+      assistant_fee_cents: pricing.assistant_fee_cents,
+    }, st);
 
     const supabase = createServerSupabase();
     const confirmationToken = generateToken();
@@ -73,6 +80,7 @@ export async function POST(req: Request) {
         delivery_address: deliveryAddress,
         delivery_city: null,
         cargo_size: cargoSize,
+        service_type: st,
         distance_km: distanceKm,
         duration_minutes: durationMinutes ?? null,
         price_cents: priceCents,

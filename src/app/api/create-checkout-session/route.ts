@@ -62,11 +62,14 @@ export async function POST(req: Request) {
           { status: 400 }
         );
       }
+      const serviceType = ["driver_only", "driver_car", "driver_car_assistant"].includes(body.serviceType) ? body.serviceType : "driver_car";
       const pricing = await getPricingSettings();
       const priceCents = calculatePriceCents(distanceKm, cargoSize, null, {
         price_per_km_cents: pricing.price_per_km_cents,
         driver_hourly_rate_cents: pricing.driver_hourly_rate_cents,
-      });
+        driver_only_hourly_cents: pricing.driver_only_hourly_cents,
+        assistant_fee_cents: pricing.assistant_fee_cents,
+      }, serviceType);
       const { data, error: insertError } = await supabase
         .from("jobs")
         .insert({
@@ -77,6 +80,7 @@ export async function POST(req: Request) {
           delivery_address: deliveryAddress,
           delivery_city: null,
           cargo_size: cargoSize,
+          service_type: serviceType,
           distance_km: distanceKm,
           price_cents: priceCents,
           payment_status: "pending",
