@@ -57,33 +57,42 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#f0f2f5]">
-      <header className="border-b border-[#0d2137]/10 bg-[#0d2137] px-4 py-3 text-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <Link href="/admin/orders" className="font-semibold">
-            TransPool24 – Admin
+    <div className="flex min-h-screen bg-[#e8eaed]">
+      <header className="fixed left-0 right-0 top-0 z-10 border-b border-[#0d2137]/10 bg-[#0d2137] px-4 py-3 text-white shadow-sm">
+        <div className="flex items-center justify-between">
+          <Link href="/admin/orders" className="text-lg font-semibold tracking-tight">
+            TransPool24 – إدارة
           </Link>
-          <nav className="flex gap-4">
-            {NAV.map(({ href, label }) => (
-              <Link
-                key={href}
-                href={href}
-                className={`text-sm ${pathname === href ? "underline" : "opacity-90 hover:opacity-100"}`}
-              >
-                {label}
-              </Link>
-            ))}
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="text-sm opacity-80 hover:opacity-100"
-            >
-              Logout
-            </button>
-          </nav>
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
+      <main className="min-h-screen flex-1 pt-14">
+        <div className="mx-auto max-w-4xl px-4 py-8">{children}</div>
+      </main>
+      <aside className="sticky top-14 h-[calc(100vh-3.5rem)] w-56 shrink-0 border-l border-[#0d2137]/10 bg-white shadow-sm">
+        <nav className="flex flex-col gap-1 p-4">
+          {NAV.map(({ href, label }) => (
+            <Link
+              key={href}
+              href={href}
+              className={`rounded-lg px-4 py-3 text-sm font-medium transition ${
+                pathname === href
+                  ? "bg-[#0d2137] text-white"
+                  : "text-[#0d2137]/80 hover:bg-[#0d2137]/5 hover:text-[#0d2137]"
+              }`}
+            >
+              {label}
+            </Link>
+          ))}
+          <div className="my-2 border-t border-[#0d2137]/10" />
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="rounded-lg px-4 py-3 text-left text-sm font-medium text-[#0d2137]/70 hover:bg-red-50 hover:text-red-700"
+          >
+            تسجيل الخروج
+          </button>
+        </nav>
+      </aside>
     </div>
   );
 }

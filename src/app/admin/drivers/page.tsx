@@ -53,15 +53,17 @@ export default function AdminDriversPage() {
 
   return (
     <div>
-      <h1 className="mb-4 text-2xl font-semibold text-[#0d2137]">Drivers / السائقين</h1>
+      <h1 className="mb-6 text-2xl font-semibold text-[#0d2137]">السائقين / Drivers</h1>
       {loading ? (
-        <p className="text-[#0d2137]/70">Loading…</p>
+        <div className="rounded-xl bg-white p-8 shadow-sm">
+          <p className="text-[#0d2137]/70">جاري التحميل…</p>
+        </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-4">
           {drivers.map((d) => (
             <div
               key={d.id}
-              className="rounded-lg border border-[#0d2137]/15 bg-white p-4 shadow-sm"
+              className="rounded-xl border border-[#0d2137]/10 bg-white p-5 shadow-sm"
             >
               <div className="flex flex-wrap items-start gap-4">
                 {d.avatar_url ? (
@@ -102,7 +104,7 @@ export default function AdminDriversPage() {
               </div>
               <div className="mt-4 border-t border-[#0d2137]/10 pt-4">
                 <p className="mb-2 text-sm font-medium text-[#0d2137]/80">
-                  Documents / الأوراق
+                  الأوراق / Documents
                 </p>
                 {d.documents.length === 0 ? (
                   <p className="text-sm text-[#0d2137]/60">No documents</p>

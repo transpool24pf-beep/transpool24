@@ -83,14 +83,14 @@ export default function AdminOrdersPage() {
 
   return (
     <div>
-      <h1 className="mb-4 text-2xl font-semibold text-[#0d2137]">Orders / الطلبات</h1>
+      <h1 className="mb-6 text-2xl font-semibold text-[#0d2137]">الطلبات / Orders</h1>
       <div className="mb-4 flex gap-2">
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm"
+          className="rounded-lg border border-[#0d2137]/20 bg-white px-4 py-2 text-sm focus:border-[var(--accent)] focus:outline-none"
         >
-          <option value="">All statuses</option>
+          <option value="">كل الحالات</option>
           {Object.entries(STATUS_LABELS).map(([value, label]) => (
             <option key={value} value={value}>
               {label}
@@ -99,9 +99,11 @@ export default function AdminOrdersPage() {
         </select>
       </div>
       {loading ? (
-        <p className="text-[#0d2137]/70">Loading…</p>
+        <div className="rounded-xl bg-white p-8 shadow-sm">
+          <p className="text-[#0d2137]/70">جاري التحميل…</p>
+        </div>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-[#0d2137]/15 bg-white shadow">
+        <div className="overflow-x-auto rounded-xl border border-[#0d2137]/10 bg-white shadow-sm">
           <table className="w-full min-w-[800px] text-left text-sm">
             <thead className="border-b bg-[#0d2137]/5">
               <tr>
