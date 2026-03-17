@@ -127,9 +127,22 @@ export async function generateInvoicePdf(
         : "Fahrer + Auto";
   drawText(`Service: ${st}`);
   drawText(`Distanz / Distance: ${job.distance_km ?? "-"} km`);
-  y -= 16;
+  y -= 12;
 
-  const totalEur = (amountCents / 100).toFixed(2);
+  const assistantCents = 1630; // 16.30 EUR
+  const hasAssistant = job.service_type === "driver_car_assistant";
+  if (type === "driver") {
+    drawText(`Fahrerpreis / سعر السائق: € ${(amountCents / 100).toFixed(2)}`);
+    if (hasAssistant) {
+      drawText(`Helferpreis / سعر المعاون: € ${(assistantCents / 100).toFixed(2)}`);
+    }
+    y -= 8;
+  }
+
+  const totalCents = type === "driver" && hasAssistant
+    ? amountCents + assistantCents
+    : amountCents;
+  const totalEur = (totalCents / 100).toFixed(2);
   drawText(`Gesamtbetrag / Total: € ${totalEur}`, { size: 12, bold: true });
   y -= 24;
 

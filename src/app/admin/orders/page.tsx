@@ -58,9 +58,29 @@ function cargoVolumeStr(cd: Record<string, unknown> | null): string | null {
   return null;
 }
 
-/** رسالة واتساب للمجموعة: كل المعلومات ما عدا السعر، بأيقونات وسطر فارغ بين الأقسام */
+const IC = {
+  megaphone: "\u{1F4E2}",
+  clipboard: "\u{1F4CB}",
+  phone: "\u{1F4DE}",
+  clock: "\u{1F556}",
+  calendar: "\u{1F4C5}",
+  ruler: "\u{1F4CF}",
+  truck: "\u{1F69A}",
+  package: "\u{1F4E6}",
+  scale: "\u2696\uFE0F",
+  lorry: "\u{1F69B}",
+  building: "\u{1F3E2}",
+  pin: "\u{1F4CD}",
+  money: "\u{1F4B0}",
+  worker: "\u{1F477}",
+};
+
+/** رسالة واتساب للمجموعة: كل المعلومات مع سعر السائق وسعر المعاون إن وجد، بأيقونات وسطر فارغ */
 function buildWhatsAppMessage(o: Job): string {
   const orderRef = o.order_number != null ? String(o.order_number) : o.id;
+  const driverEur = getDriverPriceEur(o);
+  const assistantEur = "16.30";
+  const hasAssistant = o.service_type === "driver_car_assistant";
   const timeStr = o.preferred_pickup_at
     ? new Date(o.preferred_pickup_at).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })
     : null;
@@ -76,28 +96,31 @@ function buildWhatsAppMessage(o: Job): string {
   const volumeStr = cargoVolumeStr(o.cargo_details);
   const serviceLabel = serviceTypeLabelAr(o.service_type);
   const blocks: string[] = [
-    "📣 TransPool24 – طلب للنقل",
+    `${IC.megaphone} TransPool24 – طلب للنقل`,
     "",
-    `📋 رقم الطلب: ${orderRef}`,
+    `${IC.clipboard} رقم الطلب: ${orderRef}`,
     "",
-    `📞 الهاتف: ${o.phone}`,
+    `${IC.phone} الهاتف: ${o.phone}`,
     "",
-    ...(timeStr ? [`🕖 وقت (للحضور): ${timeStr}`] : []),
-    ...(dateStr ? [`📅 التاريخ: ${dateStr}`] : []),
+    ...(timeStr ? [`${IC.clock} وقت (للحضور): ${timeStr}`] : []),
+    ...(dateStr ? [`${IC.calendar} التاريخ: ${dateStr}`] : []),
     ...(timeStr || dateStr ? [""] : []),
-    `📏 المسافة: ${distanceStr}`,
+    `${IC.ruler} المسافة: ${distanceStr}`,
     "",
-    `🚚 الحمولة: ${o.cargo_size}`,
-    ...(volumeStr ? [`📦 حجم البضاعة: ${volumeStr}`] : []),
-    ...(weightKg != null ? [`⚖️ الوزن: ${weightKg} kg`] : []),
-    `🚛 نوع النقل: ${serviceLabel}`,
-    `🏢 الشركة: ${o.company_name}`,
+    `${IC.truck} الحمولة: ${o.cargo_size}`,
+    ...(volumeStr ? [`${IC.package} حجم البضاعة: ${volumeStr}`] : []),
+    ...(weightKg != null ? [`${IC.scale} الوزن: ${weightKg} kg`] : []),
+    `${IC.lorry} نوع النقل: ${serviceLabel}`,
+    `${IC.building} الشركة: ${o.company_name}`,
     "",
-    "📍 الاستلام:",
+    `${IC.pin} الاستلام:`,
     o.pickup_address,
     "",
-    "📍 التسليم:",
+    `${IC.pin} التسليم:`,
     o.delivery_address,
+    "",
+    `${IC.money} سعر السائق: ${driverEur} EUR`,
+    ...(hasAssistant ? [`${IC.worker} سعر المعاون: ${assistantEur} EUR`] : []),
   ];
   return blocks.join("\n");
 }
