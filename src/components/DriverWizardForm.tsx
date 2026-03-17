@@ -253,7 +253,12 @@ export function DriverWizardForm({
     }
   };
 
-  const stepLabels = [t("step1Name"), t("step2Name"), t("step3Name"), t("step4Name")];
+  const stepLabels = [
+    t("step1Name"),
+    t("step2Name"),
+    t("step3Name"),
+    t("step4Name"),
+  ];
 
   if (step === 5) {
     return (
@@ -270,16 +275,16 @@ export function DriverWizardForm({
 
   return (
     <div className="space-y-8">
-      {/* Step indicator: names + icons + animated connecting line */}
-      <div className="rounded-2xl border border-[#0d2137]/10 bg-[#f8f9fa] px-4 py-5">
-        <div className="flex items-center justify-between gap-0">
+      {/* Step indicator: icons + names + animated connecting line */}
+      <div className="rounded-2xl border-2 border-[#0d2137]/10 bg-white px-4 py-6 shadow-sm">
+        <div className="flex items-stretch gap-0">
           {stepLabels.map((name, i) => (
-            <div key={i} className="flex flex-1 items-center last:flex-none">
-              <div className="flex flex-col items-center">
+            <div key={i} className="flex flex-1 items-center min-w-0">
+              <div className="flex flex-col items-center w-full">
                 <div
-                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-xl transition-all duration-300 ${
+                  className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-2xl transition-all duration-300 ${
                     i + 1 === step
-                      ? "bg-[var(--accent)] text-white ring-4 ring-[var(--accent)]/20"
+                      ? "bg-[var(--accent)] text-white ring-4 ring-[var(--accent)]/30 scale-105"
                       : i + 1 < step
                         ? "bg-emerald-100 text-emerald-700"
                         : "bg-[#0d2137]/10 text-[#0d2137]/50"
@@ -288,16 +293,17 @@ export function DriverWizardForm({
                   {STEP_ICONS[i]}
                 </div>
                 <span
-                  className={`mt-2 max-w-[4.5rem] text-center text-xs font-medium ${
+                  className={`mt-2 text-center text-xs font-semibold leading-tight min-h-[2rem] flex items-center justify-center ${
                     i + 1 === step ? "text-[#0d2137]" : "text-[#0d2137]/70"
                   }`}
+                  style={{ maxWidth: "5.5rem" }}
                 >
                   {name}
                 </span>
               </div>
               {i < stepLabels.length - 1 && (
-                <div className="mx-1 flex-1 px-1 sm:mx-2">
-                  <div className="h-1 overflow-hidden rounded-full bg-[#0d2137]/15">
+                <div className="flex flex-1 items-center px-1 sm:px-2 min-w-[1rem]">
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-[#0d2137]/15">
                     <div
                       className="h-full rounded-full bg-[var(--accent)] transition-all duration-500 ease-out"
                       style={{ width: step > i + 1 ? "100%" : "0%" }}

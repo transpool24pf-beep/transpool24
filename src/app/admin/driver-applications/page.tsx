@@ -18,22 +18,39 @@ type DriverApp = {
 export default function AdminDriverApplicationsPage() {
   const [list, setList] = useState<DriverApp[]>([]);
   const [loading, setLoading] = useState(true);
+  const [apiError, setApiError] = useState<string | null>(null);
 
   useEffect(() => {
+    setApiError(null);
     fetch("/api/admin/driver-applications")
-      .then((r) => r.json())
-      .then((data) => setList(Array.isArray(data) ? data : []))
-      .catch(() => setList([]))
+      .then(async (r) => {
+        const data = await r.json();
+        if (!r.ok) {
+          setApiError(data?.error || "خطأ في التحميل");
+          return [];
+        }
+        return Array.isArray(data) ? data : [];
+      })
+      .then(setList)
+      .catch(() => {
+        setApiError("فشل الاتصال. تحقق من تشغيل الموقع وقاعدة البيانات.");
+        setList([]);
+      })
       .finally(() => setLoading(false));
   }, []);
 
   return (
     <div>
       <h1 className="mb-6 text-2xl font-semibold text-[#0d2137]">طلبات السائقين</h1>
+      {apiError && (
+        <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+          {apiError} — تأكد من تنفيذ ملف الهجرة <code className="bg-amber-100 px-1">add_driver_applications.sql</code> و <code className="bg-amber-100 px-1">add_driver_application_fields.sql</code> في Supabase.
+        </div>
+      )}
       {loading ? (
         <p className="text-[#0d2137]/70">جاري التحميل…</p>
       ) : list.length === 0 ? (
-        <p className="text-[#0d2137]/70">لا توجد طلبات حتى الآن.</p>
+        <p className="text-[#0d2137]/70">لا توجد طلبات حتى الآن. الطلبات المقدمة من صفحة السائقين ستظهر هنا بعد الإرسال.</p>
       ) : (
         <div className="overflow-x-auto rounded-xl border border-[#0d2137]/10 bg-white shadow-sm">
           <table className="w-full min-w-[640px] text-right">

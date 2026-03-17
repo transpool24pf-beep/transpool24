@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 type Doc = { driver_id: string; document_type: string; storage_path: string; file_name: string | null; verified: boolean };
@@ -54,6 +55,15 @@ export default function AdminDriversPage() {
   return (
     <div>
       <h1 className="mb-6 text-2xl font-semibold text-[#0d2137]">السائقين / Drivers</h1>
+      <div className="mb-6 rounded-xl border border-[var(--accent)]/30 bg-[#fff8f0] p-4">
+        <p className="text-sm text-[#0d2137]/90">
+          <strong>ملاحظة:</strong> طلبات التقديم من نموذج السائقين (الاسم، البريد، المستندات، إلخ) تظهر في قسم{" "}
+          <Link href="/admin/driver-applications" className="font-semibold text-[var(--accent)] underline hover:no-underline">
+            طلبات السائقين
+          </Link>
+          {" "}في القائمة — وليس هنا. هذا القسم يعرض السائقين المسجلين في النظام بعد الموافقة.
+        </p>
+      </div>
       {loading ? (
         <div className="rounded-xl bg-white p-8 shadow-sm">
           <p className="text-[#0d2137]/70">جاري التحميل…</p>
