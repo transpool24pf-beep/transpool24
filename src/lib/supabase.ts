@@ -46,6 +46,7 @@ export type Job = {
   confirmation_token: string | null;
   stripe_session_id: string | null;
   stripe_payment_intent_id: string | null;
+  assigned_driver_id: string | null;
   created_at: string;
   updated_at: string;
 };

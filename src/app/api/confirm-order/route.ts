@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 import { calculatePriceCents } from "@/lib/pricing";
+import { getPricingSettings } from "@/lib/settings";
 import { getRouteDistanceAndDuration } from "@/lib/route-distance-server";
 import { randomBytes } from "crypto";
 
@@ -51,7 +52,11 @@ export async function POST(req: Request) {
       );
     }
     const { distanceKm, durationMinutes } = route;
-    const priceCents = calculatePriceCents(distanceKm, cargoSize, durationMinutes);
+    const pricing = await getPricingSettings();
+    const priceCents = calculatePriceCents(distanceKm, cargoSize, durationMinutes, {
+      price_per_km_cents: pricing.price_per_km_cents,
+      driver_hourly_rate_cents: pricing.driver_hourly_rate_cents,
+    });
 
     const supabase = createServerSupabase();
     const confirmationToken = generateToken();

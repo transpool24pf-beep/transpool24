@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createServerSupabase } from "@/lib/supabase";
 import { calculatePriceCents } from "@/lib/pricing";
+import { getPricingSettings } from "@/lib/settings";
 import { getRouteDistanceKm } from "@/lib/route-distance-server";
 
 const VALID_CARGO = ["XS", "M", "L"] as const;
@@ -61,7 +62,11 @@ export async function POST(req: Request) {
           { status: 400 }
         );
       }
-      const priceCents = calculatePriceCents(distanceKm, cargoSize);
+      const pricing = await getPricingSettings();
+      const priceCents = calculatePriceCents(distanceKm, cargoSize, null, {
+        price_per_km_cents: pricing.price_per_km_cents,
+        driver_hourly_rate_cents: pricing.driver_hourly_rate_cents,
+      });
       const { data, error: insertError } = await supabase
         .from("jobs")
         .insert({

@@ -52,7 +52,17 @@ If the `jobs` table already existed before adding this feature, run `supabase/ad
 
 Run `supabase/add_duration_minutes.sql` once if your `jobs` table already exists, to add the `duration_minutes` column.
 
-### 7. Run
+### 7. Admin dashboard (optional)
+
+- Set `ADMIN_PASSWORD` in your env. Only you should know this password.
+- Open `https://your-domain.com/admin` (or `/admin/login`). Enter the password to access the dashboard.
+- **Orders**: list all orders, filter by status (قيد الانتظار / قيد التنفيذ / تم التسليم), update status, send confirmation email with PDF to customer.
+- **Drivers**: list drivers with documents (Gewerbe, insurance, ID), avatar, and star rating (editable).
+- **Settings**: change price per km (XS, M, L) and driver hourly rate (cents). These values are stored in the database and used for new orders.
+
+For existing databases, run `supabase/add_admin_dashboard.sql` in the SQL Editor once to add the `settings` table and new columns (profiles: `star_rating`, `avatar_url`; jobs: `assigned_driver_id`).
+
+### 8. Run
 
 ```bash
 npm run dev
@@ -84,4 +94,4 @@ Default UI language: **German**. Language switcher in header: Arabic, English, T
 
 ## Deploy on Vercel
 
-Connect the repo, add the same env vars as in `.env.local`, and set `NEXT_PUBLIC_APP_URL` to your production URL. Use that URL in Stripe for the webhook endpoint.
+Connect the repo, add the same env vars as in `.env.local`, and set `NEXT_PUBLIC_APP_URL` to your production URL. Use that URL in Stripe for the webhook endpoint. For the admin dashboard, add `ADMIN_PASSWORD` in Vercel environment variables.

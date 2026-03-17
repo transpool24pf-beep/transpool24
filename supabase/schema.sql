@@ -13,6 +13,8 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   company_name TEXT,
   phone TEXT,
   role TEXT CHECK (role IN ('customer', 'driver', 'admin')) DEFAULT 'customer',
+  star_rating NUMERIC(2,1),
+  avatar_url TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -38,9 +40,20 @@ CREATE TABLE IF NOT EXISTS public.jobs (
   confirmation_token TEXT UNIQUE,
   stripe_session_id TEXT UNIQUE,
   stripe_payment_intent_id TEXT,
+  assigned_driver_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Settings (pricing etc., editable from admin dashboard)
+CREATE TABLE IF NOT EXISTS public.settings (
+  key TEXT PRIMARY KEY,
+  value JSONB NOT NULL DEFAULT '{}',
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE public.settings ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Service role only settings" ON public.settings;
+CREATE POLICY "Service role only settings" ON public.settings FOR ALL USING (auth.jwt() ->> 'role' = 'service_role');
 
 -- Driver documents: references to files in Storage (Gewerbe, insurance, ID)
 CREATE TABLE IF NOT EXISTS public.driver_documents (
