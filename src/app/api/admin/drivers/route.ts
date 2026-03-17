@@ -24,10 +24,34 @@ export async function GET() {
     acc[id].push(d);
     return acc;
   }, {});
-  const list = (profiles ?? []).map((p) => ({
+  const fromProfiles = (profiles ?? []).map((p) => ({
     ...p,
     documents: byDriver[p.id] ?? [],
+    source: "profile" as const,
+    driver_number: null as number | null,
   }));
+
+  const { data: approvedApps } = await supabase
+    .from("driver_applications")
+    .select("id, full_name, email, phone, city, driver_number, personal_photo_url, approved_at, created_at")
+    .eq("status", "approved")
+    .not("driver_number", "is", null)
+    .order("driver_number", { ascending: true });
+  const fromApplications = (approvedApps ?? []).map((a) => ({
+    id: a.id,
+    email: a.email,
+    full_name: a.full_name,
+    company_name: null,
+    phone: a.phone,
+    star_rating: null,
+    avatar_url: a.personal_photo_url ?? null,
+    created_at: a.approved_at ?? a.created_at,
+    documents: [] as { driver_id: string; document_type: string; storage_path: string; file_name: string | null; verified: boolean }[],
+    source: "application" as const,
+    driver_number: a.driver_number as number,
+  }));
+
+  const list = [...fromApplications, ...fromProfiles];
   return NextResponse.json(list);
 }
 

@@ -14,6 +14,8 @@ type Driver = {
   avatar_url: string | null;
   created_at: string;
   documents: Doc[];
+  source?: "profile" | "application";
+  driver_number?: number | null;
 };
 
 const DOC_LABELS: Record<string, string> = {
@@ -36,6 +38,8 @@ export default function AdminDriversPage() {
   }, []);
 
   const updateStarRating = (id: string, star_rating: number | null) => {
+    const driver = drivers.find((d) => d.id === id);
+    if (driver?.source === "application") return;
     setEditingStar(id);
     fetch("/api/admin/drivers", {
       method: "PATCH",
@@ -88,28 +92,45 @@ export default function AdminDriversPage() {
                   </div>
                 )}
                 <div className="min-w-0 flex-1">
-                  <p className="font-medium text-[#0d2137]">
-                    {d.full_name || d.company_name || "—"}
-                  </p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-medium text-[#0d2137]">
+                      {d.full_name || d.company_name || "—"}
+                    </p>
+                    {d.driver_number != null && (
+                      <span className="rounded bg-[var(--accent)]/15 px-2 py-0.5 text-sm font-medium text-[var(--accent)]">
+                        رقم السائق #{d.driver_number}
+                      </span>
+                    )}
+                    {d.source === "application" && (
+                      <Link
+                        href={`/admin/driver-applications/${d.id}`}
+                        className="text-xs text-[var(--accent)] hover:underline"
+                      >
+                        عرض الطلب
+                      </Link>
+                    )}
+                  </div>
                   <p className="text-sm text-[#0d2137]/70">{d.email ?? "—"}</p>
                   <p className="text-sm text-[#0d2137]/70">{d.phone ?? "—"}</p>
-                  <div className="mt-2 flex items-center gap-2">
-                    <span className="text-sm text-[#0d2137]/70">Stars / نجمة:</span>
-                    {[1, 2, 3, 4, 5].map((n) => (
-                      <button
-                        key={n}
-                        type="button"
-                        onClick={() =>
-                          updateStarRating(d.id, d.star_rating === n ? null : n)
-                        }
-                        disabled={editingStar === d.id}
-                        className={`text-lg ${(d.star_rating ?? 0) >= n ? "text-amber-500" : "text-[#0d2137]/30"}`}
-                      >
-                        ★
-                      </button>
-                    ))}
-                    {editingStar === d.id && <span className="text-xs">…</span>}
-                  </div>
+                  {d.source !== "application" && (
+                    <div className="mt-2 flex items-center gap-2">
+                      <span className="text-sm text-[#0d2137]/70">Stars / نجمة:</span>
+                      {[1, 2, 3, 4, 5].map((n) => (
+                        <button
+                          key={n}
+                          type="button"
+                          onClick={() =>
+                            updateStarRating(d.id, d.star_rating === n ? null : n)
+                          }
+                          disabled={editingStar === d.id}
+                          className={`text-lg ${(d.star_rating ?? 0) >= n ? "text-amber-500" : "text-[#0d2137]/30"}`}
+                        >
+                          ★
+                        </button>
+                      ))}
+                      {editingStar === d.id && <span className="text-xs">…</span>}
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="mt-4 border-t border-[#0d2137]/10 pt-4">

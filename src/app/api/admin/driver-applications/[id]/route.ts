@@ -49,15 +49,33 @@ export async function PATCH(
 
   const now = new Date().toISOString();
   if (action === "approve") {
-    const { error: updateErr } = await supabase
+    const { data: maxRows } = await supabase
       .from("driver_applications")
-      .update({ status: "approved", approved_at: now, updated_at: now })
-      .eq("id", id);
+      .select("driver_number")
+      .not("driver_number", "is", null)
+      .order("driver_number", { ascending: false })
+      .limit(1);
+    const nextNumber = (maxRows?.[0]?.driver_number ?? 0) + 1;
+    const { data: updated, error: updateErr } = await supabase
+      .from("driver_applications")
+      .update({
+        status: "approved",
+        approved_at: now,
+        driver_number: nextNumber,
+        updated_at: now,
+      })
+      .eq("id", id)
+      .select("driver_number")
+      .single();
     if (updateErr) {
       console.error("[admin/driver-applications PATCH approve]", updateErr);
       return NextResponse.json({ error: updateErr.message }, { status: 500 });
     }
-    return NextResponse.json({ ok: true, status: "approved" });
+    return NextResponse.json({
+      ok: true,
+      status: "approved",
+      driver_number: updated?.driver_number ?? nextNumber,
+    });
   }
 
   // reject

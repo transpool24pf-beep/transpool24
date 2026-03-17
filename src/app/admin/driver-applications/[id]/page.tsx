@@ -10,6 +10,7 @@ type DriverApp = {
   phone: string;
   city: string;
   status: string;
+  driver_number: number | null;
   approved_at: string | null;
   rejected_at: string | null;
   rejection_notes: string | null;
@@ -185,6 +186,11 @@ export default function AdminDriverApplicationDetailPage({
         <h1 className="text-xl font-bold text-[#0d2137]">طلب سائق: {app.full_name}</h1>
         <p className="mt-1 text-sm text-[#0d2137]/60">
           {new Date(app.created_at).toLocaleString("ar-DE")} · الحالة: {statusLabel}
+          {app.driver_number != null && (
+            <span className="mr-2 rounded bg-[var(--accent)]/15 px-2 py-0.5 font-medium text-[var(--accent)]">
+              رقم السائق #{app.driver_number}
+            </span>
+          )}
         </p>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <p><strong>البريد:</strong> {app.email}</p>

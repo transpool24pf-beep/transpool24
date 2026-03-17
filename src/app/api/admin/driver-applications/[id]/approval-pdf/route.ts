@@ -13,7 +13,7 @@ export async function GET(
   const supabase = createServerSupabase();
   const { data, error } = await supabase
     .from("driver_applications")
-    .select("full_name, email, phone, city, vehicle_plate, languages_spoken, approved_at, status")
+    .select("full_name, email, phone, city, vehicle_plate, languages_spoken, approved_at, status, driver_number")
     .eq("id", id)
     .single();
   if (error || !data) {
@@ -23,14 +23,21 @@ export async function GET(
     return NextResponse.json({ error: "Application not approved" }, { status: 400 });
   }
   try {
+    const approvedAt =
+      data.approved_at != null
+        ? typeof data.approved_at === "string"
+          ? data.approved_at
+          : new Date(data.approved_at).toISOString()
+        : new Date().toISOString();
     const pdf = await generateDriverApprovalPdf({
-      full_name: data.full_name,
-      email: data.email,
-      phone: data.phone,
-      city: data.city,
-      vehicle_plate: data.vehicle_plate,
-      languages_spoken: data.languages_spoken,
-      approved_at: data.approved_at,
+      full_name: String(data.full_name ?? ""),
+      email: String(data.email ?? ""),
+      phone: String(data.phone ?? ""),
+      city: String(data.city ?? ""),
+      vehicle_plate: data.vehicle_plate != null ? String(data.vehicle_plate) : null,
+      languages_spoken: data.languages_spoken != null ? String(data.languages_spoken) : null,
+      approved_at: approvedAt,
+      driver_number: data.driver_number != null ? Number(data.driver_number) : null,
     });
     return new NextResponse(Buffer.from(pdf), {
       status: 200,
@@ -40,7 +47,11 @@ export async function GET(
       },
     });
   } catch (e) {
-    console.error("[approval-pdf]", e);
-    return NextResponse.json({ error: "PDF generation failed" }, { status: 500 });
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error("[approval-pdf]", msg, e);
+    return NextResponse.json(
+      { error: "PDF generation failed", detail: msg },
+      { status: 500 }
+    );
   }
 }

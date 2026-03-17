@@ -1,6 +1,4 @@
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
-import fs from "fs";
-import path from "path";
 
 const SITE_DOMAIN = "www.transpool24.com";
 
@@ -12,6 +10,7 @@ export type DriverAppForPdf = {
   vehicle_plate: string | null;
   languages_spoken: string | null;
   approved_at: string;
+  driver_number?: number | null;
 };
 
 function drawText(
@@ -41,21 +40,12 @@ export async function generateDriverApprovalPdf(app: DriverAppForPdf): Promise<U
   const { width, height } = page.getSize();
   let y = height - 50;
 
-  // Logo
+  // Logo: only from env (Vercel serverless has no reliable fs access to public/)
   let logoBytes: Uint8Array | null = null;
   try {
     const base64 = process.env.INVOICE_LOGO_BASE64;
-    if (base64) {
+    if (base64 && typeof base64 === "string") {
       logoBytes = new Uint8Array(Buffer.from(base64, "base64"));
-    } else {
-      const publicDir = path.join(process.cwd(), "public");
-      for (const name of ["345remov.png", "logo.png"]) {
-        const logoPath = path.join(publicDir, name);
-        if (fs.existsSync(logoPath)) {
-          logoBytes = new Uint8Array(fs.readFileSync(logoPath));
-          break;
-        }
-      }
     }
   } catch {
     // no logo
@@ -72,7 +62,19 @@ export async function generateDriverApprovalPdf(app: DriverAppForPdf): Promise<U
         height: imgH,
       });
     } catch {
-      // embed failed
+      try {
+        const img = await doc.embedJpg(logoBytes);
+        const imgW = 90;
+        const imgH = Math.min(40, (img.height / img.width) * imgW);
+        page.drawImage(img, {
+          x: width - 50 - imgW,
+          y: height - 45 - imgH,
+          width: imgW,
+          height: imgH,
+        });
+      } catch {
+        // skip logo
+      }
     }
   }
 
@@ -96,6 +98,9 @@ export async function generateDriverApprovalPdf(app: DriverAppForPdf): Promise<U
 
   // Driver info
   y = drawText(page, font, fontBold, "Driver / Fahrer", { y, size: 10, bold: true });
+  if (app.driver_number != null) {
+    y = drawText(page, font, fontBold, `Driver number / Nummer: ${app.driver_number}`, { y, size: 10 });
+  }
   y = drawText(page, font, fontBold, `Name: ${app.full_name}`, { y, size: 10 });
   y = drawText(page, font, fontBold, `Email: ${app.email}`, { y, size: 10 });
   y = drawText(page, font, fontBold, `Phone / WhatsApp: ${app.phone}`, { y, size: 10 });
@@ -106,13 +111,11 @@ export async function generateDriverApprovalPdf(app: DriverAppForPdf): Promise<U
   if (app.languages_spoken) {
     y = drawText(page, font, fontBold, `Languages: ${app.languages_spoken}`, { y, size: 10 });
   }
-  y = drawText(
-    page,
-    font,
-    fontBold,
-    `Approval date: ${new Date(app.approved_at).toLocaleDateString("de-DE")}`,
-    { y, size: 10 }
-  );
+  const approvedDateStr =
+    typeof app.approved_at === "string" && app.approved_at
+      ? new Date(app.approved_at).toLocaleDateString("de-DE")
+      : new Date().toLocaleDateString("de-DE");
+  y = drawText(page, font, fontBold, `Approval date: ${approvedDateStr}`, { y, size: 10 });
   y -= 20;
 
   // Welcome text
