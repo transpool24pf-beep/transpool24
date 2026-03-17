@@ -682,18 +682,26 @@ export function OrderForm({ locale }: { locale: string }) {
           </div>
           <div className="rounded-lg border border-[#0d2137]/15 bg-[#0d2137]/5 p-4">
             <p className="mb-2 text-sm font-medium text-[var(--foreground)]">{t("driverTimeSummary")}</p>
-            <p className="text-sm text-[var(--foreground)]/90">
-              {t("roundTripTime")}: {Math.floor(roundTripMinutes / 60)} {t("hours")} {roundTripMinutes % 60} {t("minutes")}
-              {routeDurationMinutes != null && (
-                <span className="ml-1 text-green-700">({t("fromRoute")})</span>
-              )}
-            </p>
-            <p className="text-sm text-[var(--foreground)]/90">
-              {t("loadingUnloadingTime")}: {loadingMinutes} + {unloadingMinutes} {t("minutes")}
-            </p>
-            <p className="mt-2 text-sm font-semibold text-[var(--accent)]">
-              {t("totalDriverTime")}: {(totalDriverMinutes / 60).toFixed(1)} {t("hours")}
-            </p>
+            {!distanceFromRoute ? (
+              <p className="text-sm text-amber-700">
+                {t("driverTimeRequiresAddress")}
+              </p>
+            ) : (
+              <>
+                <p className="text-sm text-[var(--foreground)]/90">
+                  {t("roundTripTime")}: {Math.floor(roundTripMinutes / 60)} {t("hours")} {roundTripMinutes % 60} {t("minutes")}
+                  {routeDurationMinutes != null && (
+                    <span className="ml-1 text-green-700">({t("fromRoute")})</span>
+                  )}
+                </p>
+                <p className="text-sm text-[var(--foreground)]/90">
+                  {t("loadingUnloadingTime")}: {loadingMinutes} + {unloadingMinutes} {t("minutes")}
+                </p>
+                <p className="mt-2 text-sm font-semibold text-[var(--accent)]">
+                  {t("totalDriverTime")}: {(totalDriverMinutes / 60).toFixed(1)} {t("hours")}
+                </p>
+              </>
+            )}
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">

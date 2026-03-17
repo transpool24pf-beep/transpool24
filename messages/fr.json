@@ -64,6 +64,7 @@
     "fromRoute": "selon l'itinéraire",
     "loadingUnloadingTime": "Chargement et déchargement",
     "totalDriverTime": "Temps total chauffeur",
+    "driverTimeRequiresAddress": "Pour calculer le temps chauffeur et la facturation à l'heure, saisissez les adresses de prise en charge et de livraison à l'étape précédente et cliquez sur \"Calculer la distance réelle\".",
     "cargoDetails": "Détails du chargement (optionnel)",
     "cargoLengthCm": "Longueur (cm)",
     "cargoWidthCm": "Largeur (cm)",

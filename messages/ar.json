@@ -64,6 +64,7 @@
     "fromRoute": "من المسار",
     "loadingUnloadingTime": "التحميل والتفريغ",
     "totalDriverTime": "إجمالي وقت السائق",
+    "driverTimeRequiresAddress": "لحساب وقت السائق والفواتير بالساعة، أدخل عناوين الاستلام والتسليم في الخطوة السابقة واضغط «احسب المسافة الحقيقية».",
     "cargoDetails": "تفاصيل الحمولة (اختياري)",
     "cargoLengthCm": "الطول (سم)",
     "cargoWidthCm": "العرض (سم)",

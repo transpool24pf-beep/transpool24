@@ -64,6 +64,7 @@
     "fromRoute": "aus Route",
     "loadingUnloadingTime": "Beladen & Entladen",
     "totalDriverTime": "Gesamte Fahrerzeit",
+    "driverTimeRequiresAddress": "Zur Berechnung der Fahrerzeit und Stundenabrechnung bitte in der vorherigen Schritt Abhol- und Lieferadresse eingeben und \"Echte Strecke berechnen\" klicken.",
     "cargoDetails": "Ladungsdetails (optional)",
     "cargoLengthCm": "Länge (cm)",
     "cargoWidthCm": "Breite (cm)",

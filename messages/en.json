@@ -64,6 +64,7 @@
     "fromRoute": "from route",
     "loadingUnloadingTime": "Loading & unloading",
     "totalDriverTime": "Total driver time",
+    "driverTimeRequiresAddress": "To calculate driver time and hourly billing, enter pickup and delivery addresses in the previous step and click \"Calculate real distance\".",
     "cargoDetails": "Cargo details (optional)",
     "cargoLengthCm": "Length (cm)",
     "cargoWidthCm": "Width (cm)",

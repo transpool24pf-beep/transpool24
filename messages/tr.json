@@ -64,6 +64,7 @@
     "fromRoute": "rota üzerinden",
     "loadingUnloadingTime": "Yükleme ve boşaltma",
     "totalDriverTime": "Toplam sürücü süresi",
+    "driverTimeRequiresAddress": "Sürücü süresi ve saatlik faturalandırma için önceki adımda alış ve teslimat adreslerini girin ve \"Gerçek mesafeyi hesapla\"ya tıklayın.",
     "cargoDetails": "Yük detayları (isteğe bağlı)",
     "cargoLengthCm": "Uzunluk (cm)",
     "cargoWidthCm": "Genişlik (cm)",
