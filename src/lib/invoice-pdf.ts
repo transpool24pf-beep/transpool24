@@ -1,7 +1,15 @@
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import type { Job } from "./supabase";
 
-export async function generateInvoicePdf(job: Job): Promise<Uint8Array> {
+export type InvoiceType = "customer" | "driver";
+
+export async function generateInvoicePdf(
+  job: Job & { driver_price_cents?: number | null },
+  options?: { type?: InvoiceType }
+): Promise<Uint8Array> {
+  const type = options?.type ?? "customer";
+  const useDriverPrice = type === "driver" && job.driver_price_cents != null;
+  const amountCents = useDriverPrice ? job.driver_price_cents! : job.price_cents;
   const doc = await PDFDocument.create();
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const fontBold = await doc.embedFont(StandardFonts.HelveticaBold);
@@ -29,7 +37,10 @@ export async function generateInvoicePdf(job: Job): Promise<Uint8Array> {
     color: rgb(0.13, 0.13, 0.22),
   });
   y -= 28;
-  page.drawText("Rechnung / Invoice", {
+  const headerTitle = type === "driver"
+    ? "Gruppenrechnung (Fahrerpreis) / Group invoice (driver price)"
+    : "Rechnung / Invoice";
+  page.drawText(headerTitle, {
     x: 50,
     y,
     size: 14,
@@ -58,7 +69,7 @@ export async function generateInvoicePdf(job: Job): Promise<Uint8Array> {
   drawText(`Distanz / Distance: ${job.distance_km ?? "-"} km`);
   y -= 16;
 
-  const totalEur = (job.price_cents / 100).toFixed(2);
+  const totalEur = (amountCents / 100).toFixed(2);
   drawText(`Gesamtbetrag / Total: € ${totalEur}`, { size: 12, bold: true });
   y -= 24;
 

@@ -149,7 +149,7 @@ const initial: OrderFormData = {
   stackable: false,
 };
 
-export function OrderForm({ locale }: { locale: string }) {
+export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrderConfirmed?: () => void }) {
   const t = useTranslations("order");
   const [step, setStep] = useState(1);
   const [data, setData] = useState<OrderFormData>(initial);
@@ -381,6 +381,7 @@ export function OrderForm({ locale }: { locale: string }) {
           token: json.confirmationToken,
           whatsappLink: json.whatsappLink,
         });
+        onOrderConfirmed?.();
       } else {
         throw new Error("Invalid response");
       }
@@ -401,16 +402,18 @@ export function OrderForm({ locale }: { locale: string }) {
 
   return (
     <div className="mt-8 rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
-      <div className="mb-6 flex gap-2">
-        {[1, 2, 3, 4].map((s) => (
-          <div
-            key={s}
-            className={`h-2 flex-1 rounded-full ${
-              s <= step ? "bg-[var(--accent)]" : "bg-[#0d2137]/10"
-            }`}
-          />
-        ))}
-      </div>
+      {!orderConfirmed && (
+        <div className="mb-6 flex gap-2">
+          {[1, 2, 3, 4].map((s) => (
+            <div
+              key={s}
+              className={`h-2 flex-1 rounded-full ${
+                s <= step ? "bg-[var(--accent)]" : "bg-[#0d2137]/10"
+              }`}
+            />
+          ))}
+        </div>
+      )}
 
       {step === 1 && (
         <div className="space-y-4">
@@ -927,25 +930,21 @@ export function OrderForm({ locale }: { locale: string }) {
       )}
 
       {step === 4 && orderConfirmed && (
-        <div className="space-y-4 rounded-xl border border-green-200 bg-green-50 p-6 text-[var(--primary)]">
-          <p className="font-medium text-green-800">{t("confirmedSuccess")}</p>
-          <p className="text-sm text-green-700">
-            {t("orderRef")}: <code className="rounded bg-green-100 px-1 font-mono text-xs">{orderConfirmed.jobId}</code>
+        <div className="space-y-5 rounded-xl border border-green-200 bg-green-50 p-6 text-[var(--primary)]">
+          <div className="text-center">
+            <p className="text-xl font-semibold text-green-800">{t("thankYouTitle")}</p>
+            <p className="mt-2 text-green-700">{t("thankYouMessage")}</p>
+            <p className="mt-3 text-sm text-green-700">{t("confirmByEmailHint")}</p>
+          </div>
+          <p className="text-center text-sm text-green-700">
+            {t("orderRef")}: <code className="rounded bg-green-100 px-1.5 py-0.5 font-mono text-xs">{orderConfirmed.jobId}</code>
           </p>
-          <a
-            href={orderConfirmed.whatsappLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-lg border border-green-300 bg-white px-4 py-2 text-sm font-medium text-green-800 shadow-sm hover:bg-green-50"
-          >
-            {t("shareToDrivers")}
-          </a>
-          <a
-            href={`/${locale}/order/confirm?job_id=${encodeURIComponent(orderConfirmed.jobId)}&token=${encodeURIComponent(orderConfirmed.token)}`}
-            className="inline-flex items-center gap-2 rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
-          >
-            {t("payNow")}
-          </a>
+          <div className="border-t border-green-200 pt-4 text-center">
+            <p className="mb-1 text-sm font-medium text-green-800">{t("rateUsOnGoogle")}</p>
+            <div className="flex justify-center gap-0.5 text-2xl text-amber-400" aria-hidden>
+              ★★★★★
+            </div>
+          </div>
         </div>
       )}
 

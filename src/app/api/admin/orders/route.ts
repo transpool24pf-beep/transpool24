@@ -8,7 +8,7 @@ export async function GET() {
   const supabase = createServerSupabase();
   const { data, error } = await supabase
     .from("jobs")
-    .select("id, company_name, phone, customer_email, pickup_address, delivery_address, cargo_size, distance_km, price_cents, payment_status, logistics_status, created_at, preferred_pickup_at")
+    .select("id, company_name, phone, customer_email, pickup_address, delivery_address, cargo_size, distance_km, price_cents, driver_price_cents, payment_status, logistics_status, created_at, preferred_pickup_at, confirmation_token")
     .order("created_at", { ascending: false });
   if (error) {
     console.error("[admin/orders]", error);
@@ -27,6 +27,7 @@ export async function PATCH(req: Request) {
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
   if (logistics_status != null) updates.logistics_status = logistics_status;
   if (assigned_driver_id !== undefined) updates.assigned_driver_id = assigned_driver_id || null;
+  if (body.driver_price_cents !== undefined) updates.driver_price_cents = body.driver_price_cents == null ? null : Number(body.driver_price_cents);
   const { data, error } = await supabase
     .from("jobs")
     .update(updates)

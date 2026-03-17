@@ -16,7 +16,9 @@ const localeLabels: Record<Locale, string> = {
   es: "ES",
 };
 
-export function Header() {
+type HeaderProps = { hideLogo?: boolean };
+
+export function Header({ hideLogo }: HeaderProps) {
   const t = useTranslations("common");
   const pathname = usePathname();
   const locale = useLocale() as Locale;
@@ -37,18 +39,22 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-[#0d2137]/10 bg-[var(--background)]/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href={`/${locale}`} className="flex items-center gap-2">
-          <Image
-            src="/images/logo.png"
-            alt="TransPool24"
-            width={48}
-            height={48}
-            className="h-10 w-10 object-contain"
-          />
-          <span className="text-lg font-semibold text-[var(--primary)]">
-            Trans<span className="text-[var(--accent)]">Pool</span>24
-          </span>
-        </Link>
+        {!hideLogo ? (
+          <Link href={`/${locale}`} className="flex items-center gap-2">
+            <Image
+              src="/images/logo.png"
+              alt="TransPool24"
+              width={48}
+              height={48}
+              className="h-10 w-10 object-contain"
+            />
+            <span className="text-lg font-semibold text-[var(--primary)]">
+              Trans<span className="text-[var(--accent)]">Pool</span>24
+            </span>
+          </Link>
+        ) : (
+          <div className="w-[136px]" aria-hidden />
+        )}
         <nav className="flex items-center gap-4">
           <Link
             href={`/${locale}/order`}

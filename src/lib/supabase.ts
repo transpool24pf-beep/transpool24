@@ -43,6 +43,7 @@ export type Job = {
   distance_km: number | null;
   duration_minutes: number | null;
   price_cents: number;
+  driver_price_cents?: number | null;
   payment_status: "pending" | "paid" | "refunded" | "failed";
   logistics_status: string;
   confirmation_token: string | null;
