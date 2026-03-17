@@ -101,6 +101,14 @@ export function OrderForm({ locale }: { locale: string }) {
   const [routeDurationMinutes, setRouteDurationMinutes] = useState<number | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const normalizePhone = (value: string) => {
+    const digits = value.replace(/\D/g, "");
+    if (!digits.length) return value.trim();
+    if (digits.startsWith("49") && digits.length >= 11) return `+${digits}`;
+    if (digits.startsWith("0")) return `+49${digits.slice(1)}`;
+    return `+49${digits}`;
+  };
+
   const step1Complete = data.companyName.trim() !== "" && data.email.trim() !== "" && data.phone.trim() !== "";
   const step2Complete = data.pickupAddress.trim() !== "" && data.deliveryAddress.trim() !== "";
   const step3Complete = data.serviceType !== "" && distanceFromRoute;
@@ -254,7 +262,7 @@ export function OrderForm({ locale }: { locale: string }) {
         body: JSON.stringify({
           companyName: data.companyName,
           email: data.email,
-          phone: data.phone,
+          phone: normalizePhone(data.phone),
           pickupAddress: data.pickupAddress,
           deliveryAddress: data.deliveryAddress,
           pickupTime: data.pickupDate && data.pickupTime ? `${data.pickupDate}T${data.pickupTime}` : null,
@@ -354,13 +362,22 @@ export function OrderForm({ locale }: { locale: string }) {
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
               {t("whatsapp")}
             </label>
-            <input
-              type="tel"
-              value={data.phone}
-              onChange={(e) => update({ phone: e.target.value })}
-              placeholder={t("whatsappPlaceholder")}
-              className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-            />
+            <div className="flex gap-2">
+              <div
+                className="flex shrink-0 items-center gap-1.5 rounded-lg border border-[#0d2137]/20 bg-[#0d2137]/5 px-3 py-2 text-sm font-medium text-[var(--foreground)]"
+                title={t("countryCodeGermany")}
+              >
+                <span className="text-lg leading-none" aria-hidden>🇩🇪</span>
+                <span>+49</span>
+              </div>
+              <input
+                type="tel"
+                value={data.phone}
+                onChange={(e) => update({ phone: e.target.value })}
+                placeholder={t("whatsappPlaceholder")}
+                className="min-w-0 flex-1 rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+              />
+            </div>
           </div>
         </div>
       )}
@@ -747,7 +764,7 @@ export function OrderForm({ locale }: { locale: string }) {
           <div className="space-y-2 rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/5 p-4 text-sm">
             <p><strong>{t("companyName")}:</strong> {data.companyName}</p>
             <p><strong>{t("email")}:</strong> {data.email}</p>
-            <p><strong>{t("whatsapp")}:</strong> {data.phone}</p>
+            <p><strong>{t("whatsapp")}:</strong> {data.phone.trim() ? normalizePhone(data.phone) : data.phone}</p>
             <p><strong>{t("pickup")}:</strong> {data.pickupAddress}</p>
             <p><strong>{t("delivery")}:</strong> {data.deliveryAddress}</p>
             {(data.pickupDate || data.pickupTime) && (
