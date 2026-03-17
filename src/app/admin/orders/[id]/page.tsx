@@ -13,6 +13,7 @@ type Job = {
   delivery_address: string;
   cargo_size: string;
   cargo_details: Record<string, unknown> | null;
+  service_type?: string;
   distance_km: number | null;
   price_cents: number;
   driver_price_cents: number | null;
@@ -30,12 +31,31 @@ function getDriverPriceEur(o: Job): string {
   return "18.00";
 }
 
-/** رسالة واتساب للمجموعة: وقت، تاريخ، وزن، مسافة، عنوان، سعر */
+/** نوع النقل بالعربية */
+function serviceTypeLabelAr(st: string | undefined): string {
+  if (st === "driver_only") return "سائق فقط";
+  if (st === "driver_car_assistant") return "سائق مع سيارة ومعاون";
+  return "سائق مع سيارة";
+}
+
+/** حجم البضاعة من cargo_details */
+function cargoVolumeStr(cd: Record<string, unknown> | null): string | null {
+  if (!cd) return null;
+  const l = cd.cargoLengthCm ?? cd.lengthCm;
+  const w = cd.cargoWidthCm ?? cd.widthCm;
+  const h = cd.cargoHeightCm ?? cd.heightCm;
+  if (l != null && w != null && h != null) return `${l} × ${w} × ${h} cm`;
+  return null;
+}
+
+/** رسالة واتساب للمجموعة: كل المعلومات ما عدا السعر، بأيقونات وسطر فارغ بين الأقسام */
 function buildWhatsAppMessage(o: Job): string {
-  const driverPriceEur = getDriverPriceEur(o);
   const orderRef = o.order_number != null ? String(o.order_number) : o.id;
-  const dateTimeStr = o.preferred_pickup_at
-    ? new Date(o.preferred_pickup_at).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" })
+  const timeStr = o.preferred_pickup_at
+    ? new Date(o.preferred_pickup_at).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })
+    : null;
+  const dateStr = o.preferred_pickup_at
+    ? new Date(o.preferred_pickup_at).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "2-digit" })
     : null;
   const weightKg = o.cargo_details && typeof o.cargo_details.weightKg === "number"
     ? o.cargo_details.weightKg
@@ -43,24 +63,33 @@ function buildWhatsAppMessage(o: Job): string {
       ? (o.cargo_details as { cargoWeightKg: number }).cargoWeightKg
       : null;
   const distanceStr = o.distance_km != null ? `${o.distance_km} km` : "—";
-  const lines = [
-    "🚚 TransPool24 – طلب للنقل",
+  const volumeStr = cargoVolumeStr(o.cargo_details);
+  const serviceLabel = serviceTypeLabelAr(o.service_type);
+  const blocks: string[] = [
+    "📣 TransPool24 – طلب للنقل",
     "",
     `📋 رقم الطلب: ${orderRef}`,
+    "",
     `📞 الهاتف: ${o.phone}`,
-    dateTimeStr ? `⏰ وقت الاستلام المختار (للحضور): ${dateTimeStr}` : null,
-    weightKg != null ? `⚖️ الوزن: ${weightKg} kg` : null,
+    "",
+    ...(timeStr ? [`🕖 وقت (للحضور): ${timeStr}`] : []),
+    ...(dateStr ? [`📅 التاريخ: ${dateStr}`] : []),
+    ...(timeStr || dateStr ? [""] : []),
     `📏 المسافة: ${distanceStr}`,
+    "",
+    `🚚 الحمولة: ${o.cargo_size}`,
+    ...(volumeStr ? [`📦 حجم البضاعة: ${volumeStr}`] : []),
+    ...(weightKg != null ? [`⚖️ الوزن: ${weightKg} kg`] : []),
+    `🚛 نوع النقل: ${serviceLabel}`,
+    `🏢 الشركة: ${o.company_name}`,
     "",
     "📍 الاستلام:",
     o.pickup_address,
     "",
     "📍 التسليم:",
     o.delivery_address,
-    "",
-    `💰 السعر: ${driverPriceEur} EUR`,
-  ].filter(Boolean);
-  return lines.join("\n");
+  ];
+  return blocks.join("\n");
 }
 
 export default function AdminOrderDetailPage({

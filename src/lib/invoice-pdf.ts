@@ -101,7 +101,7 @@ export async function generateInvoicePdf(
       `Wunschtermin / Preferred: ${new Date(job.preferred_pickup_at).toLocaleString("de-DE")}`
     );
   }
-  y -= 12;
+  y -= 16;
 
   drawText("Transportdetails / Transport details", { bold: true });
   drawText(`Abholung / Pickup: ${job.pickup_address}${job.pickup_city ? `, ${job.pickup_city}` : ""}`);
@@ -115,7 +115,8 @@ export async function generateInvoicePdf(
     const h = cd.cargoHeightCm != null ? `${cd.cargoHeightCm}` : "-";
     drawText(`Maße (L×B×H cm): ${l} × ${w} × ${h}`);
   }
-  if (cd?.cargoWeightKg != null) drawText(`Gewicht / Weight: ${cd.cargoWeightKg} kg`);
+  const weightKg = cd?.cargoWeightKg ?? cd?.weightKg;
+  if (weightKg != null) drawText(`Gewicht / Weight: ${weightKg} kg`);
   if (cd?.cargoType) drawText(`Typ / Type: ${String(cd.cargoType)}`);
   if (cd?.stackable != null) drawText(`Stapelbar / Stackable: ${cd.stackable ? "Ja" : "Nein"}`);
   const st =
