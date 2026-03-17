@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type FormState = {
   fullName: string;
@@ -26,8 +26,11 @@ const initialState: FormState = {
   note: "",
 };
 
-export function DriverApplicationForm() {
-  const [form, setForm] = useState<FormState>(initialState);
+export function DriverApplicationForm({ initialCity = "" }: { initialCity?: string }) {
+  const [form, setForm] = useState<FormState>({ ...initialState, city: initialCity });
+  useEffect(() => {
+    if (initialCity) setForm((p) => ({ ...p, city: initialCity }));
+  }, [initialCity]);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
