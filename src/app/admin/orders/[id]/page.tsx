@@ -12,6 +12,7 @@ type Job = {
   pickup_address: string;
   delivery_address: string;
   cargo_size: string;
+  cargo_details: Record<string, unknown> | null;
   distance_km: number | null;
   price_cents: number;
   driver_price_cents: number | null;
@@ -29,15 +30,27 @@ function getDriverPriceEur(o: Job): string {
   return "18.00";
 }
 
-/** رسالة واتساب للمجموعة: عنوان + السعر الذي يحدده الأدمن فقط (بدون رابط تأكيد أو سعر عميل) */
+/** رسالة واتساب للمجموعة: وقت، تاريخ، وزن، مسافة، عنوان، سعر */
 function buildWhatsAppMessage(o: Job): string {
   const driverPriceEur = getDriverPriceEur(o);
   const orderRef = o.order_number != null ? String(o.order_number) : o.id;
+  const dateTimeStr = o.preferred_pickup_at
+    ? new Date(o.preferred_pickup_at).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" })
+    : null;
+  const weightKg = o.cargo_details && typeof o.cargo_details.weightKg === "number"
+    ? o.cargo_details.weightKg
+    : o.cargo_details && typeof (o.cargo_details as { cargoWeightKg?: number }).cargoWeightKg === "number"
+      ? (o.cargo_details as { cargoWeightKg: number }).cargoWeightKg
+      : null;
+  const distanceStr = o.distance_km != null ? `${o.distance_km} km` : "—";
   const lines = [
     "🚚 TransPool24 – طلب للنقل",
     "",
     `📋 رقم الطلب: ${orderRef}`,
     `📞 الهاتف: ${o.phone}`,
+    dateTimeStr ? `📅 التاريخ والوقت: ${dateTimeStr}` : null,
+    weightKg != null ? `⚖️ الوزن: ${weightKg} kg` : null,
+    `📏 المسافة: ${distanceStr}`,
     "",
     "📍 الاستلام:",
     o.pickup_address,
@@ -46,7 +59,7 @@ function buildWhatsAppMessage(o: Job): string {
     o.delivery_address,
     "",
     `💰 السعر: ${driverPriceEur} EUR`,
-  ];
+  ].filter(Boolean);
   return lines.join("\n");
 }
 
@@ -164,9 +177,15 @@ export default function AdminOrderDetailPage({
               <dd className="font-mono font-semibold text-[#0d2137]">{order.order_number ?? order.id}</dd>
             </div>
             <div>
-              <dt className="text-[#0d2137]/60">التاريخ</dt>
+              <dt className="text-[#0d2137]/60">التاريخ (إنشاء الطلب)</dt>
               <dd>{new Date(order.created_at).toLocaleDateString("de-DE")}</dd>
             </div>
+            {order.preferred_pickup_at && (
+              <div>
+                <dt className="text-[#0d2137]/60">وقت وتاريخ الاستلام المفضل</dt>
+                <dd>{new Date(order.preferred_pickup_at).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" })}</dd>
+              </div>
+            )}
             <div>
               <dt className="text-[#0d2137]/60">الشركة</dt>
               <dd>{order.company_name}</dd>
@@ -188,8 +207,18 @@ export default function AdminOrderDetailPage({
               <dd>{order.delivery_address}</dd>
             </div>
             <div>
-              <dt className="text-[#0d2137]/60">الحمولة / المسافة</dt>
-              <dd>{order.cargo_size} · {order.distance_km ?? "—"} km</dd>
+              <dt className="text-[#0d2137]/60">الحمولة</dt>
+              <dd>{order.cargo_size}</dd>
+            </div>
+            {(order.cargo_details && (typeof (order.cargo_details as { weightKg?: number }).weightKg === "number" || typeof (order.cargo_details as { cargoWeightKg?: number }).cargoWeightKg === "number")) && (
+              <div>
+                <dt className="text-[#0d2137]/60">الوزن</dt>
+                <dd>{(order.cargo_details as { weightKg?: number; cargoWeightKg?: number }).weightKg ?? (order.cargo_details as { cargoWeightKg?: number }).cargoWeightKg} kg</dd>
+              </div>
+            )}
+            <div>
+              <dt className="text-[#0d2137]/60">المسافة</dt>
+              <dd>{order.distance_km != null ? `${order.distance_km} km` : "—"}</dd>
             </div>
             <div>
               <dt className="text-[#0d2137]/60">سعر العميل (النظام)</dt>
