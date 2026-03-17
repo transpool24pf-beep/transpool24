@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 type Job = {
   id: string;
@@ -30,12 +31,10 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }
   cancelled: { label: "ملغي / Cancelled", color: "text-red-700", bg: "bg-red-500" },
 };
 
-function buildWhatsAppMessage(o: Job, appUrl: string): string {
-  const driverPrice = o.driver_price_cents != null ? (o.driver_price_cents / 100).toFixed(2) : "—";
-  const customerPrice = (o.price_cents / 100).toFixed(2);
-  const confirmLink = o.confirmation_token
-    ? `${appUrl}/ar/order/confirm?job_id=${o.id}&token=${o.confirmation_token}`
-    : "";
+const DRIVER_INVOICE_DEFAULT_EUR = 18;
+
+function buildWhatsAppMessage(o: Job): string {
+  const driverPrice = o.driver_price_cents != null ? (o.driver_price_cents / 100).toFixed(2) : DRIVER_INVOICE_DEFAULT_EUR.toFixed(2);
   const lines = [
     "🚚 TransPool24 – طلب للنقل",
     "",
@@ -52,9 +51,7 @@ function buildWhatsAppMessage(o: Job, appUrl: string): string {
     "",
     `📦 الحمولة: ${o.cargo_size} | المسافة: ${o.distance_km ?? "—"} km`,
     `💰 سعر السائق/المجموعة: ${driverPrice} EUR`,
-    `💰 سعر العميل: ${customerPrice} EUR`,
     `📅 التاريخ: ${new Date(o.created_at).toLocaleDateString("de-DE")}`,
-    confirmLink ? `\n🔗 رابط التأكيد للعميل:\n${confirmLink}` : "",
   ].filter(Boolean);
   return lines.join("\n");
 }
@@ -127,8 +124,7 @@ export default function AdminOrdersPage() {
   };
 
   const openWhatsApp = (o: Job) => {
-    const appUrl = typeof window !== "undefined" ? window.location.origin : "";
-    const text = buildWhatsAppMessage(o, appUrl);
+    const text = buildWhatsAppMessage(o);
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener");
   };
 
@@ -250,6 +246,12 @@ export default function AdminOrdersPage() {
                       </td>
                       <td className="px-5 py-3">
                         <div className="flex flex-col gap-2">
+                          <Link
+                            href={`/admin/orders/${o.id}`}
+                            className="inline-flex items-center justify-center rounded-lg bg-[#0d2137] px-3 py-2 text-xs font-medium text-white hover:bg-[#0d2137]/90"
+                          >
+                            فتح الطلب
+                          </Link>
                           <button
                             type="button"
                             onClick={() => openWhatsApp(o)}

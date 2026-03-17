@@ -22,8 +22,11 @@ export async function GET(req: Request) {
   if (error || !job) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
   }
+  const driverCents = type === "driver" && (job.driver_price_cents == null)
+    ? 1800
+    : job.driver_price_cents;
   const pdf = await generateInvoicePdf(
-    { ...job, driver_price_cents: job.driver_price_cents ?? undefined },
+    { ...job, driver_price_cents: driverCents ?? undefined },
     { type }
   );
   const filename = type === "driver"

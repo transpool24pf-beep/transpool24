@@ -8,8 +8,10 @@ export async function generateInvoicePdf(
   options?: { type?: InvoiceType }
 ): Promise<Uint8Array> {
   const type = options?.type ?? "customer";
-  const useDriverPrice = type === "driver" && job.driver_price_cents != null;
-  const amountCents = useDriverPrice ? job.driver_price_cents! : job.price_cents;
+  const DEFAULT_DRIVER_INVOICE_CENTS = 1800; // 18 EUR for group invoice when not set
+  const amountCents = type === "driver"
+    ? (job.driver_price_cents ?? DEFAULT_DRIVER_INVOICE_CENTS)
+    : job.price_cents;
   const doc = await PDFDocument.create();
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const fontBold = await doc.embedFont(StandardFonts.HelveticaBold);
