@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 const NAV = [
   { href: "/admin/orders", label: "Orders / الطلبات" },
+  { href: "/admin/driver-applications", label: "طلبات السائقين" },
   { href: "/admin/drivers", label: "Drivers / السائقين" },
   { href: "/admin/settings", label: "Settings / الإعدادات" },
 ];
@@ -76,7 +77,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
       <main className="flex min-h-screen flex-1 flex-col pt-14">
-        <div className={`mx-auto flex-1 px-4 py-8 ${pathname === "/admin/orders" ? "max-w-[98%] xl:max-w-7xl" : "max-w-4xl"}`}>
+        <div className={`mx-auto flex-1 px-4 py-8 ${pathname === "/admin/orders" || pathname?.startsWith("/admin/driver-applications") ? "max-w-[98%] xl:max-w-7xl" : "max-w-4xl"}`}>
           {children}
         </div>
         <footer className="border-t border-[#0d2137]/10 bg-white py-2 text-center text-xs text-[#0d2137]/60">

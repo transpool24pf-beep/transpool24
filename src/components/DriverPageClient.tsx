@@ -2,23 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import dynamic from "next/dynamic";
-import { DriverApplicationForm } from "./DriverApplicationForm";
-
-const DriverCityMap = dynamic(
-  () => import("@/components/DriverCityMap").then((m) => m.DriverCityMap),
-  { ssr: false }
-);
-
-const STEPS = [
-  { key: "location", label: "موقع" },
-  { key: "need", label: "ما تحتاج إليه" },
-  { key: "personal", label: "المعلومات الشخصية" },
-  { key: "vehicle", label: "عربة" },
-  { key: "finish", label: "إنهاء التطبيق" },
-];
-
-const CITIES = ["بفورتسهايم", "شتوتغارت", "كارلسروه", "مانهايم", "هايدلبرغ", "أخرى"];
+import { DriverWizardForm } from "./DriverWizardForm";
 
 const FAQ_ITEMS: { q: string; a: string }[] = [
   { q: "ما هو السن المطلوب للعمل كسائق؟", a: "يجب أن يكون عمرك 18 عاماً على الأقل وحاصل على رخصة قيادة سارية." },
@@ -30,13 +14,10 @@ const FAQ_ITEMS: { q: string; a: string }[] = [
 
 export function DriverPageClient({ locale }: { locale: string }) {
   const [showForm, setShowForm] = useState(false);
-  const [formStep, setFormStep] = useState(1);
-  const [selectedCity, setSelectedCity] = useState("");
   const [faqOpen, setFaqOpen] = useState<number | null>(null);
 
   const scrollToApply = () => {
     setShowForm(true);
-    setFormStep(1);
     setTimeout(() => document.getElementById("driver-form")?.scrollIntoView({ behavior: "smooth" }), 50);
   };
 
@@ -221,86 +202,9 @@ export function DriverPageClient({ locale }: { locale: string }) {
           </section>
         </>
       ) : (
-        /* Form: multi-step */
         <section id="driver-form" className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
           <div className="rounded-2xl border border-[#0d2137]/10 bg-white p-6 shadow-lg sm:p-8">
-            {/* Progress bar */}
-            <div className="mb-10 flex flex-wrap justify-between gap-2">
-              {STEPS.map((s, i) => (
-                <div key={s.key} className="flex items-center gap-2">
-                  <div
-                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                      i + 1 === formStep ? "bg-[var(--accent)] text-white" : i + 1 < formStep ? "bg-emerald-100 text-emerald-800" : "bg-[#0d2137]/10 text-[#0d2137]/60"
-                    }`}
-                  >
-                    {i + 1}
-                  </div>
-                  <span className={`hidden text-sm sm:inline ${i + 1 === formStep ? "font-semibold text-[#0d2137]" : "text-[#0d2137]/70"}`}>
-                    {s.label}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            {formStep === 1 && (
-              <>
-                <h2 className="text-xl font-bold text-[#0d2137]">اختر المدينة التي ترغب في العمل بها</h2>
-                <div className="mt-4">
-                  <label className="mb-2 block text-sm font-medium text-[#0d2137]">مدينة تقديم الطلب</label>
-                  <select
-                    value={selectedCity}
-                    onChange={(e) => setSelectedCity(e.target.value)}
-                    className="w-full rounded-xl border border-[#0d2137]/20 bg-white px-4 py-3 text-[#0d2137]"
-                  >
-                    <option value="">— اختر المدينة —</option>
-                    {CITIES.map((c) => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="mt-6">
-                  <DriverCityMap />
-                </div>
-                <p className="mt-3 text-sm text-[#0d2137]/70">
-                  تنشط TransPool24 في ألمانيا في عدة مدن.
-                </p>
-                <div className="mt-8 flex justify-between gap-4">
-                  <button
-                    type="button"
-                    onClick={() => setShowForm(false)}
-                    className="rounded-xl border border-[#0d2137]/20 bg-white px-6 py-3 font-medium text-[#0d2137] transition hover:bg-[#0d2137]/5"
-                  >
-                    رجوع
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setFormStep(2)}
-                    disabled={!selectedCity}
-                    className="rounded-xl bg-[var(--accent)] px-8 py-3 font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
-                  >
-                    متابعة
-                  </button>
-                </div>
-              </>
-            )}
-
-            {formStep === 2 && (
-              <>
-                <p className="text-lg text-[#0d2137]/80">المدينة المختارة: <strong>{selectedCity || "—"}</strong>. أكمل بياناتك أدناه لإرسال الطلب.</p>
-                <div className="mt-6">
-                  <DriverApplicationForm initialCity={selectedCity} />
-                </div>
-                <div className="mt-6 flex justify-between gap-4">
-                  <button
-                    type="button"
-                    onClick={() => setFormStep(1)}
-                    className="rounded-xl border border-[#0d2137]/20 bg-white px-6 py-3 font-medium text-[#0d2137] transition hover:bg-[#0d2137]/5"
-                  >
-                    رجوع
-                  </button>
-                </div>
-              </>
-            )}
+            <DriverWizardForm onBack={() => setShowForm(false)} initialCity="" />
           </div>
         </section>
       )}

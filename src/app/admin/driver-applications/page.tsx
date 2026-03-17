@@ -1,0 +1,78 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+
+type DriverApp = {
+  id: string;
+  full_name: string;
+  email: string;
+  phone: string;
+  city: string;
+  status: string;
+  vehicle_plate: string | null;
+  languages_spoken: string | null;
+  created_at: string;
+};
+
+export default function AdminDriverApplicationsPage() {
+  const [list, setList] = useState<DriverApp[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/admin/driver-applications")
+      .then((r) => r.json())
+      .then((data) => setList(Array.isArray(data) ? data : []))
+      .catch(() => setList([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return (
+    <div>
+      <h1 className="mb-6 text-2xl font-semibold text-[#0d2137]">طلبات السائقين</h1>
+      {loading ? (
+        <p className="text-[#0d2137]/70">جاري التحميل…</p>
+      ) : list.length === 0 ? (
+        <p className="text-[#0d2137]/70">لا توجد طلبات حتى الآن.</p>
+      ) : (
+        <div className="overflow-x-auto rounded-xl border border-[#0d2137]/10 bg-white shadow-sm">
+          <table className="w-full min-w-[640px] text-right">
+            <thead>
+              <tr className="border-b border-[#0d2137]/10 bg-[#0d2137]/5">
+                <th className="p-3 text-sm font-semibold text-[#0d2137]">الاسم</th>
+                <th className="p-3 text-sm font-semibold text-[#0d2137]">البريد</th>
+                <th className="p-3 text-sm font-semibold text-[#0d2137]">الهاتف</th>
+                <th className="p-3 text-sm font-semibold text-[#0d2137]">المدينة</th>
+                <th className="p-3 text-sm font-semibold text-[#0d2137]">الحالة</th>
+                <th className="p-3 text-sm font-semibold text-[#0d2137]">التاريخ</th>
+                <th className="p-3 text-sm font-semibold text-[#0d2137]"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {list.map((app) => (
+                <tr key={app.id} className="border-b border-[#0d2137]/5 hover:bg-[#0d2137]/[0.02]">
+                  <td className="p-3 text-sm text-[#0d2137]">{app.full_name}</td>
+                  <td className="p-3 text-sm text-[#0d2137]/80">{app.email}</td>
+                  <td className="p-3 text-sm text-[#0d2137]/80">{app.phone}</td>
+                  <td className="p-3 text-sm text-[#0d2137]/80">{app.city}</td>
+                  <td className="p-3 text-sm text-[#0d2137]/80">{app.status === "new" ? "جديد" : app.status}</td>
+                  <td className="p-3 text-sm text-[#0d2137]/70">
+                    {new Date(app.created_at).toLocaleDateString("ar-DE")}
+                  </td>
+                  <td className="p-3">
+                    <Link
+                      href={`/admin/driver-applications/${app.id}`}
+                      className="rounded-lg bg-[var(--accent)]/10 px-3 py-1.5 text-sm font-medium text-[var(--accent)] hover:bg-[var(--accent)]/20"
+                    >
+                      عرض
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
