@@ -101,6 +101,10 @@ export function OrderForm({ locale }: { locale: string }) {
   const [routeDurationMinutes, setRouteDurationMinutes] = useState<number | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const step1Complete = data.companyName.trim() !== "" && data.email.trim() !== "" && data.phone.trim() !== "";
+  const step2Complete = data.pickupAddress.trim() !== "" && data.deliveryAddress.trim() !== "";
+  const step3Complete = data.serviceType !== "" && distanceFromRoute;
+
   const oneWayMinutes = routeDurationMinutes ?? (data.distanceKm / 50) * 60;
   const roundTripMinutes = oneWayMinutes * 2;
   const { loadingMinutes, unloadingMinutes } = getLoadUnloadMinutes(
@@ -348,13 +352,13 @@ export function OrderForm({ locale }: { locale: string }) {
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
-              {t("phone")}
+              {t("whatsapp")}
             </label>
             <input
               type="tel"
               value={data.phone}
               onChange={(e) => update({ phone: e.target.value })}
-              placeholder={t("phonePlaceholder")}
+              placeholder={t("whatsappPlaceholder")}
               className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
             />
           </div>
@@ -743,7 +747,7 @@ export function OrderForm({ locale }: { locale: string }) {
           <div className="space-y-2 rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/5 p-4 text-sm">
             <p><strong>{t("companyName")}:</strong> {data.companyName}</p>
             <p><strong>{t("email")}:</strong> {data.email}</p>
-            <p><strong>{t("phone")}:</strong> {data.phone}</p>
+            <p><strong>{t("whatsapp")}:</strong> {data.phone}</p>
             <p><strong>{t("pickup")}:</strong> {data.pickupAddress}</p>
             <p><strong>{t("delivery")}:</strong> {data.deliveryAddress}</p>
             {(data.pickupDate || data.pickupTime) && (
@@ -823,7 +827,12 @@ export function OrderForm({ locale }: { locale: string }) {
             <button
               type="button"
               onClick={next}
-              disabled={distanceLoading || (step === 3 && !data.serviceType)}
+              disabled={
+                distanceLoading ||
+                (step === 1 && !step1Complete) ||
+                (step === 2 && !step2Complete) ||
+                (step === 3 && !step3Complete)
+              }
               className="rounded-lg bg-[var(--accent)] px-6 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {distanceLoading ? "…" : t("next")}

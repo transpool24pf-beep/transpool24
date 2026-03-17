@@ -31,6 +31,8 @@
     "emailPlaceholder": "example@company.com",
     "phone": "Phone number",
     "phonePlaceholder": "+49 123 456789",
+    "whatsapp": "WhatsApp",
+    "whatsappPlaceholder": "WhatsApp number with country code, e.g. +49 123 456789",
     "pickup": "Pickup address",
     "pickupPlaceholder": "Pforzheim or surrounding area",
     "delivery": "Delivery address",

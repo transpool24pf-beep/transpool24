@@ -31,6 +31,8 @@
     "emailPlaceholder": "beispiel@firma.de",
     "phone": "Telefonnummer",
     "phonePlaceholder": "+49 123 456789",
+    "whatsapp": "WhatsApp",
+    "whatsappPlaceholder": "WhatsApp-Nummer mit Ländervorwahl, z. B. +49 123 456789",
     "pickup": "Abholadresse",
     "pickupPlaceholder": "Pforzheim oder Umgebung",
     "delivery": "Lieferadresse",

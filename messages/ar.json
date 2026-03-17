@@ -31,6 +31,8 @@
     "emailPlaceholder": "example@company.com",
     "phone": "رقم الهاتف",
     "phonePlaceholder": "+49 123 456789",
+    "whatsapp": "واتساب",
+    "whatsappPlaceholder": "رقم واتساب مع رمز الدولة، مثال: +49 123 456789",
     "pickup": "عنوان الاستلام",
     "pickupPlaceholder": "بفورتسهايم أو الجوار",
     "delivery": "عنوان التسليم",

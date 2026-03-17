@@ -31,6 +31,8 @@
     "emailPlaceholder": "ornek@sirket.com",
     "phone": "Telefon numarası",
     "phonePlaceholder": "+49 123 456789",
+    "whatsapp": "WhatsApp",
+    "whatsappPlaceholder": "Ülke kodu ile WhatsApp numarası, örn. +49 123 456789",
     "pickup": "Alış adresi",
     "pickupPlaceholder": "Pforzheim veya çevresi",
     "delivery": "Teslimat adresi",
