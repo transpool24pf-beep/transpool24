@@ -44,7 +44,7 @@ export default function AdminDriverApplicationsPage() {
       <h1 className="mb-6 text-2xl font-semibold text-[#0d2137]">طلبات السائقين</h1>
       {apiError && (
         <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
-          {apiError} — تأكد من تنفيذ ملف الهجرة <code className="bg-amber-100 px-1">add_driver_applications.sql</code> و <code className="bg-amber-100 px-1">add_driver_application_fields.sql</code> في Supabase.
+          {apiError} — تأكد من تنفيذ ملفات الهجرة في Supabase: add_driver_applications.sql و add_driver_application_fields.sql و add_driver_application_approve_reject.sql
         </div>
       )}
       {loading ? (
@@ -72,7 +72,9 @@ export default function AdminDriverApplicationsPage() {
                   <td className="p-3 text-sm text-[#0d2137]/80">{app.email}</td>
                   <td className="p-3 text-sm text-[#0d2137]/80">{app.phone}</td>
                   <td className="p-3 text-sm text-[#0d2137]/80">{app.city}</td>
-                  <td className="p-3 text-sm text-[#0d2137]/80">{app.status === "new" ? "جديد" : app.status}</td>
+                  <td className="p-3 text-sm text-[#0d2137]/80">
+                    {app.status === "new" ? "جديد" : app.status === "approved" ? "موافق عليه" : app.status === "rejected" ? "مرفوض" : app.status}
+                  </td>
                   <td className="p-3 text-sm text-[#0d2137]/70">
                     {new Date(app.created_at).toLocaleDateString("ar-DE")}
                   </td>
