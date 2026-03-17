@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { calculatePriceCents, formatPrice, type ServiceType } from "@/lib/pricing";
-import { volumeM3, suggestCargoSize, suggestVehicleLabel, type CargoType } from "@/lib/cargo";
+import { volumeM3, suggestCargoSize, suggestVehicleLabel, getLoadUnloadMinutes, CARGO_CATEGORIES, type CargoType, type CargoCategoryId } from "@/lib/cargo";
 
 const RouteMap = dynamic(
   () => import("@/components/RouteMapInner").then((m) => m.RouteMapInner),
@@ -51,6 +51,7 @@ export type OrderFormData = {
   pickupDate: string;
   pickupTime: string;
   cargoSize: CargoSize;
+  cargoCategory: CargoCategoryId | "";
   serviceType: ServiceType | "";
   distanceKm: number;
   cargoLengthCm: number;
@@ -70,6 +71,7 @@ const initial: OrderFormData = {
   pickupDate: "",
   pickupTime: "",
   cargoSize: "M",
+  cargoCategory: "",
   serviceType: "",
   distanceKm: DEFAULT_KM,
   cargoLengthCm: 0,
@@ -96,16 +98,24 @@ export function OrderForm({ locale }: { locale: string }) {
   const [distanceFromRoute, setDistanceFromRoute] = useState(false);
   const [distanceError, setDistanceError] = useState<string | null>(null);
   const [routeGeo, setRouteGeo] = useState<RouteGeo | null>(null);
+  const [routeDurationMinutes, setRouteDurationMinutes] = useState<number | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const estimatedDurationMinutes =
-    data.serviceType === "driver_only" ? (data.distanceKm / 50) * 60 : null;
+  const oneWayMinutes = routeDurationMinutes ?? (data.distanceKm / 50) * 60;
+  const roundTripMinutes = oneWayMinutes * 2;
+  const { loadingMinutes, unloadingMinutes } = getLoadUnloadMinutes(
+    data.cargoCategory || null,
+    data.cargoWeightKg || 0
+  );
+  const totalDriverMinutes = roundTripMinutes + loadingMinutes + unloadingMinutes;
+  const estimatedDurationMinutes = routeDurationMinutes ?? (data.distanceKm / 50) * 60;
   const priceCents = calculatePriceCents(
     data.distanceKm,
     data.cargoSize,
     estimatedDurationMinutes,
     null,
-    data.serviceType || "driver_car"
+    data.serviceType || "driver_car",
+    totalDriverMinutes
   );
 
   const fetchSuggestions = useCallback((query: string, setter: (s: Suggestion[]) => void) => {
@@ -139,14 +149,19 @@ export function OrderForm({ locale }: { locale: string }) {
     if (!data.pickupAddress.trim() || !data.deliveryAddress.trim()) return;
     setDistanceLoading(true);
     setDistanceError(null);
+    const departureParam =
+      data.pickupDate && data.pickupTime
+        ? `&departure_time=${encodeURIComponent(`${data.pickupDate}T${data.pickupTime}`)}`
+        : "";
     try {
       const res = await fetch(
-        `/api/route-distance?pickup=${encodeURIComponent(data.pickupAddress)}&delivery=${encodeURIComponent(data.deliveryAddress)}&_=${Date.now()}`
+        `/api/route-distance?pickup=${encodeURIComponent(data.pickupAddress)}&delivery=${encodeURIComponent(data.deliveryAddress)}${departureParam}&_=${Date.now()}`
       );
       const json = await res.json();
       if (res.ok && typeof json.distanceKm === "number" && json.distanceKm > 0) {
         update({ distanceKm: Math.round(json.distanceKm * 10) / 10 });
         setDistanceFromRoute(true);
+        setRouteDurationMinutes(typeof json.durationMinutes === "number" ? json.durationMinutes : null);
         if (json.from && json.to) {
           setRouteGeo({
             from: json.from,
@@ -159,16 +174,18 @@ export function OrderForm({ locale }: { locale: string }) {
       } else {
         setDistanceFromRoute(false);
         setRouteGeo(null);
+        setRouteDurationMinutes(null);
         setDistanceError(json.error || "Could not calculate route");
       }
     } catch {
       setDistanceFromRoute(false);
       setRouteGeo(null);
+      setRouteDurationMinutes(null);
       setDistanceError("Network error");
     } finally {
       setDistanceLoading(false);
     }
-  }, [data.pickupAddress, data.deliveryAddress]);
+  }, [data.pickupAddress, data.deliveryAddress, data.pickupDate, data.pickupTime]);
 
   // If we have distance but no map data (e.g. old API response), refetch once to get from/to for the map
   useEffect(() => {
@@ -247,7 +264,8 @@ export function OrderForm({ locale }: { locale: string }) {
             data.cargoHeightCm > 0 ||
             data.cargoWeightKg > 0 ||
             data.cargoType ||
-            data.stackable
+            data.stackable ||
+            data.cargoCategory
               ? {
                   lengthCm: data.cargoLengthCm || null,
                   widthCm: data.cargoWidthCm || null,
@@ -255,6 +273,7 @@ export function OrderForm({ locale }: { locale: string }) {
                   weightKg: data.cargoWeightKg || null,
                   cargoType: data.cargoType || null,
                   stackable: data.stackable,
+                  cargoCategory: data.cargoCategory || null,
                 }
               : null,
         }),
@@ -487,6 +506,30 @@ export function OrderForm({ locale }: { locale: string }) {
           </h2>
           <div>
             <label className="mb-2 block text-sm font-medium text-[var(--foreground)]">
+              {t("cargoWhatToTransport")}
+            </label>
+            <select
+              value={data.cargoCategory || ""}
+              onChange={(e) => {
+                const id = (e.target.value || "") as CargoCategoryId | "";
+                const cat = id ? CARGO_CATEGORIES.find((c) => c.id === id) : null;
+                update({
+                  cargoCategory: id,
+                  ...(cat ? { cargoSize: cat.suggestedSize } : {}),
+                });
+              }}
+              className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2.5 text-[var(--foreground)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+            >
+              <option value="">— {t("cargoSelectCategory")}</option>
+              {CARGO_CATEGORIES.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {t(c.labelKey)}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-[var(--foreground)]">
               {t("serviceType")}
             </label>
             <div className="space-y-2">
@@ -637,6 +680,21 @@ export function OrderForm({ locale }: { locale: string }) {
               ))}
             </div>
           </div>
+          <div className="rounded-lg border border-[#0d2137]/15 bg-[#0d2137]/5 p-4">
+            <p className="mb-2 text-sm font-medium text-[var(--foreground)]">{t("driverTimeSummary")}</p>
+            <p className="text-sm text-[var(--foreground)]/90">
+              {t("roundTripTime")}: {Math.floor(roundTripMinutes / 60)} {t("hours")} {roundTripMinutes % 60} {t("minutes")}
+              {routeDurationMinutes != null && (
+                <span className="ml-1 text-green-700">({t("fromRoute")})</span>
+              )}
+            </p>
+            <p className="text-sm text-[var(--foreground)]/90">
+              {t("loadingUnloadingTime")}: {loadingMinutes} + {unloadingMinutes} {t("minutes")}
+            </p>
+            <p className="mt-2 text-sm font-semibold text-[var(--accent)]">
+              {t("totalDriverTime")}: {(totalDriverMinutes / 60).toFixed(1)} {t("hours")}
+            </p>
+          </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
               {distanceFromRoute ? t("distanceRoute") : t("distance")} (km)
@@ -684,6 +742,9 @@ export function OrderForm({ locale }: { locale: string }) {
               <p><strong>{t("pickupDate")} / {t("pickupTime")}:</strong> {data.pickupDate ? new Date(data.pickupDate).toLocaleDateString() : "—"} {data.pickupTime ? data.pickupTime : ""}</p>
             )}
             <p><strong>{t("serviceType")}:</strong> {data.serviceType ? t(SERVICE_OPTIONS.find((o) => o.value === data.serviceType)?.key ?? "serviceDriverCar") : "—"}</p>
+            {data.cargoCategory && (
+              <p><strong>{t("cargoWhatToTransport")}:</strong> {t(CARGO_CATEGORIES.find((c) => c.id === data.cargoCategory)?.labelKey ?? "cargoCatMisc")}</p>
+            )}
             <p><strong>{t("cargoSize")}:</strong> {t(`cargo${data.cargoSize}` as "cargoXS")}</p>
             {(data.cargoLengthCm > 0 || data.cargoWidthCm > 0 || data.cargoHeightCm > 0 || data.cargoWeightKg > 0 || data.cargoType) && (
               <p><strong>{t("cargoDetails")}:</strong> {[data.cargoLengthCm && `${data.cargoLengthCm}×${data.cargoWidthCm}×${data.cargoHeightCm} cm`, data.cargoWeightKg && `${data.cargoWeightKg} kg`, data.cargoType && t(CARGO_TYPE_OPTIONS.find((o) => o.value === data.cargoType)?.key ?? "cargoTypeEuroPallet"), data.stackable && t("stackable")].filter(Boolean).join(" · ")}</p>

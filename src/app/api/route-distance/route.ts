@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getRouteDistanceAndDuration } from "@/lib/route-distance-server";
 
 const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
 const OSRM_URL = "https://router.project-osrm.org/route/v1/driving";
@@ -23,14 +24,21 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const pickup = searchParams.get("pickup");
   const delivery = searchParams.get("delivery");
+  const departureTimeParam = searchParams.get("departure_time");
   if (!pickup || !delivery) {
     return NextResponse.json({ error: "Missing pickup or delivery" }, { status: 400 });
   }
+  const departureTime =
+    departureTimeParam && !Number.isNaN(Date.parse(departureTimeParam))
+      ? new Date(departureTimeParam)
+      : null;
+
   try {
     const [from, to] = await Promise.all([geocode(pickup), geocode(delivery)]);
     if (!from || !to) {
       return NextResponse.json({ error: "Could not geocode one or both addresses" }, { status: 400 });
     }
+
     const res = await fetch(
       `${OSRM_URL}/${from.lon},${from.lat};${to.lon},${to.lat}?overview=full&geometries=geojson`
     );
@@ -40,13 +48,23 @@ export async function GET(req: Request) {
     }
     const route = data.routes[0];
     const distanceMeters = route.distance;
-    const distanceKm = Math.round((distanceMeters / 1000) * 10) / 10;
-    const geometry = route.geometry; // GeoJSON LineString
+    let distanceKm = Math.round((distanceMeters / 1000) * 10) / 10;
+    let durationMinutes: number | null = null;
+
+    if (departureTime) {
+      const routeWithDuration = await getRouteDistanceAndDuration(pickup, delivery, departureTime);
+      if (routeWithDuration && routeWithDuration.distanceKm > 0) {
+        distanceKm = routeWithDuration.distanceKm;
+        durationMinutes = routeWithDuration.durationMinutes ?? null;
+      }
+    }
+
     return NextResponse.json({
       distanceKm,
+      durationMinutes,
       from: { lat: from.lat, lon: from.lon },
       to: { lat: to.lat, lon: to.lon },
-      geometry: geometry ?? null,
+      geometry: route.geometry ?? null,
     });
   } catch (e) {
     console.error("[route-distance]", e);

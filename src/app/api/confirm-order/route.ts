@@ -3,6 +3,7 @@ import { createServerSupabase } from "@/lib/supabase";
 import { calculatePriceCents } from "@/lib/pricing";
 import { getPricingSettings } from "@/lib/settings";
 import { getRouteDistanceAndDuration } from "@/lib/route-distance-server";
+import { getLoadUnloadMinutes } from "@/lib/cargo";
 import { randomBytes } from "crypto";
 
 const VALID_CARGO = ["XS", "M", "L"] as const;
@@ -55,16 +56,32 @@ export async function POST(req: Request) {
       );
     }
     const { distanceKm, durationMinutes } = route;
+    const oneWayMinutes = durationMinutes ?? Math.round((distanceKm / 50) * 60);
+    const roundTripMinutes = oneWayMinutes * 2;
+    const weightKg = cargoDetails?.weightKg != null ? Number(cargoDetails.weightKg) : 0;
+    const { loadingMinutes, unloadingMinutes } = getLoadUnloadMinutes(
+      cargoDetails?.cargoCategory ?? null,
+      weightKg
+    );
+    const totalDriverMinutes = roundTripMinutes + loadingMinutes + unloadingMinutes;
+
     const st = VALID_SERVICE_TYPES.includes(serviceType as (typeof VALID_SERVICE_TYPES)[number])
       ? (serviceType as (typeof VALID_SERVICE_TYPES)[number])
       : "driver_car";
     const pricing = await getPricingSettings();
-    const priceCents = calculatePriceCents(distanceKm, cargoSize, durationMinutes ?? null, {
-      price_per_km_cents: pricing.price_per_km_cents,
-      driver_hourly_rate_cents: pricing.driver_hourly_rate_cents,
-      driver_only_hourly_cents: pricing.driver_only_hourly_cents,
-      assistant_fee_cents: pricing.assistant_fee_cents,
-    }, st);
+    const priceCents = calculatePriceCents(
+      distanceKm,
+      cargoSize,
+      durationMinutes ?? null,
+      {
+        price_per_km_cents: pricing.price_per_km_cents,
+        driver_hourly_rate_cents: pricing.driver_hourly_rate_cents,
+        driver_only_hourly_cents: pricing.driver_only_hourly_cents,
+        assistant_fee_cents: pricing.assistant_fee_cents,
+      },
+      st,
+      totalDriverMinutes
+    );
 
     const supabase = createServerSupabase();
     const confirmationToken = generateToken();
@@ -81,7 +98,17 @@ export async function POST(req: Request) {
         delivery_address: deliveryAddress,
         delivery_city: null,
         cargo_size: cargoSize,
-        cargo_details: cargoDetails && typeof cargoDetails === "object" ? cargoDetails : null,
+        cargo_details:
+          cargoDetails && typeof cargoDetails === "object"
+            ? {
+                ...cargoDetails,
+                cargoCategory: cargoDetails.cargoCategory ?? null,
+                roundTripMinutes,
+                loadingMinutes,
+                unloadingMinutes,
+                totalDriverMinutes,
+              }
+            : null,
         service_type: st,
         distance_km: distanceKm,
         duration_minutes: durationMinutes ?? null,
