@@ -22,21 +22,26 @@ type Job = {
   confirmation_token: string | null;
 };
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  draft: { label: "مسودة / Draft", color: "text-slate-700", bg: "bg-slate-400" },
-  confirmed: { label: "قيد الانتظار / Confirmed", color: "text-blue-700", bg: "bg-blue-500" },
-  paid: { label: "مدفوع / Paid", color: "text-emerald-700", bg: "bg-emerald-500" },
-  assigned: { label: "قيد التنفيذ / Assigned", color: "text-amber-700", bg: "bg-amber-500" },
-  in_transit: { label: "في الطريق / In transit", color: "text-violet-700", bg: "bg-violet-500" },
-  delivered: { label: "تم التسليم / Delivered", color: "text-green-700", bg: "bg-green-500" },
-  cancelled: { label: "ملغي / Cancelled", color: "text-red-700", bg: "bg-red-500" },
+const STATUS_CONFIG: Record<string, { label: string; labelAr: string; color: string; bg: string }> = {
+  draft: { label: "مسودة / Draft", labelAr: "مسودة", color: "text-slate-700", bg: "bg-slate-400" },
+  confirmed: { label: "قيد الانتظار / Confirmed", labelAr: "قيد الانتظار", color: "text-blue-700", bg: "bg-blue-500" },
+  paid: { label: "مدفوع / Paid", labelAr: "مدفوع", color: "text-emerald-700", bg: "bg-emerald-500" },
+  assigned: { label: "قيد التنفيذ / Assigned", labelAr: "قيد التنفيذ", color: "text-amber-700", bg: "bg-amber-500" },
+  in_transit: { label: "في الطريق / In transit", labelAr: "في الطريق", color: "text-violet-700", bg: "bg-violet-500" },
+  delivered: { label: "تم التسليم / Delivered", labelAr: "تم التسليم", color: "text-green-700", bg: "bg-green-500" },
+  cancelled: { label: "ملغي / Cancelled", labelAr: "ملغي", color: "text-red-700", bg: "bg-red-500" },
 };
 
-const DRIVER_INVOICE_DEFAULT_EUR = 18;
+/** سعر السائق: إما المحفوظ أو 18 × مسافة الذهاب والإياب (بالمليم) */
+function getDriverPriceEur(o: Job): string {
+  if (o.driver_price_cents != null) return (o.driver_price_cents / 100).toFixed(2);
+  if (o.distance_km != null && o.distance_km > 0) return ((18 * o.distance_km * 2) / 100).toFixed(2);
+  return "18.00";
+}
 
 /** رسالة واتساب للمجموعة: عنوان + السعر الذي يحدده الأدمن فقط (بدون رابط تأكيد أو سعر عميل) */
 function buildWhatsAppMessage(o: Job): string {
-  const driverPrice = o.driver_price_cents != null ? (o.driver_price_cents / 100).toFixed(2) : DRIVER_INVOICE_DEFAULT_EUR.toFixed(2);
+  const driverPrice = getDriverPriceEur(o);
   const orderRef = o.order_number != null ? String(o.order_number) : o.id;
   const lines = [
     "🚚 TransPool24 – طلب للنقل",
@@ -60,6 +65,7 @@ function matchSearch(o: Job, q: string): boolean {
   const s = q.trim().toLowerCase();
   const str = (v: unknown) => (v == null ? "" : String(v)).toLowerCase();
   const statusLabel = STATUS_CONFIG[o.logistics_status]?.label ?? "";
+  const statusLabelAr = STATUS_CONFIG[o.logistics_status]?.labelAr ?? "";
   return (
     str(o.id).includes(s) ||
     (o.order_number != null && str(o.order_number).includes(s)) ||
@@ -71,6 +77,7 @@ function matchSearch(o: Job, q: string): boolean {
     str(o.cargo_size).includes(s) ||
     str(o.logistics_status).includes(s) ||
     str(statusLabel).includes(s) ||
+    str(statusLabelAr).includes(s) ||
     str((o.price_cents / 100).toFixed(2)).includes(s) ||
     (o.driver_price_cents != null && str((o.driver_price_cents / 100).toFixed(2)).includes(s))
   );
@@ -138,7 +145,16 @@ export default function AdminOrdersPage() {
     })
       .then((r) => {
         if (r.ok) alert("تم إرسال البريد.");
-        else r.json().then((d) => alert(d.error || "فشل الإرسال."));
+        else
+          r.json().then((d) => {
+            const errMsg =
+              typeof d?.error === "string"
+                ? d.error
+                : (d?.error && typeof d.error === "object" && "message" in d.error)
+                  ? String((d.error as { message: unknown }).message)
+                  : "فشل الإرسال.";
+            alert(errMsg);
+          });
       })
       .catch(() => alert("فشل الطلب"))
       .finally(() => setSending(null));
@@ -147,6 +163,12 @@ export default function AdminOrdersPage() {
   const openWhatsApp = (o: Job) => {
     const text = buildWhatsAppMessage(o);
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener");
+  };
+
+  const openWhatsAppCustomer = (phone: string) => {
+    const digits = phone.replace(/\D/g, "");
+    if (!digits) return;
+    window.open(`https://wa.me/${digits}`, "_blank", "noopener");
   };
 
   const downloadInvoice = (jobId: string, type: "customer" | "driver") => {
@@ -175,9 +197,9 @@ export default function AdminOrdersPage() {
           className="rounded-xl border-2 border-[#0d2137]/15 bg-white px-4 py-2.5 text-sm font-medium text-[#0d2137] shadow-sm transition focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30"
         >
           <option value="">كل الحالات / All statuses</option>
-          {Object.entries(STATUS_CONFIG).map(([value, { label }]) => (
+          {Object.entries(STATUS_CONFIG).map(([value, { labelAr }]) => (
             <option key={value} value={value}>
-              {label}
+              {labelAr}
             </option>
           ))}
         </select>
@@ -193,16 +215,15 @@ export default function AdminOrdersPage() {
             <table className="w-full table-fixed text-left text-sm">
               <thead>
                 <tr className="border-b-2 border-[#0d2137]/10 bg-gradient-to-r from-[#0d2137]/10 to-[#0d2137]/5">
-                  <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">رقم الطلب</th>
-                  <th className="w-[9%] px-2 py-3 font-semibold text-[#0d2137]">الحالة</th>
-                  <th className="w-[6%] px-2 py-3 font-semibold text-[#0d2137]">التاريخ</th>
-                  <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">الشركة</th>
-                  <th className="w-[11%] px-2 py-3 font-semibold text-[#0d2137]">البريد</th>
-                  <th className="w-[16%] px-2 py-3 font-semibold text-[#0d2137]">الطريق</th>
-                  <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">سعر العميل</th>
-                  <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">سعر السائق</th>
-                  <th className="w-[6%] px-2 py-3 font-semibold text-[#0d2137]">الدفع</th>
-                  <th className="w-[19%] px-2 py-3 font-semibold text-[#0d2137]">إجراءات</th>
+                  <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">رقم الطلب</th>
+                  <th className="w-[10%] px-2 py-3 font-semibold text-[#0d2137]">الحالة</th>
+                  <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">التاريخ</th>
+                  <th className="w-[9%] px-2 py-3 font-semibold text-[#0d2137]">الشركة</th>
+                  <th className="w-[14%] px-2 py-3 font-semibold text-[#0d2137]">البريد</th>
+                  <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">سعر العميل</th>
+                  <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">سعر السائق</th>
+                  <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">الدفع</th>
+                  <th className="w-[29%] px-2 py-3 font-semibold text-[#0d2137]">إجراءات</th>
                 </tr>
               </thead>
               <tbody>
@@ -222,7 +243,7 @@ export default function AdminOrdersPage() {
                         <div className="flex items-center gap-1">
                           <span
                             className={`inline-block h-3 w-3 shrink-0 rounded-full ${statusConf.bg}`}
-                            title={statusConf.label}
+                            title={statusConf.labelAr}
                           />
                           <select
                             value={o.logistics_status}
@@ -230,9 +251,9 @@ export default function AdminOrdersPage() {
                             disabled={updating === o.id}
                             className={`rounded-lg border-2 bg-white px-2 py-1.5 text-xs font-medium ${statusConf.color} focus:border-[var(--accent)] focus:outline-none`}
                           >
-                            {Object.entries(STATUS_CONFIG).map(([value, { label }]) => (
+                            {Object.entries(STATUS_CONFIG).map(([value, { labelAr }]) => (
                               <option key={value} value={value}>
-                                {label}
+                                {labelAr}
                               </option>
                             ))}
                           </select>
@@ -246,9 +267,6 @@ export default function AdminOrdersPage() {
                       </td>
                       <td className="min-w-0 px-2 py-2 text-[#0d2137]/80 text-xs break-words" title={o.customer_email ?? ""}>
                         {o.customer_email ?? "—"}
-                      </td>
-                      <td className="min-w-0 px-2 py-2 text-[#0d2137]/80 text-xs break-words" title={`${o.pickup_address} → ${o.delivery_address}`}>
-                        <span className="line-clamp-2">{o.pickup_address} → {o.delivery_address}</span>
                       </td>
                       <td className="min-w-0 px-2 py-2 font-semibold text-[#0d2137] text-xs whitespace-nowrap">
                         € {(o.price_cents / 100).toFixed(2)}
@@ -289,7 +307,14 @@ export default function AdminOrdersPage() {
                             onClick={() => openWhatsApp(o)}
                             className="inline-flex items-center justify-center rounded-lg bg-[#25D366] px-2 py-1.5 text-[10px] font-medium text-white hover:bg-[#20bd5a]"
                           >
-                            واتساب
+                            واتساب مجموعة
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => openWhatsAppCustomer(o.phone)}
+                            className="inline-flex items-center justify-center rounded-lg border border-[#25D366] bg-[#25D366]/10 px-2 py-1.5 text-[10px] font-medium text-[#25D366] hover:bg-[#25D366]/20"
+                          >
+                            واتساب عميل
                           </button>
                           <button
                             type="button"

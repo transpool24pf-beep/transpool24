@@ -88,6 +88,10 @@ export async function POST(req: Request) {
       totalDriverMinutes
     );
 
+    /** سعر السائق = 18 × مسافة الذهاب والإياب (بالمليم) — 18 سنت لكل كم ذهاب وإياب */
+    const roundTripKm = distanceKm * 2;
+    const driverPriceCents = Math.round(18 * roundTripKm);
+
     const supabase = createServerSupabase();
     const confirmationToken = generateToken();
     let orderNumber = generateOrderNumber();
@@ -125,6 +129,7 @@ export async function POST(req: Request) {
         distance_km: distanceKm,
         duration_minutes: durationMinutes ?? null,
         price_cents: priceCents,
+        driver_price_cents: driverPriceCents,
         payment_status: "pending",
         logistics_status: "confirmed",
         confirmation_token: confirmationToken,

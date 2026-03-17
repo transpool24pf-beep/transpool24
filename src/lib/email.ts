@@ -61,7 +61,13 @@ export async function sendOrderConfirmationEmail(
     });
     if (error) {
       console.error("[TransPool24] Resend error:", error);
-      return { success: false, error: String(error) };
+      const errMsg =
+        typeof error === "string"
+          ? error
+          : (error && typeof error === "object" && "message" in error)
+            ? String((error as { message: unknown }).message)
+            : JSON.stringify(error);
+      return { success: false, error: errMsg };
     }
     return { success: true };
   } catch (e) {

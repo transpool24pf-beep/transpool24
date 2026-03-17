@@ -22,13 +22,7 @@ export async function GET(req: Request) {
   if (error || !job) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
   }
-  const driverCents = type === "driver" && (job.driver_price_cents == null)
-    ? 1800
-    : job.driver_price_cents;
-  const pdf = await generateInvoicePdf(
-    { ...job, driver_price_cents: driverCents ?? undefined },
-    { type }
-  );
+  const pdf = await generateInvoicePdf(job, { type });
   const filename = type === "driver"
     ? `TransPool24-Gruppe-${String(jobId).slice(0, 8)}.pdf`
     : `TransPool24-Rechnung-${String(jobId).slice(0, 8)}.pdf`;

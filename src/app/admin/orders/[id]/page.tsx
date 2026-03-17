@@ -22,13 +22,16 @@ type Job = {
   confirmation_token: string | null;
 };
 
-const DRIVER_INVOICE_DEFAULT_EUR = 18;
+/** سعر السائق: إما المحفوظ أو 18 × مسافة الذهاب والإياب (بالمليم) */
+function getDriverPriceEur(o: Job): string {
+  if (o.driver_price_cents != null) return (o.driver_price_cents / 100).toFixed(2);
+  if (o.distance_km != null && o.distance_km > 0) return ((18 * o.distance_km * 2) / 100).toFixed(2);
+  return "18.00";
+}
 
 /** رسالة واتساب للمجموعة: عنوان + السعر الذي يحدده الأدمن فقط (بدون رابط تأكيد أو سعر عميل) */
 function buildWhatsAppMessage(o: Job): string {
-  const driverPriceEur = o.driver_price_cents != null
-    ? (o.driver_price_cents / 100).toFixed(2)
-    : DRIVER_INVOICE_DEFAULT_EUR.toFixed(2);
+  const driverPriceEur = getDriverPriceEur(o);
   const orderRef = o.order_number != null ? String(o.order_number) : o.id;
   const lines = [
     "🚚 TransPool24 – طلب للنقل",
@@ -80,7 +83,16 @@ export default function AdminOrderDetailPage({
     })
       .then((r) => {
         if (r.ok) alert("تم إرسال البريد إلى " + order.customer_email);
-        else r.json().then((d) => alert(d.error || "فشل الإرسال."));
+        else
+          r.json().then((d) => {
+            const errMsg =
+              typeof d?.error === "string"
+                ? d.error
+                : (d?.error && typeof d.error === "object" && "message" in d.error)
+                  ? String((d.error as { message: unknown }).message)
+                  : "فشل الإرسال.";
+            alert(errMsg);
+          });
       })
       .catch(() => alert("فشل الطلب"))
       .finally(() => setSending(false));
@@ -90,6 +102,13 @@ export default function AdminOrderDetailPage({
     if (!order) return;
     const text = buildWhatsAppMessage(order);
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener");
+  };
+
+  const openWhatsAppCustomer = () => {
+    if (!order?.phone) return;
+    const digits = order.phone.replace(/\D/g, "");
+    if (!digits) return;
+    window.open(`https://wa.me/${digits}`, "_blank", "noopener");
   };
 
   const openEmailClient = () => {
@@ -121,9 +140,7 @@ export default function AdminOrderDetailPage({
     );
   }
 
-  const driverPriceEur = order.driver_price_cents != null
-    ? (order.driver_price_cents / 100).toFixed(2)
-    : DRIVER_INVOICE_DEFAULT_EUR.toFixed(2);
+  const driverPriceEur = getDriverPriceEur(order);
   const customerPriceEur = (order.price_cents / 100).toFixed(2);
 
   return (
@@ -194,6 +211,13 @@ export default function AdminOrderDetailPage({
               className="flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-3 font-medium text-white shadow-sm hover:bg-[#20bd5a]"
             >
               واتساب للمجموعة (سعر السائق فقط)
+            </button>
+            <button
+              type="button"
+              onClick={openWhatsAppCustomer}
+              className="flex items-center justify-center gap-2 rounded-xl border-2 border-[#25D366] bg-[#25D366]/10 px-4 py-3 font-medium text-[#25D366] hover:bg-[#25D366]/20"
+            >
+              واتساب العميل ({order.phone})
             </button>
             {order.customer_email && (
               <>

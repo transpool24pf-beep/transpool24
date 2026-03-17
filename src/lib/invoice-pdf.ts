@@ -17,9 +17,13 @@ export async function generateInvoicePdf(
   options?: { type?: InvoiceType }
 ): Promise<Uint8Array> {
   const type = options?.type ?? "customer";
-  const DEFAULT_DRIVER_INVOICE_CENTS = 1800;
+  /** عند عدم وجود سعر سائق: 18 × مسافة الذهاب والإياب (بالمليم) */
+  const defaultDriverCents =
+    job.distance_km != null && job.distance_km > 0
+      ? Math.round(18 * job.distance_km * 2)
+      : 1800;
   const amountCents = type === "driver"
-    ? (job.driver_price_cents ?? DEFAULT_DRIVER_INVOICE_CENTS)
+    ? (job.driver_price_cents ?? defaultDriverCents)
     : job.price_cents;
   const doc = await PDFDocument.create();
   const font = await doc.embedFont(StandardFonts.Helvetica);
@@ -28,21 +32,33 @@ export async function generateInvoicePdf(
   const { width, height } = page.getSize();
   let y = height - 60;
 
-  // Logo top-right corner
+  // Logo top-right corner (file or INVOICE_LOGO_BASE64 env for Vercel)
+  let logoBytes: Uint8Array | null = null;
   try {
-    const logoPath = path.join(process.cwd(), "public", "logo.png");
-    const logoBytes = fs.readFileSync(logoPath);
-    const img = await doc.embedPng(logoBytes);
-    const imgW = 90;
-    const imgH = Math.min(40, (img.height / img.width) * imgW);
-    page.drawImage(img, {
-      x: width - 50 - imgW,
-      y: height - 50 - imgH,
-      width: imgW,
-      height: imgH,
-    });
+    const base64 = process.env.INVOICE_LOGO_BASE64;
+    if (base64) {
+      logoBytes = new Uint8Array(Buffer.from(base64, "base64"));
+    } else {
+      const logoPath = path.join(process.cwd(), "public", "logo.png");
+      logoBytes = new Uint8Array(fs.readFileSync(logoPath));
+    }
   } catch {
-    // no logo file
+    // no logo
+  }
+  if (logoBytes && logoBytes.length > 0) {
+    try {
+      const img = await doc.embedPng(logoBytes);
+      const imgW = 90;
+      const imgH = Math.min(40, (img.height / img.width) * imgW);
+      page.drawImage(img, {
+        x: width - 50 - imgW,
+        y: height - 50 - imgH,
+        width: imgW,
+        height: imgH,
+      });
+    } catch {
+      // embed failed
+    }
   }
 
   const drawText = (
