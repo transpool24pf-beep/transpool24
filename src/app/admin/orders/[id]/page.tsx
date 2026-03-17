@@ -23,6 +23,7 @@ type Job = {
 
 const DRIVER_INVOICE_DEFAULT_EUR = 18;
 
+/** رسالة واتساب للمجموعة: عنوان + السعر الذي يحدده الأدمن فقط (بدون رابط تأكيد أو سعر عميل) */
 function buildWhatsAppMessage(o: Job): string {
   const driverPriceEur = o.driver_price_cents != null
     ? (o.driver_price_cents / 100).toFixed(2)
@@ -31,9 +32,7 @@ function buildWhatsAppMessage(o: Job): string {
     "🚚 TransPool24 – طلب للنقل",
     "",
     `📋 رقم الطلب: ${o.id}`,
-    `🏢 الشركة: ${o.company_name}`,
     `📞 الهاتف: ${o.phone}`,
-    o.customer_email ? `📧 البريد: ${o.customer_email}` : null,
     "",
     "📍 الاستلام:",
     o.pickup_address,
@@ -41,10 +40,8 @@ function buildWhatsAppMessage(o: Job): string {
     "📍 التسليم:",
     o.delivery_address,
     "",
-    `📦 الحمولة: ${o.cargo_size} | المسافة: ${o.distance_km ?? "—"} km`,
-    `💰 سعر السائق للمجموعة: ${driverPriceEur} EUR`,
-    `📅 التاريخ: ${new Date(o.created_at).toLocaleDateString("de-DE")}`,
-  ].filter(Boolean);
+    `💰 السعر: ${driverPriceEur} EUR`,
+  ];
   return lines.join("\n");
 }
 

@@ -66,7 +66,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </div>
       </header>
       <main className="min-h-screen flex-1 pt-14">
-        <div className="mx-auto max-w-4xl px-4 py-8">{children}</div>
+        <div className={`mx-auto px-4 py-8 ${pathname === "/admin/orders" ? "max-w-[98%] xl:max-w-7xl" : "max-w-4xl"}`}>
+          {children}
+        </div>
       </main>
       <aside className="sticky top-14 h-[calc(100vh-3.5rem)] w-56 shrink-0 border-l border-[#0d2137]/10 bg-white shadow-sm">
         <nav className="flex flex-col gap-1 p-4">

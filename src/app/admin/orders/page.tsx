@@ -33,15 +33,14 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }
 
 const DRIVER_INVOICE_DEFAULT_EUR = 18;
 
+/** رسالة واتساب للمجموعة: عنوان + السعر الذي يحدده الأدمن فقط (بدون رابط تأكيد أو سعر عميل) */
 function buildWhatsAppMessage(o: Job): string {
   const driverPrice = o.driver_price_cents != null ? (o.driver_price_cents / 100).toFixed(2) : DRIVER_INVOICE_DEFAULT_EUR.toFixed(2);
   const lines = [
     "🚚 TransPool24 – طلب للنقل",
     "",
     `📋 رقم الطلب: ${o.id}`,
-    `🏢 الشركة: ${o.company_name}`,
     `📞 الهاتف: ${o.phone}`,
-    o.customer_email ? `📧 البريد: ${o.customer_email}` : null,
     "",
     "📍 الاستلام:",
     o.pickup_address,
@@ -49,17 +48,36 @@ function buildWhatsAppMessage(o: Job): string {
     "📍 التسليم:",
     o.delivery_address,
     "",
-    `📦 الحمولة: ${o.cargo_size} | المسافة: ${o.distance_km ?? "—"} km`,
-    `💰 سعر السائق/المجموعة: ${driverPrice} EUR`,
-    `📅 التاريخ: ${new Date(o.created_at).toLocaleDateString("de-DE")}`,
-  ].filter(Boolean);
+    `💰 السعر: ${driverPrice} EUR`,
+  ];
   return lines.join("\n");
+}
+
+function matchSearch(o: Job, q: string): boolean {
+  if (!q.trim()) return true;
+  const s = q.trim().toLowerCase();
+  const str = (v: unknown) => (v == null ? "" : String(v)).toLowerCase();
+  const statusLabel = STATUS_CONFIG[o.logistics_status]?.label ?? "";
+  return (
+    str(o.id).includes(s) ||
+    str(o.company_name).includes(s) ||
+    str(o.phone).includes(s) ||
+    str(o.customer_email).includes(s) ||
+    str(o.pickup_address).includes(s) ||
+    str(o.delivery_address).includes(s) ||
+    str(o.cargo_size).includes(s) ||
+    str(o.logistics_status).includes(s) ||
+    str(statusLabel).includes(s) ||
+    str((o.price_cents / 100).toFixed(2)).includes(s) ||
+    (o.driver_price_cents != null && str((o.driver_price_cents / 100).toFixed(2)).includes(s))
+  );
 }
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [sending, setSending] = useState<string | null>(null);
   const [updating, setUpdating] = useState<string | null>(null);
 
@@ -132,15 +150,22 @@ export default function AdminOrdersPage() {
     window.open(`/api/admin/invoice?job_id=${encodeURIComponent(jobId)}&type=${type}`, "_blank");
   };
 
-  const filtered = filter
-    ? orders.filter((o) => o.logistics_status === filter)
-    : orders;
+  const filtered = orders
+    .filter((o) => (filter ? o.logistics_status === filter : true))
+    .filter((o) => matchSearch(o, searchQuery));
 
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-[#0d2137]">الطلبات / Orders</h1>
 
       <div className="flex flex-wrap items-center gap-3">
+        <input
+          type="search"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="بحث: رقم طلب، اسم، بريد، عنوان، سائق، أي نص..."
+          className="min-w-[220px] flex-1 rounded-xl border-2 border-[#0d2137]/15 bg-white px-4 py-2.5 text-sm text-[#0d2137] placeholder:text-[#0d2137]/50 shadow-sm transition focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30"
+        />
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
@@ -161,19 +186,19 @@ export default function AdminOrdersPage() {
         </div>
       ) : (
         <div className="overflow-hidden rounded-2xl border-2 border-[#0d2137]/10 bg-white shadow-lg">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[900px] text-left text-sm">
+          <div className="w-full overflow-hidden">
+            <table className="w-full table-fixed text-left text-sm">
               <thead>
                 <tr className="border-b-2 border-[#0d2137]/10 bg-gradient-to-r from-[#0d2137]/10 to-[#0d2137]/5">
-                  <th className="px-5 py-4 font-semibold text-[#0d2137]">الحالة</th>
-                  <th className="px-5 py-4 font-semibold text-[#0d2137]">التاريخ</th>
-                  <th className="px-5 py-4 font-semibold text-[#0d2137]">الشركة</th>
-                  <th className="px-5 py-4 font-semibold text-[#0d2137]">البريد</th>
-                  <th className="px-5 py-4 font-semibold text-[#0d2137]">الطريق</th>
-                  <th className="px-5 py-4 font-semibold text-[#0d2137]">سعر العميل</th>
-                  <th className="px-5 py-4 font-semibold text-[#0d2137]">سعر السائق</th>
-                  <th className="px-5 py-4 font-semibold text-[#0d2137]">الدفع</th>
-                  <th className="px-5 py-4 font-semibold text-[#0d2137]">إجراءات</th>
+                  <th className="w-[10%] px-2 py-3 font-semibold text-[#0d2137]">الحالة</th>
+                  <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">التاريخ</th>
+                  <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">الشركة</th>
+                  <th className="w-[12%] px-2 py-3 font-semibold text-[#0d2137]">البريد</th>
+                  <th className="w-[18%] px-2 py-3 font-semibold text-[#0d2137]">الطريق</th>
+                  <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">سعر العميل</th>
+                  <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">سعر السائق</th>
+                  <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">الدفع</th>
+                  <th className="w-[22%] px-2 py-3 font-semibold text-[#0d2137]">إجراءات</th>
                 </tr>
               </thead>
               <tbody>
@@ -186,8 +211,8 @@ export default function AdminOrdersPage() {
                         idx % 2 === 1 ? "bg-[#0d2137]/[0.02]" : ""
                       }`}
                     >
-                      <td className="px-5 py-3">
-                        <div className="flex items-center gap-2">
+                      <td className="min-w-0 px-2 py-2">
+                        <div className="flex items-center gap-1">
                           <span
                             className={`inline-block h-3 w-3 shrink-0 rounded-full ${statusConf.bg}`}
                             title={statusConf.label}
@@ -206,22 +231,22 @@ export default function AdminOrdersPage() {
                           </select>
                         </div>
                       </td>
-                      <td className="px-5 py-3 text-[#0d2137]/80">
+                      <td className="min-w-0 px-2 py-2 text-[#0d2137]/80 text-xs">
                         {new Date(o.created_at).toLocaleDateString("de-DE")}
                       </td>
-                      <td className="px-5 py-3 font-medium text-[#0d2137]">
+                      <td className="min-w-0 truncate px-2 py-2 font-medium text-[#0d2137] text-xs" title={o.company_name}>
                         {o.company_name}
                       </td>
-                      <td className="max-w-[160px] truncate px-5 py-3 text-[#0d2137]/80" title={o.customer_email ?? ""}>
+                      <td className="min-w-0 px-2 py-2 text-[#0d2137]/80 text-xs break-words" title={o.customer_email ?? ""}>
                         {o.customer_email ?? "—"}
                       </td>
-                      <td className="max-w-[200px] truncate px-5 py-3 text-[#0d2137]/80" title={`${o.pickup_address} → ${o.delivery_address}`}>
-                        {o.pickup_address} → {o.delivery_address}
+                      <td className="min-w-0 px-2 py-2 text-[#0d2137]/80 text-xs break-words" title={`${o.pickup_address} → ${o.delivery_address}`}>
+                        <span className="line-clamp-2">{o.pickup_address} → {o.delivery_address}</span>
                       </td>
-                      <td className="px-5 py-3 font-semibold text-[#0d2137]">
+                      <td className="min-w-0 px-2 py-2 font-semibold text-[#0d2137] text-xs whitespace-nowrap">
                         € {(o.price_cents / 100).toFixed(2)}
                       </td>
-                      <td className="px-5 py-3">
+                      <td className="min-w-0 px-2 py-2">
                         <input
                           type="text"
                           defaultValue={o.driver_price_cents != null ? (o.driver_price_cents / 100).toFixed(2).replace(".", ",") : ""}
@@ -230,10 +255,10 @@ export default function AdminOrdersPage() {
                             if (v) updateDriverPrice(o.id, v);
                           }}
                           placeholder="—"
-                          className="w-20 rounded border border-[#0d2137]/20 px-2 py-1 text-xs"
+                          className="w-16 max-w-full rounded border border-[#0d2137]/20 px-1.5 py-1 text-xs"
                         />
                       </td>
-                      <td className="px-5 py-3">
+                      <td className="min-w-0 px-2 py-2">
                         <span
                           className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${
                             o.payment_status === "paid"
@@ -244,45 +269,43 @@ export default function AdminOrdersPage() {
                           {o.payment_status === "paid" ? "مدفوع" : "قيد الانتظار"}
                         </span>
                       </td>
-                      <td className="px-5 py-3">
-                        <div className="flex flex-col gap-2">
+                      <td className="min-w-0 px-2 py-2">
+                        <div className="flex flex-wrap gap-1.5">
                           <Link
                             href={`/admin/orders/${o.id}`}
-                            className="inline-flex items-center justify-center rounded-lg bg-[#0d2137] px-3 py-2 text-xs font-medium text-white hover:bg-[#0d2137]/90"
+                            className="inline-flex items-center justify-center rounded-lg bg-[#0d2137] px-2 py-1.5 text-[10px] font-medium text-white hover:bg-[#0d2137]/90"
                           >
-                            فتح الطلب
+                            فتح
                           </Link>
                           <button
                             type="button"
                             onClick={() => openWhatsApp(o)}
-                            className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-[#25D366] px-3 py-2 text-xs font-medium text-white shadow-sm hover:bg-[#20bd5a]"
+                            className="inline-flex items-center justify-center rounded-lg bg-[#25D366] px-2 py-1.5 text-[10px] font-medium text-white hover:bg-[#20bd5a]"
                           >
-                            واتساب للمجموعة
+                            واتساب
                           </button>
-                          <div className="flex flex-wrap gap-1">
-                            <button
-                              type="button"
-                              onClick={() => downloadInvoice(o.id, "driver")}
-                              className="rounded-lg border-2 border-amber-200 bg-amber-50 px-2.5 py-1.5 text-xs font-medium text-amber-800 hover:bg-amber-100"
-                            >
-                              فاتورة المجموعة
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => downloadInvoice(o.id, "customer")}
-                              className="rounded-lg border-2 border-blue-200 bg-blue-50 px-2.5 py-1.5 text-xs font-medium text-blue-800 hover:bg-blue-100"
-                            >
-                              فاتورة العميل
-                            </button>
-                          </div>
+                          <button
+                            type="button"
+                            onClick={() => downloadInvoice(o.id, "driver")}
+                            className="rounded-lg border border-amber-200 bg-amber-50 px-2 py-1 text-[10px] font-medium text-amber-800 hover:bg-amber-100"
+                          >
+                            فاتورة مجموعة
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => downloadInvoice(o.id, "customer")}
+                            className="rounded-lg border border-blue-200 bg-blue-50 px-2 py-1 text-[10px] font-medium text-blue-800 hover:bg-blue-100"
+                          >
+                            فاتورة عميل
+                          </button>
                           {o.customer_email && (
                             <button
                               type="button"
                               onClick={() => sendEmail(o.id)}
                               disabled={sending === o.id}
-                              className="rounded-lg bg-[var(--accent)] px-2.5 py-1.5 text-xs font-medium text-white hover:opacity-90 disabled:opacity-60"
+                              className="rounded-lg bg-[var(--accent)] px-2 py-1 text-[10px] font-medium text-white hover:opacity-90 disabled:opacity-60"
                             >
-                              {sending === o.id ? "…" : "إرسال بريد"}
+                              {sending === o.id ? "…" : "بريد"}
                             </button>
                           )}
                         </div>
