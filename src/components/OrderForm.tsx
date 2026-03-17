@@ -36,6 +36,73 @@ const SERVICE_OPTIONS: { value: ServiceType; key: "serviceDriverOnly" | "service
 
 const DEFAULT_KM = 50;
 
+/** Country codes for WhatsApp: Germany first, then others. */
+const COUNTRY_CODES: { code: string; flag: string }[] = [
+  { code: "+49", flag: "🇩🇪" },
+  { code: "+43", flag: "🇦🇹" },
+  { code: "+41", flag: "🇨🇭" },
+  { code: "+31", flag: "🇳🇱" },
+  { code: "+32", flag: "🇧🇪" },
+  { code: "+33", flag: "🇫🇷" },
+  { code: "+34", flag: "🇪🇸" },
+  { code: "+39", flag: "🇮🇹" },
+  { code: "+44", flag: "🇬🇧" },
+  { code: "+45", flag: "🇩🇰" },
+  { code: "+46", flag: "🇸🇪" },
+  { code: "+47", flag: "🇳🇴" },
+  { code: "+48", flag: "🇵🇱" },
+  { code: "+351", flag: "🇵🇹" },
+  { code: "+352", flag: "🇱🇺" },
+  { code: "+353", flag: "🇮🇪" },
+  { code: "+358", flag: "🇫🇮" },
+  { code: "+30", flag: "🇬🇷" },
+  { code: "+36", flag: "🇭🇺" },
+  { code: "+359", flag: "🇧🇬" },
+  { code: "+385", flag: "🇭🇷" },
+  { code: "+386", flag: "🇸🇮" },
+  { code: "+420", flag: "🇨🇿" },
+  { code: "+421", flag: "🇸🇰" },
+  { code: "+370", flag: "🇱🇹" },
+  { code: "+371", flag: "🇱🇻" },
+  { code: "+372", flag: "🇪🇪" },
+  { code: "+1", flag: "🇺🇸" },
+  { code: "+52", flag: "🇲🇽" },
+  { code: "+55", flag: "🇧🇷" },
+  { code: "+54", flag: "🇦🇷" },
+  { code: "+61", flag: "🇦🇺" },
+  { code: "+81", flag: "🇯🇵" },
+  { code: "+86", flag: "🇨🇳" },
+  { code: "+91", flag: "🇮🇳" },
+  { code: "+90", flag: "🇹🇷" },
+  { code: "+7", flag: "🇷🇺" },
+  { code: "+82", flag: "🇰🇷" },
+  { code: "+27", flag: "🇿🇦" },
+  { code: "+20", flag: "🇪🇬" },
+  { code: "+212", flag: "🇲🇦" },
+  { code: "+213", flag: "🇩🇿" },
+  { code: "+216", flag: "🇹🇳" },
+  { code: "+962", flag: "🇯🇴" },
+  { code: "+961", flag: "🇱🇧" },
+  { code: "+972", flag: "🇮🇱" },
+  { code: "+966", flag: "🇸🇦" },
+  { code: "+971", flag: "🇦🇪" },
+  { code: "+974", flag: "🇶🇦" },
+  { code: "+973", flag: "🇧🇭" },
+  { code: "+964", flag: "🇮🇶" },
+  { code: "+98", flag: "🇮🇷" },
+  { code: "+963", flag: "🇸🇾" },
+  { code: "+249", flag: "🇸🇩" },
+  { code: "+218", flag: "🇱🇾" },
+  { code: "+260", flag: "🇿🇲" },
+  { code: "+254", flag: "🇰🇪" },
+  { code: "+234", flag: "🇳🇬" },
+  { code: "+233", flag: "🇬🇭" },
+  { code: "+255", flag: "🇹🇿" },
+  { code: "+256", flag: "🇺🇬" },
+  { code: "+250", flag: "🇷🇼" },
+  { code: "+237", flag: "🇨🇲" },
+];
+
 const CARGO_TYPE_OPTIONS: { value: CargoType; key: string }[] = [
   { value: "euro_pallet", key: "cargoTypeEuroPallet" },
   { value: "pallets_boxes", key: "cargoTypePalletsBoxes" },
@@ -99,14 +166,30 @@ export function OrderForm({ locale }: { locale: string }) {
   const [distanceError, setDistanceError] = useState<string | null>(null);
   const [routeGeo, setRouteGeo] = useState<RouteGeo | null>(null);
   const [routeDurationMinutes, setRouteDurationMinutes] = useState<number | null>(null);
+  const [phoneCountryCode, setPhoneCountryCode] = useState("+49");
+  const [countryCodeOpen, setCountryCodeOpen] = useState(false);
+  const countryCodeRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const normalizePhone = (value: string) => {
+  useEffect(() => {
+    const close = (e: MouseEvent) => {
+      if (countryCodeRef.current && !countryCodeRef.current.contains(e.target as Node)) {
+        setCountryCodeOpen(false);
+      }
+    };
+    if (countryCodeOpen) {
+      document.addEventListener("click", close);
+      return () => document.removeEventListener("click", close);
+    }
+  }, [countryCodeOpen]);
+
+  const normalizePhone = (value: string, countryCode: string = phoneCountryCode) => {
     const digits = value.replace(/\D/g, "");
     if (!digits.length) return value.trim();
-    if (digits.startsWith("49") && digits.length >= 11) return `+${digits}`;
-    if (digits.startsWith("0")) return `+49${digits.slice(1)}`;
-    return `+49${digits}`;
+    const prefix = countryCode.replace(/\D/g, "");
+    if (digits.startsWith(prefix) && digits.length > prefix.length) return `+${digits}`;
+    if (digits.startsWith("0")) return `${countryCode}${digits.slice(1)}`;
+    return `${countryCode}${digits}`;
   };
 
   const step1Complete = data.companyName.trim() !== "" && data.email.trim() !== "" && data.phone.trim() !== "";
@@ -362,13 +445,49 @@ export function OrderForm({ locale }: { locale: string }) {
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
               {t("whatsapp")}
             </label>
-            <div className="flex gap-2">
-              <div
-                className="flex shrink-0 items-center gap-1.5 rounded-lg border border-[#0d2137]/20 bg-[#0d2137]/5 px-3 py-2 text-sm font-medium text-[var(--foreground)]"
-                title={t("countryCodeGermany")}
-              >
-                <span className="text-lg leading-none" aria-hidden>🇩🇪</span>
-                <span>+49</span>
+            <div className="flex gap-2" ref={countryCodeRef}>
+              <div className="relative shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setCountryCodeOpen((o) => !o)}
+                  className="flex min-w-[4.5rem] items-center gap-1.5 rounded-lg border border-[#0d2137]/20 bg-[#0d2137]/5 px-3 py-2 text-sm font-medium text-[var(--foreground)] hover:bg-[#0d2137]/10 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                  aria-expanded={countryCodeOpen}
+                  aria-haspopup="listbox"
+                  aria-label={t("selectCountryCode")}
+                >
+                  <span className="text-lg leading-none" aria-hidden>
+                    {COUNTRY_CODES.find((c) => c.code === phoneCountryCode)?.flag ?? "🇩🇪"}
+                  </span>
+                  <span>{phoneCountryCode}</span>
+                  <span className="ml-0.5 shrink-0 text-[var(--foreground)]/60" aria-hidden>▾</span>
+                </button>
+                {countryCodeOpen && (
+                  <ul
+                    className="absolute left-0 top-full z-20 mt-1 max-h-64 w-48 overflow-auto rounded-lg border border-[#0d2137]/20 bg-white py-1 shadow-lg"
+                    role="listbox"
+                  >
+                    {COUNTRY_CODES.map((c) => (
+                      <li key={c.code + c.flag}>
+                        <button
+                          type="button"
+                          role="option"
+                          aria-selected={c.code === phoneCountryCode}
+                          className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-[#0d2137]/10 ${
+                            c.code === phoneCountryCode ? "bg-[var(--accent)]/10 text-[var(--accent)]" : ""
+                          }`}
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            setPhoneCountryCode(c.code);
+                            setCountryCodeOpen(false);
+                          }}
+                        >
+                          <span className="text-lg leading-none">{c.flag}</span>
+                          <span>{c.code}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
               <input
                 type="tel"
