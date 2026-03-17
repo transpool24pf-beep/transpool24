@@ -48,7 +48,7 @@ function buildWhatsAppMessage(o: Job): string {
     "",
     `📋 رقم الطلب: ${orderRef}`,
     `📞 الهاتف: ${o.phone}`,
-    dateTimeStr ? `📅 التاريخ والوقت: ${dateTimeStr}` : null,
+    dateTimeStr ? `⏰ وقت الاستلام المختار (للحضور): ${dateTimeStr}` : null,
     weightKg != null ? `⚖️ الوزن: ${weightKg} kg` : null,
     `📏 المسافة: ${distanceStr}`,
     "",
@@ -182,8 +182,8 @@ export default function AdminOrderDetailPage({
             </div>
             {order.preferred_pickup_at && (
               <div>
-                <dt className="text-[#0d2137]/60">وقت وتاريخ الاستلام المفضل</dt>
-                <dd>{new Date(order.preferred_pickup_at).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" })}</dd>
+                <dt className="text-[#0d2137]/60">وقت الاستلام المختار (للحضور)</dt>
+                <dd className="font-medium text-[#0d2137]">{new Date(order.preferred_pickup_at).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" })}</dd>
               </div>
             )}
             <div>

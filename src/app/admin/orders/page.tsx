@@ -58,7 +58,7 @@ function buildWhatsAppMessage(o: Job): string {
     "",
     `📋 رقم الطلب: ${orderRef}`,
     `📞 الهاتف: ${o.phone}`,
-    dateTimeStr ? `📅 التاريخ والوقت: ${dateTimeStr}` : null,
+    dateTimeStr ? `⏰ وقت الاستلام المختار (للحضور): ${dateTimeStr}` : null,
     weightKg != null ? `⚖️ الوزن: ${weightKg} kg` : null,
     `📏 المسافة: ${distanceStr}`,
     "",
