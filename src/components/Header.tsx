@@ -60,7 +60,7 @@ export function Header({ hideLogo }: HeaderProps) {
             href={`/${locale}/driver`}
             className="rounded-lg border border-[#0d2137]/15 px-4 py-2 text-sm font-medium text-[var(--foreground)] transition hover:bg-[#0d2137]/5"
           >
-            السائقين
+            {t("drivers")}
           </Link>
           <Link
             href={`/${locale}/order`}

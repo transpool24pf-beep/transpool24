@@ -3,9 +3,9 @@
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
 import {
   DRIVER_COUNTRY_CODES,
-  SERVICE_POLICY_TEXT,
   WORK_POLICY_TITLE,
   WORK_POLICY_TEXT,
 } from "@/lib/driver-policy";
@@ -16,12 +16,7 @@ const DriverCityMap = dynamic(
 );
 
 const CITIES = ["بفورتسهايم", "شتوتغارت", "كارلسروه", "مانهايم", "هايدلبرغ", "أخرى"];
-const STEPS = [
-  { label: "الخطوة 1" },
-  { label: "المعلومات الشخصية" },
-  { label: "عربة" },
-  { label: "التحقق" },
-];
+const STEP_ICONS = ["📋", "🪪", "🚗", "✓"];
 
 type FormData = {
   city: string;
@@ -77,13 +72,23 @@ function FileUploadBox({
   onChange,
   label,
   exampleSrc,
+  exampleLabel,
   accept = "image/*",
+  chooseFileOrDrag,
+  remove,
+  uploading,
+  uploadFailed,
 }: {
   value: string;
   onChange: (url: string) => void;
   label: string;
   exampleSrc?: string;
+  exampleLabel?: string;
   accept?: string;
+  chooseFileOrDrag: string;
+  remove: string;
+  uploading: string;
+  uploadFailed: string;
 }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -104,7 +109,7 @@ function FileUploadBox({
       const url = await uploadFile(dataUrl, file.name);
       onChange(url);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "فشل الرفع");
+      setError(err instanceof Error ? err.message : uploadFailed);
     } finally {
       setLoading(false);
       if (inputRef.current) inputRef.current.value = "";
@@ -115,9 +120,14 @@ function FileUploadBox({
     <div className="rounded-xl border-2 border-dashed border-[#0d2137]/20 bg-[#f8f9fa] p-4">
       <p className="mb-2 text-sm font-medium text-[#0d2137]">{label}</p>
       {exampleSrc && (
-        <div className="mb-2 flex justify-center">
-          <div className="relative h-24 w-24 overflow-hidden rounded-lg border-2 border-[#0d2137]/15 shadow-sm">
-            <Image src={exampleSrc} alt="" fill className="object-cover" />
+        <div className="mb-3 flex flex-col items-center">
+          {exampleLabel && (
+            <span className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-[var(--accent)]">
+              {exampleLabel}
+            </span>
+          )}
+          <div className="relative h-28 w-28 overflow-hidden rounded-xl border-2 border-[#0d2137]/15 bg-white shadow-md ring-2 ring-[#0d2137]/5">
+            <Image src={exampleSrc} alt="" fill className="object-cover" sizes="112px" />
           </div>
         </div>
       )}
@@ -131,7 +141,7 @@ function FileUploadBox({
       />
       {value ? (
         <div className="flex items-center justify-between gap-2">
-          <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded border bg-white">
+          <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg border-2 border-[#0d2137]/10 bg-white shadow-sm">
             <img src={value} alt="" className="h-full w-full object-cover" />
           </div>
           <button
@@ -139,15 +149,15 @@ function FileUploadBox({
             onClick={() => onChange("")}
             className="text-sm text-red-600 hover:underline"
           >
-            إزالة
+            {remove}
           </button>
         </div>
       ) : (
         <label
           htmlFor={label.replace(/\s/g, "-")}
-          className="flex cursor-pointer flex-col items-center justify-center rounded-lg border border-[#0d2137]/15 bg-white py-4 text-sm text-[#0d2137]/70 hover:bg-[#0d2137]/5"
+          className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#0d2137]/15 bg-white py-5 text-sm text-[#0d2137]/70 transition hover:border-[var(--accent)]/30 hover:bg-[#0d2137]/5"
         >
-          {loading ? "جاري الرفع…" : "اختر ملفاً أو اسحب الصورة هنا"}
+          {loading ? uploading : chooseFileOrDrag}
         </label>
       )}
       {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
@@ -162,6 +172,7 @@ export function DriverWizardForm({
   onBack: () => void;
   initialCity?: string;
 }) {
+  const t = useTranslations("driver");
   const [step, setStep] = useState(1);
   const [form, setForm] = useState<FormData>({
     ...initialForm,
@@ -242,76 +253,103 @@ export function DriverWizardForm({
     }
   };
 
+  const stepLabels = [t("step1Name"), t("step2Name"), t("step3Name"), t("step4Name")];
+
   if (step === 5) {
     return (
       <div className="rounded-2xl border border-[#0d2137]/10 bg-white p-8 text-center shadow-lg">
         <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 text-4xl text-emerald-600">✓</div>
-        <h2 className="text-2xl font-bold text-[#0d2137]">تم استلام طلبك بنجاح</h2>
+        <h2 className="text-2xl font-bold text-[#0d2137]">{t("successTitle")}</h2>
         <p className="mt-4 max-w-lg mx-auto text-[#0d2137]/80 leading-relaxed">
-          سنراجع ملفك بعناية ونتواصل معك عبر الواتساب أو البريد الإلكتروني في أقرب وقت.
-          <br />
-          شكراً لثقتك بـ TransPool24.
+          {t("successMessage")}
         </p>
-        <p className="mt-6 text-sm font-medium text-[var(--accent)]">TransPool24 – شريكك اللوجستي</p>
+        <p className="mt-6 text-sm font-medium text-[var(--accent)]">{t("successBrand")}</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-wrap gap-2">
-        {STEPS.map((s, i) => (
-          <div
-            key={i}
-            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-              i + 1 === step ? "bg-[var(--accent)] text-white" : i + 1 < step ? "bg-emerald-100 text-emerald-800" : "bg-[#0d2137]/10 text-[#0d2137]/60"
-            }`}
-          >
-            {i + 1}
-          </div>
-        ))}
+      {/* Step indicator: names + icons + animated connecting line */}
+      <div className="rounded-2xl border border-[#0d2137]/10 bg-[#f8f9fa] px-4 py-5">
+        <div className="flex items-center justify-between gap-0">
+          {stepLabels.map((name, i) => (
+            <div key={i} className="flex flex-1 items-center last:flex-none">
+              <div className="flex flex-col items-center">
+                <div
+                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-xl transition-all duration-300 ${
+                    i + 1 === step
+                      ? "bg-[var(--accent)] text-white ring-4 ring-[var(--accent)]/20"
+                      : i + 1 < step
+                        ? "bg-emerald-100 text-emerald-700"
+                        : "bg-[#0d2137]/10 text-[#0d2137]/50"
+                  }`}
+                >
+                  {STEP_ICONS[i]}
+                </div>
+                <span
+                  className={`mt-2 max-w-[4.5rem] text-center text-xs font-medium ${
+                    i + 1 === step ? "text-[#0d2137]" : "text-[#0d2137]/70"
+                  }`}
+                >
+                  {name}
+                </span>
+              </div>
+              {i < stepLabels.length - 1 && (
+                <div className="mx-1 flex-1 px-1 sm:mx-2">
+                  <div className="h-1 overflow-hidden rounded-full bg-[#0d2137]/15">
+                    <div
+                      className="h-full rounded-full bg-[var(--accent)] transition-all duration-500 ease-out"
+                      style={{ width: step > i + 1 ? "100%" : "0%" }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Step 1: مدينة + اسم + بريد + واتساب + سياسة الخدمة */}
+      {/* Step 1 */}
       {step === 1 && (
         <>
-          <h2 className="text-xl font-bold text-[#0d2137]">الخطوة الأولى – البيانات الأساسية</h2>
+          <h2 className="text-xl font-bold text-[#0d2137]">{t("step1Title")}</h2>
           <div className="space-y-4">
             <div>
-              <label className="mb-1 block text-sm font-medium text-[#0d2137]">مدينة العمل</label>
+              <label className="mb-1 block text-sm font-medium text-[#0d2137]">{t("city")}</label>
               <select
                 value={form.city}
                 onChange={(e) => update("city", e.target.value)}
                 className="w-full rounded-xl border border-[#0d2137]/20 bg-white px-4 py-3"
               >
-                <option value="">— اختر المدينة —</option>
+                <option value="">{t("cityPlaceholder")}</option>
                 {CITIES.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-[#0d2137]">الاسم الكامل</label>
+              <label className="mb-1 block text-sm font-medium text-[#0d2137]">{t("fullName")}</label>
               <input
                 type="text"
                 value={form.fullName}
                 onChange={(e) => update("fullName", e.target.value)}
-                placeholder="الاسم الكامل"
+                placeholder={t("fullNamePlaceholder")}
                 className="w-full rounded-xl border border-[#0d2137]/20 px-4 py-3"
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-[#0d2137]">البريد الإلكتروني</label>
+              <label className="mb-1 block text-sm font-medium text-[#0d2137]">{t("email")}</label>
               <input
                 type="email"
                 value={form.email}
                 onChange={(e) => update("email", e.target.value)}
-                placeholder="example@domain.com"
+                placeholder={t("emailPlaceholder")}
                 className="w-full rounded-xl border border-[#0d2137]/20 px-4 py-3"
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-[#0d2137]">رقم الواتساب</label>
+              <label className="mb-1 block text-sm font-medium text-[#0d2137]">{t("whatsapp")}</label>
               <div className="flex gap-2" ref={countryCodeRef}>
                 <div className="relative shrink-0">
                   <button
@@ -344,7 +382,7 @@ export function DriverWizardForm({
                   type="tel"
                   value={form.phone}
                   onChange={(e) => update("phone", e.target.value)}
-                  placeholder="15123456789"
+                  placeholder={t("whatsappPlaceholder")}
                   className="min-w-0 flex-1 rounded-xl border border-[#0d2137]/20 px-4 py-3"
                 />
               </div>
@@ -357,7 +395,7 @@ export function DriverWizardForm({
                   onChange={(e) => update("servicePolicyAccepted", e.target.checked)}
                   className="mt-1 h-5 w-5 shrink-0 rounded border-[#0d2137]/20 text-[var(--accent)]"
                 />
-                <span className="text-sm text-[#0d2137]">{SERVICE_POLICY_TEXT}</span>
+                <span className="text-sm text-[#0d2137]">{t("servicePolicy")}</span>
               </label>
             </div>
           </div>
@@ -366,7 +404,7 @@ export function DriverWizardForm({
           </div>
           <div className="mt-8 flex justify-between gap-4">
             <button type="button" onClick={onBack} className="rounded-xl border border-[#0d2137]/20 bg-white px-6 py-3 font-medium text-[#0d2137]">
-              رجوع
+              {t("back")}
             </button>
             <button
               type="button"
@@ -374,64 +412,81 @@ export function DriverWizardForm({
               disabled={!step1Valid}
               className="rounded-xl bg-[var(--accent)] px-8 py-3 font-semibold text-white disabled:opacity-50"
             >
-              متابعة
+              {t("continue")}
             </button>
           </div>
         </>
       )}
 
-      {/* Step 2: المعلومات الشخصية */}
+      {/* Step 2 */}
       {step === 2 && (
         <>
-          <h2 className="text-xl font-bold text-[#0d2137]">المعلومات الشخصية</h2>
+          <h2 className="text-xl font-bold text-[#0d2137]">{t("step2Title")}</h2>
           <div className="grid gap-6 sm:grid-cols-2">
             <FileUploadBox
-              label="صورة الهوية أو الإقامة القانونية"
+              label={t("idDocument")}
               value={form.idDocumentUrl}
               onChange={(url) => update("idDocumentUrl", url)}
+              chooseFileOrDrag={t("chooseFileOrDrag")}
+              remove={t("remove")}
+              uploading={t("uploading")}
+              uploadFailed={t("uploadFailed")}
             />
             <FileUploadBox
-              label="صورة شهادة القيادة – الوجه الأمامي"
+              label={t("licenseFront")}
               value={form.licenseFrontUrl}
               onChange={(url) => update("licenseFrontUrl", url)}
+              chooseFileOrDrag={t("chooseFileOrDrag")}
+              remove={t("remove")}
+              uploading={t("uploading")}
+              uploadFailed={t("uploadFailed")}
             />
             <FileUploadBox
-              label="صورة شهادة القيادة – الوجه الخلفي"
+              label={t("licenseBack")}
               value={form.licenseBackUrl}
               onChange={(url) => update("licenseBackUrl", url)}
+              chooseFileOrDrag={t("chooseFileOrDrag")}
+              remove={t("remove")}
+              uploading={t("uploading")}
+              uploadFailed={t("uploadFailed")}
             />
             <div className="sm:col-span-2">
-              <label className="mb-1 block text-sm font-medium text-[#0d2137]">الرقم الضريبي أو التجاري</label>
+              <label className="mb-1 block text-sm font-medium text-[#0d2137]">{t("taxNumber")}</label>
               <input
                 type="text"
                 value={form.taxOrCommercialNumber}
                 onChange={(e) => update("taxOrCommercialNumber", e.target.value)}
-                placeholder="إن وجد"
+                placeholder={t("taxPlaceholder")}
                 className="w-full rounded-xl border border-[#0d2137]/20 px-4 py-3"
               />
             </div>
             <div className="sm:col-span-2">
               <FileUploadBox
-                label="صورة شخصية بخلفية بيضاء"
+                label={t("personalPhoto")}
                 value={form.personalPhotoUrl}
                 onChange={(url) => update("personalPhotoUrl", url)}
                 exampleSrc="/images/445.png"
+                exampleLabel={t("examplePhoto")}
+                chooseFileOrDrag={t("chooseFileOrDrag")}
+                remove={t("remove")}
+                uploading={t("uploading")}
+                uploadFailed={t("uploadFailed")}
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="mb-1 block text-sm font-medium text-[#0d2137]">اللغات التي تتحدثها بشكل جيد</label>
+              <label className="mb-1 block text-sm font-medium text-[#0d2137]">{t("languagesSpoken")}</label>
               <input
                 type="text"
                 value={form.languagesSpoken}
                 onChange={(e) => update("languagesSpoken", e.target.value)}
-                placeholder="مثال: العربية، الألمانية، الإنجليزية"
+                placeholder={t("languagesPlaceholder")}
                 className="w-full rounded-xl border border-[#0d2137]/20 px-4 py-3"
               />
             </div>
           </div>
           <div className="mt-8 flex justify-between gap-4">
             <button type="button" onClick={() => setStep(1)} className="rounded-xl border border-[#0d2137]/20 bg-white px-6 py-3 font-medium text-[#0d2137]">
-              رجوع
+              {t("back")}
             </button>
             <button
               type="button"
@@ -439,43 +494,52 @@ export function DriverWizardForm({
               disabled={!step2Valid}
               className="rounded-xl bg-[var(--accent)] px-8 py-3 font-semibold text-white disabled:opacity-50"
             >
-              متابعة
+              {t("continue")}
             </button>
           </div>
         </>
       )}
 
-      {/* Step 3: عربة */}
+      {/* Step 3 */}
       {step === 3 && (
         <>
-          <h2 className="text-xl font-bold text-[#0d2137]">عربة</h2>
+          <h2 className="text-xl font-bold text-[#0d2137]">{t("step3Title")}</h2>
           <div className="space-y-6">
             <div>
-              <label className="mb-1 block text-sm font-medium text-[#0d2137]">رقم السيارة (لوحة)</label>
+              <label className="mb-1 block text-sm font-medium text-[#0d2137]">{t("vehiclePlate")}</label>
               <input
                 type="text"
                 value={form.vehiclePlate}
                 onChange={(e) => update("vehiclePlate", e.target.value)}
-                placeholder="مثال: PF-AB 1234"
+                placeholder={t("vehiclePlatePlaceholder")}
                 className="w-full rounded-xl border border-[#0d2137]/20 px-4 py-3"
               />
             </div>
             <FileUploadBox
-              label="أوراق السيارة"
+              label={t("vehicleDocuments")}
               value={form.vehicleDocumentsUrl}
               onChange={(url) => update("vehicleDocumentsUrl", url)}
               accept="image/*,.pdf"
+              chooseFileOrDrag={t("chooseFileOrDrag")}
+              remove={t("remove")}
+              uploading={t("uploading")}
+              uploadFailed={t("uploadFailed")}
             />
             <FileUploadBox
-              label="صورة السيارة"
+              label={t("vehiclePhoto")}
               value={form.vehiclePhotoUrl}
               onChange={(url) => update("vehiclePhotoUrl", url)}
               exampleSrc="/images/5677.png"
+              exampleLabel={t("examplePhoto")}
+              chooseFileOrDrag={t("chooseFileOrDrag")}
+              remove={t("remove")}
+              uploading={t("uploading")}
+              uploadFailed={t("uploadFailed")}
             />
           </div>
           <div className="mt-8 flex justify-between gap-4">
             <button type="button" onClick={() => setStep(2)} className="rounded-xl border border-[#0d2137]/20 bg-white px-6 py-3 font-medium text-[#0d2137]">
-              رجوع
+              {t("back")}
             </button>
             <button
               type="button"
@@ -483,24 +547,24 @@ export function DriverWizardForm({
               disabled={!step3Valid}
               className="rounded-xl bg-[var(--accent)] px-8 py-3 font-semibold text-white disabled:opacity-50"
             >
-              متابعة
+              {t("continue")}
             </button>
           </div>
         </>
       )}
 
-      {/* Step 4: التحقق + سياسة العمل */}
+      {/* Step 4 */}
       {step === 4 && (
         <>
-          <h2 className="text-xl font-bold text-[#0d2137]">التحقق – مراجعة البيانات والموافقة</h2>
+          <h2 className="text-xl font-bold text-[#0d2137]">{t("step4Title")}</h2>
           <div className="rounded-xl border border-[#0d2137]/15 bg-[#f8f9fa] p-4 text-sm">
-            <p><strong>الاسم:</strong> {form.fullName}</p>
-            <p><strong>البريد:</strong> {form.email}</p>
-            <p><strong>الواتساب:</strong> {form.phoneCountryCode} {form.phone}</p>
-            <p><strong>المدينة:</strong> {form.city}</p>
-            <p><strong>الرقم الضريبي/التجاري:</strong> {form.taxOrCommercialNumber || "—"}</p>
-            <p><strong>اللغات:</strong> {form.languagesSpoken || "—"}</p>
-            <p><strong>رقم السيارة:</strong> {form.vehiclePlate || "—"}</p>
+            <p><strong>{t("reviewName")}:</strong> {form.fullName}</p>
+            <p><strong>{t("reviewEmail")}:</strong> {form.email}</p>
+            <p><strong>{t("reviewWhatsapp")}:</strong> {form.phoneCountryCode} {form.phone}</p>
+            <p><strong>{t("reviewCity")}:</strong> {form.city}</p>
+            <p><strong>{t("reviewTax")}:</strong> {form.taxOrCommercialNumber || "—"}</p>
+            <p><strong>{t("reviewLanguages")}:</strong> {form.languagesSpoken || "—"}</p>
+            <p><strong>{t("reviewVehiclePlate")}:</strong> {form.vehiclePlate || "—"}</p>
           </div>
           <div className="rounded-xl border-2 border-[var(--accent)]/40 bg-[#fff8f0] p-4">
             <p className="mb-2 font-semibold text-[#0d2137]">{WORK_POLICY_TITLE}</p>
@@ -514,13 +578,13 @@ export function DriverWizardForm({
                 onChange={(e) => update("workPolicyAccepted", e.target.checked)}
                 className="mt-1 h-5 w-5 shrink-0 rounded border-[#0d2137]/20 text-[var(--accent)]"
               />
-              <span className="text-sm text-[#0d2137]">أوافق على سياسة العمل وسياسة الشركة أعلاه.</span>
+              <span className="text-sm text-[#0d2137]">{t("workPolicyAgree")}</span>
             </label>
           </div>
           {submitError && <p className="text-red-600 text-sm">{submitError}</p>}
           <div className="mt-8 flex justify-between gap-4">
             <button type="button" onClick={() => setStep(3)} className="rounded-xl border border-[#0d2137]/20 bg-white px-6 py-3 font-medium text-[#0d2137]">
-              رجوع
+              {t("back")}
             </button>
             <button
               type="button"
@@ -528,7 +592,7 @@ export function DriverWizardForm({
               disabled={!step4Valid || submitLoading}
               className="rounded-xl bg-[var(--accent)] px-8 py-3 font-semibold text-white disabled:opacity-50"
             >
-              {submitLoading ? "جاري الإرسال…" : "إرسال الطلب"}
+              {submitLoading ? t("submitting") : t("submit")}
             </button>
           </div>
         </>
