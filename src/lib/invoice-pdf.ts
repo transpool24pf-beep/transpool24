@@ -32,15 +32,22 @@ export async function generateInvoicePdf(
   const { width, height } = page.getSize();
   let y = height - 60;
 
-  // Logo top-right corner (file or INVOICE_LOGO_BASE64 env for Vercel)
+  // الشعار في الزاوية العليا اليمنى (أولاً 345remov.png أو logo.png أو INVOICE_LOGO_BASE64)
   let logoBytes: Uint8Array | null = null;
   try {
     const base64 = process.env.INVOICE_LOGO_BASE64;
     if (base64) {
       logoBytes = new Uint8Array(Buffer.from(base64, "base64"));
     } else {
-      const logoPath = path.join(process.cwd(), "public", "logo.png");
-      logoBytes = new Uint8Array(fs.readFileSync(logoPath));
+      const publicDir = path.join(process.cwd(), "public");
+      const candidates = ["345remov.png", "logo.png"];
+      for (const name of candidates) {
+        const logoPath = path.join(publicDir, name);
+        if (fs.existsSync(logoPath)) {
+          logoBytes = new Uint8Array(fs.readFileSync(logoPath));
+          break;
+        }
+      }
     }
   } catch {
     // no logo
@@ -48,11 +55,12 @@ export async function generateInvoicePdf(
   if (logoBytes && logoBytes.length > 0) {
     try {
       const img = await doc.embedPng(logoBytes);
-      const imgW = 90;
-      const imgH = Math.min(40, (img.height / img.width) * imgW);
+      const imgW = 100;
+      const imgH = Math.min(45, (img.height / img.width) * imgW);
+      const margin = 45;
       page.drawImage(img, {
-        x: width - 50 - imgW,
-        y: height - 50 - imgH,
+        x: width - margin - imgW,
+        y: height - margin - imgH,
         width: imgW,
         height: imgH,
       });
