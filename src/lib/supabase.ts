@@ -38,6 +38,7 @@ export type Job = {
   customer_email: string | null;
   preferred_pickup_at: string | null;
   cargo_size: "XS" | "M" | "L";
+  cargo_details: Record<string, unknown> | null;
   service_type: "driver_only" | "driver_car" | "driver_car_assistant";
   distance_km: number | null;
   duration_minutes: number | null;

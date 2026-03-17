@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS public.jobs (
   customer_email TEXT,
   preferred_pickup_at TIMESTAMPTZ,
   cargo_size TEXT NOT NULL CHECK (cargo_size IN ('XS', 'M', 'L')),
+  cargo_details JSONB,
   service_type TEXT NOT NULL DEFAULT 'driver_car' CHECK (service_type IN ('driver_only', 'driver_car', 'driver_car_assistant')),
   distance_km NUMERIC(10, 2),
   duration_minutes INTEGER,

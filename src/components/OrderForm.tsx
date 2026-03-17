@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { calculatePriceCents, formatPrice, type ServiceType } from "@/lib/pricing";
+import { volumeM3, suggestCargoSize, suggestVehicleLabel, type CargoType } from "@/lib/cargo";
 
 const RouteMap = dynamic(
   () => import("@/components/RouteMapInner").then((m) => m.RouteMapInner),
@@ -35,6 +36,12 @@ const SERVICE_OPTIONS: { value: ServiceType; key: "serviceDriverOnly" | "service
 
 const DEFAULT_KM = 50;
 
+const CARGO_TYPE_OPTIONS: { value: CargoType; key: string }[] = [
+  { value: "euro_pallet", key: "cargoTypeEuroPallet" },
+  { value: "pallets_boxes", key: "cargoTypePalletsBoxes" },
+  { value: "parcels", key: "cargoTypeParcels" },
+];
+
 export type OrderFormData = {
   companyName: string;
   email: string;
@@ -46,6 +53,12 @@ export type OrderFormData = {
   cargoSize: CargoSize;
   serviceType: ServiceType | "";
   distanceKm: number;
+  cargoLengthCm: number;
+  cargoWidthCm: number;
+  cargoHeightCm: number;
+  cargoWeightKg: number;
+  cargoType: CargoType | "";
+  stackable: boolean;
 };
 
 const initial: OrderFormData = {
@@ -59,6 +72,12 @@ const initial: OrderFormData = {
   cargoSize: "M",
   serviceType: "",
   distanceKm: DEFAULT_KM,
+  cargoLengthCm: 0,
+  cargoWidthCm: 0,
+  cargoHeightCm: 0,
+  cargoWeightKg: 0,
+  cargoType: "",
+  stackable: false,
 };
 
 export function OrderForm({ locale }: { locale: string }) {
@@ -222,6 +241,22 @@ export function OrderForm({ locale }: { locale: string }) {
           serviceType: data.serviceType || "driver_car",
           distanceKm: data.distanceKm,
           priceCents,
+          cargoDetails:
+            data.cargoLengthCm > 0 ||
+            data.cargoWidthCm > 0 ||
+            data.cargoHeightCm > 0 ||
+            data.cargoWeightKg > 0 ||
+            data.cargoType ||
+            data.stackable
+              ? {
+                  lengthCm: data.cargoLengthCm || null,
+                  widthCm: data.cargoWidthCm || null,
+                  heightCm: data.cargoHeightCm || null,
+                  weightKg: data.cargoWeightKg || null,
+                  cargoType: data.cargoType || null,
+                  stackable: data.stackable,
+                }
+              : null,
         }),
       });
       const json = await res.json();
@@ -481,6 +516,106 @@ export function OrderForm({ locale }: { locale: string }) {
               <p className="mt-1 text-sm text-amber-700">{t("serviceTypeRequired")}</p>
             )}
           </div>
+          <div className="rounded-lg border border-[#0d2137]/15 bg-[#0d2137]/5 p-4">
+            <p className="mb-3 text-sm font-medium text-[var(--foreground)]">
+              {t("cargoDetails")}
+            </p>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <div>
+                <label className="mb-1 block text-xs text-[var(--foreground)]/80">{t("cargoLengthCm")}</label>
+                <input
+                  type="number"
+                  min={0}
+                  value={data.cargoLengthCm || ""}
+                  onChange={(e) => {
+                    const v = Number(e.target.value) || 0;
+                    const vol = volumeM3(v, data.cargoWidthCm, data.cargoHeightCm);
+                    const size = suggestCargoSize(vol, data.cargoWeightKg);
+                    update({ cargoLengthCm: v, cargoSize: size });
+                  }}
+                  placeholder="120"
+                  className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs text-[var(--foreground)]/80">{t("cargoWidthCm")}</label>
+                <input
+                  type="number"
+                  min={0}
+                  value={data.cargoWidthCm || ""}
+                  onChange={(e) => {
+                    const v = Number(e.target.value) || 0;
+                    const vol = volumeM3(data.cargoLengthCm, v, data.cargoHeightCm);
+                    const size = suggestCargoSize(vol, data.cargoWeightKg);
+                    update({ cargoWidthCm: v, cargoSize: size });
+                  }}
+                  placeholder="80"
+                  className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs text-[var(--foreground)]/80">{t("cargoHeightCm")}</label>
+                <input
+                  type="number"
+                  min={0}
+                  value={data.cargoHeightCm || ""}
+                  onChange={(e) => {
+                    const v = Number(e.target.value) || 0;
+                    const vol = volumeM3(data.cargoLengthCm, data.cargoWidthCm, v);
+                    const size = suggestCargoSize(vol, data.cargoWeightKg);
+                    update({ cargoHeightCm: v, cargoSize: size });
+                  }}
+                  placeholder="100"
+                  className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-xs text-[var(--foreground)]/80">{t("cargoWeightKg")}</label>
+                <input
+                  type="number"
+                  min={0}
+                  value={data.cargoWeightKg || ""}
+                  onChange={(e) => {
+                    const v = Number(e.target.value) || 0;
+                    const vol = volumeM3(data.cargoLengthCm, data.cargoWidthCm, data.cargoHeightCm);
+                    const size = suggestCargoSize(vol, v);
+                    update({ cargoWeightKg: v, cargoSize: size });
+                  }}
+                  placeholder="250"
+                  className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
+                />
+              </div>
+            </div>
+            <div className="mt-3 flex flex-wrap items-center gap-4">
+              <div>
+                <label className="mb-1 block text-xs text-[var(--foreground)]/80">{t("cargoType")}</label>
+                <select
+                  value={data.cargoType || ""}
+                  onChange={(e) => update({ cargoType: (e.target.value || "") as CargoType | "" })}
+                  className="rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
+                >
+                  <option value="">—</option>
+                  {CARGO_TYPE_OPTIONS.map(({ value, key }) => (
+                    <option key={value} value={value}>{t(key)}</option>
+                  ))}
+                </select>
+              </div>
+              <label className="flex cursor-pointer items-center gap-2 pt-5">
+                <input
+                  type="checkbox"
+                  checked={data.stackable}
+                  onChange={(e) => update({ stackable: e.target.checked })}
+                  className="rounded border-[#0d2137]/30 text-[var(--accent)]"
+                />
+                <span className="text-sm text-[var(--foreground)]/90">{t("stackable")}</span>
+              </label>
+            </div>
+            {(data.cargoLengthCm > 0 || data.cargoWidthCm > 0 || data.cargoHeightCm > 0 || data.cargoWeightKg > 0) && (
+              <p className="mt-3 text-sm text-green-700">
+                {t("suggestedSize")}: {t(`cargo${data.cargoSize}` as "cargoXS")} — {t("suggestedVehicle")}: {suggestVehicleLabel(data.cargoSize)}
+              </p>
+            )}
+          </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
               {t("cargoSize")}
@@ -550,6 +685,9 @@ export function OrderForm({ locale }: { locale: string }) {
             )}
             <p><strong>{t("serviceType")}:</strong> {data.serviceType ? t(SERVICE_OPTIONS.find((o) => o.value === data.serviceType)?.key ?? "serviceDriverCar") : "—"}</p>
             <p><strong>{t("cargoSize")}:</strong> {t(`cargo${data.cargoSize}` as "cargoXS")}</p>
+            {(data.cargoLengthCm > 0 || data.cargoWidthCm > 0 || data.cargoHeightCm > 0 || data.cargoWeightKg > 0 || data.cargoType) && (
+              <p><strong>{t("cargoDetails")}:</strong> {[data.cargoLengthCm && `${data.cargoLengthCm}×${data.cargoWidthCm}×${data.cargoHeightCm} cm`, data.cargoWeightKg && `${data.cargoWeightKg} kg`, data.cargoType && t(CARGO_TYPE_OPTIONS.find((o) => o.value === data.cargoType)?.key ?? "cargoTypeEuroPallet"), data.stackable && t("stackable")].filter(Boolean).join(" · ")}</p>
+            )}
             <p><strong>{t("distance")}:</strong> {data.distanceKm} km</p>
             <p className="pt-2 text-lg font-bold text-[var(--accent)]">
               {t("total")}: {formatPrice(priceCents)}

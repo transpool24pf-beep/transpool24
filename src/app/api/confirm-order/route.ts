@@ -24,6 +24,7 @@ export async function POST(req: Request) {
       pickupTime,
       cargoSize,
       serviceType = "driver_car",
+      cargoDetails,
     } = body;
 
     if (
@@ -80,6 +81,7 @@ export async function POST(req: Request) {
         delivery_address: deliveryAddress,
         delivery_city: null,
         cargo_size: cargoSize,
+        cargo_details: cargoDetails && typeof cargoDetails === "object" ? cargoDetails : null,
         service_type: st,
         distance_km: distanceKm,
         duration_minutes: durationMinutes ?? null,
