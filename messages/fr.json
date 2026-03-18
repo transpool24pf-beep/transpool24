@@ -180,7 +180,7 @@
     "namePlaceholder": "Votre nom",
     "email": "E-mail",
     "emailPlaceholder": "votre@email.com",
-    "driverNumber": "Numéro de chauffeur (optionnel)",
+    "driverNumber": "Numéro de chauffeur",
     "driverNumberPlaceholder": "ex. 10002",
     "message": "Message",
     "messagePlaceholder": "Votre question ou message…",

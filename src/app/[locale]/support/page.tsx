@@ -13,10 +13,12 @@ export default function SupportPage() {
   const [driverNumber, setDriverNumber] = useState("");
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("sending");
+    setErrorMessage("");
     try {
       const res = await fetch("/api/support", {
         method: "POST",
@@ -25,7 +27,7 @@ export default function SupportPage() {
           name: name.trim(),
           email: email.trim(),
           message: message.trim(),
-          driver_number: driverNumber.trim() || undefined,
+          driver_number: driverNumber.trim(),
         }),
       });
       const data = await res.json();
@@ -37,9 +39,11 @@ export default function SupportPage() {
         setMessage("");
       } else {
         setStatus("error");
+        setErrorMessage(typeof data?.error === "string" ? data.error : t("error"));
       }
     } catch {
       setStatus("error");
+      setErrorMessage(t("error"));
     }
   };
 
@@ -59,7 +63,7 @@ export default function SupportPage() {
             )}
             {status === "error" && (
               <div className="mb-6 rounded-lg bg-red-50 p-4 text-red-800">
-                {t("error")}
+                {errorMessage || t("error")}
               </div>
             )}
 
@@ -93,12 +97,14 @@ export default function SupportPage() {
                 />
               </div>
               <div>
-                <label htmlFor="support-driver" className="mb-1 block text-sm font-medium text-[#0d2137]/80">
-                  {t("driverNumber")}
+                <label htmlFor="support-driver" className="mb-1 block text-sm font-medium text-[#0d2137]">
+                  {t("driverNumber")} *
                 </label>
                 <input
                   id="support-driver"
                   type="text"
+                  required
+                  inputMode="numeric"
                   value={driverNumber}
                   onChange={(e) => setDriverNumber(e.target.value)}
                   placeholder={t("driverNumberPlaceholder")}

@@ -180,7 +180,7 @@
     "namePlaceholder": "اسمك",
     "email": "البريد الإلكتروني",
     "emailPlaceholder": "your@email.com",
-    "driverNumber": "رقم السائق (اختياري)",
+    "driverNumber": "رقم السائق",
     "driverNumberPlaceholder": "مثال 10002",
     "message": "الرسالة",
     "messagePlaceholder": "سؤالك أو ملاحظتك…",

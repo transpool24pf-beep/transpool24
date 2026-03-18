@@ -180,7 +180,7 @@
     "namePlaceholder": "Su nombre",
     "email": "Correo electrónico",
     "emailPlaceholder": "su@email.com",
-    "driverNumber": "Número de conductor (opcional)",
+    "driverNumber": "Número de conductor",
     "driverNumberPlaceholder": "ej. 10002",
     "message": "Mensaje",
     "messagePlaceholder": "Su pregunta o mensaje…",
