@@ -245,15 +245,22 @@ function buildDriverPaymentInvoiceEmailHtml(data: DriverPaymentInvoiceEmailData)
   const headerBlue = "#0d2137";
   const cardBg = "#ffffff";
   const summaryBg = "#f0f4f8";
+  const supportUrl = `${SITE_URL}/de/support`;
+  const instagramUrl = `${SITE_URL}/icons/instagram.png`;
+  const linkedinUrl = `${SITE_URL}/icons/linkedin.png`;
+  const tiktokUrl = `${SITE_URL}/icons/tiktok.png`;
   return `
 <!DOCTYPE html>
 <html dir="rtl" lang="ar">
 <head><meta charset="utf-8"><title>فاتورة التحويل – TransPool24</title></head>
 <body style="margin:0; font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f4f4;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background: ${headerBlue}; padding: 20px 24px;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background: #fff; border-bottom: 1px solid #eee;"><tr><td align="right" style="padding: 8px 24px;"><a href="${SITE_URL}" style="color:#000; text-decoration:underline; font-size:13px;">www.transpool24.com</a></td></tr></table>
+  <!-- صورة أولى: هيدر بشعار 356.png كبير -->
+  <table width="100%" cellpadding="0" cellspacing="0" style="background: ${headerBlue}; padding: 28px 24px;">
     <tr>
-      <td align="right"><img src="${LOGO_URL}" alt="TransPool24" width="140" height="40" style="display:block; height:40px; width:auto;" /></td>
-      <td align="left" style="color:#fff; font-size:14px;">TransPool24</td>
+      <td align="center">
+        <img src="${LOGO_BLUE_URL}" alt="TransPool24" width="320" height="90" style="display:block; max-width:320px; height:auto; max-height:90px;" />
+      </td>
     </tr>
   </table>
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; padding: 32px 20px;">
@@ -282,6 +289,24 @@ function buildDriverPaymentInvoiceEmailHtml(data: DriverPaymentInvoiceEmailData)
         </div>
         <p style="margin: 20px 0 0 0; font-size: 14px; color: #666;">هل تحتاج مساعدة؟ خدمة العملاء TransPool24 – الهاتف: +49 176 29767442 – البريد: transpool24@hotmail.com</p>
         <p style="margin: 12px 0 0 0; font-size: 13px;"><a href="https://www.linkedin.com/in/trans-pool-1235803b8" style="color:#0d2137;">LinkedIn</a> · ساعات العمل: على مدار الساعة</p>
+      </div>
+    </td></tr>
+  </table>
+  <!-- صورة ثانية: نفس تصميم البانر (أزرق، شعار، عبارة، زر، تابعنا) -->
+  <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; padding: 0 20px 24px;">
+    <tr><td>
+      <div style="background: ${headerBlue}; border-radius: 0 0 16px 16px; padding: 32px 24px; text-align: center;">
+        <img src="${LOGO_BLUE_URL}" alt="TransPool24" width="280" height="80" style="display:block; margin: 0 auto 20px; max-width:280px; height:auto; max-height:80px;" />
+        <p style="margin: 0 0 20px 0; font-size: 18px; font-weight: bold; color: #ffffff;">طريقك آمن، وفريقنا يدعمك دائماً.</p>
+        <a href="${supportUrl}" style="display: inline-block; margin: 0 0 24px 0; padding: 14px 28px; background: #00BFFF; color: #fff; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 15px;">نحن بجانبك في كل كيلومتر.</a>
+        <p style="margin: 0 0 12px 0; font-size: 13px; color: rgba(255,255,255,0.9);">تابعنا</p>
+        <table cellpadding="0" cellspacing="0" align="center" style="margin: 0 auto;">
+          <tr>
+            <td style="padding: 0 10px;"><a href="https://www.tiktok.com/@transpool24" target="_blank" rel="noopener"><img src="${tiktokUrl}" alt="TikTok" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
+            <td style="padding: 0 10px;"><a href="https://www.linkedin.com/in/trans-pool-1235803b8" target="_blank" rel="noopener"><img src="${linkedinUrl}" alt="LinkedIn" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
+            <td style="padding: 0 10px;"><a href="https://www.instagram.com/transpool24/" target="_blank" rel="noopener"><img src="${instagramUrl}" alt="Instagram" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
+          </tr>
+        </table>
       </div>
     </td></tr>
   </table>
