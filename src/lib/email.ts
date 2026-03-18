@@ -112,7 +112,7 @@ export async function sendOrderConfirmationEmail(
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com";
 const LOGO_URL = `${SITE_URL}/345remov.png`;
 const LOGO_ORANGE_URL = `${SITE_URL}/567.png`;
-const LOGO_BLUE_URL = `${SITE_URL}/23556.png`;
+const LOGO_BLUE_URL = `${SITE_URL}/356.png`;
 const WHATSAPP_GROUP_LINK = "https://chat.whatsapp.com/ESup6od1fkHCixxMrT162q?mode=gi_t";
 const QR_WHATSAPP_URL = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&bgcolor=FFFFFF&color=000000&data=${encodeURIComponent(WHATSAPP_GROUP_LINK)}`;
 const ORANGE = "#e85d04";
@@ -128,7 +128,7 @@ export type DriverApprovalData = {
 
 function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string | null): string {
   const driverNum = data.driver_number != null ? String(data.driver_number).padStart(5, "0") : "—";
-  const dateStr = new Date(data.approved_at).toLocaleDateString("ar-DE", {
+  const dateStr = new Date(data.approved_at).toLocaleDateString("de-DE", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -137,11 +137,11 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
   const driverPhoto = data.personal_photo_url?.trim();
   return `
 <!DOCTYPE html>
-<html dir="rtl" lang="ar">
+<html dir="ltr" lang="de">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TransPool24 – موافقة على طلب السائق</title>
+  <title>TransPool24 – Fahrer-Anfrage genehmigt</title>
 </head>
 <body style="margin:0; padding:0; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background:#f0f0f0;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f0f0; padding: 24px 16px;">
@@ -162,36 +162,36 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
                 </td>
                 <td style="vertical-align:top;">
                   <h1 style="margin:0 0 8px 0; font-size:22px; font-weight:700; color:#0d2137;">
-                    تمت الموافقة على طلبك للانضمام كسائق في TransPool24
+                    Ihre Anfrage zur Aufnahme als Fahrer bei TransPool24 wurde genehmigt.
                   </h1>
                   <p style="margin:0; font-size:15px; color:#333;">
-                    مرحباً ${data.full_name || "السائق"}،
+                    Hallo ${data.full_name || "Fahrer"},
                   </p>
                 </td>
               </tr>
             </table>
             <p style="margin:20px 0 0 0; font-size:15px; color:#444; line-height:1.6;">
-              نود إعلامك بأنه تمت الموافقة على طلبك. يمكنك الآن الانضمام لمجموعة السائقين واستلام الطلبات. أنت في انتظار أول مهمة لقبول العمل.
+              Wir freuen uns, Ihnen mitzuteilen, dass Ihre Anfrage genehmigt wurde. Sie können jetzt der Fahrergruppe beitreten und Aufträge entgegennehmen. Sie warten auf Ihre erste Aufgabe zur Annahme.
             </p>
             <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px; background:#f5f5f5; border-radius:10px; padding: 20px;">
               <tr><td>
                 <table width="100%" cellpadding="4" cellspacing="0">
-                  <tr><td style="text-align:right; font-weight:600; color:#0d2137;">رقم السائق:</td><td style="text-align:left;">#${driverNum}</td></tr>
-                  <tr><td style="text-align:right; font-weight:600; color:#0d2137;">الاسم:</td><td style="text-align:left;">${data.full_name || "—"}</td></tr>
-                  <tr><td style="text-align:right; font-weight:600; color:#0d2137;">تاريخ الموافقة:</td><td style="text-align:left;">${dateStr}</td></tr>
-                  ${data.vehicle_plate ? `<tr><td style="text-align:right; font-weight:600; color:#0d2137;">رقم السيارة:</td><td style="text-align:left;">${data.vehicle_plate}</td></tr>` : ""}
+                  <tr><td style="text-align:left; font-weight:600; color:#0d2137;">Fahrernummer:</td><td style="text-align:right;">#${driverNum}</td></tr>
+                  <tr><td style="text-align:left; font-weight:600; color:#0d2137;">Name:</td><td style="text-align:right;">${data.full_name || "—"}</td></tr>
+                  <tr><td style="text-align:left; font-weight:600; color:#0d2137;">Genehmigungsdatum:</td><td style="text-align:right;">${dateStr}</td></tr>
+                  ${data.vehicle_plate ? `<tr><td style="text-align:left; font-weight:600; color:#0d2137;">Kennzeichen:</td><td style="text-align:right;">${data.vehicle_plate}</td></tr>` : ""}
                 </table>
               </td></tr>
             </table>
             <p style="margin:24px 0 12px 0; font-size:14px; color:#555;">
-              للانضمام لمجموعة السائقين على واتساب واستلام الطلبات:
+              Zum Beitritt zur Fahrergruppe bei WhatsApp und zum Erhalt von Aufträgen:
             </p>
             <p style="margin:0 0 16px 0;">
-              <a href="${ctaUrl}" style="display:inline-block; padding:14px 28px; background:#25D366; color:#fff; text-decoration:none; border-radius:8px; font-weight:600; font-size:15px;">انضم لمجموعة السائقين (واتساب)</a>
+              <a href="${ctaUrl}" style="display:inline-block; padding:14px 28px; background:#25D366; color:#fff; text-decoration:none; border-radius:8px; font-weight:600; font-size:15px;">Fahrergruppe beitreten (WhatsApp)</a>
             </p>
-            <p style="margin:0 0 8px 0; font-size:13px; color:#555;">امسح رمز QR للانضمام للمجموعة:</p>
+            <p style="margin:0 0 8px 0; font-size:13px; color:#555;">Scannen Sie den QR-Code zum Beitritt zur Gruppe:</p>
             <p style="margin:0 0 24px 0;">
-              <img src="${QR_WHATSAPP_URL}" alt="QR انضمام واتساب" width="140" height="140" style="display:block; width:140px; height:140px; background:#fff; border-radius:12px; padding:8px; border:1px solid #eee;" />
+              <img src="${QR_WHATSAPP_URL}" alt="QR-Code WhatsApp" width="140" height="140" style="display:block; width:140px; height:140px; background:#fff; border-radius:12px; padding:8px; border:1px solid #eee;" />
             </p>
             <p style="margin:0; font-size:13px; color:#777;">
               — TransPool24 · Pforzheim & Region<br>
@@ -202,19 +202,19 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
         <tr>
           <td style="background:#0d2137; padding: 28px 24px; text-align: center;">
             <img src="${LOGO_BLUE_URL}" alt="TransPool24" width="320" height="90" style="height:90px; width:auto; max-width:320px; display:block; margin:0 auto 16px auto; background:transparent;" />
-            <p style="margin:0; font-size:18px; font-weight:700; color:#fff; line-height:1.4;" dir="ltr" lang="de">
+            <p style="margin:0; font-size:18px; font-weight:700; color:#fff; line-height:1.4;">
               Ihr Weg ist sicher – und unser Team steht immer hinter Ihnen.
             </p>
           </td>
         </tr>
         <tr>
-          <td style="background:#0d2137; padding: 0 24px 24px 24px; text-align: center;" dir="ltr" lang="de">
+          <td style="background:#0d2137; padding: 0 24px 24px 24px; text-align: center;">
             <a href="${SITE_URL}/de/support" style="display:inline-block; padding:14px 28px; background:#00BFFF; color:#fff; text-decoration:none; border-radius:8px; font-weight:600; font-size:15px;">Wir sind an Ihrer Seite bei jedem Kilometer.</a>
           </td>
         </tr>
         <tr>
           <td style="background:#0d2137; padding: 16px 24px 28px; text-align: center;">
-            <p style="margin:0 0 12px 0; font-size:12px; color:rgba(255,255,255,0.8);">تابعنا</p>
+            <p style="margin:0 0 12px 0; font-size:12px; color:rgba(255,255,255,0.8);">Folgen Sie uns</p>
             <p style="margin:0; font-size:0; line-height:0;">
               <a href="https://www.instagram.com/transpool24/" target="_blank" rel="noopener" style="display:inline-block; margin:0 14px; vertical-align:middle;"><img src="${SITE_URL}/icons/instagram.png" alt="Instagram" width="32" height="32" style="display:block; width:32px; height:32px;" /></a>
               <a href="https://www.linkedin.com/in/trans-pool-1235803b8" target="_blank" rel="noopener" style="display:inline-block; margin:0 14px; vertical-align:middle;"><img src="${SITE_URL}/icons/linkedin.png" alt="LinkedIn" width="32" height="32" style="display:block; width:32px; height:32px;" /></a>
@@ -249,7 +249,7 @@ export async function sendDriverApprovalEmail(
     const { error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: [to],
-      subject: `TransPool24 – تمت الموافقة على طلبك كسائق #${data.driver_number != null ? String(data.driver_number).padStart(5, "0") : ""}`,
+      subject: `TransPool24 – Ihre Fahrer-Anfrage wurde genehmigt #${data.driver_number != null ? String(data.driver_number).padStart(5, "0") : ""}`,
       html,
       attachments,
     });
