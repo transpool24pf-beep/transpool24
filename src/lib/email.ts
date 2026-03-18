@@ -18,6 +18,18 @@ function getValidFromEmail(): string {
 
 const FROM_EMAIL = getValidFromEmail();
 
+/* أيقونات Gmail و Email كـ data URI لضمان ظهورها في الإيميل دون الاعتماد على ملفات خارجية */
+const DATA_URI_GMAIL_ICON =
+  "data:image/svg+xml;base64," +
+  Buffer.from(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32"><rect width="32" height="32" rx="6" fill="#EA4335"/><path fill="#fff" d="M8 10v12h4V14.6l4 3.2 4-3.2V22h4V10H8zm4 4.4L8 12.2V10l4 2.6 4-2.6v2.2l-4 2.2z"/><path fill="#fff" opacity="0.9" d="M24 10v2.2l-4 2.2-4-2.2V10h8z"/></svg>'
+  ).toString("base64");
+const DATA_URI_EMAIL_ICON =
+  "data:image/svg+xml;base64," +
+  Buffer.from(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32"><rect width="32" height="32" rx="6" fill="#fff" opacity="0.2"/><path fill="#fff" d="M6 10v12h20V10H6zm4 2l6 4 6-4v2.5l-6 4-6-4V12zm-2 .5V22h16v-9.5l-6 4-6-4-4 2.5z"/></svg>'
+  ).toString("base64");
+
 /** Driver info for order confirmation email (from driver_applications) */
 export type OrderEmailDriverInfo = {
   full_name: string;
@@ -115,8 +127,8 @@ function buildConfirmationHtml(
               <td style="padding: 0 10px;"><a href="https://www.instagram.com/transpool24/" target="_blank" rel="noopener" style="display:inline-block;"><img src="${SITE_URL}/icons/instagram.png" alt="Instagram" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
               <td style="padding: 0 10px;"><a href="https://www.linkedin.com/in/trans-pool-1235803b8" target="_blank" rel="noopener" style="display:inline-block;"><img src="${SITE_URL}/icons/linkedin.png" alt="LinkedIn" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
               <td style="padding: 0 10px;"><a href="https://www.tiktok.com/@transpool24" target="_blank" rel="noopener" style="display:inline-block;"><img src="${SITE_URL}/icons/tiktok.png" alt="TikTok" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
-              <td style="padding: 0 10px;"><a href="mailto:transpool24pf@gmail.com" style="display:inline-block;"><img src="${SITE_URL}/gmail.png" alt="Gmail" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
-              <td style="padding: 0 10px;"><a href="mailto:transpool24@hotmail.com" style="display:inline-block;"><img src="${SITE_URL}/email.png" alt="Email" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
+              <td style="padding: 0 10px;"><a href="mailto:transpool24pf@gmail.com" style="display:inline-block;"><img src="${DATA_URI_GMAIL_ICON}" alt="Gmail" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
+              <td style="padding: 0 10px;"><a href="mailto:transpool24@hotmail.com" style="display:inline-block;"><img src="${DATA_URI_EMAIL_ICON}" alt="Email" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
             </tr>
           </table>
           <p style="margin: 12px 0 0 0; font-size: 12px; color: rgba(255,255,255,0.8);">transpool24pf@gmail.com · transpool24@hotmail.com</p>
