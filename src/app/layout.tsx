@@ -15,6 +15,15 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "TransPool24 – Logistik in Pforzheim",
   description: "Transportaufträge einfach online buchen. Pforzheim und Region.",
+  icons: {
+    icon: [
+      { url: "/4566.png", sizes: "32x32", type: "image/png" },
+      { url: "/4566.png", sizes: "96x96", type: "image/png" },
+      { url: "/4566.png", sizes: "192x192", type: "image/png" },
+      { url: "/4566.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: "/4566.png",
+  },
 };
 
 export default function RootLayout({
