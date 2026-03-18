@@ -44,11 +44,13 @@ export async function generateDriverPaymentInvoicePdf(data: DriverPaymentInvoice
   // —— Zone 1: Header (Logo + Company) ——
   let y = height - MARGIN;
   const logoBytes = await getPdfLogoBytes();
+  let logoHeight = 0;
   if (logoBytes?.length) {
     try {
       const img = await doc.embedPng(logoBytes);
-      const imgW = 90;
-      const imgH = Math.min(40, (img.height / img.width) * imgW);
+      const imgW = 220;
+      const imgH = Math.min(100, (img.height / img.width) * imgW);
+      logoHeight = imgH;
       page.drawImage(img, {
         x: MARGIN,
         y: y - imgH,
@@ -58,8 +60,9 @@ export async function generateDriverPaymentInvoicePdf(data: DriverPaymentInvoice
     } catch {
       try {
         const img = await doc.embedJpg(logoBytes);
-        const imgW = 90;
-        const imgH = Math.min(40, (img.height / img.width) * imgW);
+        const imgW = 220;
+        const imgH = Math.min(100, (img.height / img.width) * imgW);
+        logoHeight = imgH;
         page.drawImage(img, { x: MARGIN, y: y - imgH, width: imgW, height: imgH });
       } catch {
         // skip
@@ -71,7 +74,7 @@ export async function generateDriverPaymentInvoicePdf(data: DriverPaymentInvoice
   drawText(page, font, fontBold, PDF_COMPANY.website, { x: rightX, y: y - SMALL - 2, size: 9 });
   drawText(page, font, fontBold, `E-Mail: ${PDF_COMPANY.email}`, { x: rightX, y: y - (SMALL + 2) * 2, size: 9 });
   drawText(page, font, fontBold, `Tel: ${PDF_COMPANY.phone}`, { x: rightX, y: y - (SMALL + 2) * 3, size: 9 });
-  y -= 58;
+  y -= Math.max(58, logoHeight + 20);
 
   // —— Zone 2: Recipient (left) + Invoice meta (right) ——
   const leftX = MARGIN;
