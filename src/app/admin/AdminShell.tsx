@@ -74,6 +74,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               className="object-contain object-right"
               priority
             />
+            <div className="absolute left-2 top-1/2 h-5 w-5 -translate-y-1/2 rounded-sm bg-[#0d2137]" aria-hidden />
+            <div className="absolute right-2 top-1/2 h-5 w-5 -translate-y-1/2 rounded-sm bg-[#0d2137]" aria-hidden />
           </div>
         </div>
       </header>
