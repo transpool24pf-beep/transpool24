@@ -15,6 +15,21 @@ type DriverApp = {
   rejected_at: string | null;
   rejection_notes: string | null;
   rejection_image_urls: string[] | null;
+  suspended_at: string | null;
+  desired_note: string | null;
+  star_rating: number | null;
+  stats?: { jobs_count: number; total_paid_cents: number; customer_rating_avg: number | null };
+  last_jobs?: Array<{
+    id: string;
+    order_number: number | null;
+    created_at: string;
+    logistics_status: string;
+    pickup_address: string;
+    delivery_address: string;
+    company_name: string;
+    driver_price_cents: number | null;
+    customer_driver_rating: number | null;
+  }>;
   service_policy_accepted: boolean;
   id_document_url: string | null;
   license_front_url: string | null;
@@ -43,6 +58,8 @@ export default function AdminDriverApplicationDetailPage({
   const [rejectModal, setRejectModal] = useState(false);
   const [rejectNotes, setRejectNotes] = useState("");
   const [rejectFiles, setRejectFiles] = useState<File[]>([]);
+  const [desiredNoteEdit, setDesiredNoteEdit] = useState("");
+  const [savingNote, setSavingNote] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchApp = () => {
@@ -184,12 +201,15 @@ export default function AdminDriverApplicationDetailPage({
 
       <div className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
         <h1 className="text-xl font-bold text-[#0d2137]">طلب سائق: {app.full_name}</h1>
-        <p className="mt-1 text-sm text-[#0d2137]/60">
+        <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-[#0d2137]/60">
           {new Date(app.created_at).toLocaleString("ar-DE")} · الحالة: {statusLabel}
           {app.driver_number != null && (
-            <span className="mr-2 rounded bg-[var(--accent)]/15 px-2 py-0.5 font-medium text-[var(--accent)]">
+            <span className="rounded bg-[var(--accent)]/15 px-2 py-0.5 font-medium text-[var(--accent)]">
               رقم السائق #{app.driver_number}
             </span>
+          )}
+          {app.suspended_at && (
+            <span className="rounded bg-red-100 px-2 py-0.5 font-medium text-red-700">عمله مقيد حتى إشعار آخر</span>
           )}
         </p>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -200,6 +220,103 @@ export default function AdminDriverApplicationDetailPage({
           <p><strong>اللغات:</strong> {app.languages_spoken || "—"}</p>
           <p><strong>رقم السيارة:</strong> {app.vehicle_plate || "—"}</p>
         </div>
+
+        {app.status === "approved" && app.stats && (
+          <div className="mt-6 rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/[0.03] p-4">
+            <p className="mb-2 text-sm font-semibold text-[#0d2137]/80">إحصائيات الخدمة</p>
+            <div className="flex flex-wrap gap-4 text-sm">
+              <span><strong>عدد الخدمات:</strong> {app.stats.jobs_count}</span>
+              <span><strong>إجمالي المبالغ المدفوعة له:</strong> {(app.stats.total_paid_cents / 100).toFixed(2)} €</span>
+              <span className="flex items-center gap-1">
+                <strong>تقييم العملاء (نجوم):</strong>
+                {(app.stats.customer_rating_avg ?? app.star_rating) != null ? (
+                  <span className="text-amber-500">
+                    {"★".repeat(Math.round(app.stats.customer_rating_avg ?? app.star_rating ?? 0))}
+                    {"☆".repeat(5 - Math.round(app.stats.customer_rating_avg ?? app.star_rating ?? 0))}
+                    {" "}({(app.stats.customer_rating_avg ?? app.star_rating)?.toFixed(1)})
+                  </span>
+                ) : (
+                  "—"
+                )}
+              </span>
+              <span className="flex items-center gap-1">
+                <strong>تقييم يدوي:</strong>
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={async () => {
+                      const res = await fetch(`/api/admin/driver-applications/${id}`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ action: "update_star_rating", star_rating: app.star_rating === n ? null : n }),
+                      });
+                      if (res.ok) fetchApp();
+                    }}
+                    className={`text-lg ${(app.star_rating ?? 0) >= n ? "text-amber-500" : "text-[#0d2137]/30"}`}
+                  >
+                    ★
+                  </button>
+                ))}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {app.status === "approved" && (
+          <div className="mt-4">
+            <p className="mb-1 text-sm font-semibold text-[#0d2137]/80">كم يريد من الشركة (ملاحظة)</p>
+            {desiredNoteEdit !== "" ? (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={desiredNoteEdit}
+                  onChange={(e) => setDesiredNoteEdit(e.target.value)}
+                  className="flex-1 rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm"
+                  placeholder="ملاحظة أو راتب مطلوب..."
+                />
+                <button
+                  type="button"
+                  disabled={savingNote}
+                  onClick={async () => {
+                    setSavingNote(true);
+                    try {
+                      const res = await fetch(`/api/admin/driver-applications/${id}`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ action: "update_desired_note", desired_note: desiredNoteEdit }),
+                      });
+                      if (res.ok) {
+                        setApp((prev) => (prev ? { ...prev, desired_note: desiredNoteEdit } : null));
+                        setDesiredNoteEdit("");
+                      }
+                    } finally {
+                      setSavingNote(false);
+                    }
+                  }}
+                  className="rounded-lg bg-[var(--accent)] px-3 py-2 text-sm text-white"
+                >
+                  حفظ
+                </button>
+                <button type="button" onClick={() => setDesiredNoteEdit("")} className="rounded-lg border px-3 py-2 text-sm">
+                  إلغاء
+                </button>
+              </div>
+            ) : (
+              <p className="text-sm text-[#0d2137]/70">
+                {app.desired_note || "—"}
+                <button
+                  type="button"
+                  onClick={() => setDesiredNoteEdit(app.desired_note ?? "")}
+                  className="mr-2 text-[var(--accent)] hover:underline"
+                >
+                  تعديل
+                </button>
+              </p>
+            )}
+          </div>
+        )}
+
         <div className="mt-4 flex flex-wrap gap-2">
           <button
             type="button"
@@ -276,6 +393,51 @@ export default function AdminDriverApplicationDetailPage({
               >
                 إرسال ترحيب + انضمام للمجموعة (واتساب)
               </button>
+              {app.suspended_at ? (
+                <button
+                  type="button"
+                  disabled={actionLoading}
+                  onClick={async () => {
+                    if (!window.confirm("إلغاء تقييد عمل هذا السائق؟")) return;
+                    setActionLoading(true);
+                    try {
+                      const res = await fetch(`/api/admin/driver-applications/${id}`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ action: "unsuspend" }),
+                      });
+                      if (res.ok) fetchApp();
+                    } finally {
+                      setActionLoading(false);
+                    }
+                  }}
+                  className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800"
+                >
+                  إلغاء التقيد
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  disabled={actionLoading}
+                  onClick={async () => {
+                    if (!window.confirm("تقيد عمل هذا السائق حتى إشعار آخر؟")) return;
+                    setActionLoading(true);
+                    try {
+                      const res = await fetch(`/api/admin/driver-applications/${id}`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ action: "suspend" }),
+                      });
+                      if (res.ok) fetchApp();
+                    } finally {
+                      setActionLoading(false);
+                    }
+                  }}
+                  className="rounded-lg bg-red-700 px-4 py-2 text-sm font-medium text-white hover:bg-red-800"
+                >
+                  تقيد عمله حتى إشعار آخر
+                </button>
+              )}
             </>
           )}
 
@@ -354,6 +516,50 @@ export default function AdminDriverApplicationDetailPage({
           )}
         </div>
       </div>
+
+      {app.last_jobs && app.last_jobs.length > 0 && (
+        <div className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
+          <h2 className="mb-4 text-lg font-semibold text-[#0d2137]">آخر التنفيذات / الطلبات المنفذة</h2>
+          <div className="space-y-3">
+            {app.last_jobs.map((job) => (
+              <Link
+                key={job.id}
+                href={`/admin/orders/${job.id}`}
+                className="block rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/[0.02] p-4 transition hover:bg-[#0d2137]/[0.05]"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="font-medium text-[#0d2137]">
+                    طلب #{job.order_number ?? job.id.slice(0, 8)}
+                  </span>
+                  <span className="text-sm text-[#0d2137]/70">
+                    {new Date(job.created_at).toLocaleString("ar-DE")}
+                  </span>
+                </div>
+                <p className="mt-1 text-sm text-[#0d2137]/80">
+                  {job.company_name} · من {String(job.pickup_address).slice(0, 40)}… → إلى {String(job.delivery_address).slice(0, 40)}…
+                </p>
+                <div className="mt-2 flex flex-wrap gap-2 text-xs">
+                  <span className="rounded bg-[#0d2137]/10 px-2 py-0.5">
+                    {job.logistics_status === "delivered" ? "تم التسليم" : job.logistics_status === "in_transit" ? "قيد النقل" : job.logistics_status === "assigned" ? "معيّن" : job.logistics_status}
+                  </span>
+                  {job.driver_price_cents != null && (
+                    <span className="text-[var(--accent)]">{(job.driver_price_cents / 100).toFixed(2)} €</span>
+                  )}
+                  {job.customer_driver_rating != null && (
+                    <span className="text-amber-600">★ {job.customer_driver_rating}</span>
+                  )}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {app.last_jobs && app.last_jobs.length === 0 && app.status === "approved" && (
+        <div className="rounded-xl border border-[#0d2137]/10 bg-[#0d2137]/[0.02] p-6">
+          <p className="text-sm text-[#0d2137]/70">لا توجد طلبات منفذة لهذا السائق بعد. عند تعيينه لطلبات من لوحة الطلبات ستظهر هنا.</p>
+        </div>
+      )}
 
       {rejectModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">

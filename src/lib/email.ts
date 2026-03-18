@@ -4,13 +4,22 @@ import { generateInvoicePdf } from "./invoice-pdf";
 
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? "TransPool24 <onboarding@resend.dev>";
 
-function buildConfirmationHtml(job: Job): string {
+function buildConfirmationHtml(job: Job, rateDriverUrl?: string | null): string {
   const totalEur = (job.price_cents / 100).toFixed(2);
   const date = new Date(job.created_at).toLocaleDateString("de-DE", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
   });
+  const rateBlock =
+    rateDriverUrl && rateDriverUrl.length > 0
+      ? `
+  <p style="margin-top: 20px; padding: 12px; background: #f0f9ff; border-radius: 8px;">
+    <strong>Bewerten Sie Ihren Fahrer:</strong> So helfen Sie uns, den Service zu verbessern.<br>
+    <a href="${rateDriverUrl}" style="display: inline-block; margin-top: 8px; padding: 10px 20px; background: #1a1a2e; color: white; text-decoration: none; border-radius: 6px;">Fahrer bewerten (1–5 Sterne)</a>
+  </p>
+  <p style="color: #555; font-size: 12px;">تقييم السائق (نجوم): يساعدنا في تحسين الخدمة.</p>`
+      : "";
   return `
 <!DOCTYPE html>
 <html>
@@ -27,7 +36,7 @@ function buildConfirmationHtml(job: Job): string {
     <tr><td style="padding: 6px 0; border-bottom: 1px solid #eee;"><strong>Ladung / Distanz</strong></td><td style="padding: 6px 0; border-bottom: 1px solid #eee;">${job.cargo_size}, ${job.distance_km ?? "-"} km</td></tr>
     <tr><td style="padding: 8px 0;"><strong>Gesamtbetrag</strong></td><td style="padding: 8px 0;">€ ${totalEur}</td></tr>
   </table>
-  <p style="color: #555; font-size: 14px;">Ihre Rechnung liegt dieser E-Mail als PDF bei.</p>
+  <p style="color: #555; font-size: 14px;">Ihre Rechnung liegt dieser E-Mail als PDF bei.</p>${rateBlock}
   <p style="color: #555; font-size: 14px;">— TransPool24 · Pforzheim & Region</p>
 </body>
 </html>
@@ -36,8 +45,9 @@ function buildConfirmationHtml(job: Job): string {
 
 export async function sendOrderConfirmationEmail(
   to: string,
-  job: Job,
-  pdfBuffer: Uint8Array
+  job: Job & { rating_token?: string | null },
+  pdfBuffer: Uint8Array,
+  rateDriverUrl?: string | null
 ): Promise<{ success: boolean; error?: string }> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
@@ -51,7 +61,7 @@ export async function sendOrderConfirmationEmail(
       from: FROM_EMAIL,
       to: [to],
       subject: `TransPool24 – Zahlungsbestätigung / Rechnung #${String(job.id).slice(0, 8)}`,
-      html: buildConfirmationHtml(job),
+      html: buildConfirmationHtml(job, rateDriverUrl),
       attachments: [
         {
           filename: `TransPool24-Rechnung-${String(job.id).slice(0, 8)}.pdf`,

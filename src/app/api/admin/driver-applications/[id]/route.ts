@@ -18,7 +18,35 @@ export async function GET(
   if (error || !data) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
-  return NextResponse.json(data);
+  const { data: jobs } = await supabase
+    .from("jobs")
+    .select("id, order_number, driver_price_cents, customer_driver_rating, created_at, logistics_status, pickup_address, delivery_address, company_name")
+    .eq("assigned_driver_application_id", id)
+    .order("created_at", { ascending: false })
+    .limit(50);
+  const jobs_count = jobs?.length ?? 0;
+  const total_paid_cents = (jobs ?? []).reduce((s, j) => s + (Number(j.driver_price_cents) || 0), 0);
+  const ratings = (jobs ?? []).filter((j) => (j as { customer_driver_rating?: number }).customer_driver_rating != null) as { customer_driver_rating: number }[];
+  const customer_rating_avg =
+    ratings.length > 0
+      ? ratings.reduce((s, j) => s + j.customer_driver_rating, 0) / ratings.length
+      : null;
+  const last_jobs = (jobs ?? []).map((j) => ({
+    id: j.id,
+    order_number: j.order_number,
+    created_at: j.created_at,
+    logistics_status: j.logistics_status,
+    pickup_address: j.pickup_address,
+    delivery_address: j.delivery_address,
+    company_name: j.company_name,
+    driver_price_cents: j.driver_price_cents,
+    customer_driver_rating: (j as { customer_driver_rating?: number }).customer_driver_rating,
+  }));
+  return NextResponse.json({
+    ...data,
+    stats: { jobs_count, total_paid_cents, customer_rating_avg },
+    last_jobs,
+  });
 }
 
 export async function PATCH(
@@ -30,11 +58,50 @@ export async function PATCH(
   const { id } = await params;
   const body = await req.json();
   const action = body?.action as string;
-  if (!action || !["approve", "reject", "assign_number"].includes(action)) {
-    return NextResponse.json({ error: "action must be approve, reject, or assign_number" }, { status: 400 });
+  if (
+    !action ||
+    !["approve", "reject", "assign_number", "suspend", "unsuspend", "update_desired_note", "update_star_rating"].includes(action)
+  ) {
+    return NextResponse.json(
+      { error: "action must be approve, reject, assign_number, suspend, unsuspend, update_desired_note, or update_star_rating" },
+      { status: 400 }
+    );
   }
 
   const supabase = createServerSupabase();
+
+  if (action === "suspend" || action === "unsuspend") {
+    const { error: updateErr } = await supabase
+      .from("driver_applications")
+      .update({
+        suspended_at: action === "suspend" ? new Date().toISOString() : null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id);
+    if (updateErr) {
+      return NextResponse.json({ error: updateErr.message }, { status: 500 });
+    }
+    return NextResponse.json({ ok: true, suspended: action === "suspend" });
+  }
+
+  if (action === "update_desired_note" || action === "update_star_rating") {
+    const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
+    if (action === "update_desired_note" && body.desired_note !== undefined) {
+      updates.desired_note = typeof body.desired_note === "string" ? body.desired_note.trim() : null;
+    }
+    if (action === "update_star_rating" && body.star_rating !== undefined) {
+      const v = body.star_rating;
+      updates.star_rating = v === null || v === "" ? null : Math.min(5, Math.max(0, Number(v)));
+    }
+    const { error: updateErr } = await supabase
+      .from("driver_applications")
+      .update(updates)
+      .eq("id", id);
+    if (updateErr) {
+      return NextResponse.json({ error: updateErr.message }, { status: 500 });
+    }
+    return NextResponse.json({ ok: true });
+  }
 
   if (action === "assign_number") {
     const { data: app, error: fetchErr } = await supabase

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 type Doc = { driver_id: string; document_type: string; storage_path: string; file_name: string | null; verified: boolean };
@@ -16,6 +17,9 @@ type Driver = {
   documents: Doc[];
   source?: "profile" | "application";
   driver_number?: number | null;
+  suspended_at?: string | null;
+  desired_note?: string | null;
+  stats?: { jobs_count: number; total_paid_cents: number; customer_rating_avg: number | null };
 };
 
 const DOC_LABELS: Record<string, string> = {
@@ -25,6 +29,7 @@ const DOC_LABELS: Record<string, string> = {
 };
 
 export default function AdminDriversPage() {
+  const router = useRouter();
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingStar, setEditingStar] = useState<string | null>(null);
@@ -77,7 +82,9 @@ export default function AdminDriversPage() {
           {drivers.map((d) => (
             <div
               key={d.id}
-              className="rounded-xl border border-[#0d2137]/10 bg-white p-5 shadow-sm"
+              className={`rounded-xl border border-[#0d2137]/10 bg-white p-5 shadow-sm ${d.source === "application" ? "cursor-pointer transition hover:border-[var(--accent)]/30 hover:shadow-md" : ""}`}
+              role={d.source === "application" ? "link" : undefined}
+              onClick={d.source === "application" ? () => router.push(`/admin/driver-applications/${d.id}`) : undefined}
             >
               <div className="flex flex-wrap items-start gap-4">
                 {d.avatar_url ? (
@@ -101,17 +108,30 @@ export default function AdminDriversPage() {
                         {d.driver_number != null ? `رقم السائق #${d.driver_number}` : "معتمد (بدون رقم بعد)"}
                       </span>
                     )}
+                    {d.suspended_at && (
+                      <span className="rounded bg-red-100 px-2 py-0.5 text-sm font-medium text-red-700">موقوف</span>
+                    )}
                     {d.source === "application" && (
                       <Link
                         href={`/admin/driver-applications/${d.id}`}
-                        className="text-xs text-[var(--accent)] hover:underline"
+                        className="rounded-lg bg-[var(--accent)] px-3 py-1.5 text-sm font-medium text-white hover:opacity-90"
+                        onClick={(e) => e.stopPropagation()}
                       >
-                        عرض الطلب
+                        فتح الملف / البروفايل
                       </Link>
                     )}
                   </div>
                   <p className="text-sm text-[#0d2137]/70">{d.email ?? "—"}</p>
                   <p className="text-sm text-[#0d2137]/70">{d.phone ?? "—"}</p>
+                  {d.stats && (d.stats.jobs_count > 0 || (d.stats.customer_rating_avg != null)) && (
+                    <div className="mt-2 flex flex-wrap gap-3 text-sm text-[#0d2137]/70">
+                      <span><strong>عدد الخدمات:</strong> {d.stats.jobs_count}</span>
+                      <span><strong>إجمالي المدفوع:</strong> {(d.stats.total_paid_cents / 100).toFixed(2)} €</span>
+                      {d.stats.customer_rating_avg != null && (
+                        <span className="text-amber-600">★ {(d.stats.customer_rating_avg).toFixed(1)}</span>
+                      )}
+                    </div>
+                  )}
                   {d.source !== "application" && (
                     <div className="mt-2 flex items-center gap-2">
                       <span className="text-sm text-[#0d2137]/70">Stars / نجمة:</span>
