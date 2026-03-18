@@ -58,7 +58,7 @@ function buildConfirmationHtml(
         </td>
         <td>
           <p style="margin: 0 0 4px 0;"><strong>${escapeHtml(driver.full_name)}</strong></p>
-          <p style="margin: 0 0 4px 0; color: #64748b;">★ ${driver.star_rating != null ? driver.star_rating.toFixed(1) : "—"} نجوم</p>
+          <p style="margin: 0 0 4px 0; color: #64748b;">${driver.star_rating != null ? driver.star_rating.toFixed(1) : "—"} نجوم</p>
           <p style="margin: 0 0 4px 0;">الهاتف: ${escapeHtml(driver.phone)}</p>
           <p style="margin: 0 0 4px 0;">رقم السيارة: ${escapeHtml(driver.vehicle_plate || "—")}</p>
           <p style="margin: 0;">اللغات: ${escapeHtml(driver.languages_spoken || "—")}</p>
@@ -86,10 +86,7 @@ function buildConfirmationHtml(
 <head><meta charset="utf-8"><title>تأكيد طلبك – TransPool24</title></head>
 <body style="margin:0; font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f4f4;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background: ${headerBlue}; padding: 24px;">
-    <tr>
-      <td align="center" width="82%" style="background: ${headerBlue};"><img src="${LOGO_BLUE_URL}" alt="TransPool24" width="240" height="70" style="display:block; max-width:240px; height:auto;" /></td>
-      <td width="18%" style="background: ${headerBlue}; vertical-align: middle;">&nbsp;</td>
-    </tr>
+    <tr><td align="center"><img src="${LOGO_BLUE_URL}" alt="TransPool24" width="240" height="70" style="display:block; max-width:240px; height:auto; margin:0 auto;" /></td></tr>
   </table>
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; padding: 32px 20px;">
     <tr><td>
@@ -293,10 +290,7 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
         </tr>
         <tr>
           <td style="background:#0d2137; padding: 28px 24px; text-align: center;">
-            <table width="100%" cellpadding="0" cellspacing="0"><tr>
-              <td align="center" width="82%" style="background:#0d2137;"><img src="${LOGO_BLUE_URL}" alt="TransPool24" width="320" height="90" style="height:90px; width:auto; max-width:320px; display:block; margin:0 auto 16px auto; background:transparent;" /></td>
-              <td width="18%" style="background:#0d2137;">&nbsp;</td>
-            </tr></table>
+            <img src="${LOGO_BLUE_URL}" alt="TransPool24" width="320" height="90" style="height:90px; width:auto; max-width:320px; display:block; margin:0 auto 16px auto; background:transparent;" />
             <p style="margin:0; font-size:18px; font-weight:700; color:#fff; line-height:1.4;">
               Ihr Weg ist sicher – und unser Team steht immer hinter Ihnen.
             </p>
@@ -352,10 +346,7 @@ function buildDriverPaymentInvoiceEmailHtml(data: DriverPaymentInvoiceEmailData)
   <table width="100%" cellpadding="0" cellspacing="0" style="background: #fff; border-bottom: 1px solid #eee;"><tr><td align="right" style="padding: 8px 24px;"><a href="${SITE_URL}" style="color:#000; text-decoration:underline; font-size:13px;">www.transpool24.com</a></td></tr></table>
   <!-- صورة أولى: هيدر بشعار 356.png كبير -->
   <table width="100%" cellpadding="0" cellspacing="0" style="background: ${headerBlue}; padding: 28px 24px;">
-    <tr>
-      <td align="center" width="82%" style="background: ${headerBlue};"><img src="${LOGO_BLUE_URL}" alt="TransPool24" width="320" height="90" style="display:block; max-width:320px; height:auto; max-height:90px;" /></td>
-      <td width="18%" style="background: ${headerBlue};">&nbsp;</td>
-    </tr>
+    <tr><td align="center"><img src="${LOGO_BLUE_URL}" alt="TransPool24" width="320" height="90" style="display:block; max-width:320px; height:auto; max-height:90px; margin:0 auto;" /></td></tr>
   </table>
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; padding: 32px 20px;">
     <tr><td>
@@ -390,10 +381,7 @@ function buildDriverPaymentInvoiceEmailHtml(data: DriverPaymentInvoiceEmailData)
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; padding: 0 20px 24px;">
     <tr><td>
       <div style="background: ${headerBlue}; border-radius: 0 0 16px 16px; padding: 32px 24px; text-align: center;">
-        <table width="100%" cellpadding="0" cellspacing="0"><tr>
-          <td align="center" width="82%" style="background: ${headerBlue};"><img src="${LOGO_BLUE_URL}" alt="TransPool24" width="280" height="80" style="display:block; margin: 0 auto 20px; max-width:280px; height:auto; max-height:80px;" /></td>
-          <td width="18%" style="background: ${headerBlue};">&nbsp;</td>
-        </tr></table>
+        <img src="${LOGO_BLUE_URL}" alt="TransPool24" width="280" height="80" style="display:block; margin: 0 auto 20px; max-width:280px; height:auto; max-height:80px;" />
         <p style="margin: 0 0 20px 0; font-size: 18px; font-weight: bold; color: #ffffff;">طريقك آمن، وفريقنا يدعمك دائماً.</p>
         <a href="${supportUrl}" style="display: inline-block; margin: 0 0 24px 0; padding: 14px 28px; background: #00BFFF; color: #fff; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 15px;">نحن بجانبك في كل كيلومتر.</a>
         <p style="margin: 0 0 12px 0; font-size: 13px; color: rgba(255,255,255,0.9);">تابعنا</p>
