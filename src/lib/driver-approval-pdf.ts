@@ -1,6 +1,5 @@
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
-
-const SITE_DOMAIN = "www.transpool24.com";
+import { PDF_COMPANY, getPdfLogoBytes } from "./pdf-company";
 
 /** Helvetica uses WinAnsi; strip non-ASCII to avoid "WinAnsi cannot encode" */
 function toWinAnsiSafe(s: string): string {
@@ -44,108 +43,128 @@ export async function generateDriverApprovalPdf(app: DriverAppForPdf): Promise<U
   const fontBold = await doc.embedFont(StandardFonts.HelveticaBold);
   const page = doc.addPage([595, 842]);
   const { width, height } = page.getSize();
-  let y = height - 50;
+  const margin = 50;
+  let y = height - margin;
 
-  // Logo: only from env (Vercel serverless has no reliable fs access to public/)
-  let logoBytes: Uint8Array | null = null;
-  try {
-    const base64 = process.env.INVOICE_LOGO_BASE64;
-    if (base64 && typeof base64 === "string") {
-      logoBytes = new Uint8Array(Buffer.from(base64, "base64"));
-    }
-  } catch {
-    // no logo
-  }
+  // —— Header: IONOS-style ——
+  // Left: Title + Subtitle
+  y = drawText(page, font, fontBold, "Zulassung zur Fahreranwendung", {
+    y,
+    size: 16,
+    bold: true,
+    x: margin,
+  });
+  y = drawText(page, font, fontBold, "Bestätigung der Mitgliedschaft", {
+    y,
+    size: 11,
+    x: margin,
+  });
+
+  // Right: Logo + Company contact block
+  const logoBytes = await getPdfLogoBytes();
+  let logoDrawn = false;
   if (logoBytes && logoBytes.length > 0) {
     try {
       const img = await doc.embedPng(logoBytes);
-      const imgW = 90;
-      const imgH = Math.min(40, (img.height / img.width) * imgW);
+      if (!img) throw new Error("no img");
+      const imgW = 100;
+      const imgH = Math.min(45, (img.height / img.width) * imgW);
       page.drawImage(img, {
-        x: width - 50 - imgW,
-        y: height - 45 - imgH,
+        x: width - margin - imgW,
+        y: height - margin - imgH,
         width: imgW,
         height: imgH,
       });
+      logoDrawn = true;
     } catch {
       try {
         const img = await doc.embedJpg(logoBytes);
-        const imgW = 90;
-        const imgH = Math.min(40, (img.height / img.width) * imgW);
+        const imgW = 100;
+        const imgH = Math.min(45, (img.height / img.width) * imgW);
         page.drawImage(img, {
-          x: width - 50 - imgW,
-          y: height - 45 - imgH,
+          x: width - margin - imgW,
+          y: height - margin - imgH,
           width: imgW,
           height: imgH,
         });
+        logoDrawn = true;
       } catch {
         // skip logo
       }
     }
   }
 
-  // Title
-  y = drawText(page, font, fontBold, "TransPool24 - Driver Application Approval", {
-    y,
-    size: 16,
+  let contactY = logoDrawn ? height - margin - 55 : height - margin - 10;
+  const rightX = width - margin - 180;
+  contactY = drawText(page, font, fontBold, PDF_COMPANY.name, {
+    x: rightX,
+    y: contactY,
+    size: 10,
     bold: true,
   });
-  y = drawText(page, font, fontBold, "Zulassung / Approval of membership request", {
-    y,
-    size: 11,
+  contactY = drawText(page, font, fontBold, `E-Mail: ${PDF_COMPANY.email}`, {
+    x: rightX,
+    y: contactY,
+    size: 9,
   });
-  y -= 16;
+  contactY = drawText(page, font, fontBold, `Tel: ${PDF_COMPANY.phone}`, {
+    x: rightX,
+    y: contactY,
+    size: 9,
+  });
+  drawText(page, font, fontBold, PDF_COMPANY.website, {
+    x: rightX,
+    y: contactY,
+    size: 9,
+  });
 
-  // Company
-  y = drawText(page, font, fontBold, "Company / Unternehmen", { y, size: 10, bold: true });
-  y = drawText(page, font, fontBold, "TransPool24", { y, size: 10 });
-  y = drawText(page, font, fontBold, SITE_DOMAIN, { y, size: 9 });
-  y -= 12;
+  // Body: start below header
+  y -= 28;
 
-  // Driver info
-  y = drawText(page, font, fontBold, "Driver / Fahrer", { y, size: 10, bold: true });
+  // Fahrer
+  y = drawText(page, font, fontBold, "Fahrer", { y, size: 10, bold: true, x: margin });
   if (app.driver_number != null) {
     const num5 = String(Math.round(app.driver_number)).padStart(5, "0");
-    y = drawText(page, font, fontBold, `Driver number / Nummer: ${num5}`, { y, size: 10 });
+    y = drawText(page, font, fontBold, `Fahrernummer: ${num5}`, { y, size: 10, x: margin });
   }
-  y = drawText(page, font, fontBold, `Name: ${toWinAnsiSafe(app.full_name)}`, { y, size: 10 });
-  y = drawText(page, font, fontBold, `Email: ${toWinAnsiSafe(app.email)}`, { y, size: 10 });
-  y = drawText(page, font, fontBold, `Phone / WhatsApp: ${toWinAnsiSafe(app.phone)}`, { y, size: 10 });
-  y = drawText(page, font, fontBold, `City: ${toWinAnsiSafe(app.city)}`, { y, size: 10 });
+  y = drawText(page, font, fontBold, `Name: ${toWinAnsiSafe(app.full_name)}`, { y, size: 10, x: margin });
+  y = drawText(page, font, fontBold, `E-Mail: ${toWinAnsiSafe(app.email)}`, { y, size: 10, x: margin });
+  y = drawText(page, font, fontBold, `Telefon / WhatsApp: ${toWinAnsiSafe(app.phone)}`, { y, size: 10, x: margin });
+  y = drawText(page, font, fontBold, `Stadt: ${toWinAnsiSafe(app.city)}`, { y, size: 10, x: margin });
   if (app.vehicle_plate) {
-    y = drawText(page, font, fontBold, `Vehicle plate: ${toWinAnsiSafe(app.vehicle_plate)}`, { y, size: 10 });
+    y = drawText(page, font, fontBold, `Kennzeichen: ${toWinAnsiSafe(app.vehicle_plate)}`, { y, size: 10, x: margin });
   }
   if (app.languages_spoken) {
-    y = drawText(page, font, fontBold, `Languages: ${toWinAnsiSafe(app.languages_spoken)}`, { y, size: 10 });
+    y = drawText(page, font, fontBold, `Sprachen: ${toWinAnsiSafe(app.languages_spoken)}`, { y, size: 10, x: margin });
   }
   const approvedDateStr =
     typeof app.approved_at === "string" && app.approved_at
       ? new Date(app.approved_at).toLocaleDateString("de-DE")
       : new Date().toLocaleDateString("de-DE");
-  y = drawText(page, font, fontBold, `Approval date: ${approvedDateStr}`, { y, size: 10 });
+  y = drawText(page, font, fontBold, `Zulassungsdatum: ${approvedDateStr}`, { y, size: 10, x: margin });
   y -= 20;
 
-  // Welcome text
-  y = drawText(page, font, fontBold, "Welcome to TransPool24.", { y, size: 11, bold: true });
+  // Willkommenstext
+  y = drawText(page, font, fontBold, "Willkommen bei TransPool24.", { y, size: 11, bold: true, x: margin });
   y = drawText(
     page,
     font,
     fontBold,
-    "You have been accepted. Please join the TransPool24 driver group to receive jobs.",
-    { y, size: 10 }
+    "Ihre Bewerbung wurde angenommen. Bitte treten Sie der TransPool24-Fahrergruppe bei, um Aufträge zu erhalten.",
+    { y, size: 10, x: margin }
   );
   y = drawText(
     page,
     font,
     fontBold,
-    "You are now waiting for your first task to accept. We will contact you via WhatsApp or email.",
-    { y, size: 10 }
+    "Sie warten nun auf Ihre erste Aufgabe. Wir kontaktieren Sie per WhatsApp oder E-Mail.",
+    { y, size: 10, x: margin }
   );
   y -= 24;
 
   // Footer
-  y = drawText(page, font, fontBold, "Thank you for joining TransPool24.", { y, size: 9 });
-  y = drawText(page, font, fontBold, SITE_DOMAIN, { y, size: 8 });
+  y = drawText(page, font, fontBold, "Vielen Dank für Ihre Teilnahme bei TransPool24.", { y, size: 9, x: margin });
+  y = drawText(page, font, fontBold, `${PDF_COMPANY.website}  |  E-Mail: ${PDF_COMPANY.email}  |  Tel: ${PDF_COMPANY.phone}`, { y, size: 8, x: margin });
 
   return doc.save();
 }
