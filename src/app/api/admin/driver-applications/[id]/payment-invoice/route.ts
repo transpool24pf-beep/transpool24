@@ -42,6 +42,7 @@ export async function GET(
   const accountHolder = (data.bank_account_holder_name ?? "").trim() || (data.full_name ?? "—");
   const driverNum = data.driver_number != null ? Number(data.driver_number) : null;
   const invoiceNumber = `TP24-${driverNum != null ? String(driverNum).padStart(5, "0") : "00000"}-${Date.now().toString(36).toUpperCase()}`;
+  const contractNumber = `TP24-Vertrag-${driverNum != null ? String(driverNum).padStart(5, "0") : "00000"}-${Date.now().toString(36).toUpperCase()}`;
   const dateStr = new Date().toLocaleDateString("de-DE");
 
   try {
@@ -54,6 +55,7 @@ export async function GET(
       account_holder_name: accountHolder,
       invoice_number: invoiceNumber,
       date: dateStr,
+      contract_number: contractNumber,
     });
     return new NextResponse(Buffer.from(pdf), {
       status: 200,

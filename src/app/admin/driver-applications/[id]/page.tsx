@@ -70,6 +70,9 @@ export default function AdminDriverApplicationDetailPage({
   const [bankHolderName, setBankHolderName] = useState("");
   const [savingBank, setSavingBank] = useState(false);
   const [editingBank, setEditingBank] = useState(false);
+  const [editingBankInModal, setEditingBankInModal] = useState(false);
+  const [modalIban, setModalIban] = useState("");
+  const [modalHolderName, setModalHolderName] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchApp = () => {
@@ -90,6 +93,35 @@ export default function AdminDriverApplicationDetailPage({
     setLoading(true);
     fetchApp();
   }, [id]);
+
+  // Auto-save bank info when editing (debounced)
+  const bankSaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!editingBank || !id) return;
+    bankSaveTimeoutRef.current = setTimeout(() => {
+      bankSaveTimeoutRef.current = null;
+      const ibanVal = bankIban.trim() || null;
+      const holderVal = bankHolderName.trim() || null;
+      fetch(`/api/admin/driver-applications/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "update_bank_info",
+          iban: ibanVal,
+          bank_account_holder_name: holderVal,
+        }),
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          if (data?.error) return;
+          setApp((prev) => (prev ? { ...prev, iban: ibanVal, bank_account_holder_name: holderVal } : null));
+        })
+        .catch(() => {});
+    }, 800);
+    return () => {
+      if (bankSaveTimeoutRef.current) clearTimeout(bankSaveTimeoutRef.current);
+    };
+  }, [editingBank, bankIban, bankHolderName, id]);
 
   const openWhatsApp = (text?: string) => {
     if (!app) return;
@@ -333,6 +365,7 @@ export default function AdminDriverApplicationDetailPage({
             <p className="mb-1 text-xs text-[#0d2137]/60">لتسهيل إرسال المال وإرفاق الفاتورة. اسم صاحب الحساب كما في البطاقة.</p>
             {editingBank ? (
               <div className="space-y-3">
+                <p className="text-xs text-[#0d2137]/60">يتم الحفظ تلقائياً عند الإدخال.</p>
                 <div>
                   <label className="block text-xs font-medium text-[#0d2137]/80">IBAN</label>
                   <input
@@ -353,41 +386,9 @@ export default function AdminDriverApplicationDetailPage({
                     className="mt-1 w-full max-w-md rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm"
                   />
                 </div>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    disabled={savingBank}
-                    onClick={async () => {
-                      setSavingBank(true);
-                      try {
-                        const res = await fetch(`/api/admin/driver-applications/${id}`, {
-                          method: "PATCH",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({
-                            action: "update_bank_info",
-                            iban: bankIban.trim() || null,
-                            bank_account_holder_name: bankHolderName.trim() || null,
-                          }),
-                        });
-                        const data = await res.json();
-                        if (res.ok) {
-                          setEditingBank(false);
-                          fetchApp();
-                        } else {
-                          alert(data?.error || "فشل الحفظ");
-                        }
-                      } finally {
-                        setSavingBank(false);
-                      }
-                    }}
-                    className="rounded-lg bg-[var(--accent)] px-3 py-2 text-sm text-white"
-                  >
-                    {savingBank ? "جاري الحفظ…" : "حفظ"}
-                  </button>
-                  <button type="button" onClick={() => setEditingBank(false)} className="rounded-lg border px-3 py-2 text-sm">
-                    إلغاء
-                  </button>
-                </div>
+                <button type="button" onClick={() => setEditingBank(false)} className="rounded-lg border px-3 py-2 text-sm">
+                  إلغاء
+                </button>
               </div>
             ) : (
               <div className="flex flex-wrap items-center gap-2">
@@ -484,6 +485,9 @@ export default function AdminDriverApplicationDetailPage({
                 onClick={() => {
                   setPaymentAmount("");
                   setPaymentTip("");
+                  setEditingBankInModal(false);
+                  setModalIban(app.iban ?? "");
+                  setModalHolderName(app.bank_account_holder_name ?? "");
                   setPaymentInvoiceModal(true);
                 }}
                 className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
@@ -704,8 +708,82 @@ export default function AdminDriverApplicationDetailPage({
           <div className="w-full max-w-md rounded-2xl border bg-white p-6 shadow-xl">
             <h3 className="text-lg font-bold text-[#0d2137]">إرسال فاتورة التحويل للسائق</h3>
             <p className="mt-1 text-sm text-[#0d2137]/70">
-              أدخل المبلغ والإكرامية (اختياري). سيتم إنشاء PDF بنفس أسلوب IONOS مع IBAN واسم صاحب الحساب المحفوظ.
+              أدخل المبلغ والإكرامية (اختياري). الفاتورة تُنشأ بأسلوب IONOS وتتضمن IBAN واسم صاحب الحساب.
             </p>
+            <div className="mt-4 rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/[0.03] p-3">
+              <p className="mb-1 text-xs font-semibold text-[#0d2137]/80">معلومات البنك (تظهر في PDF)</p>
+              {editingBankInModal ? (
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    value={modalIban}
+                    onChange={(e) => setModalIban(e.target.value)}
+                    placeholder="IBAN"
+                    className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
+                  />
+                  <input
+                    type="text"
+                    value={modalHolderName}
+                    onChange={(e) => setModalHolderName(e.target.value)}
+                    placeholder="اسم صاحب الحساب"
+                    className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      disabled={savingBank}
+                      onClick={async () => {
+                        setSavingBank(true);
+                        try {
+                          const res = await fetch(`/api/admin/driver-applications/${id}`, {
+                            method: "PATCH",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                              action: "update_bank_info",
+                              iban: modalIban.trim() || null,
+                              bank_account_holder_name: modalHolderName.trim() || null,
+                            }),
+                          });
+                          const data = await res.json();
+                          if (res.ok) {
+                            setApp((prev) => (prev ? { ...prev, iban: modalIban.trim() || null, bank_account_holder_name: modalHolderName.trim() || null } : null));
+                            setEditingBankInModal(false);
+                            fetchApp();
+                          } else {
+                            alert(data?.error || "فشل الحفظ");
+                          }
+                        } finally {
+                          setSavingBank(false);
+                        }
+                      }}
+                      className="rounded bg-[var(--accent)] px-3 py-1.5 text-sm text-white"
+                    >
+                      {savingBank ? "جاري الحفظ…" : "حفظ"}
+                    </button>
+                    <button type="button" onClick={() => setEditingBankInModal(false)} className="rounded border px-3 py-1.5 text-sm">
+                      إلغاء
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-sm text-[#0d2137]/80">
+                    IBAN: {app?.iban || "—"} · صاحب الحساب: {app?.bank_account_holder_name || "—"}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setModalIban(app?.iban ?? "");
+                      setModalHolderName(app?.bank_account_holder_name ?? "");
+                      setEditingBankInModal(true);
+                    }}
+                    className="text-sm text-[var(--accent)] hover:underline"
+                  >
+                    تعديل
+                  </button>
+                </div>
+              )}
+            </div>
             <div className="mt-4 space-y-3">
               <div>
                 <label className="block text-sm font-medium text-[#0d2137]">المبلغ (€) *</label>

@@ -16,6 +16,7 @@ export type DriverPaymentInvoiceData = {
   account_holder_name: string;
   invoice_number: string;
   date: string;
+  contract_number: string;
 };
 
 function drawText(
@@ -94,12 +95,21 @@ export async function generateDriverPaymentInvoicePdf(data: DriverPaymentInvoice
   }
   y -= 16;
 
-  // Right: invoice meta
+  // Right: invoice meta (IONOS style)
   const metaX = width - margin - 200;
   let metaY = height - margin - 10;
   metaY = drawText(page, font, fontBold, `Rechnungsnummer: ${toWinAnsiSafe(data.invoice_number)}`, { x: metaX, y: metaY, size: 9 });
   metaY = drawText(page, font, fontBold, `Rechnungsdatum: ${data.date}`, { x: metaX, y: metaY, size: 9 });
-  metaY = drawText(page, font, fontBold, `Kundennummer: ${data.driver_number != null ? String(data.driver_number).padStart(5, "0") : "-"}`, { x: metaX, y: metaY, size: 9 });
+  metaY = drawText(page, font, fontBold, `Fahrernummer: ${data.driver_number != null ? String(data.driver_number).padStart(5, "0") : "-"}`, { x: metaX, y: metaY, size: 9 });
+  metaY = drawText(page, font, fontBold, `Vertragsnummer: ${toWinAnsiSafe(data.contract_number)}`, { x: metaX, y: metaY, size: 9 });
+  metaY -= 14;
+  metaY = drawText(page, font, fontBold, "Brauchen Sie Hilfe?", { x: metaX, y: metaY, size: 9, bold: true });
+  metaY = drawText(page, font, fontBold, `Mein TransPool24: ${PDF_COMPANY.website}`, { x: metaX, y: metaY, size: 8 });
+  metaY = drawText(page, font, fontBold, `Kundenservice ${PDF_COMPANY.name}`, { x: metaX, y: metaY, size: 8 });
+  metaY = drawText(page, font, fontBold, `E-Mail: ${PDF_COMPANY.email}`, { x: metaX, y: metaY, size: 8 });
+  metaY = drawText(page, font, fontBold, `Telefon: ${PDF_COMPANY.phone}`, { x: metaX, y: metaY, size: 8 });
+  metaY = drawText(page, font, fontBold, "LinkedIn: linkedin.com/in/trans-pool-1235803b8", { x: metaX, y: metaY, size: 8 });
+  metaY = drawText(page, font, fontBold, "Servicezeiten: taeglich rund um die Uhr", { x: metaX, y: metaY, size: 8 });
 
   // Table header
   y -= 8;
