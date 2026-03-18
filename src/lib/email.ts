@@ -147,7 +147,7 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
       <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.08);">
         <tr>
           <td style="background:${ORANGE}; padding: 28px 32px; text-align: center;">
-            <img src="${LOGO_URL}" alt="TransPool24" width="320" height="90" style="height:90px; width:auto; max-width:320px; display:block; margin:0 auto;" />
+            <img src="${LOGO_URL}" alt="TransPool24" width="360" height="100" style="height:100px; width:auto; max-width:360px; display:block; margin:0 auto; filter:brightness(0) invert(1);" />
           </td>
         </tr>
         <tr>
@@ -199,7 +199,7 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
         </tr>
         <tr>
           <td style="background:#0d2137; padding: 28px 24px; text-align: center;">
-            <img src="${LOGO_URL}" alt="TransPool24" width="260" height="72" style="height:72px; width:auto; max-width:260px; display:block; margin:0 auto 16px auto;" />
+            <img src="${LOGO_URL}" alt="TransPool24" width="280" height="78" style="height:78px; width:auto; max-width:280px; display:block; margin:0 auto 16px auto; filter:brightness(0) invert(1);" />
             <p style="margin:0; font-size:18px; font-weight:700; color:#fff; line-height:1.4;" dir="ltr" lang="de">
               Ihr Weg ist sicher – und unser Team steht immer hinter Ihnen.
             </p>
@@ -208,6 +208,16 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
         <tr>
           <td style="background:#0d2137; padding: 0 24px 24px 24px; text-align: center;" dir="ltr" lang="de">
             <a href="${SITE_URL}/de/support" style="display:inline-block; padding:14px 28px; background:#00BFFF; color:#fff; text-decoration:none; border-radius:8px; font-weight:600; font-size:15px;">Wir sind an Ihrer Seite bei jedem Kilometer.</a>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#0d2137; padding: 16px 24px 28px; text-align: center;">
+            <p style="margin:0 0 8px 0; font-size:12px; color:rgba(255,255,255,0.8);">تابعنا</p>
+            <p style="margin:0; font-size:0;">
+              <a href="https://www.instagram.com/transpool24/" target="_blank" rel="noopener" style="display:inline-block; margin:0 10px; color:#fff; text-decoration:none; font-size:14px; font-weight:600;">Instagram</a>
+              <a href="https://www.linkedin.com/in/trans-pool-1235803b8" target="_blank" rel="noopener" style="display:inline-block; margin:0 10px; color:#fff; text-decoration:none; font-size:14px; font-weight:600;">LinkedIn</a>
+              <a href="https://www.tiktok.com/@transpool24" target="_blank" rel="noopener" style="display:inline-block; margin:0 10px; color:#fff; text-decoration:none; font-size:14px; font-weight:600;">TikTok</a>
+            </p>
           </td>
         </tr>
       </table>
