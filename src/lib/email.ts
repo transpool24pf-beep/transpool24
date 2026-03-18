@@ -201,7 +201,7 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
         </tr>
         <tr>
           <td style="background:#0d2137; padding: 28px 24px; text-align: center;">
-            <img src="${LOGO_BLUE_URL}" alt="TransPool24" width="320" height="90" style="height:90px; width:auto; max-width:320px; display:block; margin:0 auto 16px auto;" />
+            <img src="${LOGO_BLUE_URL}" alt="TransPool24" width="320" height="90" style="height:90px; width:auto; max-width:320px; display:block; margin:0 auto 16px auto; background:transparent;" />
             <p style="margin:0; font-size:18px; font-weight:700; color:#fff; line-height:1.4;" dir="ltr" lang="de">
               Ihr Weg ist sicher – und unser Team steht immer hinter Ihnen.
             </p>
@@ -216,9 +216,9 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
           <td style="background:#0d2137; padding: 16px 24px 28px; text-align: center;">
             <p style="margin:0 0 12px 0; font-size:12px; color:rgba(255,255,255,0.8);">تابعنا</p>
             <p style="margin:0; font-size:0; line-height:0;">
-              <a href="https://www.instagram.com/transpool24/" target="_blank" rel="noopener" style="display:inline-block; margin:0 14px; vertical-align:middle;"><img src="https://cdn.simpleicons.org/instagram/FFFFFF" alt="Instagram" width="32" height="32" style="display:block; width:32px; height:32px;" /></a>
-              <a href="https://www.linkedin.com/in/trans-pool-1235803b8" target="_blank" rel="noopener" style="display:inline-block; margin:0 14px; vertical-align:middle;"><img src="https://cdn.simpleicons.org/linkedin/FFFFFF" alt="LinkedIn" width="32" height="32" style="display:block; width:32px; height:32px;" /></a>
-              <a href="https://www.tiktok.com/@transpool24" target="_blank" rel="noopener" style="display:inline-block; margin:0 14px; vertical-align:middle;"><img src="https://cdn.simpleicons.org/tiktok/FFFFFF" alt="TikTok" width="32" height="32" style="display:block; width:32px; height:32px;" /></a>
+              <a href="https://www.instagram.com/transpool24/" target="_blank" rel="noopener" style="display:inline-block; margin:0 14px; vertical-align:middle;"><img src="${SITE_URL}/icons/instagram.png" alt="Instagram" width="32" height="32" style="display:block; width:32px; height:32px;" /></a>
+              <a href="https://www.linkedin.com/in/trans-pool-1235803b8" target="_blank" rel="noopener" style="display:inline-block; margin:0 14px; vertical-align:middle;"><img src="${SITE_URL}/icons/linkedin.png" alt="LinkedIn" width="32" height="32" style="display:block; width:32px; height:32px;" /></a>
+              <a href="https://www.tiktok.com/@transpool24" target="_blank" rel="noopener" style="display:inline-block; margin:0 14px; vertical-align:middle;"><img src="${SITE_URL}/icons/tiktok.png" alt="TikTok" width="32" height="32" style="display:block; width:32px; height:32px;" /></a>
             </p>
           </td>
         </tr>
