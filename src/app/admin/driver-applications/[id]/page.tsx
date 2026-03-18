@@ -205,7 +205,7 @@ export default function AdminDriverApplicationDetailPage({
           {new Date(app.created_at).toLocaleString("ar-DE")} · الحالة: {statusLabel}
           {app.driver_number != null && (
             <span className="rounded bg-[var(--accent)]/15 px-2 py-0.5 font-medium text-[var(--accent)]">
-              رقم السائق #{app.driver_number}
+              رقم السائق #{String(app.driver_number).padStart(5, "0")}
             </span>
           )}
           {app.suspended_at && (
@@ -265,7 +265,7 @@ export default function AdminDriverApplicationDetailPage({
 
         {app.status === "approved" && (
           <div className="mt-4">
-            <p className="mb-1 text-sm font-semibold text-[#0d2137]/80">كم يريد من الشركة (ملاحظة)</p>
+            <p className="mb-1 text-sm font-semibold text-[#0d2137]/80">المبالغ التي يريدها من الشركة</p>
             {desiredNoteEdit !== "" ? (
               <div className="flex gap-2">
                 <input
@@ -273,7 +273,7 @@ export default function AdminDriverApplicationDetailPage({
                   value={desiredNoteEdit}
                   onChange={(e) => setDesiredNoteEdit(e.target.value)}
                   className="flex-1 rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm"
-                  placeholder="ملاحظة أو راتب مطلوب..."
+                  placeholder="مثال: الراتب أو المبلغ المطلوب..."
                 />
                 <button
                   type="button"

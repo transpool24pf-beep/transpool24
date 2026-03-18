@@ -121,10 +121,10 @@ export async function PATCH(
     const { data: maxRows } = await supabase
       .from("driver_applications")
       .select("driver_number")
-      .not("driver_number", "is", null)
+      .gte("driver_number", 10000)
       .order("driver_number", { ascending: false })
       .limit(1);
-    const nextNumber = (maxRows?.[0]?.driver_number ?? 0) + 1;
+    const nextNumber = (maxRows?.[0]?.driver_number ?? 10000) + 1;
     const { data: updated, error: updateErr } = await supabase
       .from("driver_applications")
       .update({ driver_number: nextNumber, updated_at: new Date().toISOString() })
@@ -154,10 +154,10 @@ export async function PATCH(
     const { data: maxRows } = await supabase
       .from("driver_applications")
       .select("driver_number")
-      .not("driver_number", "is", null)
+      .gte("driver_number", 10000)
       .order("driver_number", { ascending: false })
       .limit(1);
-    const nextNumber = (maxRows?.[0]?.driver_number ?? 0) + 1;
+    const nextNumber = (maxRows?.[0]?.driver_number ?? 10000) + 1;
     const { data: updated, error: updateErr } = await supabase
       .from("driver_applications")
       .update({

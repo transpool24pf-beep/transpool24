@@ -86,7 +86,7 @@ export async function GET() {
 
   const { data: approvedApps } = await supabase
     .from("driver_applications")
-    .select("id, full_name, email, phone, city, driver_number, personal_photo_url, approved_at, created_at, suspended_at, star_rating, desired_note")
+    .select("id, full_name, email, phone, city, driver_number, vehicle_plate, personal_photo_url, approved_at, created_at, suspended_at, star_rating, desired_note")
     .eq("status", "approved")
     .order("driver_number", { ascending: true });
   const fromApplications = (approvedApps ?? []).map((a) => {
@@ -103,6 +103,7 @@ export async function GET() {
       documents: [] as { driver_id: string; document_type: string; storage_path: string; file_name: string | null; verified: boolean }[],
       source: "application" as const,
       driver_number: a.driver_number ?? null,
+      vehicle_plate: a.vehicle_plate ?? null,
       suspended_at: a.suspended_at ?? null,
       desired_note: a.desired_note ?? null,
       stats,

@@ -17,6 +17,7 @@ type Driver = {
   documents: Doc[];
   source?: "profile" | "application";
   driver_number?: number | null;
+  vehicle_plate?: string | null;
   suspended_at?: string | null;
   desired_note?: string | null;
   stats?: { jobs_count: number; total_paid_cents: number; customer_rating_avg: number | null };
@@ -105,7 +106,7 @@ export default function AdminDriversPage() {
                     </p>
                     {d.source === "application" && (
                       <span className="rounded bg-[var(--accent)]/15 px-2 py-0.5 text-sm font-medium text-[var(--accent)]">
-                        {d.driver_number != null ? `رقم السائق #${d.driver_number}` : "معتمد (بدون رقم بعد)"}
+                        {d.driver_number != null ? `رقم السائق #${String(d.driver_number).padStart(5, "0")}` : "معتمد (بدون رقم بعد)"}
                       </span>
                     )}
                     {d.suspended_at && (
@@ -154,23 +155,40 @@ export default function AdminDriversPage() {
                 </div>
               </div>
               <div className="mt-4 border-t border-[#0d2137]/10 pt-4">
-                <p className="mb-2 text-sm font-medium text-[#0d2137]/80">
-                  الأوراق / Documents
-                </p>
-                {d.documents.length === 0 ? (
-                  <p className="text-sm text-[#0d2137]/60">No documents</p>
+                {d.source === "application" ? (
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-[#0d2137]/80">
+                    <span><strong>اسم السائق:</strong> {d.full_name || "—"}</span>
+                    <span><strong>نوع / رقم السيارة:</strong> {d.vehicle_plate || "—"}</span>
+                    <span>
+                      <strong>عدد النجوم:</strong>{" "}
+                      {(d.stats?.customer_rating_avg ?? d.star_rating) != null ? (
+                        <span className="text-amber-600">★ {(d.stats?.customer_rating_avg ?? d.star_rating)?.toFixed(1)}</span>
+                      ) : (
+                        "—"
+                      )}
+                    </span>
+                  </div>
                 ) : (
-                  <ul className="space-y-1 text-sm text-[#0d2137]/80">
-                    {d.documents.map((doc, i) => (
-                      <li key={i}>
-                        {DOC_LABELS[doc.document_type] ?? doc.document_type}:{" "}
-                        {doc.file_name ?? doc.storage_path}{" "}
-                        {doc.verified && (
-                          <span className="text-green-600">✓ verified</span>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
+                  <>
+                    <p className="mb-2 text-sm font-medium text-[#0d2137]/80">
+                      الأوراق / Documents
+                    </p>
+                    {d.documents.length === 0 ? (
+                      <p className="text-sm text-[#0d2137]/60">No documents</p>
+                    ) : (
+                      <ul className="space-y-1 text-sm text-[#0d2137]/80">
+                        {d.documents.map((doc, i) => (
+                          <li key={i}>
+                            {DOC_LABELS[doc.document_type] ?? doc.document_type}:{" "}
+                            {doc.file_name ?? doc.storage_path}{" "}
+                            {doc.verified && (
+                              <span className="text-green-600">✓ verified</span>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </>
                 )}
               </div>
             </div>

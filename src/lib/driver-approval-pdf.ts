@@ -105,7 +105,8 @@ export async function generateDriverApprovalPdf(app: DriverAppForPdf): Promise<U
   // Driver info
   y = drawText(page, font, fontBold, "Driver / Fahrer", { y, size: 10, bold: true });
   if (app.driver_number != null) {
-    y = drawText(page, font, fontBold, `Driver number / Nummer: ${app.driver_number}`, { y, size: 10 });
+    const num5 = String(Math.round(app.driver_number)).padStart(5, "0");
+    y = drawText(page, font, fontBold, `Driver number / Nummer: ${num5}`, { y, size: 10 });
   }
   y = drawText(page, font, fontBold, `Name: ${toWinAnsiSafe(app.full_name)}`, { y, size: 10 });
   y = drawText(page, font, fontBold, `Email: ${toWinAnsiSafe(app.email)}`, { y, size: 10 });
