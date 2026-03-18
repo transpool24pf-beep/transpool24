@@ -2,6 +2,12 @@ import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 
 const SITE_DOMAIN = "www.transpool24.com";
 
+/** Helvetica uses WinAnsi; strip non-ASCII to avoid "WinAnsi cannot encode" */
+function toWinAnsiSafe(s: string): string {
+  if (typeof s !== "string") return "";
+  return s.replace(/[^\x20-\x7E]/g, "?").trim() || "-";
+}
+
 export type DriverAppForPdf = {
   full_name: string;
   email: string;
@@ -101,15 +107,15 @@ export async function generateDriverApprovalPdf(app: DriverAppForPdf): Promise<U
   if (app.driver_number != null) {
     y = drawText(page, font, fontBold, `Driver number / Nummer: ${app.driver_number}`, { y, size: 10 });
   }
-  y = drawText(page, font, fontBold, `Name: ${app.full_name}`, { y, size: 10 });
-  y = drawText(page, font, fontBold, `Email: ${app.email}`, { y, size: 10 });
-  y = drawText(page, font, fontBold, `Phone / WhatsApp: ${app.phone}`, { y, size: 10 });
-  y = drawText(page, font, fontBold, `City: ${app.city}`, { y, size: 10 });
+  y = drawText(page, font, fontBold, `Name: ${toWinAnsiSafe(app.full_name)}`, { y, size: 10 });
+  y = drawText(page, font, fontBold, `Email: ${toWinAnsiSafe(app.email)}`, { y, size: 10 });
+  y = drawText(page, font, fontBold, `Phone / WhatsApp: ${toWinAnsiSafe(app.phone)}`, { y, size: 10 });
+  y = drawText(page, font, fontBold, `City: ${toWinAnsiSafe(app.city)}`, { y, size: 10 });
   if (app.vehicle_plate) {
-    y = drawText(page, font, fontBold, `Vehicle plate: ${app.vehicle_plate}`, { y, size: 10 });
+    y = drawText(page, font, fontBold, `Vehicle plate: ${toWinAnsiSafe(app.vehicle_plate)}`, { y, size: 10 });
   }
   if (app.languages_spoken) {
-    y = drawText(page, font, fontBold, `Languages: ${app.languages_spoken}`, { y, size: 10 });
+    y = drawText(page, font, fontBold, `Languages: ${toWinAnsiSafe(app.languages_spoken)}`, { y, size: 10 });
   }
   const approvedDateStr =
     typeof app.approved_at === "string" && app.approved_at

@@ -35,7 +35,6 @@ export async function GET() {
     .from("driver_applications")
     .select("id, full_name, email, phone, city, driver_number, personal_photo_url, approved_at, created_at")
     .eq("status", "approved")
-    .not("driver_number", "is", null)
     .order("driver_number", { ascending: true });
   const fromApplications = (approvedApps ?? []).map((a) => ({
     id: a.id,
@@ -48,7 +47,7 @@ export async function GET() {
     created_at: a.approved_at ?? a.created_at,
     documents: [] as { driver_id: string; document_type: string; storage_path: string; file_name: string | null; verified: boolean }[],
     source: "application" as const,
-    driver_number: a.driver_number as number,
+    driver_number: a.driver_number ?? null,
   }));
 
   const list = [...fromApplications, ...fromProfiles];

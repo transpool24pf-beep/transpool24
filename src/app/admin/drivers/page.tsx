@@ -96,9 +96,9 @@ export default function AdminDriversPage() {
                     <p className="font-medium text-[#0d2137]">
                       {d.full_name || d.company_name || "—"}
                     </p>
-                    {d.driver_number != null && (
+                    {d.source === "application" && (
                       <span className="rounded bg-[var(--accent)]/15 px-2 py-0.5 text-sm font-medium text-[var(--accent)]">
-                        رقم السائق #{d.driver_number}
+                        {d.driver_number != null ? `رقم السائق #${d.driver_number}` : "معتمد (بدون رقم بعد)"}
                       </span>
                     )}
                     {d.source === "application" && (

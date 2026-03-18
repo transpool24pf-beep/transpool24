@@ -30,11 +30,46 @@ export async function PATCH(
   const { id } = await params;
   const body = await req.json();
   const action = body?.action as string;
-  if (!action || !["approve", "reject"].includes(action)) {
-    return NextResponse.json({ error: "action must be approve or reject" }, { status: 400 });
+  if (!action || !["approve", "reject", "assign_number"].includes(action)) {
+    return NextResponse.json({ error: "action must be approve, reject, or assign_number" }, { status: 400 });
   }
 
   const supabase = createServerSupabase();
+
+  if (action === "assign_number") {
+    const { data: app, error: fetchErr } = await supabase
+      .from("driver_applications")
+      .select("id, status, driver_number")
+      .eq("id", id)
+      .single();
+    if (fetchErr || !app) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+    if (app.status !== "approved") {
+      return NextResponse.json({ error: "Only approved applications can get a driver number" }, { status: 400 });
+    }
+    if (app.driver_number != null) {
+      return NextResponse.json({ ok: true, driver_number: app.driver_number });
+    }
+    const { data: maxRows } = await supabase
+      .from("driver_applications")
+      .select("driver_number")
+      .not("driver_number", "is", null)
+      .order("driver_number", { ascending: false })
+      .limit(1);
+    const nextNumber = (maxRows?.[0]?.driver_number ?? 0) + 1;
+    const { data: updated, error: updateErr } = await supabase
+      .from("driver_applications")
+      .update({ driver_number: nextNumber, updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .select("driver_number")
+      .single();
+    if (updateErr) {
+      return NextResponse.json({ error: updateErr.message }, { status: 500 });
+    }
+    return NextResponse.json({ ok: true, driver_number: updated?.driver_number ?? nextNumber });
+  }
+
   const { data: existing, error: fetchErr } = await supabase
     .from("driver_applications")
     .select("id, status")

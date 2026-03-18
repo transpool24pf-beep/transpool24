@@ -232,6 +232,35 @@ export default function AdminDriverApplicationDetailPage({
 
           {app.status === "approved" && (
             <>
+              {app.driver_number == null && (
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setActionLoading(true);
+                    try {
+                      const res = await fetch(`/api/admin/driver-applications/${id}`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ action: "assign_number" }),
+                      });
+                      const data = await res.json();
+                      if (res.ok) {
+                        fetchApp();
+                      } else {
+                        alert(data?.error || "فشل");
+                      }
+                    } catch {
+                      alert("فشل الاتصال");
+                    } finally {
+                      setActionLoading(false);
+                    }
+                  }}
+                  disabled={actionLoading}
+                  className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700 disabled:opacity-50"
+                >
+                  تعيين رقم السائق
+                </button>
+              )}
               <a
                 href={`/api/admin/driver-applications/${id}/approval-pdf`}
                 target="_blank"
