@@ -16,12 +16,8 @@ export const metadata: Metadata = {
   title: "TransPool24 – Logistik in Pforzheim",
   description: "Transportaufträge einfach online buchen. Pforzheim und Region.",
   icons: {
-    icon: [
-      { url: "/icon.png?v=3", type: "image/png", sizes: "32x32" },
-      { url: "/icon.png?v=3", type: "image/png", sizes: "192x192" },
-      { url: "/favicon.ico?v=3", type: "image/x-icon", sizes: "any" },
-    ],
-    apple: "/icon.png?v=3",
+    icon: "/4566.png",
+    apple: "/4566.png",
   },
 };
 
