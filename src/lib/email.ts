@@ -111,6 +111,8 @@ export async function sendOrderConfirmationEmail(
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com";
 const LOGO_URL = `${SITE_URL}/345remov.png`;
+const LOGO_ORANGE_URL = `${SITE_URL}/567.png`;
+const LOGO_BLUE_URL = `${SITE_URL}/23556.png`;
 const WHATSAPP_GROUP_LINK = "https://chat.whatsapp.com/ESup6od1fkHCixxMrT162q?mode=gi_t";
 const QR_WHATSAPP_URL = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&bgcolor=FFFFFF&color=000000&data=${encodeURIComponent(WHATSAPP_GROUP_LINK)}`;
 const ORANGE = "#e85d04";
@@ -147,7 +149,7 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
       <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.08);">
         <tr>
           <td style="background:${ORANGE}; padding: 28px 32px; text-align: center;">
-            <img src="${LOGO_URL}" alt="TransPool24" width="360" height="100" style="height:100px; width:auto; max-width:360px; display:block; margin:0 auto; filter:brightness(0) invert(1);" />
+            <img src="${LOGO_ORANGE_URL}" alt="TransPool24" width="400" height="110" style="height:110px; width:auto; max-width:400px; display:block; margin:0 auto;" />
           </td>
         </tr>
         <tr>
@@ -199,7 +201,7 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
         </tr>
         <tr>
           <td style="background:#0d2137; padding: 28px 24px; text-align: center;">
-            <img src="${LOGO_URL}" alt="TransPool24" width="280" height="78" style="height:78px; width:auto; max-width:280px; display:block; margin:0 auto 16px auto; filter:brightness(0) invert(1);" />
+            <img src="${LOGO_BLUE_URL}" alt="TransPool24" width="320" height="90" style="height:90px; width:auto; max-width:320px; display:block; margin:0 auto 16px auto;" />
             <p style="margin:0; font-size:18px; font-weight:700; color:#fff; line-height:1.4;" dir="ltr" lang="de">
               Ihr Weg ist sicher – und unser Team steht immer hinter Ihnen.
             </p>
@@ -212,11 +214,11 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
         </tr>
         <tr>
           <td style="background:#0d2137; padding: 16px 24px 28px; text-align: center;">
-            <p style="margin:0 0 8px 0; font-size:12px; color:rgba(255,255,255,0.8);">تابعنا</p>
-            <p style="margin:0; font-size:0;">
-              <a href="https://www.instagram.com/transpool24/" target="_blank" rel="noopener" style="display:inline-block; margin:0 10px; color:#fff; text-decoration:none; font-size:14px; font-weight:600;">Instagram</a>
-              <a href="https://www.linkedin.com/in/trans-pool-1235803b8" target="_blank" rel="noopener" style="display:inline-block; margin:0 10px; color:#fff; text-decoration:none; font-size:14px; font-weight:600;">LinkedIn</a>
-              <a href="https://www.tiktok.com/@transpool24" target="_blank" rel="noopener" style="display:inline-block; margin:0 10px; color:#fff; text-decoration:none; font-size:14px; font-weight:600;">TikTok</a>
+            <p style="margin:0 0 12px 0; font-size:12px; color:rgba(255,255,255,0.8);">تابعنا</p>
+            <p style="margin:0; font-size:0; line-height:0;">
+              <a href="https://www.instagram.com/transpool24/" target="_blank" rel="noopener" style="display:inline-block; margin:0 14px; vertical-align:middle;"><img src="https://cdn.simpleicons.org/instagram/FFFFFF" alt="Instagram" width="32" height="32" style="display:block; width:32px; height:32px;" /></a>
+              <a href="https://www.linkedin.com/in/trans-pool-1235803b8" target="_blank" rel="noopener" style="display:inline-block; margin:0 14px; vertical-align:middle;"><img src="https://cdn.simpleicons.org/linkedin/FFFFFF" alt="LinkedIn" width="32" height="32" style="display:block; width:32px; height:32px;" /></a>
+              <a href="https://www.tiktok.com/@transpool24" target="_blank" rel="noopener" style="display:inline-block; margin:0 14px; vertical-align:middle;"><img src="https://cdn.simpleicons.org/tiktok/FFFFFF" alt="TikTok" width="32" height="32" style="display:block; width:32px; height:32px;" /></a>
             </p>
           </td>
         </tr>
