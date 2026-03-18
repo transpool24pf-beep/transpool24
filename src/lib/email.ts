@@ -5,13 +5,15 @@ import { generateInvoicePdf } from "./invoice-pdf";
 const DEFAULT_FROM = "TransPool24 <onboarding@resend.dev>";
 
 function getValidFromEmail(): string {
-  const raw = process.env.RESEND_FROM_EMAIL?.trim();
+  let raw = process.env.RESEND_FROM_EMAIL ?? "";
+  raw = raw.trim().replace(/^["']|["']$/g, "");
   if (!raw) return DEFAULT_FROM;
-  // Resend: "email@example.com" or "Name <email@example.com>"
-  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw)) return raw;
-  const match = raw.match(/^(.+?)\s*<\s*([^\s@]+@[^\s@]+\.[^\s@]+)\s*>$/);
-  if (match) return `${match[1].trim()} <${match[2]}>`;
-  return DEFAULT_FROM;
+  let email = "";
+  const angleMatch = raw.match(/\s*<\s*([^\s@]+@[^\s@]+\.[^\s@]+)\s*>$/);
+  if (angleMatch) email = angleMatch[1];
+  else if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw)) email = raw;
+  if (!email) return DEFAULT_FROM;
+  return `TransPool24 <${email}>`;
 }
 
 const FROM_EMAIL = getValidFromEmail();
