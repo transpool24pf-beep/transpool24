@@ -108,6 +108,19 @@ function buildConfirmationHtml(
         ${confirmBtn}
         ${rateBlock}
         <p style="margin-top: 24px; font-size: 13px; color: #94a3b8;">— TransPool24</p>
+        <div style="margin-top: 28px; padding: 24px; background: #0d2137; border-radius: 0 0 12px 12px; text-align: center;">
+          <p style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600; color: #fff;">تابعنا</p>
+          <table cellpadding="0" cellspacing="0" align="center" style="margin: 0 auto;">
+            <tr>
+              <td style="padding: 0 10px;"><a href="https://www.instagram.com/transpool24/" target="_blank" rel="noopener" style="display:inline-block;"><img src="${SITE_URL}/icons/instagram.png" alt="Instagram" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
+              <td style="padding: 0 10px;"><a href="https://www.linkedin.com/in/trans-pool-1235803b8" target="_blank" rel="noopener" style="display:inline-block;"><img src="${SITE_URL}/icons/linkedin.png" alt="LinkedIn" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
+              <td style="padding: 0 10px;"><a href="https://www.tiktok.com/@transpool24" target="_blank" rel="noopener" style="display:inline-block;"><img src="${SITE_URL}/icons/tiktok.png" alt="TikTok" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
+              <td style="padding: 0 10px;"><a href="mailto:transpool24pf@gmail.com" style="display:inline-block;"><img src="${SITE_URL}/gmail.png" alt="Gmail" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
+              <td style="padding: 0 10px;"><a href="mailto:transpool24@hotmail.com" style="display:inline-block;"><img src="${SITE_URL}/email.png" alt="Email" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
+            </tr>
+          </table>
+          <p style="margin: 12px 0 0 0; font-size: 12px; color: rgba(255,255,255,0.8);">transpool24pf@gmail.com · transpool24@hotmail.com</p>
+        </div>
       </div>
     </td></tr>
   </table>
