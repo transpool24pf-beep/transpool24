@@ -2,7 +2,19 @@ import { Resend } from "resend";
 import type { Job } from "./supabase";
 import { generateInvoicePdf } from "./invoice-pdf";
 
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? "TransPool24 <onboarding@resend.dev>";
+const DEFAULT_FROM = "TransPool24 <onboarding@resend.dev>";
+
+function getValidFromEmail(): string {
+  const raw = process.env.RESEND_FROM_EMAIL?.trim();
+  if (!raw) return DEFAULT_FROM;
+  // Resend: "email@example.com" or "Name <email@example.com>"
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw)) return raw;
+  const match = raw.match(/^(.+?)\s*<\s*([^\s@]+@[^\s@]+\.[^\s@]+)\s*>$/);
+  if (match) return `${match[1].trim()} <${match[2]}>`;
+  return DEFAULT_FROM;
+}
+
+const FROM_EMAIL = getValidFromEmail();
 
 function buildConfirmationHtml(job: Job, rateDriverUrl?: string | null): string {
   const totalEur = (job.price_cents / 100).toFixed(2);
