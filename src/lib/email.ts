@@ -187,8 +187,18 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
           </td>
         </tr>
         <tr>
-          <td style="background:#0d2137; padding: 20px 24px; text-align: center;">
-            <p style="margin:0; font-size:14px; color:rgba(255,255,255,0.9);">نحن بجانبك في الطريق</p>
+          <td style="padding:0; line-height:0;">
+            <img src="${SITE_URL}/134.png" alt="TransPool24" width="560" style="display:block; width:100%; max-width:560px; height:auto;" />
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#0d2137; padding: 24px; text-align: center;" dir="ltr" lang="de">
+            <p style="margin:0 0 8px 0; font-size:18px; font-weight:700; color:#fff;">
+              Ihr Weg ist sicher – und unser Team steht immer hinter Ihnen.
+            </p>
+            <p style="margin:0; font-size:14px; color:rgba(255,255,255,0.9);">
+              Wir sind an Ihrer Seite bei jedem Kilometer.
+            </p>
           </td>
         </tr>
       </table>
