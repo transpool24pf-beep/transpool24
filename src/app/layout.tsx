@@ -29,6 +29,11 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="de" suppressHydrationWarning>
+      <head>
+        <link rel="icon" href="/favicon.ico?t=1" type="image/png" />
+        <link rel="icon" href="/favicon-32.png?t=1" type="image/png" sizes="32x32" />
+        <link rel="apple-touch-icon" href="/favicon-48.png?t=1" sizes="48x48" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
