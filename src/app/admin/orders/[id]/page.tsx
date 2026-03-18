@@ -176,6 +176,10 @@ export default function AdminOrderDetailPage({
 
   const sendEmailToCustomer = () => {
     if (!order?.customer_email) return;
+    if (!order.assigned_driver_application_id) {
+      alert("الرجاء اختيار رقم السائق أولاً ليظهر في إيميل الزبون.");
+      return;
+    }
     setSending(true);
     fetch("/api/admin/send-order-email", {
       method: "POST",
@@ -357,6 +361,23 @@ export default function AdminOrderDetailPage({
             </button>
             {order.customer_email && (
               <>
+                <div className="rounded-xl border-2 border-amber-200 bg-amber-50/50 p-3">
+                  <label className="mb-1.5 block text-sm font-medium text-amber-900">رقم السائق (مطلوب قبل الإرسال)</label>
+                  <select
+                    value={order.assigned_driver_application_id ?? ""}
+                    onChange={(e) => assignDriver(e.target.value || null)}
+                    disabled={updatingDriver}
+                    className="w-full rounded-lg border-2 border-amber-300 bg-white px-3 py-2 text-sm font-medium text-[#0d2137] focus:border-[var(--accent)] focus:outline-none disabled:opacity-60"
+                  >
+                    <option value="">— اختر السائق —</option>
+                    {drivers.map((d) => (
+                      <option key={d.id} value={d.id}>
+                        {d.driver_number != null ? `#${String(d.driver_number)} – ${d.full_name}` : d.full_name}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="mt-1 text-xs text-amber-800/80">معلومات السائق (صورة، نجوم، هاتف، سيارة، لغات) ستظهر في إيميل الزبون.</p>
+                </div>
                 <button
                   type="button"
                   onClick={openEmailClient}
@@ -367,8 +388,8 @@ export default function AdminOrderDetailPage({
                 <button
                   type="button"
                   onClick={sendEmailToCustomer}
-                  disabled={sending}
-                  className="flex items-center justify-center gap-2 rounded-xl bg-[var(--accent)] px-4 py-3 font-medium text-white hover:opacity-90 disabled:opacity-60"
+                  disabled={sending || !order.assigned_driver_application_id}
+                  className="flex items-center justify-center gap-2 rounded-xl bg-[var(--accent)] px-4 py-3 font-medium text-white hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {sending ? "جاري الإرسال…" : "إرسال بريد التأكيد للعميل"}
                 </button>
