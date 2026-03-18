@@ -62,10 +62,10 @@ export async function PATCH(
   const action = body?.action as string;
   if (
     !action ||
-    !["approve", "reject", "assign_number", "suspend", "unsuspend", "update_desired_note", "update_star_rating"].includes(action)
+    !["approve", "reject", "assign_number", "suspend", "unsuspend", "update_desired_note", "update_star_rating", "update_bank_info"].includes(action)
   ) {
     return NextResponse.json(
-      { error: "action must be approve, reject, assign_number, suspend, unsuspend, update_desired_note, or update_star_rating" },
+      { error: "action must be approve, reject, assign_number, suspend, unsuspend, update_desired_note, update_star_rating, or update_bank_info" },
       { status: 400 }
     );
   }
@@ -86,7 +86,7 @@ export async function PATCH(
     return NextResponse.json({ ok: true, suspended: action === "suspend" });
   }
 
-  if (action === "update_desired_note" || action === "update_star_rating") {
+  if (action === "update_desired_note" || action === "update_star_rating" || action === "update_bank_info") {
     const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
     if (action === "update_desired_note" && body.desired_note !== undefined) {
       updates.desired_note = typeof body.desired_note === "string" ? body.desired_note.trim() : null;
@@ -94,6 +94,14 @@ export async function PATCH(
     if (action === "update_star_rating" && body.star_rating !== undefined) {
       const v = body.star_rating;
       updates.star_rating = v === null || v === "" ? null : Math.min(5, Math.max(0, Number(v)));
+    }
+    if (action === "update_bank_info") {
+      if (body.iban !== undefined) {
+        updates.iban = typeof body.iban === "string" ? body.iban.trim() || null : null;
+      }
+      if (body.bank_account_holder_name !== undefined) {
+        updates.bank_account_holder_name = typeof body.bank_account_holder_name === "string" ? body.bank_account_holder_name.trim() || null : null;
+      }
     }
     const { error: updateErr } = await supabase
       .from("driver_applications")

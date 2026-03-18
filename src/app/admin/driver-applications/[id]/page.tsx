@@ -42,6 +42,8 @@ type DriverApp = {
   vehicle_photo_url: string | null;
   work_policy_accepted: boolean;
   created_at: string;
+  iban: string | null;
+  bank_account_holder_name: string | null;
 };
 
 const UPLOAD_URL = "/api/driver-applications/upload";
@@ -61,6 +63,13 @@ export default function AdminDriverApplicationDetailPage({
   const [desiredNoteEdit, setDesiredNoteEdit] = useState("");
   const [savingNote, setSavingNote] = useState(false);
   const [emailSending, setEmailSending] = useState(false);
+  const [paymentInvoiceModal, setPaymentInvoiceModal] = useState(false);
+  const [paymentAmount, setPaymentAmount] = useState("");
+  const [paymentTip, setPaymentTip] = useState("");
+  const [bankIban, setBankIban] = useState("");
+  const [bankHolderName, setBankHolderName] = useState("");
+  const [savingBank, setSavingBank] = useState(false);
+  const [editingBank, setEditingBank] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchApp = () => {
@@ -318,6 +327,89 @@ export default function AdminDriverApplicationDetailPage({
           </div>
         )}
 
+        {app.status === "approved" && (
+          <div className="mt-6 rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/[0.03] p-4">
+            <p className="mb-2 text-sm font-semibold text-[#0d2137]/80">معلومات البنك للتحويل (IBAN)</p>
+            <p className="mb-1 text-xs text-[#0d2137]/60">لتسهيل إرسال المال وإرفاق الفاتورة. اسم صاحب الحساب كما في البطاقة.</p>
+            {editingBank ? (
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-medium text-[#0d2137]/80">IBAN</label>
+                  <input
+                    type="text"
+                    value={bankIban}
+                    onChange={(e) => setBankIban(e.target.value)}
+                    placeholder="DE89 3704 0044 0532 0130 00"
+                    className="mt-1 w-full max-w-md rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-[#0d2137]/80">اسم صاحب الحساب (كما في البطاقة)</label>
+                  <input
+                    type="text"
+                    value={bankHolderName}
+                    onChange={(e) => setBankHolderName(e.target.value)}
+                    placeholder="Wisam Dandash"
+                    className="mt-1 w-full max-w-md rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    disabled={savingBank}
+                    onClick={async () => {
+                      setSavingBank(true);
+                      try {
+                        const res = await fetch(`/api/admin/driver-applications/${id}`, {
+                          method: "PATCH",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            action: "update_bank_info",
+                            iban: bankIban.trim() || null,
+                            bank_account_holder_name: bankHolderName.trim() || null,
+                          }),
+                        });
+                        const data = await res.json();
+                        if (res.ok) {
+                          setEditingBank(false);
+                          fetchApp();
+                        } else {
+                          alert(data?.error || "فشل الحفظ");
+                        }
+                      } finally {
+                        setSavingBank(false);
+                      }
+                    }}
+                    className="rounded-lg bg-[var(--accent)] px-3 py-2 text-sm text-white"
+                  >
+                    {savingBank ? "جاري الحفظ…" : "حفظ"}
+                  </button>
+                  <button type="button" onClick={() => setEditingBank(false)} className="rounded-lg border px-3 py-2 text-sm">
+                    إلغاء
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-sm text-[#0d2137]/80">
+                  IBAN: {app.iban || "—"} · صاحب الحساب: {app.bank_account_holder_name || "—"}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setBankIban(app.iban ?? "");
+                    setBankHolderName(app.bank_account_holder_name ?? "");
+                    setEditingBank(true);
+                  }}
+                  className="text-sm text-[var(--accent)] hover:underline"
+                >
+                  {app.iban || app.bank_account_holder_name ? "تعديل" : "إضافة بيانات البنك"}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="mt-4 flex flex-wrap gap-2">
           <button
             type="button"
@@ -387,6 +479,17 @@ export default function AdminDriverApplicationDetailPage({
               >
                 تحميل PDF الموافقة
               </a>
+              <button
+                type="button"
+                onClick={() => {
+                  setPaymentAmount("");
+                  setPaymentTip("");
+                  setPaymentInvoiceModal(true);
+                }}
+                className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+              >
+                إرسال فاتورة التحويل (مبلغ + إكرامية)
+              </button>
               <button
                 type="button"
                 onClick={() => openWhatsApp(welcomeMessage)}
@@ -593,6 +696,69 @@ export default function AdminDriverApplicationDetailPage({
       {app.last_jobs && app.last_jobs.length === 0 && app.status === "approved" && (
         <div className="rounded-xl border border-[#0d2137]/10 bg-[#0d2137]/[0.02] p-6">
           <p className="text-sm text-[#0d2137]/70">لا توجد طلبات منفذة لهذا السائق بعد. عند تعيينه لطلبات من لوحة الطلبات ستظهر هنا.</p>
+        </div>
+      )}
+
+      {paymentInvoiceModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-2xl border bg-white p-6 shadow-xl">
+            <h3 className="text-lg font-bold text-[#0d2137]">إرسال فاتورة التحويل للسائق</h3>
+            <p className="mt-1 text-sm text-[#0d2137]/70">
+              أدخل المبلغ والإكرامية (اختياري). سيتم إنشاء PDF بنفس أسلوب IONOS مع IBAN واسم صاحب الحساب المحفوظ.
+            </p>
+            <div className="mt-4 space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-[#0d2137]">المبلغ (€) *</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={paymentAmount}
+                  onChange={(e) => setPaymentAmount(e.target.value)}
+                  placeholder="0.00"
+                  className="mt-1 w-full rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-[#0d2137]">الإكرامية (€) اختياري</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={paymentTip}
+                  onChange={(e) => setPaymentTip(e.target.value)}
+                  placeholder="0.00"
+                  className="mt-1 w-full rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm"
+                />
+              </div>
+            </div>
+            <div className="mt-6 flex flex-wrap justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setPaymentInvoiceModal(false)}
+                className="rounded-xl border border-[#0d2137]/20 px-4 py-2 text-sm font-medium"
+              >
+                إلغاء
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  const amount = parseFloat(paymentAmount);
+                  if (Number.isNaN(amount) || amount < 0) {
+                    alert("أدخل مبلغاً صحيحاً (€).");
+                    return;
+                  }
+                  const tip = parseFloat(paymentTip) || 0;
+                  const url = `/api/admin/driver-applications/${id}/payment-invoice?amount=${encodeURIComponent(amount)}&tip=${encodeURIComponent(tip)}`;
+                  window.open(url, "_blank");
+                }}
+                disabled={!paymentAmount.trim() || Number.isNaN(parseFloat(paymentAmount)) || parseFloat(paymentAmount) < 0}
+                className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+              >
+                تحميل PDF الفاتورة
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
