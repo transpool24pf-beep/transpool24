@@ -18,50 +18,120 @@ function getValidFromEmail(): string {
 
 const FROM_EMAIL = getValidFromEmail();
 
-function buildConfirmationHtml(job: Job, rateDriverUrl?: string | null): string {
+/** Driver info for order confirmation email (from driver_applications) */
+export type OrderEmailDriverInfo = {
+  full_name: string;
+  phone: string;
+  vehicle_plate: string | null;
+  languages_spoken: string | null;
+  personal_photo_url: string | null;
+  star_rating: number | null;
+};
+
+function buildConfirmationHtml(
+  job: Job,
+  options: {
+    confirmPaymentUrl?: string | null;
+    rateDriverUrl?: string | null;
+    driver?: OrderEmailDriverInfo | null;
+  } = {}
+): string {
+  const { confirmPaymentUrl, rateDriverUrl, driver } = options;
   const totalEur = (job.price_cents / 100).toFixed(2);
+  const orderRef = job.order_number != null ? String(job.order_number) : job.id.slice(0, 8);
   const date = new Date(job.created_at).toLocaleDateString("de-DE", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
   });
+  const headerBlue = "#0d2137";
+  const companyName = (job.company_name || "").trim() || "العميل";
+  const driverSection =
+    driver
+      ? `
+  <div style="margin-top: 24px; padding: 20px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
+    <p style="margin: 0 0 12px 0; font-size: 16px; font-weight: bold; color: #0d2137;">معلومات السائق</p>
+    <table cellpadding="0" cellspacing="0" style="font-size: 14px;">
+      <tr>
+        <td style="vertical-align: top; padding-right: 16px;">
+          ${driver.personal_photo_url ? `<img src="${driver.personal_photo_url}" alt="" width="80" height="80" style="border-radius: 50%; object-fit: cover; display: block;" />` : ""}
+        </td>
+        <td>
+          <p style="margin: 0 0 4px 0;"><strong>${escapeHtml(driver.full_name)}</strong></p>
+          <p style="margin: 0 0 4px 0; color: #64748b;">★ ${driver.star_rating != null ? driver.star_rating.toFixed(1) : "—"} نجوم</p>
+          <p style="margin: 0 0 4px 0;">الهاتف: ${escapeHtml(driver.phone)}</p>
+          <p style="margin: 0 0 4px 0;">رقم السيارة: ${escapeHtml(driver.vehicle_plate || "—")}</p>
+          <p style="margin: 0;">اللغات: ${escapeHtml(driver.languages_spoken || "—")}</p>
+        </td>
+      </tr>
+    </table>
+  </div>`
+      : "";
   const rateBlock =
     rateDriverUrl && rateDriverUrl.length > 0
-      ? `
-  <p style="margin-top: 20px; padding: 12px; background: #f0f9ff; border-radius: 8px;">
-    <strong>Bewerten Sie Ihren Fahrer:</strong> So helfen Sie uns, den Service zu verbessern.<br>
-    <a href="${rateDriverUrl}" style="display: inline-block; margin-top: 8px; padding: 10px 20px; background: #1a1a2e; color: white; text-decoration: none; border-radius: 6px;">Fahrer bewerten (1–5 Sterne)</a>
-  </p>
-  <p style="color: #555; font-size: 12px;">تقييم السائق (نجوم): يساعدنا في تحسين الخدمة.</p>`
+      ? `<p style="margin-top: 16px;"><a href="${rateDriverUrl}" style="color: #0d2137; text-decoration: underline;">تقييم السائق (نجوم)</a></p>`
       : "";
+  const confirmBtn =
+    confirmPaymentUrl && confirmPaymentUrl.length > 0
+      ? `
+  <p style="margin-top: 24px;">
+    <a href="${confirmPaymentUrl}" style="display: inline-block; padding: 16px 32px; background: linear-gradient(135deg, #e85d04 0%, #f48c06 100%); color: #fff !important; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 20px rgba(232,93,4,0.4);">تأكيد الدفع / الدفع الآن</a>
+  </p>`
+      : "";
+
   return `
 <!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"><title>Zahlungsbestätigung</title></head>
-<body style="font-family: system-ui, sans-serif; max-width: 560px; margin: 0 auto; padding: 24px; color: #1a1a2e;">
-  <h1 style="color: #1a1a2e; font-size: 22px;">TransPool24 – Zahlungsbestätigung</h1>
-  <p>Vielen Dank für Ihre Bestellung. Die Zahlung wurde erfolgreich verbucht.</p>
-  <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
-    <tr><td style="padding: 6px 0; border-bottom: 1px solid #eee;"><strong>Auftragsnummer</strong></td><td style="padding: 6px 0; border-bottom: 1px solid #eee;">${job.id}</td></tr>
-    <tr><td style="padding: 6px 0; border-bottom: 1px solid #eee;"><strong>Datum</strong></td><td style="padding: 6px 0; border-bottom: 1px solid #eee;">${date}</td></tr>
-    <tr><td style="padding: 6px 0; border-bottom: 1px solid #eee;"><strong>Firma</strong></td><td style="padding: 6px 0; border-bottom: 1px solid #eee;">${job.company_name}</td></tr>
-    <tr><td style="padding: 6px 0; border-bottom: 1px solid #eee;"><strong>Abholung</strong></td><td style="padding: 6px 0; border-bottom: 1px solid #eee;">${job.pickup_address}${job.pickup_city ? `, ${job.pickup_city}` : ""}</td></tr>
-    <tr><td style="padding: 6px 0; border-bottom: 1px solid #eee;"><strong>Lieferung</strong></td><td style="padding: 6px 0; border-bottom: 1px solid #eee;">${job.delivery_address}${job.delivery_city ? `, ${job.delivery_city}` : ""}</td></tr>
-    <tr><td style="padding: 6px 0; border-bottom: 1px solid #eee;"><strong>Ladung / Distanz</strong></td><td style="padding: 6px 0; border-bottom: 1px solid #eee;">${job.cargo_size}, ${job.distance_km ?? "-"} km</td></tr>
-    <tr><td style="padding: 8px 0;"><strong>Gesamtbetrag</strong></td><td style="padding: 8px 0;">€ ${totalEur}</td></tr>
+<html dir="rtl" lang="ar">
+<head><meta charset="utf-8"><title>تأكيد طلبك – TransPool24</title></head>
+<body style="margin:0; font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f4f4;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background: ${headerBlue}; padding: 24px;">
+    <tr><td align="center"><img src="${LOGO_BLUE_URL}" alt="TransPool24" width="240" height="70" style="display:block; max-width:240px; height:auto;" /></td></tr>
   </table>
-  <p style="color: #555; font-size: 14px;">Ihre Rechnung liegt dieser E-Mail als PDF bei.</p>${rateBlock}
-  <p style="color: #555; font-size: 14px;">— TransPool24 · Pforzheim & Region</p>
+  <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; padding: 32px 20px;">
+    <tr><td>
+      <div style="background: #fff; border-radius: 12px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+        <p style="margin: 0 0 8px 0; font-size: 20px; color: #0d2137; font-weight: bold;">مرحباً ${escapeHtml(companyName)}،</p>
+        <p style="margin: 0 0 16px 0; font-size: 16px; color: #334155;">نشكرك لاختيارك شركة TransPool24.</p>
+        <p style="margin: 0 0 16px 0; font-size: 15px; color: #475569;">تؤكد هذه الرسالة الإلكترونية نجاح عملية إبرام عقدك. يمكنك الآن استخدام الخدمات التي طلبتها.</p>
+        <p style="margin: 0 0 12px 0; font-size: 16px; font-weight: bold; color: #0d2137;">تفاصيل عقدك:</p>
+        <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse: collapse; font-size: 14px; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <tr style="background: #f8fafc;"><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">رقم الطلب</td><td style="border-bottom: 1px solid #e2e8f0;">${orderRef}</td></tr>
+          <tr><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">التاريخ</td><td style="border-bottom: 1px solid #e2e8f0;">${date}</td></tr>
+          <tr style="background: #f8fafc;"><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">الاستلام</td><td style="border-bottom: 1px solid #e2e8f0;">${escapeHtml(job.pickup_address)}${job.pickup_city ? `, ${job.pickup_city}` : ""}</td></tr>
+          <tr><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">التسليم</td><td style="border-bottom: 1px solid #e2e8f0;">${escapeHtml(job.delivery_address)}${job.delivery_city ? `, ${job.delivery_city}` : ""}</td></tr>
+          <tr style="background: #f8fafc;"><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">الحمولة / المسافة</td><td style="border-bottom: 1px solid #e2e8f0;">${job.cargo_size}، ${job.distance_km ?? "—"} km</td></tr>
+          <tr><td style="color: #64748b;">المبلغ الإجمالي</td><td style="font-weight: bold;">€ ${totalEur}</td></tr>
+        </table>
+        <p style="margin: 16px 0 0 0; font-size: 14px; color: #64748b;">يمكنك الاطلاع على تفاصيل العقد في مدخل هذا المنتج في ملخص طلبك أدناه. المرفق PDF يتضمن تفاصيل الرحلة والسائق ومعلومات الشركة.</p>
+        ${driverSection}
+        ${confirmBtn}
+        ${rateBlock}
+        <p style="margin-top: 24px; font-size: 13px; color: #94a3b8;">— TransPool24</p>
+      </div>
+    </td></tr>
+  </table>
 </body>
 </html>
   `.trim();
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 export async function sendOrderConfirmationEmail(
   to: string,
   job: Job & { rating_token?: string | null },
   pdfBuffer: Uint8Array,
-  rateDriverUrl?: string | null
+  options: {
+    rateDriverUrl?: string | null;
+    confirmPaymentUrl?: string | null;
+    driver?: OrderEmailDriverInfo | null;
+  } = {}
 ): Promise<{ success: boolean; error?: string }> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
@@ -69,17 +139,22 @@ export async function sendOrderConfirmationEmail(
     return { success: false, error: "RESEND_API_KEY not set" };
   }
 
+  const orderRef = job.order_number != null ? String(job.order_number) : job.id.slice(0, 8);
   const resend = new Resend(apiKey);
   try {
     const { error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: [to],
-      subject: `TransPool24 – Zahlungsbestätigung / Rechnung #${String(job.id).slice(0, 8)}`,
-      html: buildConfirmationHtml(job, rateDriverUrl),
+      subject: `TransPool24 – تأكيد طلبك #${orderRef}`,
+      html: buildConfirmationHtml(job, {
+        confirmPaymentUrl: options.confirmPaymentUrl,
+        rateDriverUrl: options.rateDriverUrl,
+        driver: options.driver,
+      }),
       attachments: [
         {
-          filename: `TransPool24-Rechnung-${String(job.id).slice(0, 8)}.pdf`,
-          content: Buffer.from(pdfBuffer),
+          filename: `TransPool24-Rechnung-${orderRef}.pdf`,
+          content: Buffer.from(pdfBuffer).toString("base64"),
         },
       ],
     });

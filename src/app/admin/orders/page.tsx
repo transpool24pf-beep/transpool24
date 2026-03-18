@@ -284,7 +284,6 @@ export default function AdminOrdersPage() {
                   <th className="w-[10%] px-2 py-3 font-semibold text-[#0d2137]">الحالة</th>
                   <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">التاريخ</th>
                   <th className="w-[9%] px-2 py-3 font-semibold text-[#0d2137]">الشركة</th>
-                  <th className="w-[14%] px-2 py-3 font-semibold text-[#0d2137]">البريد</th>
                   <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">سعر العميل</th>
                   <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">سعر السائق</th>
                   <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">الدفع</th>
@@ -329,9 +328,6 @@ export default function AdminOrdersPage() {
                       </td>
                       <td className="min-w-0 truncate px-2 py-2 font-medium text-[#0d2137] text-xs" title={o.company_name}>
                         {o.company_name}
-                      </td>
-                      <td className="min-w-0 px-2 py-2 text-[#0d2137]/80 text-xs break-words" title={o.customer_email ?? ""}>
-                        {o.customer_email ?? "—"}
                       </td>
                       <td className="min-w-0 px-2 py-2 font-semibold text-[#0d2137] text-xs whitespace-nowrap">
                         € {(o.price_cents / 100).toFixed(2)}
