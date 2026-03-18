@@ -230,6 +230,104 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
   `.trim();
 }
 
+export type DriverPaymentInvoiceEmailData = {
+  driver_name: string;
+  invoice_number: string;
+  date: string;
+  driver_number: string;
+  contract_number: string;
+  amount_eur: string;
+  tip_eur: string;
+  total_eur: string;
+};
+
+function buildDriverPaymentInvoiceEmailHtml(data: DriverPaymentInvoiceEmailData): string {
+  const headerBlue = "#0d2137";
+  const cardBg = "#ffffff";
+  const summaryBg = "#f0f4f8";
+  return `
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head><meta charset="utf-8"><title>فاتورة التحويل – TransPool24</title></head>
+<body style="margin:0; font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f4f4;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background: ${headerBlue}; padding: 20px 24px;">
+    <tr>
+      <td align="right"><img src="${LOGO_URL}" alt="TransPool24" width="140" height="40" style="display:block; height:40px; width:auto;" /></td>
+      <td align="left" style="color:#fff; font-size:14px;">TransPool24</td>
+    </tr>
+  </table>
+  <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; padding: 32px 20px;">
+    <tr><td>
+      <div style="background: ${cardBg}; border-radius: 12px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+        <table width="100%" cellpadding="0" cellspacing="0">
+          <tr>
+            <td width="48" style="vertical-align:top;"><div style="width:40px; height:40px; background: #0d2137; border-radius: 8px;"></div></td>
+            <td>
+              <h1 style="margin: 0 0 8px 0; font-size: 20px; color: #0d2137;">وصلت فاتورة TransPool24 الخاصة بك رقم ${data.invoice_number} بتاريخ ${data.date}</h1>
+            </td>
+          </tr>
+        </table>
+        <p style="margin: 20px 0 0 0; font-size: 16px; color: #333;">يوم جيد،</p>
+        <p style="margin: 8px 0 16px 0; font-size: 15px; color: #555;">ستجد مرفقاً فاتورة التحويل (Zahlungsnachweis) كملف PDF.</p>
+        <div style="background: ${summaryBg}; border-radius: 10px; padding: 20px; margin: 20px 0;">
+          <table width="100%" cellpadding="4" cellspacing="0" style="font-size: 14px;">
+            <tr><td style="color:#555;"><strong>رقم الفاتورة:</strong></td><td style="text-align:left;">${data.invoice_number}</td></tr>
+            <tr><td style="color:#555;"><strong>تاريخ الفاتورة:</strong></td><td style="text-align:left;">${data.date}</td></tr>
+            <tr><td style="color:#555;"><strong>رقم السائق:</strong></td><td style="text-align:left;">${data.driver_number}</td></tr>
+            <tr><td style="color:#555;"><strong>رقم العقد:</strong></td><td style="text-align:left;">${data.contract_number}</td></tr>
+            <tr><td style="color:#555;"><strong>المبلغ:</strong></td><td style="text-align:left;">${data.amount_eur} يورو</td></tr>
+            <tr><td style="color:#555;"><strong>الإكرامية:</strong></td><td style="text-align:left;">${data.tip_eur} يورو</td></tr>
+            <tr><td style="color:#0d2137; padding-top:8px;"><strong>المجموع:</strong></td><td style="text-align:left; padding-top:8px;"><strong>${data.total_eur} يورو</strong></td></tr>
+          </table>
+        </div>
+        <p style="margin: 20px 0 0 0; font-size: 14px; color: #666;">هل تحتاج مساعدة؟ خدمة العملاء TransPool24 – الهاتف: +49 176 29767442 – البريد: transpool24@hotmail.com</p>
+        <p style="margin: 12px 0 0 0; font-size: 13px;"><a href="https://www.linkedin.com/in/trans-pool-1235803b8" style="color:#0d2137;">LinkedIn</a> · ساعات العمل: على مدار الساعة</p>
+      </div>
+    </td></tr>
+  </table>
+</body>
+</html>
+  `.trim();
+}
+
+export async function sendDriverPaymentInvoiceEmail(
+  to: string,
+  data: DriverPaymentInvoiceEmailData,
+  pdfBuffer: Uint8Array,
+  pdfFilename: string
+): Promise<{ success: boolean; error?: string }> {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.error("[TransPool24] RESEND_API_KEY not set");
+    return { success: false, error: "RESEND_API_KEY not set" };
+  }
+  const resend = new Resend(apiKey);
+  try {
+    const { error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [to],
+      subject: `TransPool24 – فاتورة التحويل / Zahlungsnachweis ${data.invoice_number}`,
+      html: buildDriverPaymentInvoiceEmailHtml(data),
+      attachments: [{ filename: pdfFilename, content: Buffer.from(pdfBuffer) }],
+    });
+    if (error) {
+      const raw = typeof error === "string" ? error : (error && typeof error === "object" && "message" in error) ? String((error as { message: unknown }).message) : JSON.stringify(error);
+      const errMsg = /only send testing emails|verify a domain|resend\.com\/domains/i.test(raw)
+        ? "حساب Resend في وضع الاختبار أو الدومين غير موثّق. ثبّت الدومين على resend.com/domains."
+        : raw;
+      return { success: false, error: errMsg };
+    }
+    return { success: true };
+  } catch (e) {
+    console.error("[TransPool24] Send payment invoice email failed:", e);
+    const msg = e instanceof Error ? e.message : "Unknown error";
+    const errMsg = /only send testing emails|verify a domain|resend\.com\/domains/i.test(msg)
+      ? "حساب Resend في وضع الاختبار أو الدومين غير موثّق. ثبّت الدومين على resend.com/domains."
+      : msg;
+    return { success: false, error: errMsg };
+  }
+}
+
 export async function sendDriverApprovalEmail(
   to: string,
   data: DriverApprovalData,

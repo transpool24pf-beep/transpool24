@@ -66,6 +66,7 @@ export default function AdminDriverApplicationDetailPage({
   const [paymentInvoiceModal, setPaymentInvoiceModal] = useState(false);
   const [paymentAmount, setPaymentAmount] = useState("");
   const [paymentTip, setPaymentTip] = useState("");
+  const [sendingInvoiceEmail, setSendingInvoiceEmail] = useState(false);
   const [bankIban, setBankIban] = useState("");
   const [bankHolderName, setBankHolderName] = useState("");
   const [savingBank, setSavingBank] = useState(false);
@@ -810,7 +811,7 @@ export default function AdminDriverApplicationDetailPage({
                 />
               </div>
             </div>
-            <div className="mt-6 flex flex-wrap justify-end gap-2">
+            <div className="mt-6 flex flex-wrap items-center justify-end gap-3">
               <button
                 type="button"
                 onClick={() => setPaymentInvoiceModal(false)}
@@ -821,19 +822,57 @@ export default function AdminDriverApplicationDetailPage({
               <button
                 type="button"
                 onClick={() => {
+                  const amount = parseFloat(paymentAmount) || 0;
+                  const tip = parseFloat(paymentTip) || 0;
+                  if (amount < 0) return;
+                  window.open(
+                    `/api/admin/driver-applications/${id}/payment-invoice?amount=${encodeURIComponent(amount)}&tip=${encodeURIComponent(tip)}`,
+                    "_blank"
+                  );
+                }}
+                className="text-sm text-[#0d2137]/70 hover:underline"
+              >
+                تحميل PDF
+              </button>
+              <button
+                type="button"
+                disabled={
+                  sendingInvoiceEmail ||
+                  !paymentAmount.trim() ||
+                  Number.isNaN(parseFloat(paymentAmount)) ||
+                  parseFloat(paymentAmount) < 0 ||
+                  !app?.email?.trim()
+                }
+                onClick={async () => {
                   const amount = parseFloat(paymentAmount);
                   if (Number.isNaN(amount) || amount < 0) {
                     alert("أدخل مبلغاً صحيحاً (€).");
                     return;
                   }
                   const tip = parseFloat(paymentTip) || 0;
-                  const url = `/api/admin/driver-applications/${id}/payment-invoice?amount=${encodeURIComponent(amount)}&tip=${encodeURIComponent(tip)}`;
-                  window.open(url, "_blank");
+                  setSendingInvoiceEmail(true);
+                  try {
+                    const res = await fetch(`/api/admin/driver-applications/${id}/send-payment-invoice-email`, {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ amount, tip }),
+                    });
+                    const data = await res.json();
+                    if (res.ok && data.ok) {
+                      alert("تم إرسال الفاتورة إلى إيميل السائق بنجاح.");
+                      setPaymentInvoiceModal(false);
+                    } else {
+                      alert(data?.error ?? "فشل الإرسال");
+                    }
+                  } catch {
+                    alert("فشل الاتصال");
+                  } finally {
+                    setSendingInvoiceEmail(false);
+                  }
                 }}
-                disabled={!paymentAmount.trim() || Number.isNaN(parseFloat(paymentAmount)) || parseFloat(paymentAmount) < 0}
                 className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
               >
-                تحميل PDF الفاتورة
+                {sendingInvoiceEmail ? "جاري الإرسال…" : "إرسال إلى إيميل السائق"}
               </button>
             </div>
           </div>
