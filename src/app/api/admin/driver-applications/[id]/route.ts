@@ -182,7 +182,7 @@ export async function PATCH(
       .eq("id", id)
       .single();
     if (appRow?.email?.trim()) {
-      const whatsAppLink = process.env.TRANSPOOL24_WHATSAPP_GROUP_LINK || "https://chat.whatsapp.com/IUQkN7Xvo9D68XgT8WRPW5?mode=gi_t";
+      const whatsAppLink = process.env.TRANSPOOL24_WHATSAPP_GROUP_LINK || "https://chat.whatsapp.com/ESup6od1fkHCixxMrT162q?mode=gi_t";
       let pdfBuffer: Uint8Array | undefined;
       try {
         pdfBuffer = await generateDriverApprovalPdf({

@@ -111,7 +111,7 @@ export async function sendOrderConfirmationEmail(
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com";
 const LOGO_URL = `${SITE_URL}/345remov.png`;
-const WHATSAPP_GROUP_LINK = "https://chat.whatsapp.com/IUQkN7Xvo9D68XgT8WRPW5?mode=gi_t";
+const WHATSAPP_GROUP_LINK = "https://chat.whatsapp.com/ESup6od1fkHCixxMrT162q?mode=gi_t";
 const QR_WHATSAPP_URL = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&bgcolor=FFFFFF&color=000000&data=${encodeURIComponent(WHATSAPP_GROUP_LINK)}`;
 const ORANGE = "#e85d04";
 
@@ -146,19 +146,19 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
     <tr><td align="center">
       <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.08);">
         <tr>
-          <td style="background:${ORANGE}; padding: 24px 28px; text-align: right;">
-            <img src="${LOGO_URL}" alt="TransPool24" width="220" height="60" style="height:60px; width:auto; max-width:220px; display:block; margin-right:0; margin-left:auto;" />
+          <td style="background:${ORANGE}; padding: 28px 32px; text-align: center;">
+            <img src="${LOGO_URL}" alt="TransPool24" width="320" height="90" style="height:90px; width:auto; max-width:320px; display:block; margin:0 auto;" />
           </td>
         </tr>
         <tr>
           <td style="padding: 28px 24px;">
+            ${driverPhoto ? `<p style="text-align:center; margin:0 0 16px 0;"><img src="${driverPhoto}" alt="" width="120" height="120" style="width:120px; height:120px; border-radius:50%; object-fit:cover; display:inline-block; border:4px solid ${ORANGE};" /></p>` : ""}
             <table width="100%" cellpadding="0" cellspacing="0">
               <tr>
                 <td style="width:48px; vertical-align:top; padding-top:4px;">
                   <span style="display:inline-block; width:40px; height:40px; background:#e8f5e9; border-radius:50%; text-align:center; line-height:40px; font-size:20px;">✓</span>
                 </td>
                 <td style="vertical-align:top;">
-                  ${driverPhoto ? `<img src="${driverPhoto}" alt="" width="64" height="64" style="width:64px; height:64px; border-radius:50%; object-fit:cover; display:block; margin-bottom:10px; border:3px solid ${ORANGE};" />` : ""}
                   <h1 style="margin:0 0 8px 0; font-size:22px; font-weight:700; color:#0d2137;">
                     تمت الموافقة على طلبك للانضمام كسائق في TransPool24
                   </h1>
@@ -198,19 +198,11 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
           </td>
         </tr>
         <tr>
-          <td style="padding:0;">
-            <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
-              <tr>
-                <td width="180" style="vertical-align:middle; padding:16px; background:#fff;">
-                  <img src="${LOGO_URL}" alt="TransPool24" width="140" height="40" style="display:block; height:40px; width:auto;" />
-                </td>
-                <td style="background:#0d2137; padding: 24px 20px; vertical-align:middle;" dir="ltr" lang="de">
-                  <p style="margin:0; font-size:18px; font-weight:700; color:#fff; line-height:1.4;">
-                    Ihr Weg ist sicher – und unser Team steht immer hinter Ihnen.
-                  </p>
-                </td>
-              </tr>
-            </table>
+          <td style="background:#0d2137; padding: 28px 24px; text-align: center;">
+            <img src="${LOGO_URL}" alt="TransPool24" width="260" height="72" style="height:72px; width:auto; max-width:260px; display:block; margin:0 auto 16px auto;" />
+            <p style="margin:0; font-size:18px; font-weight:700; color:#fff; line-height:1.4;" dir="ltr" lang="de">
+              Ihr Weg ist sicher – und unser Team steht immer hinter Ihnen.
+            </p>
           </td>
         </tr>
         <tr>

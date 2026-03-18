@@ -49,7 +49,7 @@ export async function POST(req: Request) {
   } catch (e) {
     console.warn("[send-driver-approval-email] PDF skip", e);
   }
-  const whatsAppLink = process.env.TRANSPOOL24_WHATSAPP_GROUP_LINK || "https://chat.whatsapp.com/IUQkN7Xvo9D68XgT8WRPW5?mode=gi_t";
+  const whatsAppLink = process.env.TRANSPOOL24_WHATSAPP_GROUP_LINK || "https://chat.whatsapp.com/ESup6od1fkHCixxMrT162q?mode=gi_t";
   const result = await sendDriverApprovalEmail(
     email,
     {
