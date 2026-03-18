@@ -20,12 +20,15 @@ export default function AdminSupportPage() {
 
   useEffect(() => {
     fetch("/api/admin/support-requests")
-      .then((r) => {
-        if (!r.ok) throw new Error("Fehler beim Laden");
-        return r.json();
+      .then(async (r) => {
+        const data = await r.json();
+        if (!r.ok) throw new Error(data?.error || "Fehler beim Laden");
+        if (Array.isArray(data)) return data;
+        if (data?.error) throw new Error(data.error);
+        return [];
       })
       .then(setList)
-      .catch(() => setError("Tabelle support_requests fehlt oder Fehler. Führen Sie supabase/support_requests.sql aus."))
+      .catch((e) => setError(e instanceof Error ? e.message : "جدول support_requests غير موجود. نفّذ الملف supabase/support_requests.sql في Supabase ثم حدّث الصفحة."))
       .finally(() => setLoading(false));
   }, []);
 
@@ -45,25 +48,32 @@ export default function AdminSupportPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold text-[#0d2137]">رسائل الدعم الفني</h1>
+        <div>
+          <h1 className="text-2xl font-bold text-[#0d2137]">لوحة رسائل الدعم الفني</h1>
+          <p className="mt-1 text-sm text-[#0d2137]/60">عرض محتوى الرسائل ومعلومات المرسل (السائق). هذا ليس نموذج الإرسال.</p>
+        </div>
         <Link
           href="/de/support"
           target="_blank"
           rel="noopener noreferrer"
           className="rounded-lg bg-[#0d2137] px-4 py-2 text-sm font-medium text-white hover:bg-[#0d2137]/90"
         >
-          فتح نموذج الدعم
+          فتح نموذج الدعم (للسائقين)
         </Link>
       </div>
 
       {loading && <p className="text-[#0d2137]/70">جاري التحميل…</p>}
       {error && (
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-amber-800">
-          {error}
+          <p className="font-medium">تعذر تحميل الرسائل</p>
+          <p className="mt-1 text-sm">{error}</p>
         </div>
       )}
       {!loading && !error && list.length === 0 && (
-        <p className="text-[#0d2137]/70">لا توجد رسائل حتى الآن.</p>
+        <div className="rounded-xl border border-[#0d2137]/10 bg-white p-6 text-center">
+          <p className="text-[#0d2137]/80">لا توجد رسائل حتى الآن.</p>
+          <p className="mt-2 text-sm text-[#0d2137]/60">عند إرسال السائقين رسائل من نموذج الدعم ستظهر هنا.</p>
+        </div>
       )}
       {!loading && !error && list.length > 0 && (
         <div className="space-y-4">
