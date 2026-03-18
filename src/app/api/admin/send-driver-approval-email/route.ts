@@ -15,7 +15,7 @@ export async function POST(req: Request) {
   const supabase = createServerSupabase();
   const { data, error } = await supabase
     .from("driver_applications")
-    .select("full_name, email, phone, approved_at, status, driver_number, vehicle_plate")
+    .select("full_name, email, phone, approved_at, status, driver_number, vehicle_plate, personal_photo_url")
     .eq("id", id)
     .single();
   if (error || !data) {
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
   } catch (e) {
     console.warn("[send-driver-approval-email] PDF skip", e);
   }
-  const whatsAppLink = process.env.TRANSPOOL24_WHATSAPP_GROUP_LINK || null;
+  const whatsAppLink = process.env.TRANSPOOL24_WHATSAPP_GROUP_LINK || "https://chat.whatsapp.com/IUQkN7Xvo9D68XgT8WRPW5?mode=gi_t";
   const result = await sendDriverApprovalEmail(
     email,
     {
@@ -58,6 +58,7 @@ export async function POST(req: Request) {
       driver_number: data.driver_number != null ? Number(data.driver_number) : null,
       approved_at: approvedAt,
       vehicle_plate: data.vehicle_plate ?? null,
+      personal_photo_url: data.personal_photo_url ?? null,
     },
     { whatsAppLink, pdfBuffer }
   );

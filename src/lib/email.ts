@@ -110,8 +110,10 @@ export async function sendOrderConfirmationEmail(
 }
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com";
-// استخدم 345remov.png إن وُجد في public، وإلا logo.png
 const LOGO_URL = `${SITE_URL}/345remov.png`;
+const WHATSAPP_GROUP_LINK = "https://chat.whatsapp.com/IUQkN7Xvo9D68XgT8WRPW5?mode=gi_t";
+const QR_WHATSAPP_URL = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&bgcolor=FFFFFF&color=000000&data=${encodeURIComponent(WHATSAPP_GROUP_LINK)}`;
+const ORANGE = "#e85d04";
 
 export type DriverApprovalData = {
   full_name: string;
@@ -119,6 +121,7 @@ export type DriverApprovalData = {
   driver_number: number | null;
   approved_at: string;
   vehicle_plate?: string | null;
+  personal_photo_url?: string | null;
 };
 
 function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string | null): string {
@@ -128,7 +131,8 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
     month: "2-digit",
     year: "numeric",
   });
-  const ctaUrl = whatsAppLink ?? SITE_URL;
+  const ctaUrl = whatsAppLink ?? WHATSAPP_GROUP_LINK;
+  const driverPhoto = data.personal_photo_url?.trim();
   return `
 <!DOCTYPE html>
 <html dir="rtl" lang="ar">
@@ -142,8 +146,8 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
     <tr><td align="center">
       <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.08);">
         <tr>
-          <td style="background:#0d2137; padding: 20px 24px; text-align: right;">
-            <img src="${LOGO_URL}" alt="TransPool24" width="140" height="40" style="height:40px; width:auto; display:block; margin-right:0; margin-left:auto;" />
+          <td style="background:${ORANGE}; padding: 24px 28px; text-align: right;">
+            <img src="${LOGO_URL}" alt="TransPool24" width="220" height="60" style="height:60px; width:auto; max-width:220px; display:block; margin-right:0; margin-left:auto;" />
           </td>
         </tr>
         <tr>
@@ -153,7 +157,8 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
                 <td style="width:48px; vertical-align:top; padding-top:4px;">
                   <span style="display:inline-block; width:40px; height:40px; background:#e8f5e9; border-radius:50%; text-align:center; line-height:40px; font-size:20px;">✓</span>
                 </td>
-                <td>
+                <td style="vertical-align:top;">
+                  ${driverPhoto ? `<img src="${driverPhoto}" alt="" width="64" height="64" style="width:64px; height:64px; border-radius:50%; object-fit:cover; display:block; margin-bottom:10px; border:3px solid ${ORANGE};" />` : ""}
                   <h1 style="margin:0 0 8px 0; font-size:22px; font-weight:700; color:#0d2137;">
                     تمت الموافقة على طلبك للانضمام كسائق في TransPool24
                   </h1>
@@ -179,8 +184,12 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
             <p style="margin:24px 0 12px 0; font-size:14px; color:#555;">
               للانضمام لمجموعة السائقين على واتساب واستلام الطلبات:
             </p>
+            <p style="margin:0 0 16px 0;">
+              <a href="${ctaUrl}" style="display:inline-block; padding:14px 28px; background:#25D366; color:#fff; text-decoration:none; border-radius:8px; font-weight:600; font-size:15px;">انضم لمجموعة السائقين (واتساب)</a>
+            </p>
+            <p style="margin:0 0 8px 0; font-size:13px; color:#555;">امسح رمز QR للانضمام للمجموعة:</p>
             <p style="margin:0 0 24px 0;">
-              <a href="${ctaUrl}" style="display:inline-block; padding:14px 28px; background:#00BFFF; color:#fff; text-decoration:none; border-radius:8px; font-weight:600; font-size:15px;">انضم لمجموعة السائقين (واتساب)</a>
+              <img src="${QR_WHATSAPP_URL}" alt="QR انضمام واتساب" width="140" height="140" style="display:block; width:140px; height:140px; background:#fff; border-radius:12px; padding:8px; border:1px solid #eee;" />
             </p>
             <p style="margin:0; font-size:13px; color:#777;">
               — TransPool24 · Pforzheim & Region<br>

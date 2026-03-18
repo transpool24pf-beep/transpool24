@@ -178,11 +178,11 @@ export async function PATCH(
     const driverNumber = updated?.driver_number ?? nextNumber;
     const { data: appRow } = await supabase
       .from("driver_applications")
-      .select("full_name, email, approved_at, vehicle_plate")
+      .select("full_name, email, approved_at, vehicle_plate, personal_photo_url")
       .eq("id", id)
       .single();
     if (appRow?.email?.trim()) {
-      const whatsAppLink = process.env.TRANSPOOL24_WHATSAPP_GROUP_LINK || null;
+      const whatsAppLink = process.env.TRANSPOOL24_WHATSAPP_GROUP_LINK || "https://chat.whatsapp.com/IUQkN7Xvo9D68XgT8WRPW5?mode=gi_t";
       let pdfBuffer: Uint8Array | undefined;
       try {
         pdfBuffer = await generateDriverApprovalPdf({
@@ -206,6 +206,7 @@ export async function PATCH(
           driver_number: driverNumber,
           approved_at: appRow.approved_at ?? now,
           vehicle_plate: appRow.vehicle_plate ?? null,
+          personal_photo_url: appRow.personal_photo_url ?? null,
         },
         { whatsAppLink, pdfBuffer }
       );
