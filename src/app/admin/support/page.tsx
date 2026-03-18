@@ -10,6 +10,7 @@ type SupportRequest = {
   email: string;
   message: string;
   created_at: string;
+  driver_info: { full_name: string; phone: string; city: string; id: string } | null;
 };
 
 export default function AdminSupportPage() {
@@ -71,28 +72,31 @@ export default function AdminSupportPage() {
               key={req.id}
               className="rounded-xl border border-[#0d2137]/10 bg-white p-5 shadow-sm"
             >
-              <div className="mb-3 flex flex-wrap items-center gap-3 border-b border-[#0d2137]/10 pb-3">
-                <span className="rounded bg-[#0d2137] px-2 py-0.5 text-sm font-medium text-white">
-                  #{String(req.driver_number).padStart(5, "0")}
-                </span>
-                <span className="font-medium text-[#0d2137]">{req.name}</span>
-                <a
-                  href={`mailto:${req.email}`}
-                  className="text-sm text-[#0d2137]/70 hover:underline"
-                >
-                  {req.email}
-                </a>
-                <span className="text-sm text-[#0d2137]/50">
-                  {formatDate(req.created_at)}
-                </span>
-                <Link
-                  href="/admin/drivers"
-                  className="text-sm text-[#e85d04] hover:underline"
-                >
-                  السائقين
-                </Link>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#0d2137]/50">
+                {formatDate(req.created_at)}
+              </p>
+              <div className="mb-4 rounded-lg border border-[#0d2137]/10 bg-[#f8fafc] p-4">
+                <h3 className="mb-2 text-sm font-bold text-[#0d2137]">المرسل – معلومات السائق</h3>
+                <ul className="space-y-1 text-sm text-[#0d2137]/90">
+                  <li><strong>رقم السائق:</strong> #{String(req.driver_number).padStart(5, "0")}</li>
+                  <li><strong>الاسم:</strong> {req.name}</li>
+                  <li><strong>البريد:</strong> <a href={`mailto:${req.email}`} className="text-[#e85d04] hover:underline">{req.email}</a></li>
+                  {req.driver_info?.phone && <li><strong>الهاتف / واتساب:</strong> <a href={`https://wa.me/${req.driver_info.phone.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer" className="text-[#25D366] hover:underline">{req.driver_info.phone}</a></li>}
+                  {req.driver_info?.city && <li><strong>المدينة:</strong> {req.driver_info.city}</li>}
+                </ul>
+                {req.driver_info?.id && (
+                  <Link
+                    href={`/admin/driver-applications/${req.driver_info.id}`}
+                    className="mt-2 inline-block text-sm font-medium text-[#e85d04] hover:underline"
+                  >
+                    فتح ملف السائق →
+                  </Link>
+                )}
               </div>
-              <p className="whitespace-pre-wrap text-[#0d2137]/90">{req.message}</p>
+              <div>
+                <h3 className="mb-2 text-sm font-bold text-[#0d2137]">محتوى الرسالة</h3>
+                <p className="whitespace-pre-wrap rounded-lg border border-[#0d2137]/10 bg-white p-4 text-[#0d2137]/90">{req.message}</p>
+              </div>
             </div>
           ))}
         </div>
