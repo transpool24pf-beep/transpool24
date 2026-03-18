@@ -21,12 +21,13 @@ export async function PATCH(req: Request) {
   const err = await requireAdmin();
   if (err) return err;
   const body = await req.json();
-  const { id, logistics_status, assigned_driver_id } = body;
+  const { id, logistics_status, assigned_driver_id, assigned_driver_application_id } = body;
   if (!id) return NextResponse.json({ error: "Missing job id" }, { status: 400 });
   const supabase = createServerSupabase();
   const updates: Record<string, unknown> = { updated_at: new Date().toISOString() };
   if (logistics_status != null) updates.logistics_status = logistics_status;
   if (assigned_driver_id !== undefined) updates.assigned_driver_id = assigned_driver_id || null;
+  if (assigned_driver_application_id !== undefined) updates.assigned_driver_application_id = assigned_driver_application_id || null;
   if (body.driver_price_cents !== undefined) updates.driver_price_cents = body.driver_price_cents == null ? null : Number(body.driver_price_cents);
   const { data, error } = await supabase
     .from("jobs")

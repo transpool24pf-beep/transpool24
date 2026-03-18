@@ -49,7 +49,7 @@ function buildConfirmationHtml(
   const driverSection =
     driver
       ? `
-  <div style="margin-top: 24px; padding: 20px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
+  <div style="margin-bottom: 24px; padding: 20px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
     <p style="margin: 0 0 12px 0; font-size: 16px; font-weight: bold; color: #0d2137;">معلومات السائق</p>
     <table cellpadding="0" cellspacing="0" style="font-size: 14px;">
       <tr>
@@ -79,6 +79,7 @@ function buildConfirmationHtml(
   </p>`
       : "";
 
+  /* معلومات السائق أولاً (في أعلى الرسالة) ثم الترحيب وتفاصيل العقد */
   return `
 <!DOCTYPE html>
 <html dir="rtl" lang="ar">
@@ -90,7 +91,8 @@ function buildConfirmationHtml(
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; padding: 32px 20px;">
     <tr><td>
       <div style="background: #fff; border-radius: 12px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
-        <p style="margin: 0 0 8px 0; font-size: 20px; color: #0d2137; font-weight: bold;">مرحباً ${escapeHtml(companyName)}،</p>
+        ${driverSection}
+        <p style="margin: ${driver ? "24" : "0"}px 0 8px 0; font-size: 20px; color: #0d2137; font-weight: bold;">مرحباً ${escapeHtml(companyName)}،</p>
         <p style="margin: 0 0 16px 0; font-size: 16px; color: #334155;">نشكرك لاختيارك شركة TransPool24.</p>
         <p style="margin: 0 0 16px 0; font-size: 15px; color: #475569;">تؤكد هذه الرسالة الإلكترونية نجاح عملية إبرام عقدك. يمكنك الآن استخدام الخدمات التي طلبتها.</p>
         <p style="margin: 0 0 12px 0; font-size: 16px; font-weight: bold; color: #0d2137;">تفاصيل عقدك:</p>
@@ -103,7 +105,6 @@ function buildConfirmationHtml(
           <tr><td style="color: #64748b;">المبلغ الإجمالي</td><td style="font-weight: bold;">€ ${totalEur}</td></tr>
         </table>
         <p style="margin: 16px 0 0 0; font-size: 14px; color: #64748b;">يمكنك الاطلاع على تفاصيل العقد في مدخل هذا المنتج في ملخص طلبك أدناه. المرفق PDF يتضمن تفاصيل الرحلة والسائق ومعلومات الشركة.</p>
-        ${driverSection}
         ${confirmBtn}
         ${rateBlock}
         <p style="margin-top: 24px; font-size: 13px; color: #94a3b8;">— TransPool24</p>

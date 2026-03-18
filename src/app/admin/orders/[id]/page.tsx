@@ -22,6 +22,14 @@ type Job = {
   created_at: string;
   preferred_pickup_at: string | null;
   confirmation_token: string | null;
+  assigned_driver_application_id?: string | null;
+};
+
+type DriverOption = {
+  id: string;
+  full_name: string;
+  driver_number: number | null;
+  source: string;
 };
 
 /** سعر السائق: إما المحفوظ أو 18 × مسافة الذهاب والإياب (بالمليم) */
@@ -124,6 +132,8 @@ export default function AdminOrderDetailPage({
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [id, setId] = useState<string | null>(null);
+  const [drivers, setDrivers] = useState<DriverOption[]>([]);
+  const [updatingDriver, setUpdatingDriver] = useState(false);
 
   useEffect(() => {
     params.then((p) => {
@@ -137,6 +147,32 @@ export default function AdminOrderDetailPage({
         .finally(() => setLoading(false));
     });
   }, [params]);
+
+  useEffect(() => {
+    fetch("/api/admin/drivers")
+      .then((r) => r.json())
+      .then((list: { id: string; full_name: string; driver_number: number | null; source: string }[]) => {
+        const fromApps = (list ?? []).filter((d) => d.source === "application" && d.driver_number != null);
+        setDrivers(fromApps.map((d) => ({ id: d.id, full_name: d.full_name, driver_number: d.driver_number, source: d.source })));
+      })
+      .catch(() => setDrivers([]));
+  }, []);
+
+  const assignDriver = (driverApplicationId: string | null) => {
+    if (!order) return;
+    setUpdatingDriver(true);
+    fetch("/api/admin/orders", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: order.id, assigned_driver_application_id: driverApplicationId || null }),
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        setOrder((prev) => (prev ? { ...prev, assigned_driver_application_id: data.assigned_driver_application_id ?? driverApplicationId } : null));
+      })
+      .catch(() => {})
+      .finally(() => setUpdatingDriver(false));
+  };
 
   const sendEmailToCustomer = () => {
     if (!order?.customer_email) return;
@@ -279,6 +315,25 @@ export default function AdminOrderDetailPage({
             <div>
               <dt className="text-[#0d2137]/60">سعر السائق للمجموعة</dt>
               <dd className="font-semibold text-amber-700">€ {driverPriceEur}</dd>
+            </div>
+            <div>
+              <dt className="mb-1.5 text-[#0d2137]/60">رقم السائق / السائق</dt>
+              <dd>
+                <select
+                  value={order.assigned_driver_application_id ?? ""}
+                  onChange={(e) => assignDriver(e.target.value || null)}
+                  disabled={updatingDriver}
+                  className="w-full max-w-xs rounded-lg border-2 border-[#0d2137]/20 bg-white px-3 py-2 text-sm font-medium text-[#0d2137] focus:border-[var(--accent)] focus:outline-none disabled:opacity-60"
+                >
+                  <option value="">— لا سائق —</option>
+                  {drivers.map((d) => (
+                    <option key={d.id} value={d.id}>
+                      {d.driver_number != null ? `#${String(d.driver_number)} – ${d.full_name}` : d.full_name}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-1 text-xs text-[#0d2137]/50">اختر السائق قبل إرسال بريد التأكيد للعميل ليظهر في الإيميل.</p>
+              </dd>
             </div>
           </dl>
         </div>
