@@ -10,6 +10,7 @@ const NAV = [
   { href: "/admin/driver-applications", label: "طلبات السائقين" },
   { href: "/admin/drivers", label: "Drivers / السائقين" },
   { href: "/admin/settings", label: "Settings / الإعدادات" },
+  { href: "/de/support", label: "دعم فني / شكاوي" },
 ];
 
 export function AdminShell({ children }: { children: React.ReactNode }) {

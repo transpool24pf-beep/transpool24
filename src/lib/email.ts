@@ -189,18 +189,24 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
           </td>
         </tr>
         <tr>
-          <td style="padding:0; line-height:0;">
-            <img src="${SITE_URL}/134.png" alt="TransPool24" width="560" style="display:block; width:100%; max-width:560px; height:auto;" />
+          <td style="padding:0;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
+              <tr>
+                <td width="180" style="vertical-align:middle; padding:16px; background:#fff;">
+                  <img src="${LOGO_URL}" alt="TransPool24" width="140" height="40" style="display:block; height:40px; width:auto;" />
+                </td>
+                <td style="background:#0d2137; padding: 24px 20px; vertical-align:middle;" dir="ltr" lang="de">
+                  <p style="margin:0; font-size:18px; font-weight:700; color:#fff; line-height:1.4;">
+                    Ihr Weg ist sicher – und unser Team steht immer hinter Ihnen.
+                  </p>
+                </td>
+              </tr>
+            </table>
           </td>
         </tr>
         <tr>
-          <td style="background:#0d2137; padding: 24px; text-align: center;" dir="ltr" lang="de">
-            <p style="margin:0 0 8px 0; font-size:18px; font-weight:700; color:#fff;">
-              Ihr Weg ist sicher – und unser Team steht immer hinter Ihnen.
-            </p>
-            <p style="margin:0; font-size:14px; color:rgba(255,255,255,0.9);">
-              Wir sind an Ihrer Seite bei jedem Kilometer.
-            </p>
+          <td style="background:#0d2137; padding: 0 24px 24px 24px; text-align: center;" dir="ltr" lang="de">
+            <a href="${SITE_URL}/de/support" style="display:inline-block; padding:14px 28px; background:#00BFFF; color:#fff; text-decoration:none; border-radius:8px; font-weight:600; font-size:15px;">Wir sind an Ihrer Seite bei jedem Kilometer.</a>
           </td>
         </tr>
       </table>

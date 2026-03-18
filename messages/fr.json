@@ -172,5 +172,21 @@
     "successMessage": "Nous examinerons votre dossier et vous contacterons par WhatsApp ou e-mail. Merci de votre confiance en TransPool24.",
     "successBrand": "TransPool24 – Votre partenaire logistique",
     "submitError": "Échec de l'envoi"
+  },
+  "support": {
+    "title": "Support technique et contact",
+    "subtitle": "Nous sommes à vos côtés à chaque kilomètre. Écrivez-nous pour toute question.",
+    "name": "Nom",
+    "namePlaceholder": "Votre nom",
+    "email": "E-mail",
+    "emailPlaceholder": "votre@email.com",
+    "driverNumber": "Numéro de chauffeur (optionnel)",
+    "driverNumberPlaceholder": "ex. 10002",
+    "message": "Message",
+    "messagePlaceholder": "Votre question ou message…",
+    "submit": "Envoyer le message",
+    "sending": "Envoi en cours…",
+    "success": "Merci. Votre message a été envoyé. Nous vous répondrons bientôt.",
+    "error": "Le message n'a pas pu être envoyé. Veuillez réessayer plus tard."
   }
 }

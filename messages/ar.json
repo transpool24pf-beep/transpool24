@@ -172,5 +172,21 @@
     "successMessage": "سنراجع ملفك بعناية ونتواصل معك عبر الواتساب أو البريد الإلكتروني في أقرب وقت. شكراً لثقتك بـ TransPool24.",
     "successBrand": "TransPool24 – شريكك اللوجستي",
     "submitError": "فشل الإرسال"
+  },
+  "support": {
+    "title": "الدعم الفني والتواصل",
+    "subtitle": "نحن بجانبك في كل كيلومتر. اكتب لنا لأي استفسار أو شكوى.",
+    "name": "الاسم",
+    "namePlaceholder": "اسمك",
+    "email": "البريد الإلكتروني",
+    "emailPlaceholder": "your@email.com",
+    "driverNumber": "رقم السائق (اختياري)",
+    "driverNumberPlaceholder": "مثال 10002",
+    "message": "الرسالة",
+    "messagePlaceholder": "سؤالك أو ملاحظتك…",
+    "submit": "إرسال الرسالة",
+    "sending": "جاري الإرسال…",
+    "success": "شكراً. تم إرسال رسالتك. سنتواصل معك قريباً.",
+    "error": "تعذر إرسال الرسالة. يرجى المحاولة لاحقاً."
   }
 }

@@ -172,5 +172,21 @@
     "successMessage": "Wir prüfen Ihre Unterlagen und melden uns per WhatsApp oder E-Mail. Vielen Dank für Ihr Vertrauen in TransPool24.",
     "successBrand": "TransPool24 – Ihr Logistikpartner",
     "submitError": "Fehler beim Absenden"
+  },
+  "support": {
+    "title": "Technischer Support & Kontakt",
+    "subtitle": "Wir sind an Ihrer Seite bei jedem Kilometer. Schreiben Sie uns bei Fragen oder Anliegen.",
+    "name": "Name",
+    "namePlaceholder": "Ihr Name",
+    "email": "E-Mail",
+    "emailPlaceholder": "ihre@email.de",
+    "driverNumber": "Fahrernummer (optional)",
+    "driverNumberPlaceholder": "z. B. 10002",
+    "message": "Nachricht",
+    "messagePlaceholder": "Ihre Frage oder Ihr Anliegen…",
+    "submit": "Nachricht senden",
+    "sending": "Wird gesendet…",
+    "success": "Vielen Dank. Ihre Nachricht wurde gesendet. Wir melden uns in Kürze.",
+    "error": "Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es später erneut."
   }
 }

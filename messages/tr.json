@@ -172,5 +172,21 @@
     "successMessage": "Dosyanızı inceleyeceğiz ve WhatsApp veya e-posta ile iletişime geçeceğiz. TransPool24'e güvendiğiniz için teşekkürler.",
     "successBrand": "TransPool24 – Lojistik ortağınız",
     "submitError": "Gönderim başarısız"
+  },
+  "support": {
+    "title": "Teknik destek ve iletişim",
+    "subtitle": "Her kilometrede yanınızdayız. Soru veya şikayetleriniz için bize yazın.",
+    "name": "Ad",
+    "namePlaceholder": "Adınız",
+    "email": "E-posta",
+    "emailPlaceholder": "sizin@email.com",
+    "driverNumber": "Sürücü numarası (isteğe bağlı)",
+    "driverNumberPlaceholder": "örn. 10002",
+    "message": "Mesaj",
+    "messagePlaceholder": "Soru veya mesajınız…",
+    "submit": "Mesaj gönder",
+    "sending": "Gönderiliyor…",
+    "success": "Teşekkürler. Mesajınız gönderildi. Yakında size dönüş yapacağız.",
+    "error": "Mesaj gönderilemedi. Lütfen daha sonra tekrar deneyin."
   }
 }
