@@ -83,21 +83,27 @@ export async function sendOrderConfirmationEmail(
     });
     if (error) {
       console.error("[TransPool24] Resend error:", error);
-      const errMsg =
+      const raw =
         typeof error === "string"
           ? error
           : (error && typeof error === "object" && "message" in error)
             ? String((error as { message: unknown }).message)
             : JSON.stringify(error);
+      const errMsg =
+        /only send testing emails|verify a domain|resend\.com\/domains/i.test(raw)
+          ? "حساب Resend في وضع الاختبار أو الدومين غير موثّق. ثبّت الدومين على resend.com/domains واستخدم بريداً من هذا الدومين."
+          : raw;
       return { success: false, error: errMsg };
     }
     return { success: true };
   } catch (e) {
     console.error("[TransPool24] Send confirmation email failed:", e);
-    return {
-      success: false,
-      error: e instanceof Error ? e.message : "Unknown error",
-    };
+    const msg = e instanceof Error ? e.message : "Unknown error";
+    const errMsg =
+      /only send testing emails|verify a domain|resend\.com\/domains/i.test(msg)
+        ? "حساب Resend في وضع الاختبار أو الدومين غير موثّق. ثبّت الدومين على resend.com/domains."
+        : msg;
+    return { success: false, error: errMsg };
   }
 }
 
@@ -217,12 +223,26 @@ export async function sendDriverApprovalEmail(
       attachments,
     });
     if (error) {
-      const errMsg = typeof error === "string" ? error : (error && typeof error === "object" && "message" in error ? String((error as { message: unknown }).message) : JSON.stringify(error));
+      const raw =
+        typeof error === "string"
+          ? error
+          : error && typeof error === "object" && "message" in error
+            ? String((error as { message: unknown }).message)
+            : JSON.stringify(error);
+      const errMsg =
+        /only send testing emails|verify a domain|resend\.com\/domains/i.test(raw)
+          ? "حساب Resend في وضع الاختبار أو الدومين غير موثّق. للإرسال لأي بريد: ثبّت الدومين على resend.com/domains واستخدم بريداً من هذا الدومين (مثل info@transpool24.com)."
+          : raw;
       return { success: false, error: errMsg };
     }
     return { success: true };
   } catch (e) {
     console.error("[TransPool24] Send driver approval email failed:", e);
-    return { success: false, error: e instanceof Error ? e.message : "Unknown error" };
+    const msg = e instanceof Error ? e.message : "Unknown error";
+    const errMsg =
+      /only send testing emails|verify a domain|resend\.com\/domains/i.test(msg)
+        ? "حساب Resend في وضع الاختبار أو الدومين غير موثّق. ثبّت الدومين على resend.com/domains."
+        : msg;
+    return { success: false, error: errMsg };
   }
 }

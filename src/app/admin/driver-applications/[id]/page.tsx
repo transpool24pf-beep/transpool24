@@ -421,6 +421,13 @@ export default function AdminDriverApplicationDetailPage({
               >
                 {emailSending ? "جاري الإرسال…" : "إرسال إيميل الموافقة للسائق"}
               </button>
+              <p className="mt-1 text-xs text-gray-500">
+                إذا لم يُرسل: ثبّت الدومين على{" "}
+                <a href="https://resend.com/domains" target="_blank" rel="noopener noreferrer" className="text-sky-600 underline">
+                  resend.com/domains
+                </a>{" "}
+                واستخدم بريداً من الدومين (مثل info@transpool24.com).
+              </p>
               {app.suspended_at ? (
                 <button
                   type="button"
