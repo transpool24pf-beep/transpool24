@@ -859,13 +859,14 @@ export default function AdminDriverApplicationDetailPage({
                     });
                     const data = await res.json();
                     if (res.ok && data.ok) {
-                      alert("تم إرسال الفاتورة إلى إيميل السائق بنجاح.");
+                      const toEmail = data.sentTo ? ` إلى ${data.sentTo}` : "";
+                      alert(`تم إرسال الفاتورة${toEmail} بنجاح. إن لم تصل خلال دقائق فتحقق من مجلد السبام.`);
                       setPaymentInvoiceModal(false);
                     } else {
                       alert(data?.error ?? "فشل الإرسال");
                     }
-                  } catch {
-                    alert("فشل الاتصال");
+                  } catch (e) {
+                    alert("فشل الاتصال. تحقق من الشبكة أو جرّب لاحقاً.");
                   } finally {
                     setSendingInvoiceEmail(false);
                   }
@@ -874,6 +875,11 @@ export default function AdminDriverApplicationDetailPage({
               >
                 {sendingInvoiceEmail ? "جاري الإرسال…" : "إرسال إلى إيميل السائق"}
               </button>
+              <p className="mt-2 w-full text-left text-xs text-[#0d2137]/60">
+                إذا لم تصل الرسالة: تحقق من مجلد السبام، وتأكد من توثيق الدومين في{" "}
+                <a href="https://resend.com/domains" target="_blank" rel="noopener noreferrer" className="text-indigo-600 underline">resend.com/domains</a>{" "}
+                لتمكين الإرسال لأي بريد.
+              </p>
             </div>
           </div>
         </div>

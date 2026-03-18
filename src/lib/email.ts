@@ -303,12 +303,13 @@ export async function sendDriverPaymentInvoiceEmail(
   }
   const resend = new Resend(apiKey);
   try {
+    const attachmentContent = Buffer.from(pdfBuffer).toString("base64");
     const { error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: [to],
       subject: `TransPool24 – فاتورة التحويل / Zahlungsnachweis ${data.invoice_number}`,
       html: buildDriverPaymentInvoiceEmailHtml(data),
-      attachments: [{ filename: pdfFilename, content: Buffer.from(pdfBuffer) }],
+      attachments: [{ filename: pdfFilename, content: attachmentContent }],
     });
     if (error) {
       const raw = typeof error === "string" ? error : (error && typeof error === "object" && "message" in error) ? String((error as { message: unknown }).message) : JSON.stringify(error);
