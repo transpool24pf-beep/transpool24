@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/admin-api";
+import { sendDriverApprovalEmail } from "@/lib/email";
+import { generateDriverApprovalPdf } from "@/lib/driver-approval-pdf";
 
 export async function GET(
   _req: Request,
@@ -173,10 +175,46 @@ export async function PATCH(
       console.error("[admin/driver-applications PATCH approve]", updateErr);
       return NextResponse.json({ error: updateErr.message }, { status: 500 });
     }
+    const driverNumber = updated?.driver_number ?? nextNumber;
+    const { data: appRow } = await supabase
+      .from("driver_applications")
+      .select("full_name, email, approved_at, vehicle_plate")
+      .eq("id", id)
+      .single();
+    if (appRow?.email?.trim()) {
+      const whatsAppLink = process.env.TRANSPOOL24_WHATSAPP_GROUP_LINK || null;
+      let pdfBuffer: Uint8Array | undefined;
+      try {
+        pdfBuffer = await generateDriverApprovalPdf({
+          full_name: String(appRow.full_name ?? ""),
+          email: String(appRow.email ?? ""),
+          phone: "",
+          city: "",
+          vehicle_plate: appRow.vehicle_plate ?? null,
+          languages_spoken: null,
+          approved_at: appRow.approved_at ?? now,
+          driver_number: driverNumber,
+        });
+      } catch (e) {
+        console.warn("[approve] PDF skip", e);
+      }
+      const sent = await sendDriverApprovalEmail(
+        appRow.email.trim(),
+        {
+          full_name: String(appRow.full_name ?? ""),
+          email: String(appRow.email ?? ""),
+          driver_number: driverNumber,
+          approved_at: appRow.approved_at ?? now,
+          vehicle_plate: appRow.vehicle_plate ?? null,
+        },
+        { whatsAppLink, pdfBuffer }
+      );
+      if (!sent.success) console.warn("[approve] Email not sent:", sent.error);
+    }
     return NextResponse.json({
       ok: true,
       status: "approved",
-      driver_number: updated?.driver_number ?? nextNumber,
+      driver_number: driverNumber,
     });
   }
 

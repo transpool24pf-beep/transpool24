@@ -60,6 +60,7 @@ export default function AdminDriverApplicationDetailPage({
   const [rejectFiles, setRejectFiles] = useState<File[]>([]);
   const [desiredNoteEdit, setDesiredNoteEdit] = useState("");
   const [savingNote, setSavingNote] = useState(false);
+  const [emailSending, setEmailSending] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchApp = () => {
@@ -392,6 +393,33 @@ export default function AdminDriverApplicationDetailPage({
                 className="rounded-lg bg-[#25D366] px-4 py-2 text-sm font-medium text-white hover:bg-[#25D366]/90"
               >
                 إرسال ترحيب + انضمام للمجموعة (واتساب)
+              </button>
+              <button
+                type="button"
+                disabled={emailSending || !app.email?.trim()}
+                onClick={async () => {
+                  setEmailSending(true);
+                  try {
+                    const res = await fetch("/api/admin/send-driver-approval-email", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ driver_application_id: id }),
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                      alert("تم إرسال إيميل الموافقة بنجاح.");
+                    } else {
+                      alert(data?.error ?? "فشل الإرسال");
+                    }
+                  } catch {
+                    alert("فشل الاتصال");
+                  } finally {
+                    setEmailSending(false);
+                  }
+                }}
+                className="rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700 disabled:opacity-50"
+              >
+                {emailSending ? "جاري الإرسال…" : "إرسال إيميل الموافقة للسائق"}
               </button>
               {app.suspended_at ? (
                 <button
