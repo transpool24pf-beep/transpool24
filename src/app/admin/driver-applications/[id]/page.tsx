@@ -29,6 +29,7 @@ type DriverApp = {
     company_name: string;
     driver_price_cents: number | null;
     customer_driver_rating: number | null;
+    customer_driver_comment: string | null;
   }>;
   service_policy_accepted: boolean;
   id_document_url: string | null;
@@ -690,6 +691,9 @@ export default function AdminDriverApplicationDetailPage({
                   )}
                   {job.customer_driver_rating != null && (
                     <span className="text-amber-600">★ {job.customer_driver_rating}</span>
+                  )}
+                  {job.customer_driver_comment && (
+                    <p className="mt-1 w-full text-xs text-[#0d2137]/70 line-clamp-2">«{job.customer_driver_comment}»</p>
                   )}
                 </div>
               </Link>

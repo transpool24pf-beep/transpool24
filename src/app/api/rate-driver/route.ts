@@ -27,6 +27,7 @@ export async function POST(req: Request) {
   const body = await req.json();
   const token = typeof body?.token === "string" ? body.token.trim() : null;
   const rating = body?.rating != null ? Number(body.rating) : null;
+  const comment = typeof body?.comment === "string" ? body.comment.trim().slice(0, 500) : null;
   if (!token) {
     return NextResponse.json({ error: "Missing token" }, { status: 400 });
   }
@@ -42,9 +43,13 @@ export async function POST(req: Request) {
   if (fetchErr || !job) {
     return NextResponse.json({ error: "Invalid or expired link" }, { status: 404 });
   }
+  const updatePayload: { customer_driver_rating: number; customer_driver_comment?: string | null } = {
+    customer_driver_rating: Math.round(rating),
+  };
+  if (comment !== undefined) updatePayload.customer_driver_comment = comment || null;
   const { error: updateErr } = await supabase
     .from("jobs")
-    .update({ customer_driver_rating: Math.round(rating) })
+    .update(updatePayload)
     .eq("id", job.id);
   if (updateErr) {
     return NextResponse.json({ error: "Update failed" }, { status: 500 });

@@ -22,7 +22,7 @@ export async function GET(
   }
   const { data: jobs } = await supabase
     .from("jobs")
-    .select("id, order_number, driver_price_cents, customer_driver_rating, created_at, logistics_status, pickup_address, delivery_address, company_name")
+    .select("id, order_number, driver_price_cents, customer_driver_rating, customer_driver_comment, created_at, logistics_status, pickup_address, delivery_address, company_name")
     .eq("assigned_driver_application_id", id)
     .order("created_at", { ascending: false })
     .limit(50);
@@ -43,6 +43,7 @@ export async function GET(
     company_name: j.company_name,
     driver_price_cents: j.driver_price_cents,
     customer_driver_rating: (j as { customer_driver_rating?: number }).customer_driver_rating,
+    customer_driver_comment: (j as { customer_driver_comment?: string | null }).customer_driver_comment ?? null,
   }));
   return NextResponse.json({
     ...data,

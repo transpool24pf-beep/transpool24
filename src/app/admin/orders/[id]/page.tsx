@@ -23,6 +23,8 @@ type Job = {
   preferred_pickup_at: string | null;
   confirmation_token: string | null;
   assigned_driver_application_id?: string | null;
+  customer_driver_rating?: number | null;
+  customer_driver_comment?: string | null;
 };
 
 type DriverOption = {
@@ -320,6 +322,19 @@ export default function AdminOrderDetailPage({
               <dt className="text-[#0d2137]/60">سعر السائق للمجموعة</dt>
               <dd className="font-semibold text-amber-700">€ {driverPriceEur}</dd>
             </div>
+            {(order.customer_driver_rating != null || order.customer_driver_comment) && (
+              <div>
+                <dt className="text-[#0d2137]/60">تقييم العميل للسائق</dt>
+                <dd className="rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/[0.03] p-2 text-sm">
+                  {order.customer_driver_rating != null && (
+                    <span className="text-amber-600 font-medium">★ {order.customer_driver_rating} نجوم</span>
+                  )}
+                  {order.customer_driver_comment && (
+                    <p className="mt-1 text-[#0d2137]/80">«{order.customer_driver_comment}»</p>
+                  )}
+                </dd>
+              </div>
+            )}
             <div>
               <dt className="mb-1.5 text-[#0d2137]/60">رقم السائق / السائق</dt>
               <dd>

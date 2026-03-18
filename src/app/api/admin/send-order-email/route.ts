@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     await supabase.from("jobs").update({ rating_token }).eq("id", job_id);
     job = { ...job, rating_token };
   }
-  const rateDriverUrl = `${SITE}/rate-driver?token=${encodeURIComponent(rating_token)}`;
+  const rateDriverUrl = `${SITE}/de/rate-driver?token=${encodeURIComponent(rating_token)}`;
 
   let driverInfo: OrderEmailDriverInfo | null = null;
   const driverAppId = (job as { assigned_driver_application_id?: string | null }).assigned_driver_application_id;
