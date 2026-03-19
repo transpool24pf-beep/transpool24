@@ -28,6 +28,7 @@ export type OrderEmailDriverInfo = {
   star_rating: number | null;
 };
 
+// ALL EMAIL CONTENT IS IN GERMAN (DE) - NO ARABIC TEXT
 function buildConfirmationHtml(
   job: Job,
   options: {
