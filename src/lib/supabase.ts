@@ -48,6 +48,8 @@ export type Job = {
   payment_status: "pending" | "paid" | "refunded" | "failed";
   logistics_status: string;
   confirmation_token: string | null;
+  /** Secret for driver GPS share page (add_driver_tracking_token.sql) */
+  driver_tracking_token?: string | null;
   stripe_session_id: string | null;
   stripe_payment_intent_id: string | null;
   assigned_driver_id: string | null;

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/admin-api";
+import { recordDriverLocationForJob } from "@/lib/record-driver-location";
 
 /** POST: record driver GPS for a job + update jobs.last_driver_* */
 export async function POST(
@@ -18,34 +19,15 @@ export async function POST(
     return NextResponse.json({ error: "Invalid latitude/longitude" }, { status: 400 });
   }
   const supabase = createServerSupabase();
-  const now = new Date().toISOString();
-  const { error: insErr } = await supabase.from("driver_location_updates").insert({
-    job_id: jobId,
-    latitude: lat,
-    longitude: lng,
-    recorded_at: now,
+  const result = await recordDriverLocationForJob(supabase, jobId, lat, lng, {
     accuracy_m: body.accuracy_m != null ? Number(body.accuracy_m) : null,
     heading: body.heading != null ? Number(body.heading) : null,
   });
-  if (insErr) {
-    console.error("[driver-location]", insErr);
+  if (!result.ok) {
     return NextResponse.json(
-      { error: insErr.message, hint: "Run supabase/roadmap_foundation.sql if table missing" },
+      { error: result.message, hint: "Run supabase/roadmap_foundation.sql if table missing" },
       { status: 500 }
     );
   }
-  const { error: upErr } = await supabase
-    .from("jobs")
-    .update({
-      last_driver_lat: lat,
-      last_driver_lng: lng,
-      last_driver_location_at: now,
-      updated_at: now,
-    })
-    .eq("id", jobId);
-  if (upErr) {
-    console.error("[driver-location job update]", upErr);
-    return NextResponse.json({ error: upErr.message }, { status: 500 });
-  }
-  return NextResponse.json({ ok: true, recorded_at: now });
+  return NextResponse.json({ ok: true, recorded_at: result.recorded_at });
 }

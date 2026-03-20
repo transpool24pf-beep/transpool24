@@ -34,6 +34,7 @@ type Job = {
   pod_signature_url?: string | null;
   pod_confirmation_code?: string | null;
   pod_completed_at?: string | null;
+  driver_tracking_token?: string | null;
 };
 
 type DriverOption = {
@@ -143,6 +144,7 @@ export default function AdminOrderDetailPage({
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [sendingTrackOnly, setSendingTrackOnly] = useState(false);
+  const [ensuringDriverLink, setEnsuringDriverLink] = useState(false);
   const [id, setId] = useState<string | null>(null);
   const [drivers, setDrivers] = useState<DriverOption[]>([]);
   const [updatingDriver, setUpdatingDriver] = useState(false);
@@ -301,6 +303,35 @@ export default function AdminOrderDetailPage({
         prompt("انسخ الرابط يدويًا:", url);
       }
     );
+  };
+
+  /** ينشئ driver_tracking_token في قاعدة البيانات إن لزم (شغّل supabase/add_driver_tracking_token.sql أو roadmap_foundation.sql) */
+  const copyDriverGpsShareLink = () => {
+    if (!order) return;
+    setEnsuringDriverLink(true);
+    fetch(`/api/admin/orders/${order.id}/driver-share-link`, { method: "POST" })
+      .then(async (r) => {
+        const j = await r.json();
+        if (!r.ok) {
+          const hint = typeof j.hint === "string" ? `\n\n${j.hint}` : "";
+          throw new Error((typeof j.error === "string" ? j.error : "فشل") + hint);
+        }
+        return j as { url: string };
+      })
+      .then(({ url }) => {
+        return navigator.clipboard.writeText(url).then(
+          () => ({ url, ok: true as const }),
+          () => ({ url, ok: false as const })
+        );
+      })
+      .then(({ url, ok }) => {
+        if (ok) alert("تم نسخ رابط مشاركة الموقع للسائق.\nأرسله بواتساب أو SMS — السائق يفتح الرابط ويضغط «بدء مشاركة الموقع».\n\n" + url);
+        else prompt("انسخ الرابط يدويًا:", url);
+        return fetch(`/api/admin/orders/${order.id}`).then((r) => r.json());
+      })
+      .then((data: Job) => setOrder(data))
+      .catch((e) => alert(e instanceof Error ? e.message : "فشل"))
+      .finally(() => setEnsuringDriverLink(false));
   };
 
   const saveTrackingAndPod = () => {
@@ -621,8 +652,19 @@ export default function AdminOrderDetailPage({
             onClick={copyTrackingLink}
             className="rounded-xl border-2 border-[var(--accent)] bg-[var(--accent)]/10 px-4 py-2 text-sm font-medium text-[#0d2137] hover:bg-[var(--accent)]/20"
           >
-            نسخ رابط التتبع (DE)
+            نسخ رابط التتبع للعميل
           </button>
+          <button
+            type="button"
+            onClick={copyDriverGpsShareLink}
+            disabled={ensuringDriverLink}
+            className="rounded-xl border-2 border-emerald-600 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-900 hover:bg-emerald-100 disabled:opacity-60"
+          >
+            {ensuringDriverLink ? "…" : "نسخ رابط GPS للسائق (مشاركة مباشرة)"}
+          </button>
+          {order.driver_tracking_token && (
+            <span className="self-center text-xs text-emerald-800/80">رمز السائق مفعّل — الرابط آمن ومنفصل عن رابط العميل</span>
+          )}
           {order.last_driver_lat != null && order.last_driver_lng != null && (
             <span className="self-center text-xs text-[#0d2137]/60">
               آخر موقع: {order.last_driver_lat.toFixed(5)}, {order.last_driver_lng.toFixed(5)}

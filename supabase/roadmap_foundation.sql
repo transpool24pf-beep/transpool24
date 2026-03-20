@@ -22,6 +22,9 @@ COMMENT ON COLUMN public.jobs.pod_signature_url IS 'Proof of delivery: signature
 COMMENT ON COLUMN public.jobs.pod_confirmation_code IS 'POD: recipient confirmation code';
 COMMENT ON COLUMN public.jobs.pod_completed_at IS 'When POD was completed';
 
+ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS driver_tracking_token TEXT UNIQUE;
+COMMENT ON COLUMN public.jobs.driver_tracking_token IS 'Secret for /driver/share-location page (driver GPS); not for customers';
+
 -- ---------- Driver location history (for maps / in_transit) ----------
 CREATE TABLE IF NOT EXISTS public.driver_location_updates (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
