@@ -4,6 +4,8 @@ import { createServerSupabase } from "@/lib/supabase";
 import { sendOrderConfirmationEmail } from "@/lib/email";
 import { generateInvoicePdf } from "@/lib/invoice-pdf";
 
+const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com";
+
 function getStripe(): Stripe {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) throw new Error("STRIPE_SECRET_KEY is required");
@@ -70,7 +72,17 @@ export async function POST(req: Request) {
     if (customerEmail) {
       try {
         const pdfBuffer = await generateInvoicePdf({ ...job, customer_email: customerEmail });
-        await sendOrderConfirmationEmail(customerEmail, { ...job, customer_email: customerEmail }, pdfBuffer);
+        const token = job.confirmation_token as string | null | undefined;
+        const confirmPaymentUrl = token
+          ? `${SITE}/de/order/confirm?job_id=${encodeURIComponent(jobId)}&token=${encodeURIComponent(token)}`
+          : null;
+        const trackOrderUrl = token
+          ? `${SITE}/de/order/track?job_id=${encodeURIComponent(jobId)}&token=${encodeURIComponent(token)}`
+          : null;
+        await sendOrderConfirmationEmail(customerEmail, { ...job, customer_email: customerEmail }, pdfBuffer, {
+          confirmPaymentUrl,
+          trackOrderUrl,
+        });
       } catch (e) {
         console.error("[TransPool24] Confirmation email/PDF failed:", e);
       }

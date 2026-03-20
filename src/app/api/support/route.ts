@@ -22,24 +22,13 @@ export async function POST(req: Request) {
     const name = String(body?.name ?? "").trim();
     const email = String(body?.email ?? "").trim();
     const message = String(body?.message ?? "").trim();
+    const requesterType = body?.requester_type === "customer" ? "customer" : "driver";
     const driverNumberRaw = body?.driver_number != null ? String(body.driver_number).trim() : "";
+    const jobId = body?.job_id != null ? String(body.job_id).trim() : null;
 
     if (!name || !email || !message) {
       return NextResponse.json(
         { error: "Name, E-Mail und Nachricht sind Pflichtfelder." },
-        { status: 400 }
-      );
-    }
-    if (!driverNumberRaw) {
-      return NextResponse.json(
-        { error: "Fahrernummer ist ein Pflichtfeld." },
-        { status: 400 }
-      );
-    }
-    const driverNumber = parseInt(driverNumberRaw, 10);
-    if (Number.isNaN(driverNumber) || driverNumber < 10000) {
-      return NextResponse.json(
-        { error: "Ungültige Fahrernummer." },
         { status: 400 }
       );
     }
@@ -48,25 +37,46 @@ export async function POST(req: Request) {
     }
 
     const supabase = createServerSupabase();
-    const { data: driver } = await supabase
-      .from("driver_applications")
-      .select("id, full_name")
-      .eq("driver_number", driverNumber)
-      .eq("status", "approved")
-      .maybeSingle();
-    if (!driver) {
-      return NextResponse.json(
-        { error: "Diese Fahrernummer ist nicht in der Datenbank registriert oder nicht genehmigt." },
-        { status: 400 }
-      );
+    let driverNumber: number | null = null;
+    if (requesterType === "driver") {
+      if (!driverNumberRaw) {
+        return NextResponse.json(
+          { error: "Fahrernummer ist ein Pflichtfeld." },
+          { status: 400 }
+        );
+      }
+      driverNumber = parseInt(driverNumberRaw, 10);
+      if (Number.isNaN(driverNumber) || driverNumber < 10000) {
+        return NextResponse.json(
+          { error: "Ungültige Fahrernummer." },
+          { status: 400 }
+        );
+      }
+      const { data: driver } = await supabase
+        .from("driver_applications")
+        .select("id, full_name")
+        .eq("driver_number", driverNumber)
+        .eq("status", "approved")
+        .maybeSingle();
+      if (!driver) {
+        return NextResponse.json(
+          { error: "Diese Fahrernummer ist nicht in der Datenbank registriert oder nicht genehmigt." },
+          { status: 400 }
+        );
+      }
     }
 
-    const { error: insertErr } = await supabase.from("support_requests").insert({
+    const insertPayload: Record<string, unknown> = {
       driver_number: driverNumber,
       name,
       email,
       message,
-    });
+      requester_type: requesterType,
+      customer_email: requesterType === "customer" ? email : null,
+      job_id: jobId || null,
+    };
+
+    const { error: insertErr } = await supabase.from("support_requests").insert(insertPayload);
     if (insertErr) {
       console.error("[support] insert", insertErr);
       return NextResponse.json({ error: "Speichern fehlgeschlagen." }, { status: 500 });
@@ -76,11 +86,16 @@ export async function POST(req: Request) {
     if (apiKey) {
       const resend = new Resend(apiKey);
       const to = getToEmail();
-      const subject = `[TransPool24 Support] ${name} (Fahrer #${driverNumber})`;
+      const subject =
+        requesterType === "customer"
+          ? `[TransPool24 Support] Kunde: ${name}`
+          : `[TransPool24 Support] ${name} (Fahrer #${driverNumber})`;
       const html = `
+      <p><strong>Typ:</strong> ${escapeHtml(requesterType === "customer" ? "Kunde" : "Fahrer")}</p>
       <p><strong>Name:</strong> ${escapeHtml(name)}</p>
       <p><strong>Email:</strong> ${escapeHtml(email)}</p>
-      <p><strong>Fahrernummer:</strong> ${escapeHtml(String(driverNumber))}</p>
+      <p><strong>Fahrernummer:</strong> ${driverNumber != null ? escapeHtml(String(driverNumber)) : "—"}</p>
+      ${jobId ? `<p><strong>Job-ID:</strong> ${escapeHtml(jobId)}</p>` : ""}
       <p><strong>Message:</strong></p>
       <pre style="white-space:pre-wrap; background:#f5f5f5; padding:12px; border-radius:8px;">${escapeHtml(message)}</pre>
     `;

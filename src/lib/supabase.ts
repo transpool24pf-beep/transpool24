@@ -51,6 +51,21 @@ export type Job = {
   stripe_session_id: string | null;
   stripe_payment_intent_id: string | null;
   assigned_driver_id: string | null;
+  /** Assigned driver application (admin) */
+  assigned_driver_application_id?: string | null;
+  /** ETA / live tracking (roadmap_foundation.sql) */
+  estimated_arrival_at?: string | null;
+  eta_minutes_remaining?: number | null;
+  last_driver_lat?: number | null;
+  last_driver_lng?: number | null;
+  last_driver_location_at?: string | null;
+  /** Proof of delivery */
+  pod_photo_url?: string | null;
+  pod_signature_url?: string | null;
+  pod_confirmation_code?: string | null;
+  pod_completed_at?: string | null;
+  customer_driver_rating?: number | null;
+  customer_driver_comment?: string | null;
   created_at: string;
   updated_at: string;
 };

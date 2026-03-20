@@ -29,6 +29,21 @@ export async function PATCH(req: Request) {
   if (assigned_driver_id !== undefined) updates.assigned_driver_id = assigned_driver_id || null;
   if (assigned_driver_application_id !== undefined) updates.assigned_driver_application_id = assigned_driver_application_id || null;
   if (body.driver_price_cents !== undefined) updates.driver_price_cents = body.driver_price_cents == null ? null : Number(body.driver_price_cents);
+  // ETA / POD / tracking (roadmap_foundation.sql)
+  if (body.estimated_arrival_at !== undefined) updates.estimated_arrival_at = body.estimated_arrival_at || null;
+  if (body.eta_minutes_remaining !== undefined) {
+    updates.eta_minutes_remaining =
+      body.eta_minutes_remaining == null || body.eta_minutes_remaining === ""
+        ? null
+        : Number(body.eta_minutes_remaining);
+  }
+  if (body.pod_photo_url !== undefined) updates.pod_photo_url = body.pod_photo_url || null;
+  if (body.pod_signature_url !== undefined) updates.pod_signature_url = body.pod_signature_url || null;
+  if (body.pod_confirmation_code !== undefined) updates.pod_confirmation_code = body.pod_confirmation_code || null;
+  if (body.pod_completed_at !== undefined) updates.pod_completed_at = body.pod_completed_at || null;
+  if (body.last_driver_lat !== undefined) updates.last_driver_lat = body.last_driver_lat == null ? null : Number(body.last_driver_lat);
+  if (body.last_driver_lng !== undefined) updates.last_driver_lng = body.last_driver_lng == null ? null : Number(body.last_driver_lng);
+  if (body.last_driver_location_at !== undefined) updates.last_driver_location_at = body.last_driver_location_at || null;
   const { data, error } = await supabase
     .from("jobs")
     .update(updates)

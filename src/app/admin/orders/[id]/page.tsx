@@ -25,6 +25,15 @@ type Job = {
   assigned_driver_application_id?: string | null;
   customer_driver_rating?: number | null;
   customer_driver_comment?: string | null;
+  estimated_arrival_at?: string | null;
+  eta_minutes_remaining?: number | null;
+  last_driver_lat?: number | null;
+  last_driver_lng?: number | null;
+  last_driver_location_at?: string | null;
+  pod_photo_url?: string | null;
+  pod_signature_url?: string | null;
+  pod_confirmation_code?: string | null;
+  pod_completed_at?: string | null;
 };
 
 type DriverOption = {
@@ -136,6 +145,15 @@ export default function AdminOrderDetailPage({
   const [id, setId] = useState<string | null>(null);
   const [drivers, setDrivers] = useState<DriverOption[]>([]);
   const [updatingDriver, setUpdatingDriver] = useState(false);
+  const [savingTrack, setSavingTrack] = useState(false);
+  const [savingLocation, setSavingLocation] = useState(false);
+  const [etaLocal, setEtaLocal] = useState("");
+  const [etaMin, setEtaMin] = useState("");
+  const [podPhoto, setPodPhoto] = useState("");
+  const [podSig, setPodSig] = useState("");
+  const [podCode, setPodCode] = useState("");
+  const [latIn, setLatIn] = useState("");
+  const [lngIn, setLngIn] = useState("");
 
   useEffect(() => {
     params.then((p) => {
@@ -159,6 +177,23 @@ export default function AdminOrderDetailPage({
       })
       .catch(() => setDrivers([]));
   }, []);
+
+  useEffect(() => {
+    if (!order) return;
+    if (order.estimated_arrival_at) {
+      const d = new Date(order.estimated_arrival_at);
+      const pad = (n: number) => String(n).padStart(2, "0");
+      setEtaLocal(
+        `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+      );
+    } else setEtaLocal("");
+    setEtaMin(order.eta_minutes_remaining != null ? String(order.eta_minutes_remaining) : "");
+    setPodPhoto(order.pod_photo_url ?? "");
+    setPodSig(order.pod_signature_url ?? "");
+    setPodCode(order.pod_confirmation_code ?? "");
+    setLatIn(order.last_driver_lat != null ? String(order.last_driver_lat) : "");
+    setLngIn(order.last_driver_lng != null ? String(order.last_driver_lng) : "");
+  }, [order]);
 
   const assignDriver = (driverApplicationId: string | null) => {
     if (!order) return;
@@ -226,6 +261,111 @@ export default function AdminOrderDetailPage({
   const downloadInvoice = (type: "customer" | "driver") => {
     if (!order) return;
     window.open(`/api/admin/invoice?job_id=${encodeURIComponent(order.id)}&type=${type}`, "_blank");
+  };
+
+  const copyTrackingLink = () => {
+    if (!order?.confirmation_token) {
+      alert("لا يوجد رمز تأكيد في الطلب — أرسل بريد التأكيد أولاً أو تحقق من قاعدة البيانات.");
+      return;
+    }
+    const base = typeof window !== "undefined" ? window.location.origin : "";
+    const url = `${base}/de/order/track?job_id=${encodeURIComponent(order.id)}&token=${encodeURIComponent(order.confirmation_token)}`;
+    void navigator.clipboard.writeText(url).then(
+      () => alert("تم نسخ رابط التتبع للعميل.\n" + url),
+      () => {
+        prompt("انسخ الرابط يدويًا:", url);
+      }
+    );
+  };
+
+  const saveTrackingAndPod = () => {
+    if (!order) return;
+    setSavingTrack(true);
+    fetch("/api/admin/orders", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: order.id,
+        estimated_arrival_at: etaLocal ? new Date(etaLocal).toISOString() : null,
+        eta_minutes_remaining: etaMin === "" ? null : Number(etaMin),
+        pod_photo_url: podPhoto.trim() || null,
+        pod_signature_url: podSig.trim() || null,
+        pod_confirmation_code: podCode.trim() || null,
+      }),
+    })
+      .then(async (r) => {
+        const data = await r.json();
+        if (!r.ok) throw new Error(typeof data.error === "string" ? data.error : "فشل الحفظ");
+        return data as Job;
+      })
+      .then((data) => {
+        setOrder((prev) => (prev ? { ...prev, ...data } : null));
+        alert("تم حفظ ETA وحقول POD.");
+      })
+      .catch((e) => alert(e instanceof Error ? e.message : "فشل الحفظ"))
+      .finally(() => setSavingTrack(false));
+  };
+
+  const markPodCompletedNow = () => {
+    if (!order) return;
+    if (!window.confirm("تسجيل اكتمال إثبات التسليم (POD) الآن؟")) return;
+    setSavingTrack(true);
+    fetch("/api/admin/orders", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: order.id,
+        pod_completed_at: new Date().toISOString(),
+      }),
+    })
+      .then(async (r) => {
+        const data = await r.json();
+        if (!r.ok) throw new Error(typeof data.error === "string" ? data.error : "فشل");
+        return data as Job;
+      })
+      .then((data) => {
+        setOrder((prev) => (prev ? { ...prev, ...data } : null));
+        alert("تم تسجيل اكتمال POD.");
+      })
+      .catch((e) => alert(e instanceof Error ? e.message : "فشل"))
+      .finally(() => setSavingTrack(false));
+  };
+
+  const submitDriverGps = () => {
+    if (!order) return;
+    const lat = parseFloat(latIn.replace(",", "."));
+    const lng = parseFloat(lngIn.replace(",", "."));
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+      alert("أدخل خط عرض وطول صالحين.");
+      return;
+    }
+    setSavingLocation(true);
+    fetch(`/api/admin/orders/${order.id}/driver-location`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ latitude: lat, longitude: lng }),
+    })
+      .then(async (r) => {
+        const j = await r.json();
+        if (!r.ok) throw new Error(typeof j.error === "string" ? j.error : "فشل حفظ الموقع");
+        return j as { recorded_at?: string };
+      })
+      .then((j) => {
+        const now = j.recorded_at ?? new Date().toISOString();
+        setOrder((prev) =>
+          prev
+            ? {
+                ...prev,
+                last_driver_lat: lat,
+                last_driver_lng: lng,
+                last_driver_location_at: now,
+              }
+            : null
+        );
+        alert("تم تسجيل نقطة GPS (ويظهر في صفحة تتبع العميل).");
+      })
+      .catch((e) => alert(e instanceof Error ? e.message : "فشل"))
+      .finally(() => setSavingLocation(false));
   };
 
   if (loading || !id) {
@@ -428,6 +568,122 @@ export default function AdminOrderDetailPage({
                 فاتورة المجموعة / السائق (€ {driverPriceEur})
               </button>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border-2 border-[#0d2137]/10 bg-white p-6 shadow-lg">
+        <h2 className="mb-2 text-lg font-semibold text-[#0d2137]">تتبع حي، ETA، وإثبات تسليم (POD)</h2>
+        <p className="mb-4 text-sm text-[#0d2137]/65">
+          يظهر للعميل في{" "}
+          <code className="rounded bg-[#0d2137]/10 px-1">/de/order/track?job_id=…&amp;token=…</code> بعد تطبيق{" "}
+          <code className="rounded bg-[#0d2137]/10 px-1">roadmap_foundation.sql</code> على Supabase.
+        </p>
+        <div className="flex flex-wrap gap-2 border-b border-[#0d2137]/10 pb-4">
+          <button
+            type="button"
+            onClick={copyTrackingLink}
+            className="rounded-xl border-2 border-[var(--accent)] bg-[var(--accent)]/10 px-4 py-2 text-sm font-medium text-[#0d2137] hover:bg-[var(--accent)]/20"
+          >
+            نسخ رابط التتبع (DE)
+          </button>
+          {order.last_driver_lat != null && order.last_driver_lng != null && (
+            <span className="self-center text-xs text-[#0d2137]/60">
+              آخر موقع: {order.last_driver_lat.toFixed(5)}, {order.last_driver_lng.toFixed(5)}
+              {order.last_driver_location_at
+                ? ` — ${new Date(order.last_driver_location_at).toLocaleString("de-DE")}`
+                : ""}
+            </span>
+          )}
+        </div>
+        <div className="mt-4 grid gap-4 lg:grid-cols-2">
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-[#0d2137]">وقت الوصول المتوقع (ETA)</p>
+            <label className="block text-xs text-[#0d2137]/60">تاريخ ووقت الوصول</label>
+            <input
+              type="datetime-local"
+              value={etaLocal}
+              onChange={(e) => setEtaLocal(e.target.value)}
+              className="w-full max-w-md rounded-lg border-2 border-[#0d2137]/20 px-3 py-2 text-sm"
+            />
+            <label className="block text-xs text-[#0d2137]/60">دقائق متبقية (رقم)</label>
+            <input
+              type="number"
+              min={0}
+              value={etaMin}
+              onChange={(e) => setEtaMin(e.target.value)}
+              placeholder="مثال: 25"
+              className="w-full max-w-xs rounded-lg border-2 border-[#0d2137]/20 px-3 py-2 text-sm"
+            />
+          </div>
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-[#0d2137]">إثبات التسليم (روابط / رمز)</p>
+            <input
+              value={podPhoto}
+              onChange={(e) => setPodPhoto(e.target.value)}
+              placeholder="رابط صورة التسليم (URL)"
+              className="w-full rounded-lg border-2 border-[#0d2137]/20 px-3 py-2 text-sm"
+            />
+            <input
+              value={podSig}
+              onChange={(e) => setPodSig(e.target.value)}
+              placeholder="رابط التوقيع (URL)"
+              className="w-full rounded-lg border-2 border-[#0d2137]/20 px-3 py-2 text-sm"
+            />
+            <input
+              value={podCode}
+              onChange={(e) => setPodCode(e.target.value)}
+              placeholder="رمز تأكيد التسليم"
+              className="w-full rounded-lg border-2 border-[#0d2137]/20 px-3 py-2 text-sm"
+            />
+            {order.pod_completed_at && (
+              <p className="text-xs text-green-800">
+                POD مكتمل عند: {new Date(order.pod_completed_at).toLocaleString("de-DE")}
+              </p>
+            )}
+          </div>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={saveTrackingAndPod}
+            disabled={savingTrack}
+            className="rounded-xl bg-[#0d2137] px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60"
+          >
+            {savingTrack ? "جاري الحفظ…" : "حفظ ETA و POD"}
+          </button>
+          <button
+            type="button"
+            onClick={markPodCompletedNow}
+            disabled={savingTrack}
+            className="rounded-xl border-2 border-green-600 bg-green-50 px-4 py-2.5 text-sm font-medium text-green-900 hover:bg-green-100 disabled:opacity-60"
+          >
+            تسجيل اكتمال POD الآن
+          </button>
+        </div>
+        <div className="mt-6 border-t border-[#0d2137]/10 pt-4">
+          <p className="mb-2 text-sm font-medium text-[#0d2137]">موقع السائق (يدوي — يُسجّل في المسار + يحدّث آخر نقطة)</p>
+          <div className="flex max-w-xl flex-wrap gap-2">
+            <input
+              value={latIn}
+              onChange={(e) => setLatIn(e.target.value)}
+              placeholder="Latitude"
+              className="min-w-[8rem] flex-1 rounded-lg border-2 border-[#0d2137]/20 px-3 py-2 text-sm"
+            />
+            <input
+              value={lngIn}
+              onChange={(e) => setLngIn(e.target.value)}
+              placeholder="Longitude"
+              className="min-w-[8rem] flex-1 rounded-lg border-2 border-[#0d2137]/20 px-3 py-2 text-sm"
+            />
+            <button
+              type="button"
+              onClick={submitDriverGps}
+              disabled={savingLocation}
+              className="rounded-xl bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60"
+            >
+              {savingLocation ? "…" : "حفظ الموقع"}
+            </button>
           </div>
         </div>
       </div>

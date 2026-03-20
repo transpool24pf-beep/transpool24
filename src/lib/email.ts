@@ -33,11 +33,12 @@ function buildConfirmationHtml(
   job: Job,
   options: {
     confirmPaymentUrl?: string | null;
+    trackOrderUrl?: string | null;
     rateDriverUrl?: string | null;
     driver?: OrderEmailDriverInfo | null;
   } = {}
 ): string {
-  const { confirmPaymentUrl, rateDriverUrl, driver } = options;
+  const { confirmPaymentUrl, trackOrderUrl, rateDriverUrl, driver } = options;
   const totalEur = (job.price_cents / 100).toFixed(2);
   const orderRef = job.order_number != null ? String(job.order_number) : job.id.slice(0, 8);
   const date = new Date(job.created_at).toLocaleDateString("de-DE", {
@@ -79,6 +80,10 @@ function buildConfirmationHtml(
     <a href="${confirmPaymentUrl}" style="display: inline-block; padding: 16px 32px; background: linear-gradient(135deg, #e85d04 0%, #f48c06 100%); color: #fff !important; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 20px rgba(232,93,4,0.4);">Zahlung bestätigen / Jetzt zahlen</a>
   </p>`
       : "";
+  const trackBlock =
+    trackOrderUrl && trackOrderUrl.length > 0
+      ? `<p style="margin-top: 16px;"><a href="${trackOrderUrl}" style="display: inline-block; padding: 12px 24px; background: #0d2137; color: #fff !important; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 15px;">Auftrag live verfolgen (Status &amp; ETA)</a></p>`
+      : "";
 
   return `
 <!DOCTYPE html>
@@ -106,6 +111,7 @@ function buildConfirmationHtml(
         </table>
         <p style="margin: 16px 0 0 0; font-size: 14px; color: #64748b;">Sie können die Vertragsdetails in Ihrem Produktzugang in der Auftragszusammenfassung unten einsehen. Der angehängte PDF enthält Details zur Fahrt, zum Fahrer und zu den Firmeninformationen.</p>
         ${confirmBtn}
+        ${trackBlock}
         ${rateBlock}
         <p style="margin-top: 24px; font-size: 13px; color: #94a3b8;">— TransPool24</p>
         <div style="margin-top: 28px; padding: 24px; background: #0d2137; border-radius: 0 0 12px 12px; text-align: center;">
@@ -144,6 +150,7 @@ export async function sendOrderConfirmationEmail(
   options: {
     rateDriverUrl?: string | null;
     confirmPaymentUrl?: string | null;
+    trackOrderUrl?: string | null;
     driver?: OrderEmailDriverInfo | null;
   } = {}
 ): Promise<{ success: boolean; error?: string }> {
@@ -162,6 +169,7 @@ export async function sendOrderConfirmationEmail(
       subject: `TransPool24 – Auftragsbestätigung #${orderRef}`,
       html: buildConfirmationHtml(job, {
         confirmPaymentUrl: options.confirmPaymentUrl,
+        trackOrderUrl: options.trackOrderUrl,
         rateDriverUrl: options.rateDriverUrl,
         driver: options.driver,
       }),

@@ -55,12 +55,16 @@ export async function POST(req: Request) {
   const confirmPaymentUrl = token
     ? `${SITE}/de/order/confirm?job_id=${encodeURIComponent(job.id)}&token=${encodeURIComponent(token)}`
     : null;
+  const trackOrderUrl = token
+    ? `${SITE}/de/order/track?job_id=${encodeURIComponent(job.id)}&token=${encodeURIComponent(token)}`
+    : null;
 
   try {
     const pdf = await generateInvoicePdf(job as Job);
     const result = await sendOrderConfirmationEmail(email, job, pdf, {
       rateDriverUrl,
       confirmPaymentUrl,
+      trackOrderUrl,
       driver: driverInfo,
     });
     if (!result.success) {
