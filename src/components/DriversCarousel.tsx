@@ -39,51 +39,22 @@ export function DriversCarousel() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock data - يمكن استبدالها ببيانات من API
-  // في المستقبل، يمكن جلب هذه البيانات من Supabase
-  const drivers: Driver[] = [
-    {
-      id: 1,
-      name: "Michael Schmidt",
-      photo: "https://ui-avatars.com/api/?name=Michael+Schmidt&background=e85d04&color=fff&size=128",
-      rating: 5,
-      comment: "Professioneller und zuverlässiger Fahrer. Schnelle und sichere Lieferung. Sehr empfehlenswert!",
-      customerName: "Thomas Müller",
-    },
-    {
-      id: 2,
-      name: "Ahmed Hassan",
-      photo: "https://ui-avatars.com/api/?name=Ahmed+Hassan&background=e85d04&color=fff&size=128",
-      rating: 5,
-      comment: "Ausgezeichneter Service! Sehr pünktlich und höflich. Vielen Dank!",
-      customerName: "Sarah Weber",
-    },
-    {
-      id: 3,
-      name: "Hans Fischer",
-      photo: "https://ui-avatars.com/api/?name=Hans+Fischer&background=e85d04&color=fff&size=128",
-      rating: 4,
-      comment: "Sehr guter Fahrer. Lieferung pünktlich. Danke!",
-      customerName: "Anna Becker",
-    },
-    {
-      id: 4,
-      name: "Mehmet Yilmaz",
-      photo: "https://ui-avatars.com/api/?name=Mehmet+Yilmaz&background=e85d04&color=fff&size=128",
-      rating: 5,
-      comment: "Bester Fahrer, mit dem ich gearbeitet habe! Professionell und kundenorientiert.",
-      customerName: "Peter Klein",
-    },
-    {
-      id: 5,
-      name: "David Wagner",
-      photo: "https://ui-avatars.com/api/?name=David+Wagner&background=e85d04&color=fff&size=128",
-      rating: 5,
-      comment: "Großartiger Service und professioneller Fahrer. Sehr empfehlenswert!",
-      customerName: "Lisa Hoffmann",
-    },
-  ];
+  // Fetch drivers from API
+  useEffect(() => {
+    fetch("/api/public/content/drivers")
+      .then((r) => r.json())
+      .then((data) => {
+        setDrivers(data.drivers || []);
+      })
+      .catch(() => {
+        // Fallback to empty array on error
+        setDrivers([]);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
   const checkScrollability = () => {
     if (!scrollContainerRef.current) return;
@@ -118,6 +89,22 @@ export function DriversCarousel() {
       behavior: "smooth",
     });
   };
+
+  if (loading) {
+    return (
+      <section className="bg-gradient-to-br from-gray-50 to-white py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <p className="text-[var(--foreground)]/70">Laden…</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (drivers.length === 0) {
+    return null; // Don't show section if no drivers
+  }
 
   return (
     <section className="bg-gradient-to-br from-gray-50 to-white py-20 sm:py-24">

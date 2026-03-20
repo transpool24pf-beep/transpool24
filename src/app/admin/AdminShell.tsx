@@ -10,6 +10,7 @@ const NAV = [
   { href: "/admin/reports", label: "Berichte" },
   { href: "/admin/driver-applications", label: "Fahrerbewerbungen" },
   { href: "/admin/drivers", label: "Fahrer" },
+  { href: "/admin/content", label: "Inhaltsverwaltung" },
   { href: "/admin/settings", label: "Einstellungen" },
   { href: "/admin/support", label: "Support-Nachrichten" },
 ];
