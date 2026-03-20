@@ -20,23 +20,23 @@ export const DRIVER_COUNTRY_CODES: { code: string; flag: string }[] = [
 
 /** Service policy (contact via WhatsApp) – short consent for step 1 */
 export const SERVICE_POLICY_TEXT =
-  "أوافق على أن يتصل بي مسؤول التوظيف عبر واتساب لمتابعة عملية التقديم.";
+  "Ich stimme zu, dass mich die Personalabteilung per WhatsApp zur Verfolgung des Bewerbungsverfahrens kontaktieren darf.";
 
-/** Work policy – strict company policy for step 4 (aligned with German law and transport rules) */
-export const WORK_POLICY_TITLE = "سياسة العمل وسياسة الشركة – الموافقة الإلزامية";
+/** Work policy – company policy for step 4 (aligned with German law and transport rules) */
+export const WORK_POLICY_TITLE = "Arbeits- und Unternehmensrichtlinie – verbindliche Zustimmung";
 
 export const WORK_POLICY_TEXT = `
-بموافقتك فإنك تقر وتوافق على ما يلي:
+Mit Ihrer Zustimmung erkennen Sie Folgendes an:
 
-1) الالتزام بقوانين ألمانيا: العمل يخضع لقوانين العمل الألمانية (ArbZG)، وقواعد أوقات القيادة والراحة (VO (EG) 561/2006)، وقانون حماية البيانات (DSGVO/GDPR). لا يجوز تجاوز 9 ساعات قيادة يومياً، مع استراحات وراحة أسبوعية إلزامية.
+1) Einhaltung des deutschen Rechts: Die Tätigkeit unterliegt dem Arbeitszeitgesetz (ArbZG), den Lenk- und Ruhezeiten (VO (EU) 561/2006) sowie der DSGVO. Maximal 9 Stunden Lenkzeit pro Tag, mit Pausen und wöchentlicher Ruhezeit.
 
-2) المستندات والمركبة: تقديم مستندات سارية (هوية/إقامة، رخصة قيادة، وثائق المركبة عند الاقتضاء) والتأمين القانوني. المركبة يجب أن تكون صالحة للاستخدام وآمنة.
+2) Unterlagen und Fahrzeug: gültige Ausweise (Identität/Aufenthalt), Führerschein, Fahrzeugpapiere soweit erforderlich; gesetzlich vorgeschriebene Versicherung. Das Fahrzeug muss verkehrssicher sein.
 
-3) حماية البيانات: معالجة بياناتك الشخصية فقط لأغراض التوظيف والتشغيل والالتزامات القانونية، مع عدم نقلها إلى جهات ثالثة دون أساس قانوني أو موافقتك.
+3) Datenschutz: Verarbeitung Ihrer personenbezogenen Daten nur für Bewerbung, Einsatzplanung und gesetzliche Pflichten; keine Weitergabe an Dritte ohne Rechtsgrundlage oder Einwilligung.
 
-4) السلوك المهني: الالتزام بسرية أعمال الشركة والعملاء، وعدم استغلال المنصب لأغراض شخصية، واحترام الزملاء والعملاء.
+4) Professionelles Verhalten: Vertraulichkeit gegenüber Unternehmen und Kunden; keine missbräuchliche Nutzung der Position; respektvoller Umgang.
 
-5) العواقب: مخالفة هذه السياسة أو القوانين المعمول بها قد تؤدي إلى إنهاء التعاون واتخاذ إجراءات قانونية عند الاقتضاء.
+5) Folgen: Verstöße gegen diese Richtlinie oder geltendes Recht können zur Beendigung der Zusammenarbeit und ggf. rechtlichen Schritten führen.
 
-بالضغط على "إرسال الطلب" فإنك تؤكد أنك قرأت وفهمت ووافقت على سياسة الشركة وسياسة العمل هذه.
+Mit Klick auf „Antrag absenden“ bestätigen Sie, dass Sie diese Richtlinie gelesen, verstanden und akzeptiert haben.
 `.trim();

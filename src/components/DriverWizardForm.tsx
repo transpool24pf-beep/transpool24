@@ -15,7 +15,7 @@ const DriverCityMap = dynamic(
   { ssr: false }
 );
 
-const CITIES = ["بفورتسهايم", "شتوتغارت", "كارلسروه", "مانهايم", "هايدلبرغ", "أخرى"];
+const CITIES = ["Pforzheim", "Stuttgart", "Karlsruhe", "Mannheim", "Heidelberg", "Sonstige"];
 const STEP_ICONS = ["📋", "🪪", "🚗", "✓"];
 
 type FormData = {
@@ -244,10 +244,10 @@ export function DriverWizardForm({
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || "فشل الإرسال");
+      if (!res.ok) throw new Error(data?.error || "Absenden fehlgeschlagen");
       setStep(5);
     } catch (e) {
-      setSubmitError(e instanceof Error ? e.message : "فشل الإرسال");
+      setSubmitError(e instanceof Error ? e.message : "Absenden fehlgeschlagen");
     } finally {
       setSubmitLoading(false);
     }

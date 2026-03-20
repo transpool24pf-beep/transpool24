@@ -41,7 +41,7 @@ export function DriverCityMap() {
         />
         <FitView />
         <Marker position={PFORZHEIM}>
-          <Popup>بفورتسهايم – منطقة النشاط</Popup>
+          <Popup>Pforzheim – Einsatzgebiet</Popup>
         </Marker>
       </MapContainer>
     </div>

@@ -64,19 +64,19 @@ export default function AdminDriversPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-semibold text-[#0d2137]">السائقين / Drivers</h1>
+      <h1 className="mb-6 text-2xl font-semibold text-[#0d2137]">Fahrer</h1>
       <div className="mb-6 rounded-xl border border-[var(--accent)]/30 bg-[#fff8f0] p-4">
         <p className="text-sm text-[#0d2137]/90">
-          <strong>ملاحظة:</strong> طلبات التقديم من نموذج السائقين (الاسم، البريد، المستندات، إلخ) تظهر في قسم{" "}
+          <strong>Hinweis:</strong> Bewerbungen aus dem Fahrerformular finden Sie unter{" "}
           <Link href="/admin/driver-applications" className="font-semibold text-[var(--accent)] underline hover:no-underline">
-            طلبات السائقين
+            Fahrerbewerbungen
           </Link>
-          {" "}في القائمة — وليس هنا. هذا القسم يعرض السائقين المسجلين في النظام بعد الموافقة.
+          . Diese Liste zeigt freigegebene Fahrer im System.
         </p>
       </div>
       {loading ? (
         <div className="rounded-xl bg-white p-8 shadow-sm">
-          <p className="text-[#0d2137]/70">جاري التحميل…</p>
+          <p className="text-[#0d2137]/70">Laden…</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -106,11 +106,11 @@ export default function AdminDriversPage() {
                     </p>
                     {d.source === "application" && (
                       <span className="rounded bg-[var(--accent)]/15 px-2 py-0.5 text-sm font-medium text-[var(--accent)]">
-                        {d.driver_number != null ? `رقم السائق #${String(d.driver_number).padStart(5, "0")}` : "معتمد (بدون رقم بعد)"}
+                        {d.driver_number != null ? `Fahrernr. #${String(d.driver_number).padStart(5, "0")}` : "Genehmigt (noch ohne Nummer)"}
                       </span>
                     )}
                     {d.suspended_at && (
-                      <span className="rounded bg-red-100 px-2 py-0.5 text-sm font-medium text-red-700">موقوف</span>
+                      <span className="rounded bg-red-100 px-2 py-0.5 text-sm font-medium text-red-700">Gesperrt</span>
                     )}
                     {d.source === "application" && (
                       <Link
@@ -118,7 +118,7 @@ export default function AdminDriversPage() {
                         className="rounded-lg bg-[var(--accent)] px-3 py-1.5 text-sm font-medium text-white hover:opacity-90"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        فتح الملف / البروفايل
+                        Profil öffnen
                       </Link>
                     )}
                   </div>
@@ -126,8 +126,8 @@ export default function AdminDriversPage() {
                   <p className="text-sm text-[#0d2137]/70">{d.phone ?? "—"}</p>
                   {d.stats && (d.stats.jobs_count > 0 || (d.stats.customer_rating_avg != null)) && (
                     <div className="mt-2 flex flex-wrap gap-3 text-sm text-[#0d2137]/70">
-                      <span><strong>عدد الخدمات:</strong> {d.stats.jobs_count}</span>
-                      <span><strong>إجمالي المدفوع:</strong> {(d.stats.total_paid_cents / 100).toFixed(2)} €</span>
+                      <span><strong>Aufträge:</strong> {d.stats.jobs_count}</span>
+                      <span><strong>Ausgezahlt:</strong> {(d.stats.total_paid_cents / 100).toFixed(2)} €</span>
                       {d.stats.customer_rating_avg != null && (
                         <span className="text-amber-600">★ {(d.stats.customer_rating_avg).toFixed(1)}</span>
                       )}
@@ -135,7 +135,7 @@ export default function AdminDriversPage() {
                   )}
                   {d.source !== "application" && (
                     <div className="mt-2 flex items-center gap-2">
-                      <span className="text-sm text-[#0d2137]/70">Stars / نجمة:</span>
+                      <span className="text-sm text-[#0d2137]/70">Sterne:</span>
                       {[1, 2, 3, 4, 5].map((n) => (
                         <button
                           key={n}
@@ -157,10 +157,10 @@ export default function AdminDriversPage() {
               <div className="mt-4 border-t border-[#0d2137]/10 pt-4">
                 {d.source === "application" ? (
                   <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-[#0d2137]/80">
-                    <span><strong>اسم السائق:</strong> {d.full_name || "—"}</span>
-                    <span><strong>نوع / رقم السيارة:</strong> {d.vehicle_plate || "—"}</span>
+                    <span><strong>Name:</strong> {d.full_name || "—"}</span>
+                    <span><strong>Kennzeichen:</strong> {d.vehicle_plate || "—"}</span>
                     <span>
-                      <strong>عدد النجوم:</strong>{" "}
+                      <strong>Bewertung:</strong>{" "}
                       {(d.stats?.customer_rating_avg ?? d.star_rating) != null ? (
                         <span className="text-amber-600">★ {(d.stats?.customer_rating_avg ?? d.star_rating)?.toFixed(1)}</span>
                       ) : (
@@ -170,9 +170,7 @@ export default function AdminDriversPage() {
                   </div>
                 ) : (
                   <>
-                    <p className="mb-2 text-sm font-medium text-[#0d2137]/80">
-                      الأوراق / Documents
-                    </p>
+                    <p className="mb-2 text-sm font-medium text-[#0d2137]/80">Dokumente</p>
                     {d.documents.length === 0 ? (
                       <p className="text-sm text-[#0d2137]/60">No documents</p>
                     ) : (

@@ -8,9 +8,9 @@ type Pricing = {
 };
 
 const SIZE_LABELS: Record<string, string> = {
-  XS: "صغير (XS)",
-  M: "متوسط (M)",
-  L: "كبير (L)",
+  XS: "Klein (XS)",
+  M: "Mittel (M)",
+  L: "Groß (L)",
 };
 
 function formatEur(cents: number): string {
@@ -62,10 +62,10 @@ export default function AdminSettingsPage() {
       body: JSON.stringify(toSave),
     })
       .then((r) => {
-        if (r.ok) alert("تم الحفظ.");
-        else alert("فشل الحفظ.");
+        if (r.ok) alert("Gespeichert.");
+        else alert("Speichern fehlgeschlagen.");
       })
-      .catch(() => alert("خطأ في الطلب"))
+      .catch(() => alert("Anfrage fehlgeschlagen"))
       .finally(() => setSaving(false));
   };
 
@@ -82,30 +82,24 @@ export default function AdminSettingsPage() {
   if (loading) {
     return (
       <div className="rounded-xl bg-white p-8 shadow-sm">
-        <p className="text-[#0d2137]/70">جاري التحميل…</p>
+        <p className="text-[#0d2137]/70">Laden…</p>
       </div>
     );
   }
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-semibold text-[#0d2137]">
-        الإعدادات / Settings
-      </h1>
+      <h1 className="mb-6 text-2xl font-semibold text-[#0d2137]">Einstellungen</h1>
       <form onSubmit={handleSubmit} className="space-y-8">
         <section className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
-          <h2 className="mb-1 text-lg font-medium text-[#0d2137]">
-            السعر لكل كم حسب حجم الحمولة (المسافة والوزن)
-          </h2>
+          <h2 className="mb-1 text-lg font-medium text-[#0d2137]">Preis pro km nach Ladungsgröße</h2>
           <p className="mb-4 text-sm text-[#0d2137]/60">
-            يعتمد السعر على المسافة وحجم الشحن (XS / M / L). القيمة بالسنت لكل كيلومتر.
+            Abhängig von Strecke und Größe (XS / M / L). Werte in Cent pro Kilometer.
           </p>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {(["XS", "M", "L"] as const).map((size) => (
               <div key={size}>
-                <label className="mb-2 block text-sm font-medium text-[#0d2137]/80">
-                  {SIZE_LABELS[size]}
-                </label>
+                <label className="mb-2 block text-sm font-medium text-[#0d2137]/80">{SIZE_LABELS[size]}</label>
                 <input
                   type="number"
                   min={1}
@@ -113,18 +107,16 @@ export default function AdminSettingsPage() {
                   onChange={(e) => setPerKm(size, parseInt(e.target.value, 10) || 0)}
                   className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2.5 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
                 />
-                <p className="mt-1 text-xs text-[#0d2137]/50">سنت/كم</p>
+                <p className="mt-1 text-xs text-[#0d2137]/50">Cent/km</p>
               </div>
             ))}
           </div>
         </section>
 
         <section className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
-          <h2 className="mb-1 text-lg font-medium text-[#0d2137]">
-            أجر السائق بالساعة (يورو)
-          </h2>
+          <h2 className="mb-1 text-lg font-medium text-[#0d2137]">Fahrer-Stundenlohn (EUR)</h2>
           <p className="mb-4 text-sm text-[#0d2137]/60">
-            يُستخدم عند حساب المدة من المسار (مثلاً مع Google). أدخل المبلغ باليورو (مثال: 25,00).
+            Für Routenzeit (z. B. Google). Betrag in Euro, z. B. 25,00.
           </p>
           <div className="max-w-xs">
             <input
@@ -135,9 +127,7 @@ export default function AdminSettingsPage() {
               placeholder="25,00"
               className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2.5 text-lg focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
             />
-            <p className="mt-1 text-xs text-[#0d2137]/50">
-              يورو/ساعة (مثال: 25,00 = 25 يورو)
-            </p>
+            <p className="mt-1 text-xs text-[#0d2137]/50">Euro pro Stunde</p>
           </div>
         </section>
 
@@ -147,7 +137,7 @@ export default function AdminSettingsPage() {
             disabled={saving}
             className="rounded-lg bg-[var(--accent)] px-6 py-2.5 font-medium text-white hover:opacity-95 disabled:opacity-60"
           >
-            {saving ? "جاري الحفظ…" : "يحفظ"}
+            {saving ? "Speichern…" : "Speichern"}
           </button>
         </div>
       </form>

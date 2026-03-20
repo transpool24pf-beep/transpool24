@@ -24,31 +24,30 @@ type Job = {
   confirmation_token: string | null;
 };
 
-const STATUS_CONFIG: Record<string, { label: string; labelAr: string; color: string; bg: string }> = {
-  draft: { label: "مسودة / Draft", labelAr: "مسودة", color: "text-slate-700", bg: "bg-slate-400" },
-  confirmed: { label: "قيد الانتظار / Confirmed", labelAr: "قيد الانتظار", color: "text-blue-700", bg: "bg-blue-500" },
-  paid: { label: "مدفوع / Paid", labelAr: "مدفوع", color: "text-emerald-700", bg: "bg-emerald-500" },
-  assigned: { label: "قيد التنفيذ / Assigned", labelAr: "قيد التنفيذ", color: "text-amber-700", bg: "bg-amber-500" },
-  in_transit: { label: "في الطريق / In transit", labelAr: "في الطريق", color: "text-violet-700", bg: "bg-violet-500" },
-  delivered: { label: "تم التسليم / Delivered", labelAr: "تم التسليم", color: "text-green-700", bg: "bg-green-500" },
-  cancelled: { label: "ملغي / Cancelled", labelAr: "ملغي", color: "text-red-700", bg: "bg-red-500" },
+const STATUS_CONFIG: Record<string, { labelDe: string; color: string; bg: string }> = {
+  draft: { labelDe: "Entwurf", color: "text-slate-700", bg: "bg-slate-400" },
+  confirmed: { labelDe: "Bestätigt", color: "text-blue-700", bg: "bg-blue-500" },
+  paid: { labelDe: "Bezahlt", color: "text-emerald-700", bg: "bg-emerald-500" },
+  assigned: { labelDe: "Zugewiesen", color: "text-amber-700", bg: "bg-amber-500" },
+  in_transit: { labelDe: "Unterwegs", color: "text-violet-700", bg: "bg-violet-500" },
+  delivered: { labelDe: "Zugestellt", color: "text-green-700", bg: "bg-green-500" },
+  cancelled: { labelDe: "Storniert", color: "text-red-700", bg: "bg-red-500" },
 };
 
-/** سعر السائق: إما المحفوظ أو 18 × مسافة الذهاب والإياب (بالمليم) */
+/** Fahrerpreis: gespeichert oder 18 × Hin- und Rückfahrt (Cent) */
 function getDriverPriceEur(o: Job): string {
   if (o.driver_price_cents != null) return (o.driver_price_cents / 100).toFixed(2);
   if (o.distance_km != null && o.distance_km > 0) return ((18 * o.distance_km * 2) / 100).toFixed(2);
   return "18.00";
 }
 
-/** نوع النقل بالعربية */
-function serviceTypeLabelAr(st: string | undefined): string {
-  if (st === "driver_only") return "سائق فقط";
-  if (st === "driver_car_assistant") return "سائق مع سيارة ومعاون";
-  return "سائق مع سيارة";
+function serviceTypeLabelDe(st: string | undefined): string {
+  if (st === "driver_only") return "Nur Fahrer";
+  if (st === "driver_car_assistant") return "Fahrer mit Fahrzeug + Helfer";
+  return "Fahrer mit Fahrzeug";
 }
 
-/** حجم البضاعة (أبعاد) من cargo_details */
+/** Ladungsabmessungen aus cargo_details */
 function cargoVolumeStr(cd: Record<string, unknown> | null): string | null {
   if (!cd) return null;
   const l = cd.cargoLengthCm ?? cd.lengthCm;
@@ -75,7 +74,7 @@ const IC = {
   worker: "\u{1F477}",
 };
 
-/** رسالة واتساب للمجموعة: كل المعلومات مع سعر السائق وسعر المعاون إن وجد، بأيقونات وسطر فارغ */
+/** WhatsApp-Text für die Fahrergruppe (Deutsch) */
 function buildWhatsAppMessage(o: Job): string {
   const orderRef = o.order_number != null ? String(o.order_number) : o.id;
   const driverEur = getDriverPriceEur(o);
@@ -94,33 +93,33 @@ function buildWhatsAppMessage(o: Job): string {
       : null;
   const distanceStr = o.distance_km != null ? `${o.distance_km} km` : "—";
   const volumeStr = cargoVolumeStr(o.cargo_details);
-  const serviceLabel = serviceTypeLabelAr(o.service_type);
+  const serviceLabel = serviceTypeLabelDe(o.service_type);
   const blocks: string[] = [
-    `${IC.megaphone} TransPool24 – طلب للنقل`,
+    `${IC.megaphone} TransPool24 – Transportauftrag`,
     "",
-    `${IC.clipboard} رقم الطلب: ${orderRef}`,
+    `${IC.clipboard} Auftragsnr.: ${orderRef}`,
     "",
-    `${IC.phone} الهاتف: ${o.phone}`,
+    `${IC.phone} Telefon: ${o.phone}`,
     "",
-    ...(timeStr ? [`${IC.clock} وقت (للحضور): ${timeStr}`] : []),
-    ...(dateStr ? [`${IC.calendar} التاريخ: ${dateStr}`] : []),
+    ...(timeStr ? [`${IC.clock} Zeit (Ankunft): ${timeStr}`] : []),
+    ...(dateStr ? [`${IC.calendar} Datum: ${dateStr}`] : []),
     ...(timeStr || dateStr ? [""] : []),
-    `${IC.ruler} المسافة: ${distanceStr}`,
+    `${IC.ruler} Distanz: ${distanceStr}`,
     "",
-    `${IC.truck} الحمولة: ${o.cargo_size}`,
-    ...(volumeStr ? [`${IC.package} حجم البضاعة: ${volumeStr}`] : []),
-    ...(weightKg != null ? [`${IC.scale} الوزن: ${weightKg} kg`] : []),
-    `${IC.lorry} نوع النقل: ${serviceLabel}`,
-    `${IC.building} الشركة: ${o.company_name}`,
+    `${IC.truck} Ladung: ${o.cargo_size}`,
+    ...(volumeStr ? [`${IC.package} Ladungsmaße: ${volumeStr}`] : []),
+    ...(weightKg != null ? [`${IC.scale} Gewicht: ${weightKg} kg`] : []),
+    `${IC.lorry} Service: ${serviceLabel}`,
+    `${IC.building} Firma: ${o.company_name}`,
     "",
-    `${IC.pin} الاستلام:`,
+    `${IC.pin} Abholung:`,
     o.pickup_address,
     "",
-    `${IC.pin} التسليم:`,
+    `${IC.pin} Zustellung:`,
     o.delivery_address,
     "",
-    `${IC.money} سعر السائق: ${driverEur} EUR`,
-    ...(hasAssistant ? [`${IC.worker} سعر المعاون: ${assistantEur} EUR`] : []),
+    `${IC.money} Fahrerpreis: ${driverEur} EUR`,
+    ...(hasAssistant ? [`${IC.worker} Helfer: ${assistantEur} EUR`] : []),
   ];
   return blocks.join("\n");
 }
@@ -129,8 +128,7 @@ function matchSearch(o: Job, q: string): boolean {
   if (!q.trim()) return true;
   const s = q.trim().toLowerCase();
   const str = (v: unknown) => (v == null ? "" : String(v)).toLowerCase();
-  const statusLabel = STATUS_CONFIG[o.logistics_status]?.label ?? "";
-  const statusLabelAr = STATUS_CONFIG[o.logistics_status]?.labelAr ?? "";
+  const statusLabelDe = STATUS_CONFIG[o.logistics_status]?.labelDe ?? "";
   return (
     str(o.id).includes(s) ||
     (o.order_number != null && str(o.order_number).includes(s)) ||
@@ -141,8 +139,7 @@ function matchSearch(o: Job, q: string): boolean {
     str(o.delivery_address).includes(s) ||
     str(o.cargo_size).includes(s) ||
     str(o.logistics_status).includes(s) ||
-    str(statusLabel).includes(s) ||
-    str(statusLabelAr).includes(s) ||
+    str(statusLabelDe).includes(s) ||
     str((o.price_cents / 100).toFixed(2)).includes(s) ||
     (o.driver_price_cents != null && str((o.driver_price_cents / 100).toFixed(2)).includes(s))
   );
@@ -209,7 +206,7 @@ export default function AdminOrdersPage() {
       body: JSON.stringify({ job_id: id }),
     })
       .then((r) => {
-        if (r.ok) alert("تم إرسال البريد.");
+        if (r.ok) alert("E-Mail wurde gesendet.");
         else
           r.json().then((d) => {
             const errMsg =
@@ -217,11 +214,11 @@ export default function AdminOrdersPage() {
                 ? d.error
                 : (d?.error && typeof d.error === "object" && "message" in d.error)
                   ? String((d.error as { message: unknown }).message)
-                  : "فشل الإرسال.";
+                  : "Versand fehlgeschlagen.";
             alert(errMsg);
           });
       })
-      .catch(() => alert("فشل الطلب"))
+      .catch(() => alert("Anfrage fehlgeschlagen"))
       .finally(() => setSending(null));
   };
 
@@ -246,14 +243,14 @@ export default function AdminOrdersPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-[#0d2137]">الطلبات / Orders</h1>
+      <h1 className="text-2xl font-bold text-[#0d2137]">Aufträge</h1>
 
       <div className="flex flex-wrap items-center gap-3">
         <input
           type="search"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="بحث: رقم طلب، اسم، بريد، عنوان، سائق، أي نص..."
+          placeholder="Suche: Auftragsnr., Firma, E-Mail, Adresse, Status …"
           className="min-w-[220px] flex-1 rounded-xl border-2 border-[#0d2137]/15 bg-white px-4 py-2.5 text-sm text-[#0d2137] placeholder:text-[#0d2137]/50 shadow-sm transition focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30"
         />
         <select
@@ -261,10 +258,10 @@ export default function AdminOrdersPage() {
           onChange={(e) => setFilter(e.target.value)}
           className="rounded-xl border-2 border-[#0d2137]/15 bg-white px-4 py-2.5 text-sm font-medium text-[#0d2137] shadow-sm transition focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30"
         >
-          <option value="">كل الحالات / All statuses</option>
-          {Object.entries(STATUS_CONFIG).map(([value, { labelAr }]) => (
+          <option value="">Alle Status</option>
+          {Object.entries(STATUS_CONFIG).map(([value, { labelDe }]) => (
             <option key={value} value={value}>
-              {labelAr}
+              {labelDe}
             </option>
           ))}
         </select>
@@ -272,7 +269,7 @@ export default function AdminOrdersPage() {
 
       {loading ? (
         <div className="rounded-2xl bg-white p-10 shadow-lg">
-          <p className="text-[#0d2137]/70">جاري التحميل…</p>
+          <p className="text-[#0d2137]/70">Laden…</p>
         </div>
       ) : (
         <div className="overflow-hidden rounded-2xl border-2 border-[#0d2137]/10 bg-white shadow-lg">
@@ -280,14 +277,14 @@ export default function AdminOrdersPage() {
             <table className="w-full table-fixed text-left text-sm">
               <thead>
                 <tr className="border-b-2 border-[#0d2137]/10 bg-gradient-to-r from-[#0d2137]/10 to-[#0d2137]/5">
-                  <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">رقم الطلب</th>
-                  <th className="w-[10%] px-2 py-3 font-semibold text-[#0d2137]">الحالة</th>
-                  <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">التاريخ</th>
-                  <th className="w-[9%] px-2 py-3 font-semibold text-[#0d2137]">الشركة</th>
-                  <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">سعر العميل</th>
-                  <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">سعر السائق</th>
-                  <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">الدفع</th>
-                  <th className="w-[29%] px-2 py-3 font-semibold text-[#0d2137]">إجراءات</th>
+                  <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">Nr.</th>
+                  <th className="w-[10%] px-2 py-3 font-semibold text-[#0d2137]">Status</th>
+                  <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">Datum</th>
+                  <th className="w-[9%] px-2 py-3 font-semibold text-[#0d2137]">Firma</th>
+                  <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">Kunde €</th>
+                  <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">Fahrer €</th>
+                  <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">Zahlung</th>
+                  <th className="w-[29%] px-2 py-3 font-semibold text-[#0d2137]">Aktionen</th>
                 </tr>
               </thead>
               <tbody>
@@ -307,7 +304,7 @@ export default function AdminOrdersPage() {
                         <div className="flex items-center gap-1">
                           <span
                             className={`inline-block h-3 w-3 shrink-0 rounded-full ${statusConf.bg}`}
-                            title={statusConf.labelAr}
+                            title={statusConf.labelDe}
                           />
                           <select
                             value={o.logistics_status}
@@ -315,9 +312,9 @@ export default function AdminOrdersPage() {
                             disabled={updating === o.id}
                             className={`rounded-lg border-2 bg-white px-2 py-1.5 text-xs font-medium ${statusConf.color} focus:border-[var(--accent)] focus:outline-none`}
                           >
-                            {Object.entries(STATUS_CONFIG).map(([value, { labelAr }]) => (
+                            {Object.entries(STATUS_CONFIG).map(([value, { labelDe }]) => (
                               <option key={value} value={value}>
-                                {labelAr}
+                                {labelDe}
                               </option>
                             ))}
                           </select>
@@ -352,7 +349,7 @@ export default function AdminOrdersPage() {
                               : "bg-amber-100 text-amber-800"
                           }`}
                         >
-                          {o.payment_status === "paid" ? "مدفوع" : "قيد الانتظار"}
+                          {o.payment_status === "paid" ? "Bezahlt" : "Ausstehend"}
                         </span>
                       </td>
                       <td className="min-w-0 px-2 py-2">
@@ -361,35 +358,35 @@ export default function AdminOrdersPage() {
                             href={`/admin/orders/${o.id}`}
                             className="inline-flex items-center justify-center rounded-lg bg-[#0d2137] px-2 py-1.5 text-[10px] font-medium text-white hover:bg-[#0d2137]/90"
                           >
-                            فتح
+                            Öffnen
                           </Link>
                           <button
                             type="button"
                             onClick={() => openWhatsApp(o)}
                             className="inline-flex items-center justify-center rounded-lg bg-[#25D366] px-2 py-1.5 text-[10px] font-medium text-white hover:bg-[#20bd5a]"
                           >
-                            واتساب مجموعة
+                            WA Gruppe
                           </button>
                           <button
                             type="button"
                             onClick={() => openWhatsAppCustomer(o.phone)}
                             className="inline-flex items-center justify-center rounded-lg border border-[#25D366] bg-[#25D366]/10 px-2 py-1.5 text-[10px] font-medium text-[#25D366] hover:bg-[#25D366]/20"
                           >
-                            واتساب عميل
+                            WA Kunde
                           </button>
                           <button
                             type="button"
                             onClick={() => downloadInvoice(o.id, "driver")}
                             className="rounded-lg border border-amber-200 bg-amber-50 px-2 py-1 text-[10px] font-medium text-amber-800 hover:bg-amber-100"
                           >
-                            فاتورة مجموعة
+                            Rechn. Fahrer
                           </button>
                           <button
                             type="button"
                             onClick={() => downloadInvoice(o.id, "customer")}
                             className="rounded-lg border border-blue-200 bg-blue-50 px-2 py-1 text-[10px] font-medium text-blue-800 hover:bg-blue-100"
                           >
-                            فاتورة عميل
+                            Rechn. Kunde
                           </button>
                           {o.customer_email && (
                             <button
@@ -398,7 +395,7 @@ export default function AdminOrdersPage() {
                               disabled={sending === o.id}
                               className="rounded-lg bg-[var(--accent)] px-2 py-1 text-[10px] font-medium text-white hover:opacity-90 disabled:opacity-60"
                             >
-                              {sending === o.id ? "…" : "بريد"}
+                              {sending === o.id ? "…" : "E-Mail"}
                             </button>
                           )}
                         </div>
@@ -414,7 +411,7 @@ export default function AdminOrdersPage() {
 
       {!loading && filtered.length === 0 && (
         <p className="rounded-2xl bg-white p-6 text-center text-[#0d2137]/70 shadow-lg">
-          لا توجد طلبات.
+          Keine Aufträge.
         </p>
       )}
     </div>

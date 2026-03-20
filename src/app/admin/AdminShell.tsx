@@ -6,12 +6,12 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const NAV = [
-  { href: "/admin/orders", label: "Orders / الطلبات" },
-  { href: "/admin/reports", label: "تقارير / Reports" },
-  { href: "/admin/driver-applications", label: "طلبات السائقين" },
-  { href: "/admin/drivers", label: "Drivers / السائقين" },
-  { href: "/admin/settings", label: "Settings / الإعدادات" },
-  { href: "/admin/support", label: "رسائل الدعم (عرض الرسائل)" },
+  { href: "/admin/orders", label: "Aufträge" },
+  { href: "/admin/reports", label: "Berichte" },
+  { href: "/admin/driver-applications", label: "Fahrerbewerbungen" },
+  { href: "/admin/drivers", label: "Fahrer" },
+  { href: "/admin/settings", label: "Einstellungen" },
+  { href: "/admin/support", label: "Support-Nachrichten" },
 ];
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
@@ -42,7 +42,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   if (!checked) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#0d2137] text-white">
-        <p>Loading…</p>
+        <p>Laden…</p>
       </div>
     );
   }
@@ -55,7 +55,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     router.replace("/admin/login");
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#0d2137] text-white">
-        <p>Redirecting to login…</p>
+        <p>Weiterleitung zur Anmeldung…</p>
       </div>
     );
   }
@@ -65,7 +65,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       <header className="fixed left-0 right-0 top-0 z-10 border-b border-[#0d2137]/10 bg-[#0d2137] px-4 py-3 text-white shadow-sm">
         <div className="flex items-center justify-between">
           <Link href="/admin/orders" className="text-lg font-semibold tracking-tight">
-            TransPool24 – إدارة
+            TransPool24 – Admin
           </Link>
           <div className="relative h-10 w-32 shrink-0">
             <Image
@@ -119,7 +119,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             onClick={handleLogout}
             className="rounded-lg px-4 py-3 text-left text-sm font-medium text-[#0d2137]/70 hover:bg-red-50 hover:text-red-700"
           >
-            تسجيل الخروج
+            Abmelden
           </button>
         </nav>
       </aside>

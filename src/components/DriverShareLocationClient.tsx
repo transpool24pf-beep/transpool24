@@ -267,7 +267,10 @@ export function DriverShareLocationClient({
       {err && sharing === false && <p className="text-sm text-red-700">{err}</p>}
       {lastSent && (
         <p className="text-xs text-[var(--foreground)]/60">
-          {t("lastSent")}: {new Date(lastSent).toLocaleString(locale === "ar" ? "ar" : locale === "de" ? "de-DE" : "en-GB")}
+          {t("lastSent")}:{" "}
+          {new Date(lastSent).toLocaleString(
+            locale === "de" ? "de-DE" : locale === "en" ? "en-GB" : `${locale}-${locale.toUpperCase()}`
+          )}
         </p>
       )}
 

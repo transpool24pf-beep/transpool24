@@ -45,21 +45,21 @@ type DriverOption = {
   phone: string;
 };
 
-/** سعر السائق: إما المحفوظ أو 18 × مسافة الذهاب والإياب (بالمليم) */
+/** Fahrerpreis: gespeichert oder 18 ct × Hin- und Rück-km */
 function getDriverPriceEur(o: Job): string {
   if (o.driver_price_cents != null) return (o.driver_price_cents / 100).toFixed(2);
   if (o.distance_km != null && o.distance_km > 0) return ((18 * o.distance_km * 2) / 100).toFixed(2);
   return "18.00";
 }
 
-/** نوع النقل بالعربية */
-function serviceTypeLabelAr(st: string | undefined): string {
-  if (st === "driver_only") return "سائق فقط";
-  if (st === "driver_car_assistant") return "سائق مع سيارة ومعاون";
-  return "سائق مع سيارة";
+/** Service type labels for WhatsApp (German only). */
+function serviceTypeLabelDe(st: string | undefined): string {
+  if (st === "driver_only") return "Nur Fahrer (Ihr Fahrzeug)";
+  if (st === "driver_car_assistant") return "Fahrer mit Fahrzeug + Helfer";
+  return "Fahrer mit Fahrzeug";
 }
 
-/** حجم البضاعة من cargo_details */
+/** Ladungsmaße aus cargo_details */
 function cargoVolumeStr(cd: Record<string, unknown> | null): string | null {
   if (!cd) return null;
   const l = cd.cargoLengthCm ?? cd.lengthCm;
@@ -86,7 +86,7 @@ const IC = {
   worker: "\u{1F477}",
 };
 
-/** رسالة واتساب للمجموعة: كل المعلومات مع سعر السائق وسعر المعاون إن وجد، بأيقونات وسطر فارغ */
+/** WhatsApp message for driver group — German only. */
 function buildWhatsAppMessage(o: Job): string {
   const orderRef = o.order_number != null ? String(o.order_number) : o.id;
   const driverEur = getDriverPriceEur(o);
@@ -105,33 +105,33 @@ function buildWhatsAppMessage(o: Job): string {
       : null;
   const distanceStr = o.distance_km != null ? `${o.distance_km} km` : "—";
   const volumeStr = cargoVolumeStr(o.cargo_details);
-  const serviceLabel = serviceTypeLabelAr(o.service_type);
+  const serviceLabel = serviceTypeLabelDe(o.service_type);
   const blocks: string[] = [
-    `${IC.megaphone} TransPool24 – طلب للنقل`,
+    `${IC.megaphone} TransPool24 – Transportauftrag`,
     "",
-    `${IC.clipboard} رقم الطلب: ${orderRef}`,
+    `${IC.clipboard} Auftragsnummer: ${orderRef}`,
     "",
-    `${IC.phone} الهاتف: ${o.phone}`,
+    `${IC.phone} Telefon: ${o.phone}`,
     "",
-    ...(timeStr ? [`${IC.clock} وقت (للحضور): ${timeStr}`] : []),
-    ...(dateStr ? [`${IC.calendar} التاريخ: ${dateStr}`] : []),
+    ...(timeStr ? [`${IC.clock} Zeit (Ankunft am Kunden): ${timeStr}`] : []),
+    ...(dateStr ? [`${IC.calendar} Datum: ${dateStr}`] : []),
     ...(timeStr || dateStr ? [""] : []),
-    `${IC.ruler} المسافة: ${distanceStr}`,
+    `${IC.ruler} Distanz: ${distanceStr}`,
     "",
-    `${IC.truck} الحمولة: ${o.cargo_size}`,
-    ...(volumeStr ? [`${IC.package} حجم البضاعة: ${volumeStr}`] : []),
-    ...(weightKg != null ? [`${IC.scale} الوزن: ${weightKg} kg`] : []),
-    `${IC.lorry} نوع النقل: ${serviceLabel}`,
-    `${IC.building} الشركة: ${o.company_name}`,
+    `${IC.truck} Ladung (Größe): ${o.cargo_size}`,
+    ...(volumeStr ? [`${IC.package} Maße (L×B×H): ${volumeStr}`] : []),
+    ...(weightKg != null ? [`${IC.scale} Gewicht: ${weightKg} kg`] : []),
+    `${IC.lorry} Leistung: ${serviceLabel}`,
+    `${IC.building} Firma: ${o.company_name}`,
     "",
-    `${IC.pin} الاستلام:`,
+    `${IC.pin} Abholung:`,
     o.pickup_address,
     "",
-    `${IC.pin} التسليم:`,
+    `${IC.pin} Zustellung:`,
     o.delivery_address,
     "",
-    `${IC.money} سعر السائق: ${driverEur} EUR`,
-    ...(hasAssistant ? [`${IC.worker} سعر المعاون: ${assistantEur} EUR`] : []),
+    `${IC.money} Fahrerpreis (Gruppe): ${driverEur} EUR`,
+    ...(hasAssistant ? [`${IC.worker} Helferpauschale: ${assistantEur} EUR`] : []),
   ];
   return blocks.join("\n");
 }
@@ -228,7 +228,7 @@ export default function AdminOrderDetailPage({
   const sendEmailToCustomer = () => {
     if (!order?.customer_email) return;
     if (!order.assigned_driver_application_id) {
-      alert("الرجاء اختيار رقم السائق أولاً ليظهر في إيميل الزبون.");
+      alert("Bitte zuerst einen Fahrer wählen (erscheint in der Kunden-E-Mail).");
       return;
     }
     setSending(true);
@@ -238,7 +238,7 @@ export default function AdminOrderDetailPage({
       body: JSON.stringify({ job_id: order.id }),
     })
       .then((r) => {
-        if (r.ok) alert("تم إرسال البريد إلى " + order.customer_email);
+        if (r.ok) alert("E-Mail gesendet an: " + order.customer_email);
         else
           r.json().then((d) => {
             const errMsg =
@@ -246,18 +246,18 @@ export default function AdminOrderDetailPage({
                 ? d.error
                 : (d?.error && typeof d.error === "object" && "message" in d.error)
                   ? String((d.error as { message: unknown }).message)
-                  : "فشل الإرسال.";
+                  : "Senden fehlgeschlagen.";
             alert(errMsg);
           });
       })
-      .catch(() => alert("فشل الطلب"))
+      .catch(() => alert("Anfrage fehlgeschlagen."))
       .finally(() => setSending(false));
   };
 
   const sendTrackingOnlyEmail = () => {
     if (!order?.customer_email) return;
     if (!order.confirmation_token) {
-      alert("لا يوجد رمز تأكيد (confirmation_token) — لا يمكن إرسال رابط التتبع الآمن.");
+      alert("Kein Bestätigungstoken (confirmation_token) – Tracking-E-Mail nicht möglich.");
       return;
     }
     setSendingTrackOnly(true);
@@ -268,13 +268,13 @@ export default function AdminOrderDetailPage({
     })
       .then(async (r) => {
         const j = await r.json();
-        if (!r.ok) throw new Error(typeof j.error === "string" ? j.error : "فشل الإرسال");
+        if (!r.ok) throw new Error(typeof j.error === "string" ? j.error : "Senden fehlgeschlagen.");
         return j;
       })
       .then(() => {
-        alert("تم إرسال رسالة التتبع للعميل (بدون PDF): " + order.customer_email);
+        alert("Tracking-Nachricht gesendet (ohne PDF) an: " + order.customer_email);
       })
-      .catch((e) => alert(e instanceof Error ? e.message : "فشل الإرسال"))
+      .catch((e) => alert(e instanceof Error ? e.message : "Senden fehlgeschlagen."))
       .finally(() => setSendingTrackOnly(false));
   };
 
@@ -291,21 +291,21 @@ export default function AdminOrderDetailPage({
     window.open(`https://wa.me/${digits}`, "_blank", "noopener");
   };
 
-  /** روابط Google Maps بنقرة واحدة + رابط صفحة مشاركة GPS للزبون */
+  /** Google Maps links + GPS share page — WhatsApp text German only. */
   const openWhatsAppDriverNavLinks = async () => {
     if (!order) return;
     if (!order.assigned_driver_application_id) {
-      alert("اختر السائق من القائمة أولاً.");
+      alert("Bitte zuerst einen Fahrer auswählen.");
       return;
     }
     const driverRow = drivers.find((d) => d.id === order.assigned_driver_application_id);
     if (!driverRow?.phone) {
-      alert("لا يوجد رقم هاتف/واتساب مسجل لهذا السائق في ملف طلب السائق.");
+      alert("Keine Telefon-/WhatsApp-Nummer in der Fahrerbewerbung hinterlegt.");
       return;
     }
     const digits = driverRow.phone.replace(/\D/g, "");
     if (!digits) {
-      alert("رقم السائق غير صالح للواتساب.");
+      alert("Ungültige Fahrernummer für WhatsApp.");
       return;
     }
     const pickupUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(order.pickup_address)}&travelmode=driving`;
@@ -321,9 +321,9 @@ export default function AdminOrderDetailPage({
       if (r.ok && j.url) {
         gpsLine = [
           "",
-          "📡 Live-Standort (für Kunden) / مشاركة الموقع للزبون:",
+          "📡 Live-Standort für den Kunden (bitte freigeben):",
           j.url,
-          "(Link öffnen → Standortfreigabe / افتح الرابط ثم اضغط مشاركة الموقع)",
+          "(Link öffnen → Standortfreigabe starten)",
           "",
         ].join("\n");
         const full = await fetch(`/api/admin/orders/${order.id}`).then((x) => x.json());
@@ -334,20 +334,20 @@ export default function AdminOrderDetailPage({
     }
 
     const text = [
-      "🚚 TransPool24 – Auftrag / طلب #" + orderRef,
+      "🚚 TransPool24 – Auftrag #" + orderRef,
       "",
-      "📍 1) Abholung / الاستلام – Navigation (eine Taste):",
+      "📍 1) Navigation zur Abholung (ein Tippen):",
       pickupUrl,
       "",
-      "📍 2) Lieferung / التسليم – Navigation:",
+      "📍 2) Navigation zur Zustellung:",
       deliveryUrl,
       "",
-      "🛣️ 3) Ganze Route / المسار كامل (Abholung → Lieferung):",
+      "🛣️ 3) Gesamtroute Abholung → Zustellung:",
       routeUrl,
       "",
-      "📏 Distanz ca. / المسافة تقريباً: " + distStr,
+      "📏 Distanz (ca.): " + distStr,
       gpsLine,
-      "Viel Erfolg! / بالتوفيق!",
+      "Viel Erfolg!",
     ].join("\n");
 
     window.open(`https://wa.me/${digits}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
@@ -365,20 +365,20 @@ export default function AdminOrderDetailPage({
 
   const copyTrackingLink = () => {
     if (!order?.confirmation_token) {
-      alert("لا يوجد رمز تأكيد في الطلب — أرسل بريد التأكيد أولاً أو تحقق من قاعدة البيانات.");
+      alert("Kein Bestätigungstoken – bitte zuerst Bestätigungs-E-Mail senden oder Datenbank prüfen.");
       return;
     }
     const base = typeof window !== "undefined" ? window.location.origin : "";
     const url = `${base}/de/order/track?job_id=${encodeURIComponent(order.id)}&token=${encodeURIComponent(order.confirmation_token)}`;
     void navigator.clipboard.writeText(url).then(
-      () => alert("تم نسخ رابط التتبع للعميل.\n" + url),
+      () => alert("Tracking-Link für Kunden kopiert:\n" + url),
       () => {
-        prompt("انسخ الرابط يدويًا:", url);
+        prompt("Link manuell kopieren:", url);
       }
     );
   };
 
-  /** ينشئ driver_tracking_token في قاعدة البيانات إن لزم (شغّل supabase/add_driver_tracking_token.sql أو roadmap_foundation.sql) */
+  /** Erzeugt driver_tracking_token in der DB falls nötig (SQL: add_driver_tracking_token.sql / roadmap_foundation.sql) */
   const copyDriverGpsShareLink = () => {
     if (!order) return;
     setEnsuringDriverLink(true);
@@ -387,7 +387,7 @@ export default function AdminOrderDetailPage({
         const j = await r.json();
         if (!r.ok) {
           const hint = typeof j.hint === "string" ? `\n\n${j.hint}` : "";
-          throw new Error((typeof j.error === "string" ? j.error : "فشل") + hint);
+          throw new Error((typeof j.error === "string" ? j.error : "Fehler") + hint);
         }
         return j as { url: string };
       })
@@ -398,12 +398,16 @@ export default function AdminOrderDetailPage({
         );
       })
       .then(({ url, ok }) => {
-        if (ok) alert("تم نسخ رابط مشاركة الموقع للسائق.\nأرسله بواتساب أو SMS — السائق يفتح الرابط ويضغط «بدء مشاركة الموقع».\n\n" + url);
-        else prompt("انسخ الرابط يدويًا:", url);
+        if (ok)
+          alert(
+            "Fahrer-GPS-Link kopiert. Per WhatsApp oder SMS senden – Fahrer öffnet den Link und startet die Standortfreigabe.\n\n" +
+              url
+          );
+        else prompt("Link manuell kopieren:", url);
         return fetch(`/api/admin/orders/${order.id}`).then((r) => r.json());
       })
       .then((data: Job) => setOrder(data))
-      .catch((e) => alert(e instanceof Error ? e.message : "فشل"))
+      .catch((e) => alert(e instanceof Error ? e.message : "Fehler"))
       .finally(() => setEnsuringDriverLink(false));
   };
 
@@ -424,20 +428,20 @@ export default function AdminOrderDetailPage({
     })
       .then(async (r) => {
         const data = await r.json();
-        if (!r.ok) throw new Error(typeof data.error === "string" ? data.error : "فشل الحفظ");
+        if (!r.ok) throw new Error(typeof data.error === "string" ? data.error : "Speichern fehlgeschlagen.");
         return data as Job;
       })
       .then((data) => {
         setOrder((prev) => (prev ? { ...prev, ...data } : null));
-        alert("تم حفظ ETA وحقول POD.");
+        alert("ETA und POD-Daten gespeichert.");
       })
-      .catch((e) => alert(e instanceof Error ? e.message : "فشل الحفظ"))
+      .catch((e) => alert(e instanceof Error ? e.message : "Speichern fehlgeschlagen."))
       .finally(() => setSavingTrack(false));
   };
 
   const markPodCompletedNow = () => {
     if (!order) return;
-    if (!window.confirm("تسجيل اكتمال إثبات التسليم (POD) الآن؟")) return;
+    if (!window.confirm("Liefernachweis (POD) jetzt als abgeschlossen markieren?")) return;
     setSavingTrack(true);
     fetch("/api/admin/orders", {
       method: "PATCH",
@@ -449,14 +453,14 @@ export default function AdminOrderDetailPage({
     })
       .then(async (r) => {
         const data = await r.json();
-        if (!r.ok) throw new Error(typeof data.error === "string" ? data.error : "فشل");
+        if (!r.ok) throw new Error(typeof data.error === "string" ? data.error : "Fehler");
         return data as Job;
       })
       .then((data) => {
         setOrder((prev) => (prev ? { ...prev, ...data } : null));
-        alert("تم تسجيل اكتمال POD.");
+        alert("POD als abgeschlossen gespeichert.");
       })
-      .catch((e) => alert(e instanceof Error ? e.message : "فشل"))
+      .catch((e) => alert(e instanceof Error ? e.message : "Fehler"))
       .finally(() => setSavingTrack(false));
   };
 
@@ -465,7 +469,7 @@ export default function AdminOrderDetailPage({
     const lat = parseFloat(latIn.replace(",", "."));
     const lng = parseFloat(lngIn.replace(",", "."));
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-      alert("أدخل خط عرض وطول صالحين.");
+      alert("Bitte gültige Breiten- und Längengrade eingeben.");
       return;
     }
     setSavingLocation(true);
@@ -476,7 +480,7 @@ export default function AdminOrderDetailPage({
     })
       .then(async (r) => {
         const j = await r.json();
-        if (!r.ok) throw new Error(typeof j.error === "string" ? j.error : "فشل حفظ الموقع");
+        if (!r.ok) throw new Error(typeof j.error === "string" ? j.error : "GPS speichern fehlgeschlagen.");
         return j as { recorded_at?: string };
       })
       .then((j) => {
@@ -491,16 +495,16 @@ export default function AdminOrderDetailPage({
               }
             : null
         );
-        alert("تم تسجيل نقطة GPS (ويظهر في صفحة تتبع العميل).");
+        alert("GPS-Position gespeichert (sichtbar in der Kunden-Tracking-Seite).");
       })
-      .catch((e) => alert(e instanceof Error ? e.message : "فشل"))
+      .catch((e) => alert(e instanceof Error ? e.message : "Fehler"))
       .finally(() => setSavingLocation(false));
   };
 
   if (loading || !id) {
     return (
       <div className="rounded-2xl bg-white p-10 shadow-lg">
-        <p className="text-[#0d2137]/70">جاري التحميل…</p>
+        <p className="text-[#0d2137]/70">Wird geladen…</p>
       </div>
     );
   }
@@ -508,9 +512,9 @@ export default function AdminOrderDetailPage({
   if (!order) {
     return (
       <div className="space-y-4">
-        <p className="text-red-600">الطلب غير موجود.</p>
+        <p className="text-red-600">Auftrag nicht gefunden.</p>
         <Link href="/admin/orders" className="text-[var(--accent)] hover:underline">
-          ← العودة للطلبات
+          ← Zurück zur Auftragsliste
         </Link>
       </div>
     );
@@ -522,81 +526,81 @@ export default function AdminOrderDetailPage({
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold text-[#0d2137]">تفاصيل الطلب / Order details</h1>
+        <h1 className="text-2xl font-bold text-[#0d2137]">Auftragsdetails</h1>
         <Link
           href="/admin/orders"
           className="rounded-xl border-2 border-[#0d2137]/20 bg-white px-4 py-2 text-sm font-medium text-[#0d2137] hover:bg-[#0d2137]/5"
         >
-          ← العودة للطلبات
+          ← Zurück zur Auftragsliste
         </Link>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="rounded-2xl border-2 border-[#0d2137]/10 bg-white p-6 shadow-lg">
-          <h2 className="mb-4 text-lg font-semibold text-[#0d2137]">معلومات الطلب</h2>
+          <h2 className="mb-4 text-lg font-semibold text-[#0d2137]">Auftragsdaten</h2>
           <dl className="space-y-3 text-sm">
             <div>
-              <dt className="text-[#0d2137]/60">رقم الطلب</dt>
+              <dt className="text-[#0d2137]/60">Auftragsnummer</dt>
               <dd className="font-mono font-semibold text-[#0d2137]">{order.order_number ?? order.id}</dd>
             </div>
             <div>
-              <dt className="text-[#0d2137]/60">التاريخ (إنشاء الطلب)</dt>
+              <dt className="text-[#0d2137]/60">Datum (Erstellung)</dt>
               <dd>{new Date(order.created_at).toLocaleDateString("de-DE")}</dd>
             </div>
             {order.preferred_pickup_at && (
               <div>
-                <dt className="text-[#0d2137]/60">وقت الاستلام المختار (للحضور)</dt>
+                <dt className="text-[#0d2137]/60">Gewünschte Abholzeit</dt>
                 <dd className="font-medium text-[#0d2137]">{new Date(order.preferred_pickup_at).toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" })}</dd>
               </div>
             )}
             <div>
-              <dt className="text-[#0d2137]/60">الشركة</dt>
+              <dt className="text-[#0d2137]/60">Firma</dt>
               <dd>{order.company_name}</dd>
             </div>
             <div>
-              <dt className="text-[#0d2137]/60">الهاتف / واتساب</dt>
+              <dt className="text-[#0d2137]/60">Telefon / WhatsApp</dt>
               <dd>{order.phone}</dd>
             </div>
             <div>
-              <dt className="text-[#0d2137]/60">البريد (الزبون)</dt>
+              <dt className="text-[#0d2137]/60">E-Mail (Kunde)</dt>
               <dd>{order.customer_email ?? "—"}</dd>
             </div>
             <div>
-              <dt className="text-[#0d2137]/60">الاستلام</dt>
+              <dt className="text-[#0d2137]/60">Abholung</dt>
               <dd>{order.pickup_address}</dd>
             </div>
             <div>
-              <dt className="text-[#0d2137]/60">التسليم</dt>
+              <dt className="text-[#0d2137]/60">Zustellung</dt>
               <dd>{order.delivery_address}</dd>
             </div>
             <div>
-              <dt className="text-[#0d2137]/60">الحمولة</dt>
+              <dt className="text-[#0d2137]/60">Ladung (Größe)</dt>
               <dd>{order.cargo_size}</dd>
             </div>
             {(order.cargo_details && (typeof (order.cargo_details as { weightKg?: number }).weightKg === "number" || typeof (order.cargo_details as { cargoWeightKg?: number }).cargoWeightKg === "number")) && (
               <div>
-                <dt className="text-[#0d2137]/60">الوزن</dt>
+                <dt className="text-[#0d2137]/60">Gewicht</dt>
                 <dd>{(order.cargo_details as { weightKg?: number; cargoWeightKg?: number }).weightKg ?? (order.cargo_details as { cargoWeightKg?: number }).cargoWeightKg} kg</dd>
               </div>
             )}
             <div>
-              <dt className="text-[#0d2137]/60">المسافة</dt>
+              <dt className="text-[#0d2137]/60">Distanz</dt>
               <dd>{order.distance_km != null ? `${order.distance_km} km` : "—"}</dd>
             </div>
             <div>
-              <dt className="text-[#0d2137]/60">سعر العميل (النظام)</dt>
+              <dt className="text-[#0d2137]/60">Kundenpreis (System)</dt>
               <dd className="font-semibold text-[#0d2137]">€ {customerPriceEur}</dd>
             </div>
             <div>
-              <dt className="text-[#0d2137]/60">سعر السائق للمجموعة</dt>
+              <dt className="text-[#0d2137]/60">Fahrerpreis (Gruppe)</dt>
               <dd className="font-semibold text-amber-700">€ {driverPriceEur}</dd>
             </div>
             {(order.customer_driver_rating != null || order.customer_driver_comment) && (
               <div>
-                <dt className="text-[#0d2137]/60">تقييم العميل للسائق</dt>
+                <dt className="text-[#0d2137]/60">Kundenbewertung Fahrer</dt>
                 <dd className="rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/[0.03] p-2 text-sm">
                   {order.customer_driver_rating != null && (
-                    <span className="text-amber-600 font-medium">★ {order.customer_driver_rating} نجوم</span>
+                    <span className="text-amber-600 font-medium">★ {order.customer_driver_rating} Sterne</span>
                   )}
                   {order.customer_driver_comment && (
                     <p className="mt-1 text-[#0d2137]/80">«{order.customer_driver_comment}»</p>
@@ -605,7 +609,7 @@ export default function AdminOrderDetailPage({
               </div>
             )}
             <div>
-              <dt className="mb-1.5 text-[#0d2137]/60">رقم السائق / السائق</dt>
+              <dt className="mb-1.5 text-[#0d2137]/60">Fahrer (Bewerbung)</dt>
               <dd>
                 <select
                   value={order.assigned_driver_application_id ?? ""}
@@ -613,71 +617,71 @@ export default function AdminOrderDetailPage({
                   disabled={updatingDriver}
                   className="w-full max-w-xs rounded-lg border-2 border-[#0d2137]/20 bg-white px-3 py-2 text-sm font-medium text-[#0d2137] focus:border-[var(--accent)] focus:outline-none disabled:opacity-60"
                 >
-                  <option value="">— لا سائق —</option>
+                  <option value="">— kein Fahrer —</option>
                   {drivers.map((d) => (
                     <option key={d.id} value={d.id}>
                       {d.driver_number != null ? `#${String(d.driver_number)} – ${d.full_name}` : d.full_name}
                     </option>
                   ))}
                 </select>
-                <p className="mt-1 text-xs text-[#0d2137]/50">اختر السائق قبل إرسال بريد التأكيد للعميل ليظهر في الإيميل.</p>
+                <p className="mt-1 text-xs text-[#0d2137]/50">Fahrer wählen, bevor die Bestätigungs-E-Mail an den Kunden gesendet wird.</p>
               </dd>
             </div>
           </dl>
         </div>
 
         <div className="rounded-2xl border-2 border-[#0d2137]/10 bg-white p-6 shadow-lg">
-          <h2 className="mb-4 text-lg font-semibold text-[#0d2137]">إرسال وفتورات</h2>
+          <h2 className="mb-4 text-lg font-semibold text-[#0d2137]">Versand & Rechnungen</h2>
           <div className="flex flex-col gap-3">
             <button
               type="button"
               onClick={openWhatsApp}
               className="flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-3 font-medium text-white shadow-sm hover:bg-[#20bd5a]"
             >
-              واتساب للمجموعة (سعر السائق فقط)
+              WhatsApp Gruppe (nur Fahrerpreis)
             </button>
             <button
               type="button"
               onClick={openWhatsAppCustomer}
               className="flex items-center justify-center gap-2 rounded-xl border-2 border-[#25D366] bg-[#25D366]/10 px-4 py-3 font-medium text-[#25D366] hover:bg-[#25D366]/20"
             >
-              واتساب العميل ({order.phone})
+              WhatsApp Kunde ({order.phone})
             </button>
             <button
               type="button"
               onClick={() => void openWhatsAppDriverNavLinks()}
               className="flex flex-col items-center justify-center gap-1 rounded-xl border-2 border-emerald-700 bg-emerald-700 px-4 py-3 text-center font-medium text-white shadow-sm hover:bg-emerald-800"
             >
-              <span>واتساب السائق: استلام + تسليم + خرائط</span>
+              <span>WhatsApp Fahrer: Abholung + Zustellung + Karten</span>
               <span className="text-xs font-normal opacity-90">
-                روابط نقرة واحدة (Google Maps) + إنشاء رابط التتبع للزبون
+                Ein-Klick-Google-Maps-Links + Tracking-Link für Kunden erzeugen
               </span>
             </button>
             {order.customer_email && (
               <>
                 <div className="rounded-xl border-2 border-amber-200 bg-amber-50/50 p-3">
-                  <label className="mb-1.5 block text-sm font-medium text-amber-900">رقم السائق (مطلوب قبل الإرسال)</label>
+                  <label className="mb-1.5 block text-sm font-medium text-amber-900">Fahrer (vor E-Mail erforderlich)</label>
                   <select
                     value={order.assigned_driver_application_id ?? ""}
                     onChange={(e) => assignDriver(e.target.value || null)}
                     disabled={updatingDriver}
                     className="w-full rounded-lg border-2 border-amber-300 bg-white px-3 py-2 text-sm font-medium text-[#0d2137] focus:border-[var(--accent)] focus:outline-none disabled:opacity-60"
                   >
-                    <option value="">— اختر السائق —</option>
+                    <option value="">— Fahrer wählen —</option>
                     {drivers.map((d) => (
                       <option key={d.id} value={d.id}>
                         {d.driver_number != null ? `#${String(d.driver_number)} – ${d.full_name}` : d.full_name}
                       </option>
                     ))}
                   </select>
-                  <p className="mt-1 text-xs text-amber-800/80">معلومات السائق (صورة، نجوم، هاتف، سيارة، لغات) ستظهر في إيميل الزبون.</p>
+                  <p className="mt-1 text-xs text-amber-800/80">Fahrerdaten (Foto, Sterne, Telefon, Kennzeichen, Sprachen) erscheinen in der Kunden-E-Mail.</p>
                 </div>
                 <button
                   type="button"
                   onClick={openEmailClient}
                   className="flex items-center justify-center gap-2 rounded-xl border-2 border-[#0d2137]/20 bg-white px-4 py-3 font-medium text-[#0d2137] hover:bg-[#0d2137]/5"
                 >
-                  فتح البريد للعميل: {order.customer_email}
+                  E-Mail-Programm öffnen: {order.customer_email}
                 </button>
                 <button
                   type="button"
@@ -685,7 +689,7 @@ export default function AdminOrderDetailPage({
                   disabled={sending || !order.assigned_driver_application_id}
                   className="flex items-center justify-center gap-2 rounded-xl bg-[var(--accent)] px-4 py-3 font-medium text-white hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {sending ? "جاري الإرسال…" : "إرسال بريد التأكيد للعميل"}
+                  {sending ? "Wird gesendet…" : "Bestätigungs-E-Mail an Kunden senden"}
                 </button>
                 <button
                   type="button"
@@ -693,29 +697,29 @@ export default function AdminOrderDetailPage({
                   disabled={sendingTrackOnly}
                   className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-[#0d2137] bg-[#0d2137] px-4 py-3 font-medium text-white shadow-sm hover:bg-[#0d2137]/90 disabled:opacity-60"
                 >
-                  {sendingTrackOnly ? "جاري الإرسال…" : "إرسال رسالة تتبع الطلب (بدون PDF)"}
+                  {sendingTrackOnly ? "Wird gesendet…" : "Tracking-Nachricht senden (ohne PDF)"}
                 </button>
                 <p className="text-xs text-[#0d2137]/65">
-                  نص احترافي عربي + ألماني، صورة وبيانات السائق إن وُجد، رابط صفحة التتبع مع خريطة المسار — دون مرفق فاتورة.
+                  Professioneller Text auf Deutsch, Fahrerinfos falls zugewiesen, Tracking-Link mit Karte – ohne PDF-Anhang.
                 </p>
               </>
             )}
             <hr className="border-[#0d2137]/10" />
-            <p className="text-sm font-medium text-[#0d2137]">تحميل الفواتير</p>
+            <p className="text-sm font-medium text-[#0d2137]">Rechnungen herunterladen</p>
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
                 onClick={() => downloadInvoice("customer")}
                 className="rounded-xl border-2 border-blue-200 bg-blue-50 px-4 py-2.5 text-sm font-medium text-blue-800 hover:bg-blue-100"
               >
-                فاتورة النظامية (السعر الحقيقي € {customerPriceEur})
+                Systemrechnung (Kundenpreis € {customerPriceEur})
               </button>
               <button
                 type="button"
                 onClick={() => downloadInvoice("driver")}
                 className="rounded-xl border-2 border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-medium text-amber-800 hover:bg-amber-100"
               >
-                فاتورة المجموعة / السائق (€ {driverPriceEur})
+                Gruppe / Fahrer-Rechnung (€ {driverPriceEur})
               </button>
             </div>
           </div>
@@ -723,11 +727,11 @@ export default function AdminOrderDetailPage({
       </div>
 
       <div className="rounded-2xl border-2 border-[#0d2137]/10 bg-white p-6 shadow-lg">
-        <h2 className="mb-2 text-lg font-semibold text-[#0d2137]">تتبع حي، ETA، وإثبات تسليم (POD)</h2>
+        <h2 className="mb-2 text-lg font-semibold text-[#0d2137]">Live-Tracking, ETA, Liefernachweis (POD)</h2>
         <p className="mb-4 text-sm text-[#0d2137]/65">
-          يظهر للعميل في{" "}
-          <code className="rounded bg-[#0d2137]/10 px-1">/de/order/track?job_id=…&amp;token=…</code> بعد تطبيق{" "}
-          <code className="rounded bg-[#0d2137]/10 px-1">roadmap_foundation.sql</code> على Supabase.
+          Für den Kunden unter{" "}
+          <code className="rounded bg-[#0d2137]/10 px-1">/de/order/track?job_id=…&amp;token=…</code> – SQL-Migrationen{" "}
+          <code className="rounded bg-[#0d2137]/10 px-1">roadmap_foundation.sql</code> in Supabase ausführen.
         </p>
         <div className="flex flex-wrap gap-2 border-b border-[#0d2137]/10 pb-4">
           <button
@@ -735,7 +739,7 @@ export default function AdminOrderDetailPage({
             onClick={copyTrackingLink}
             className="rounded-xl border-2 border-[var(--accent)] bg-[var(--accent)]/10 px-4 py-2 text-sm font-medium text-[#0d2137] hover:bg-[var(--accent)]/20"
           >
-            نسخ رابط التتبع للعميل
+            Kunden-Tracking-Link kopieren
           </button>
           <button
             type="button"
@@ -743,14 +747,14 @@ export default function AdminOrderDetailPage({
             disabled={ensuringDriverLink}
             className="rounded-xl border-2 border-emerald-600 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-900 hover:bg-emerald-100 disabled:opacity-60"
           >
-            {ensuringDriverLink ? "…" : "نسخ رابط GPS للسائق (مشاركة مباشرة)"}
+            {ensuringDriverLink ? "…" : "Fahrer-GPS-Link kopieren (Live-Freigabe)"}
           </button>
           {order.driver_tracking_token && (
-            <span className="self-center text-xs text-emerald-800/80">رمز السائق مفعّل — الرابط آمن ومنفصل عن رابط العميل</span>
+            <span className="self-center text-xs text-emerald-800/80">Fahrer-Token aktiv – getrennt vom Kunden-Link</span>
           )}
           {order.last_driver_lat != null && order.last_driver_lng != null && (
             <span className="self-center text-xs text-[#0d2137]/60">
-              آخر موقع: {order.last_driver_lat.toFixed(5)}, {order.last_driver_lng.toFixed(5)}
+              Letzte Position: {order.last_driver_lat.toFixed(5)}, {order.last_driver_lng.toFixed(5)}
               {order.last_driver_location_at
                 ? ` — ${new Date(order.last_driver_location_at).toLocaleString("de-DE")}`
                 : ""}
@@ -759,47 +763,47 @@ export default function AdminOrderDetailPage({
         </div>
         <div className="mt-4 grid gap-4 lg:grid-cols-2">
           <div className="space-y-3">
-            <p className="text-sm font-medium text-[#0d2137]">وقت الوصول المتوقع (ETA)</p>
-            <label className="block text-xs text-[#0d2137]/60">تاريخ ووقت الوصول</label>
+            <p className="text-sm font-medium text-[#0d2137]">Voraussichtliche Ankunft (ETA)</p>
+            <label className="block text-xs text-[#0d2137]/60">Datum und Uhrzeit</label>
             <input
               type="datetime-local"
               value={etaLocal}
               onChange={(e) => setEtaLocal(e.target.value)}
               className="w-full max-w-md rounded-lg border-2 border-[#0d2137]/20 px-3 py-2 text-sm"
             />
-            <label className="block text-xs text-[#0d2137]/60">دقائق متبقية (رقم)</label>
+            <label className="block text-xs text-[#0d2137]/60">Verbleibende Minuten</label>
             <input
               type="number"
               min={0}
               value={etaMin}
               onChange={(e) => setEtaMin(e.target.value)}
-              placeholder="مثال: 25"
+              placeholder="z. B. 25"
               className="w-full max-w-xs rounded-lg border-2 border-[#0d2137]/20 px-3 py-2 text-sm"
             />
           </div>
           <div className="space-y-3">
-            <p className="text-sm font-medium text-[#0d2137]">إثبات التسليم (روابط / رمز)</p>
+            <p className="text-sm font-medium text-[#0d2137]">Liefernachweis (URLs / Code)</p>
             <input
               value={podPhoto}
               onChange={(e) => setPodPhoto(e.target.value)}
-              placeholder="رابط صورة التسليم (URL)"
+              placeholder="Foto-URL Liefernachweis"
               className="w-full rounded-lg border-2 border-[#0d2137]/20 px-3 py-2 text-sm"
             />
             <input
               value={podSig}
               onChange={(e) => setPodSig(e.target.value)}
-              placeholder="رابط التوقيع (URL)"
+              placeholder="Unterschrift-URL"
               className="w-full rounded-lg border-2 border-[#0d2137]/20 px-3 py-2 text-sm"
             />
             <input
               value={podCode}
               onChange={(e) => setPodCode(e.target.value)}
-              placeholder="رمز تأكيد التسليم"
+              placeholder="Bestätigungscode Zustellung"
               className="w-full rounded-lg border-2 border-[#0d2137]/20 px-3 py-2 text-sm"
             />
             {order.pod_completed_at && (
               <p className="text-xs text-green-800">
-                POD مكتمل عند: {new Date(order.pod_completed_at).toLocaleString("de-DE")}
+                POD abgeschlossen: {new Date(order.pod_completed_at).toLocaleString("de-DE")}
               </p>
             )}
           </div>
@@ -811,7 +815,7 @@ export default function AdminOrderDetailPage({
             disabled={savingTrack}
             className="rounded-xl bg-[#0d2137] px-4 py-2.5 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60"
           >
-            {savingTrack ? "جاري الحفظ…" : "حفظ ETA و POD"}
+            {savingTrack ? "Speichern…" : "ETA & POD speichern"}
           </button>
           <button
             type="button"
@@ -819,11 +823,11 @@ export default function AdminOrderDetailPage({
             disabled={savingTrack}
             className="rounded-xl border-2 border-green-600 bg-green-50 px-4 py-2.5 text-sm font-medium text-green-900 hover:bg-green-100 disabled:opacity-60"
           >
-            تسجيل اكتمال POD الآن
+            POD jetzt abschließen
           </button>
         </div>
         <div className="mt-6 border-t border-[#0d2137]/10 pt-4">
-          <p className="mb-2 text-sm font-medium text-[#0d2137]">موقع السائق (يدوي — يُسجّل في المسار + يحدّث آخر نقطة)</p>
+          <p className="mb-2 text-sm font-medium text-[#0d2137]">Fahrerposition manuell (Trail + letzte Position)</p>
           <div className="flex max-w-xl flex-wrap gap-2">
             <input
               value={latIn}
@@ -843,7 +847,7 @@ export default function AdminOrderDetailPage({
               disabled={savingLocation}
               className="rounded-xl bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-60"
             >
-              {savingLocation ? "…" : "حفظ الموقع"}
+              {savingLocation ? "…" : "Position speichern"}
             </button>
           </div>
         </div>

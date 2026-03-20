@@ -10,7 +10,7 @@ export async function POST(req: Request) {
   const body = await req.json();
   const id = body?.driver_application_id ?? body?.id;
   if (!id) {
-    return NextResponse.json({ error: "driver_application_id مطلوب" }, { status: 400 });
+    return NextResponse.json({ error: "driver_application_id fehlt" }, { status: 400 });
   }
   const supabase = createServerSupabase();
   const { data, error } = await supabase
@@ -19,14 +19,14 @@ export async function POST(req: Request) {
     .eq("id", id)
     .single();
   if (error || !data) {
-    return NextResponse.json({ error: "الطلب غير موجود" }, { status: 404 });
+    return NextResponse.json({ error: "Bewerbung nicht gefunden" }, { status: 404 });
   }
   if (data.status !== "approved") {
-    return NextResponse.json({ error: "يُرسل الإيميل فقط للطلبات المعتمدة" }, { status: 400 });
+    return NextResponse.json({ error: "E-Mail nur bei genehmigten Bewerbungen" }, { status: 400 });
   }
   const email = data.email?.trim();
   if (!email) {
-    return NextResponse.json({ error: "لا يوجد بريد إلكتروني لهذا الطلب" }, { status: 400 });
+    return NextResponse.json({ error: "Keine E-Mail-Adresse hinterlegt" }, { status: 400 });
   }
   const approvedAt =
     data.approved_at != null
@@ -63,7 +63,7 @@ export async function POST(req: Request) {
     { whatsAppLink, pdfBuffer }
   );
   if (!result.success) {
-    return NextResponse.json({ error: result.error ?? "فشل الإرسال" }, { status: 500 });
+    return NextResponse.json({ error: result.error ?? "Versand fehlgeschlagen" }, { status: 500 });
   }
   return NextResponse.json({ ok: true });
 }

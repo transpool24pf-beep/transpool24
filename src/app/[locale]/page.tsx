@@ -44,7 +44,7 @@ export default async function HomePage({
                 href={`/${locale}/driver`}
                 className="ml-3 mt-8 inline-block rounded-lg border border-white/25 bg-white/10 px-6 py-3 text-lg font-semibold text-white transition hover:bg-white/15"
               >
-                قدّم كسائق
+                {t("applyAsDriver")}
               </Link>
             </div>
           </div>
@@ -109,7 +109,7 @@ export default async function HomePage({
                   href={`/${locale}/driver`}
                   className="ml-3 mt-4 inline-block rounded-lg border border-[#0d2137]/15 bg-white px-5 py-2.5 font-medium text-[#0d2137] transition hover:bg-[#0d2137]/5"
                 >
-                  تسجيل كسائق
+                  {t("driverSignup")}
                 </Link>
               </div>
             </div>

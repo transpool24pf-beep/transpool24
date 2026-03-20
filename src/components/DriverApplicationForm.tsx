@@ -46,11 +46,11 @@ export function DriverApplicationForm({ initialCity = "" }: { initialCity?: stri
         body: JSON.stringify(form),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json?.error || "Failed to submit");
+      if (!res.ok) throw new Error(json?.error || "Absenden fehlgeschlagen");
       setDone(true);
       setForm(initialState);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to submit");
+      setError(err instanceof Error ? err.message : "Absenden fehlgeschlagen");
     } finally {
       setLoading(false);
     }
@@ -62,56 +62,60 @@ export function DriverApplicationForm({ initialCity = "" }: { initialCity?: stri
     <form onSubmit={submit} className="space-y-4 rounded-2xl border border-[#0d2137]/10 bg-white p-5 shadow-sm">
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block">
-          <span className="mb-1 block text-sm font-medium text-[#0d2137]">الاسم الكامل</span>
+          <span className="mb-1 block text-sm font-medium text-[#0d2137]">Vollständiger Name</span>
           <input className="w-full rounded-lg border border-[#0d2137]/15 px-3 py-2" required value={form.fullName} onChange={(e) => update("fullName", e.target.value)} />
         </label>
         <label className="block">
-          <span className="mb-1 block text-sm font-medium text-[#0d2137]">البريد الإلكتروني</span>
+          <span className="mb-1 block text-sm font-medium text-[#0d2137]">E-Mail</span>
           <input type="email" className="w-full rounded-lg border border-[#0d2137]/15 px-3 py-2" required value={form.email} onChange={(e) => update("email", e.target.value)} />
         </label>
         <label className="block">
-          <span className="mb-1 block text-sm font-medium text-[#0d2137]">رقم الهاتف</span>
+          <span className="mb-1 block text-sm font-medium text-[#0d2137]">Telefon</span>
           <input className="w-full rounded-lg border border-[#0d2137]/15 px-3 py-2" required value={form.phone} onChange={(e) => update("phone", e.target.value)} />
         </label>
         <label className="block">
-          <span className="mb-1 block text-sm font-medium text-[#0d2137]">المدينة</span>
+          <span className="mb-1 block text-sm font-medium text-[#0d2137]">Stadt</span>
           <input className="w-full rounded-lg border border-[#0d2137]/15 px-3 py-2" required value={form.city} onChange={(e) => update("city", e.target.value)} />
         </label>
         <label className="block">
-          <span className="mb-1 block text-sm font-medium text-[#0d2137]">رخصة القيادة</span>
+          <span className="mb-1 block text-sm font-medium text-[#0d2137]">Führerschein</span>
           <input className="w-full rounded-lg border border-[#0d2137]/15 px-3 py-2" required value={form.license} onChange={(e) => update("license", e.target.value)} />
         </label>
         <label className="block">
-          <span className="mb-1 block text-sm font-medium text-[#0d2137]">نوع المركبة</span>
-          <input className="w-full rounded-lg border border-[#0d2137]/15 px-3 py-2" placeholder="Van / Truck / Car" required value={form.vehicleType} onChange={(e) => update("vehicleType", e.target.value)} />
+          <span className="mb-1 block text-sm font-medium text-[#0d2137]">Fahrzeugtyp</span>
+          <input className="w-full rounded-lg border border-[#0d2137]/15 px-3 py-2" placeholder="Van / LKW / PKW" required value={form.vehicleType} onChange={(e) => update("vehicleType", e.target.value)} />
         </label>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block">
-          <span className="mb-1 block text-sm font-medium text-[#0d2137]">التوفر</span>
-          <input className="w-full rounded-lg border border-[#0d2137]/15 px-3 py-2" placeholder="Full-time / Part-time" required value={form.availability} onChange={(e) => update("availability", e.target.value)} />
+          <span className="mb-1 block text-sm font-medium text-[#0d2137]">Verfügbarkeit</span>
+          <input className="w-full rounded-lg border border-[#0d2137]/15 px-3 py-2" placeholder="Vollzeit / Teilzeit" required value={form.availability} onChange={(e) => update("availability", e.target.value)} />
         </label>
         <label className="block">
-          <span className="mb-1 block text-sm font-medium text-[#0d2137]">الخبرة</span>
+          <span className="mb-1 block text-sm font-medium text-[#0d2137]">Erfahrung</span>
           <input className="w-full rounded-lg border border-[#0d2137]/15 px-3 py-2" value={form.experience} onChange={(e) => update("experience", e.target.value)} />
         </label>
       </div>
 
       <label className="block">
-        <span className="mb-1 block text-sm font-medium text-[#0d2137]">ملاحظات</span>
+        <span className="mb-1 block text-sm font-medium text-[#0d2137]">Notizen</span>
         <textarea className="min-h-[110px] w-full rounded-lg border border-[#0d2137]/15 px-3 py-2" value={form.note} onChange={(e) => update("note", e.target.value)} />
       </label>
 
       {error && <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
-      {done && <p className="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">تم استلام طلبك بنجاح، وسنتواصل معك قريباً.</p>}
+      {done && (
+        <p className="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+          Bewerbung eingegangen – wir melden uns bald.
+        </p>
+      )}
 
       <button
         type="submit"
         disabled={loading}
         className="rounded-lg bg-[var(--accent)] px-5 py-3 font-semibold text-white transition hover:opacity-90 disabled:opacity-60"
       >
-        {loading ? "جاري الإرسال…" : "إرسال طلب العمل"}
+        {loading ? "Senden…" : "Bewerbung senden"}
       </button>
     </form>
   );

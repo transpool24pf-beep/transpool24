@@ -9,7 +9,6 @@ import { locales, type Locale } from "@/i18n/routing";
 
 const localeLabels: Record<Locale, string> = {
   de: "DE",
-  ar: "العربية",
   en: "EN",
   tr: "TR",
   fr: "FR",

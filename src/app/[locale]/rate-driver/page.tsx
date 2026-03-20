@@ -43,9 +43,9 @@ function RateDriverContent() {
       });
       const data = await res.json();
       if (res.ok && data.ok) setStatus("done");
-      else alert(data?.error ?? "فشل الإرسال");
+      else alert(data?.error ?? "Senden fehlgeschlagen");
     } catch {
-      alert("فشل الإرسال");
+      alert("Senden fehlgeschlagen");
     } finally {
       setSubmitting(false);
     }
@@ -54,23 +54,23 @@ function RateDriverContent() {
   if (status === "loading") {
     return (
       <div className="mx-auto max-w-md rounded-2xl border bg-white p-8 shadow-lg">
-        <p className="text-center text-[#0d2137]/70">جاري التحميل…</p>
+        <p className="text-center text-[#0d2137]/70">Laden…</p>
       </div>
     );
   }
   if (status === "invalid") {
     return (
       <div className="mx-auto max-w-md rounded-2xl border border-red-200 bg-red-50 p-8 shadow-lg">
-        <p className="text-center font-medium text-red-800">الرابط غير صالح أو منتهي الصلاحية.</p>
+        <p className="text-center font-medium text-red-800">Link ungültig oder abgelaufen.</p>
       </div>
     );
   }
   if (status === "done") {
     return (
       <div className="mx-auto max-w-md rounded-2xl border bg-white p-8 shadow-lg">
-        <h1 className="text-center text-xl font-bold text-[#0d2137]">شكراً لتقييمك</h1>
+        <h1 className="text-center text-xl font-bold text-[#0d2137]">Vielen Dank</h1>
         <p className="mt-2 text-center text-[#0d2137]/70">
-          {alreadyRated ? "كنت قد قيّمت السائق مسبقاً." : "تم تسجيل تقييمك بنجاح."}
+          {alreadyRated ? "Sie haben den Fahrer bereits bewertet." : "Ihre Bewertung wurde gespeichert."}
         </p>
         <p className="mt-4 text-center text-sm text-[#0d2137]/60">— TransPool24</p>
       </div>
@@ -79,9 +79,9 @@ function RateDriverContent() {
 
   return (
     <div className="mx-auto max-w-md rounded-2xl border bg-white p-8 shadow-lg">
-      <h1 className="text-center text-xl font-bold text-[#0d2137]">تقييم السائق</h1>
+      <h1 className="text-center text-xl font-bold text-[#0d2137]">Fahrer bewerten</h1>
       <p className="mt-2 text-center text-sm text-[#0d2137]/70">
-        كيف تقيّم خدمة السائق؟ (الطلب {orderLabel})
+        Wie war der Service? (Auftrag {orderLabel})
       </p>
       <div className="mt-6 flex justify-center gap-2">
         {[1, 2, 3, 4, 5].map((n) => (
@@ -96,14 +96,14 @@ function RateDriverContent() {
         ))}
       </div>
       <p className="mt-2 text-center text-xs text-[#0d2137]/60">
-        {selected > 0 ? `${selected} نجوم` : "اختر عدد النجوم"}
+        {selected > 0 ? `${selected} Sterne` : "Sterne wählen"}
       </p>
       <div className="mt-4">
-        <label className="mb-1 block text-sm font-medium text-[#0d2137]/80">تعليق (اختياري)</label>
+        <label className="mb-1 block text-sm font-medium text-[#0d2137]/80">Kommentar (optional)</label>
         <textarea
           value={comment}
           onChange={(e) => setComment(e.target.value)}
-          placeholder="أضف تعليقاً عن تجربتك مع السائق..."
+          placeholder="Kurz Ihre Erfahrung mit dem Fahrer…"
           rows={3}
           className="w-full rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm text-[#0d2137] placeholder:text-[#0d2137]/40 focus:border-[var(--accent)] focus:outline-none"
           maxLength={500}
@@ -116,7 +116,7 @@ function RateDriverContent() {
           disabled={selected < 1 || submitting}
           className="rounded-lg bg-[var(--accent)] px-6 py-2 font-medium text-white disabled:opacity-50"
         >
-          {submitting ? "جاري الإرسال…" : "إرسال التقييم"}
+          {submitting ? "Senden…" : "Bewertung senden"}
         </button>
       </div>
     </div>
@@ -126,7 +126,7 @@ function RateDriverContent() {
 export default function RateDriverPage() {
   return (
     <div className="min-h-screen bg-[#f6f7fb] px-4 py-16">
-      <Suspense fallback={<div className="mx-auto max-w-md rounded-2xl border bg-white p-8">جاري التحميل…</div>}>
+      <Suspense fallback={<div className="mx-auto max-w-md rounded-2xl border bg-white p-8">Laden…</div>}>
         <RateDriverContent />
       </Suspense>
     </div>
