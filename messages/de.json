@@ -132,7 +132,19 @@
     "trackNotDelivered": "Unterwegs",
     "trackDeliveredLabel": "Zustellstatus",
     "trackRefresh": "Aktualisieren",
-    "trackNoPosition": "Noch keine Live-Position. Die Karte erscheint, sobald der Standort aktualisiert wird."
+    "trackNoPosition": "Noch keine Live-Position. Die Karte erscheint, sobald der Standort aktualisiert wird.",
+    "trackYourDriver": "Ihr Fahrer",
+    "trackDriverName": "Name",
+    "trackDriverPhone": "Telefon",
+    "trackDriverPlate": "Kennzeichen",
+    "trackDriverLanguages": "Sprachen",
+    "trackDriverPending": "Sobald ein Fahrer zugewiesen ist, sehen Sie Foto und Kontakt hier. Die geplante Route sehen Sie trotzdem auf der Karte.",
+    "trackDistance": "Distanz (ca.)",
+    "trackMapTitle": "Karte & Route",
+    "trackMapHint": "Grau gestrichelt: geplante Route (Abholung → Lieferung). Orange: Live-GPS-Verlauf, sobald der Fahrer den Standort teilt. Der Live-Marker erscheint mit dem nächsten Update.",
+    "trackLiveMarker": "Aktuelle Position",
+    "trackNoGeocode": "Für diese Adressen konnte keine automatische Karte geladen werden. Route stattdessen in Google Maps öffnen.",
+    "trackOpenGoogleDirections": "Route in Google Maps öffnen"
   },
   "footer": {
     "rights": "Alle Rechte vorbehalten.",

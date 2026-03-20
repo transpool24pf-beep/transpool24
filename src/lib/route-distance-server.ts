@@ -2,7 +2,8 @@ const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
 const OSRM_URL = "https://router.project-osrm.org/route/v1/driving";
 const GOOGLE_DIRECTIONS_URL = "https://maps.googleapis.com/maps/api/directions/json";
 
-async function geocode(address: string): Promise<{ lat: number; lon: number } | null> {
+/** Nominatim (server-only). Use sparingly; respect OSM usage policy. */
+export async function geocodeAddressForMap(address: string): Promise<{ lat: number; lon: number } | null> {
   const res = await fetch(
     `${NOMINATIM_URL}?format=json&q=${encodeURIComponent(address)}&limit=1&countrycodes=de`,
     {
@@ -57,8 +58,8 @@ export async function getRouteDistanceAndDuration(
   }
 
   const [from, to] = await Promise.all([
-    geocode(pickupAddress.trim()),
-    geocode(deliveryAddress.trim()),
+    geocodeAddressForMap(pickupAddress.trim()),
+    geocodeAddressForMap(deliveryAddress.trim()),
   ]);
   if (!from || !to) return null;
   try {

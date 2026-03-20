@@ -1,8 +1,23 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
+
+import type { TrailPointMap } from "@/components/OrderTrackMap";
+
+const OrderTrackMap = dynamic(
+  () => import("@/components/OrderTrackMap").then((m) => m.OrderTrackMap),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-[300px] items-center justify-center rounded-xl border border-[#0d2137]/10 bg-[#0d2137]/[0.04] text-sm text-[var(--foreground)]/60">
+        …
+      </div>
+    ),
+  }
+);
 
 type TrackJob = {
   id: string;
@@ -16,6 +31,24 @@ type TrackJob = {
   last_driver_lng: number | null;
   last_driver_location_at: string | null;
   pod_completed_at: string | null;
+  distance_km?: number | null;
+};
+
+type DriverPublic = {
+  full_name: string;
+  phone: string;
+  vehicle_plate: string | null;
+  languages_spoken: string | null;
+  personal_photo_url: string | null;
+  star_rating: number | null;
+};
+
+type RoutePlan = {
+  pickup_lat: number;
+  pickup_lng: number;
+  delivery_lat: number;
+  delivery_lng: number;
+  line: GeoJSON.LineString;
 };
 
 type TrailPoint = { latitude: number; longitude: number; recorded_at: string };
@@ -39,6 +72,8 @@ export function OrderTrackClient({
 }) {
   const t = useTranslations("order");
   const [job, setJob] = useState<TrackJob | null>(null);
+  const [driver, setDriver] = useState<DriverPublic | null>(null);
+  const [routePlan, setRoutePlan] = useState<RoutePlan | null>(null);
   const [trail, setTrail] = useState<TrailPoint[]>([]);
   const [stops, setStops] = useState<StopRow[]>([]);
   const [delivered, setDelivered] = useState(false);
@@ -60,12 +95,23 @@ export function OrderTrackClient({
         if (!res.ok) return res.json().then((d) => { throw new Error(d.error || "Failed"); });
         return res.json();
       })
-      .then((data: { job: TrackJob; trail: TrailPoint[]; stops: StopRow[]; delivered: boolean }) => {
-        setJob(data.job);
-        setTrail(data.trail ?? []);
-        setStops(data.stops ?? []);
-        setDelivered(Boolean(data.delivered));
-      })
+      .then(
+        (data: {
+          job: TrackJob;
+          driver: DriverPublic | null;
+          route_plan: RoutePlan | null;
+          trail: TrailPoint[];
+          stops: StopRow[];
+          delivered: boolean;
+        }) => {
+          setJob(data.job);
+          setDriver(data.driver ?? null);
+          setRoutePlan(data.route_plan ?? null);
+          setTrail(data.trail ?? []);
+          setStops(data.stops ?? []);
+          setDelivered(Boolean(data.delivered));
+        }
+      )
       .catch((e) => {
         setError(e instanceof Error ? e.message : t("invalidLink"));
         setJob(null);
@@ -77,15 +123,30 @@ export function OrderTrackClient({
     load();
   }, [load]);
 
-  const lat = job?.last_driver_lat;
-  const lng = job?.last_driver_lng;
-  const hasPosition =
-    lat != null && lng != null && Number.isFinite(lat) && Number.isFinite(lng);
+  const lat = job?.last_driver_lat != null ? Number(job.last_driver_lat) : null;
+  const lng = job?.last_driver_lng != null ? Number(job.last_driver_lng) : null;
+  const hasLivePosition = lat != null && lng != null && Number.isFinite(lat) && Number.isFinite(lng);
 
-  const embedSrc =
-    hasPosition && lat != null && lng != null
-      ? `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.02},${lat - 0.015},${lng + 0.02},${lat + 0.015}&layer=mapnik&marker=${lat}%2C${lng}`
-      : null;
+  const trailForMap: TrailPointMap[] = useMemo(
+    () =>
+      trail.map((p) => ({
+        lat: Number(p.latitude),
+        lng: Number(p.longitude),
+        recorded_at: p.recorded_at,
+      })),
+    [trail]
+  );
+
+  const googleDirUrl = useMemo(() => {
+    if (!job) return "";
+    return `https://www.google.com/maps/dir/${encodeURIComponent(job.pickup_address)}/${encodeURIComponent(job.delivery_address)}`;
+  }, [job]);
+
+  const showMap = Boolean(
+    routePlan ||
+      hasLivePosition ||
+      trailForMap.length >= 1
+  );
 
   if (loading && !job) {
     return (
@@ -113,6 +174,59 @@ export function OrderTrackClient({
     <div className="space-y-6">
       <p className="text-[var(--foreground)]/80">{t("trackSubtitle")}</p>
 
+      {driver && driver.full_name && (
+        <div className="rounded-xl border border-[#0d2137]/10 bg-white p-5 shadow-sm">
+          <h2 className="mb-3 text-lg font-semibold text-[var(--primary)]">{t("trackYourDriver")}</h2>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+            {driver.personal_photo_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={driver.personal_photo_url}
+                alt=""
+                className="h-24 w-24 shrink-0 rounded-full object-cover ring-2 ring-[#0d2137]/10"
+              />
+            ) : (
+              <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-[#0d2137]/10 text-3xl text-[#0d2137]/40">
+                ···
+              </div>
+            )}
+            <dl className="min-w-0 flex-1 space-y-1 text-sm">
+              <dt className="sr-only">{t("trackDriverName")}</dt>
+              <dd className="text-lg font-semibold text-[var(--primary)]">{driver.full_name}</dd>
+              {driver.star_rating != null && (
+                <dd className="text-amber-600">★ {driver.star_rating.toFixed(1)}</dd>
+              )}
+              <div>
+                <dt className="text-[var(--foreground)]/60">{t("trackDriverPhone")}</dt>
+                <dd>
+                  <a href={`tel:${driver.phone}`} className="font-medium text-[var(--accent)] hover:underline">
+                    {driver.phone}
+                  </a>
+                </dd>
+              </div>
+              {driver.vehicle_plate && (
+                <div>
+                  <dt className="text-[var(--foreground)]/60">{t("trackDriverPlate")}</dt>
+                  <dd className="font-mono">{driver.vehicle_plate}</dd>
+                </div>
+              )}
+              {driver.languages_spoken && (
+                <div>
+                  <dt className="text-[var(--foreground)]/60">{t("trackDriverLanguages")}</dt>
+                  <dd>{driver.languages_spoken}</dd>
+                </div>
+              )}
+            </dl>
+          </div>
+        </div>
+      )}
+
+      {!driver?.full_name && (
+        <p className="rounded-lg border border-amber-200 bg-amber-50/60 p-4 text-sm text-amber-950/90">
+          {t("trackDriverPending")}
+        </p>
+      )}
+
       <div className="rounded-xl border border-[#0d2137]/10 bg-white p-5 shadow-sm">
         <dl className="grid gap-3 text-sm sm:grid-cols-2">
           <div>
@@ -131,6 +245,12 @@ export function OrderTrackClient({
             <dt className="text-[var(--foreground)]/60">{t("trackDelivery")}</dt>
             <dd>{job.delivery_address}</dd>
           </div>
+          {job.distance_km != null && (
+            <div>
+              <dt className="text-[var(--foreground)]/60">{t("trackDistance")}</dt>
+              <dd>{job.distance_km} km</dd>
+            </div>
+          )}
           {job.estimated_arrival_at && (
             <div>
               <dt className="text-[var(--foreground)]/60">{t("trackEta")}</dt>
@@ -168,27 +288,68 @@ export function OrderTrackClient({
         </dl>
       </div>
 
-      {hasPosition && embedSrc && (
-        <div className="overflow-hidden rounded-xl border border-[#0d2137]/10 bg-white shadow-sm">
-          <iframe title="Map" className="h-[280px] w-full border-0" src={embedSrc} loading="lazy" />
-          <div className="border-t border-[#0d2137]/10 p-3">
-            <a
-              href={`https://www.google.com/maps?q=${lat},${lng}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm font-medium text-[var(--accent)] hover:underline"
-            >
-              {t("trackMapLink")}
-            </a>
-          </div>
+      {showMap && (
+        <div className="space-y-2">
+          <h2 className="text-lg font-semibold text-[var(--primary)]">{t("trackMapTitle")}</h2>
+          <p className="text-sm text-[var(--foreground)]/75">{t("trackMapHint")}</p>
+          <OrderTrackMap
+            pickup={
+              routePlan
+                ? { lat: routePlan.pickup_lat, lng: routePlan.pickup_lng }
+                : null
+            }
+            delivery={
+              routePlan
+                ? { lat: routePlan.delivery_lat, lng: routePlan.delivery_lng }
+                : null
+            }
+            routeLine={routePlan?.line ?? null}
+            livePosition={hasLivePosition && lat != null && lng != null ? { lat, lng } : null}
+            trail={trailForMap}
+            pickupLabel={t("trackPickup")}
+            deliveryLabel={t("trackDelivery")}
+            liveLabel={t("trackLiveMarker")}
+          />
         </div>
       )}
 
-      {!hasPosition && (
-        <p className="rounded-lg border border-dashed border-[#0d2137]/20 bg-[#0d2137]/[0.03] p-4 text-sm text-[var(--foreground)]/70">
-          {t("trackNoPosition")}
-        </p>
+      {!showMap && (
+        <div className="space-y-3 rounded-lg border border-dashed border-[#0d2137]/25 bg-[#0d2137]/[0.03] p-4 text-sm text-[var(--foreground)]/80">
+          <p>{t("trackNoGeocode")}</p>
+          <a
+            href={googleDirUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block font-medium text-[var(--accent)] hover:underline"
+          >
+            {t("trackOpenGoogleDirections")}
+          </a>
+        </div>
       )}
+
+      {hasLivePosition && (
+        <div className="rounded-lg border border-[#0d2137]/10 bg-white p-3 text-center text-sm">
+          <a
+            href={`https://www.google.com/maps?q=${lat},${lng}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-medium text-[var(--accent)] hover:underline"
+          >
+            {t("trackMapLink")}
+          </a>
+        </div>
+      )}
+
+      <div className="flex flex-wrap gap-2">
+        <a
+          href={googleDirUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="rounded-xl border-2 border-[#0d2137]/20 bg-white px-4 py-2 text-sm font-medium text-[#0d2137] hover:bg-[#0d2137]/5"
+        >
+          {t("trackOpenGoogleDirections")}
+        </a>
+      </div>
 
       {stops.length > 0 && (
         <div className="rounded-xl border border-[#0d2137]/10 bg-white p-5">
@@ -198,9 +359,7 @@ export function OrderTrackClient({
               <li key={s.sequence_order}>
                 <span className="font-medium">{s.address}</span>
                 {s.city ? `, ${s.city}` : ""}
-                {s.completed_at ? (
-                  <span className="ml-2 text-green-700">✓</span>
-                ) : null}
+                {s.completed_at ? <span className="ml-2 text-green-700">✓</span> : null}
               </li>
             ))}
           </ol>
@@ -213,7 +372,7 @@ export function OrderTrackClient({
           <ul className="max-h-40 space-y-1 overflow-y-auto font-mono text-xs text-[var(--foreground)]/80">
             {trail.slice(0, 15).map((p, i) => (
               <li key={`${p.recorded_at}-${i}`}>
-                {p.latitude.toFixed(5)}, {p.longitude.toFixed(5)} —{" "}
+                {Number(p.latitude).toFixed(5)}, {Number(p.longitude).toFixed(5)} —{" "}
                 {new Date(p.recorded_at).toLocaleTimeString(locale === "ar" ? "ar" : locale, {
                   hour: "2-digit",
                   minute: "2-digit",

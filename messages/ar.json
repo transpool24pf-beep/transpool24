@@ -132,7 +132,19 @@
     "trackNotDelivered": "قيد التنفيذ",
     "trackDeliveredLabel": "حالة التسليم",
     "trackRefresh": "تحديث",
-    "trackNoPosition": "لا يوجد موقع مباشر بعد. ستظهر الخريطة عند تحديث موقع السائق."
+    "trackNoPosition": "لا يوجد موقع مباشر بعد. ستظهر الخريطة عند تحديث موقع السائق.",
+    "trackYourDriver": "سائقك",
+    "trackDriverName": "الاسم",
+    "trackDriverPhone": "الهاتف",
+    "trackDriverPlate": "لوحة المركبة",
+    "trackDriverLanguages": "اللغات",
+    "trackDriverPending": "سيظهر هنا صورة وبيانات السائق فور تعيينه. يمكنك الاطلاع على المسار المخطط على الخريطة في الأثناء.",
+    "trackDistance": "المسافة (تقريبية)",
+    "trackMapTitle": "الخريطة والمسار",
+    "trackMapHint": "الخط الرمادي المتقطع: المسار المخطط (استلام → تسليم). البرتقالي: مسار الـ GPS عند مشاركة السائق لموقعه. يظهر مؤشر الموقع الحي فور استلام أول تحديث.",
+    "trackLiveMarker": "موقع المركبة الحالي",
+    "trackNoGeocode": "تعذر تحميل الخريطة تلقائياً لهذه العناوين. يمكنك فتح المسار في خرائط Google.",
+    "trackOpenGoogleDirections": "فتح المسار في خرائط Google"
   },
   "footer": {
     "rights": "جميع الحقوق محفوظة.",

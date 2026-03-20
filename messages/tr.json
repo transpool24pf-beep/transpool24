@@ -132,7 +132,19 @@
     "trackNotDelivered": "Devam ediyor",
     "trackDeliveredLabel": "Teslimat durumu",
     "trackRefresh": "Yenile",
-    "trackNoPosition": "Canlı konum yok. Konum güncellenince harita görünür."
+    "trackNoPosition": "Canlı konum yok. Konum güncellenince harita görünür.",
+    "trackYourDriver": "Sürücünüz",
+    "trackDriverName": "Ad",
+    "trackDriverPhone": "Telefon",
+    "trackDriverPlate": "Plaka",
+    "trackDriverLanguages": "Diller",
+    "trackDriverPending": "Sürücü atanınca fotoğraf ve iletişim burada görünür. Planlanan rota haritada kalır.",
+    "trackDistance": "Mesafe (yaklaşık)",
+    "trackMapTitle": "Harita ve rota",
+    "trackMapHint": "Gri kesik çizgi: planlanan rota. Turuncu: canlı GPS izi. İlk konumla birlikte canlı işaret görünür.",
+    "trackLiveMarker": "Anlık konum",
+    "trackNoGeocode": "Otomatik harita yüklenemedi. Rotayı Google Haritalar’da açın.",
+    "trackOpenGoogleDirections": "Google Haritalar’da rotayı aç"
   },
   "footer": {
     "rights": "Tüm hakları saklıdır.",

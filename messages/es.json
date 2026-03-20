@@ -132,7 +132,19 @@
     "trackNotDelivered": "En curso",
     "trackDeliveredLabel": "Estado de entrega",
     "trackRefresh": "Actualizar",
-    "trackNoPosition": "Aún no hay posición en vivo. El mapa aparecerá cuando se actualice la ubicación."
+    "trackNoPosition": "Aún no hay posición en vivo. El mapa aparecerá cuando se actualice la ubicación.",
+    "trackYourDriver": "Su conductor",
+    "trackDriverName": "Nombre",
+    "trackDriverPhone": "Teléfono",
+    "trackDriverPlate": "Matrícula",
+    "trackDriverLanguages": "Idiomas",
+    "trackDriverPending": "La foto y datos del conductor aparecerán al asignarlo. Puede ver la ruta planificada en el mapa.",
+    "trackDistance": "Distancia (aprox.)",
+    "trackMapTitle": "Mapa y ruta",
+    "trackMapHint": "Línea gris: ruta prevista. Naranja: rastro GPS en vivo. El marcador aparece con la primera posición.",
+    "trackLiveMarker": "Posición actual",
+    "trackNoGeocode": "No se pudo cargar el mapa automático. Abrir la ruta en Google Maps.",
+    "trackOpenGoogleDirections": "Abrir ruta en Google Maps"
   },
   "footer": {
     "rights": "Todos los derechos reservados.",

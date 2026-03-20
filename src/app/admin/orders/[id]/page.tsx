@@ -142,6 +142,7 @@ export default function AdminOrderDetailPage({
   const [order, setOrder] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [sendingTrackOnly, setSendingTrackOnly] = useState(false);
   const [id, setId] = useState<string | null>(null);
   const [drivers, setDrivers] = useState<DriverOption[]>([]);
   const [updatingDriver, setUpdatingDriver] = useState(false);
@@ -238,6 +239,30 @@ export default function AdminOrderDetailPage({
       })
       .catch(() => alert("فشل الطلب"))
       .finally(() => setSending(false));
+  };
+
+  const sendTrackingOnlyEmail = () => {
+    if (!order?.customer_email) return;
+    if (!order.confirmation_token) {
+      alert("لا يوجد رمز تأكيد (confirmation_token) — لا يمكن إرسال رابط التتبع الآمن.");
+      return;
+    }
+    setSendingTrackOnly(true);
+    fetch("/api/admin/send-tracking-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ job_id: order.id }),
+    })
+      .then(async (r) => {
+        const j = await r.json();
+        if (!r.ok) throw new Error(typeof j.error === "string" ? j.error : "فشل الإرسال");
+        return j;
+      })
+      .then(() => {
+        alert("تم إرسال رسالة التتبع للعميل (بدون PDF): " + order.customer_email);
+      })
+      .catch((e) => alert(e instanceof Error ? e.message : "فشل الإرسال"))
+      .finally(() => setSendingTrackOnly(false));
   };
 
   const openWhatsApp = () => {
@@ -548,6 +573,17 @@ export default function AdminOrderDetailPage({
                 >
                   {sending ? "جاري الإرسال…" : "إرسال بريد التأكيد للعميل"}
                 </button>
+                <button
+                  type="button"
+                  onClick={sendTrackingOnlyEmail}
+                  disabled={sendingTrackOnly}
+                  className="flex w-full items-center justify-center gap-2 rounded-xl border-2 border-[#0d2137] bg-[#0d2137] px-4 py-3 font-medium text-white shadow-sm hover:bg-[#0d2137]/90 disabled:opacity-60"
+                >
+                  {sendingTrackOnly ? "جاري الإرسال…" : "إرسال رسالة تتبع الطلب (بدون PDF)"}
+                </button>
+                <p className="text-xs text-[#0d2137]/65">
+                  نص احترافي عربي + ألماني، صورة وبيانات السائق إن وُجد، رابط صفحة التتبع مع خريطة المسار — دون مرفق فاتورة.
+                </p>
               </>
             )}
             <hr className="border-[#0d2137]/10" />

@@ -143,6 +143,10 @@ function escapeHtml(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
+function escapeHref(u: string): string {
+  return u.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+}
+
 export async function sendOrderConfirmationEmail(
   to: string,
   job: Job & { rating_token?: string | null },
@@ -210,6 +214,154 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.co
 const LOGO_URL = `${SITE_URL}/345remov.png`;
 const LOGO_ORANGE_URL = `${SITE_URL}/567.png`;
 const LOGO_BLUE_URL = `${SITE_URL}/356.png`;
+
+/** Dedicated tracking email: Arabic + German, driver card, no PDF (Resend). */
+function buildTrackingUpdateHtml(
+  job: Job,
+  options: {
+    trackOrderUrl: string;
+    googleMapsDirectionsUrl: string;
+    driver?: OrderEmailDriverInfo | null;
+  }
+): string {
+  const headerBlue = "#0d2137";
+  const orderRef = job.order_number != null ? String(job.order_number) : job.id.slice(0, 8);
+  const companyName = (job.company_name || "").trim() || "عميلنا الكريم";
+  const statusDe = (job.logistics_status || "").replace(/_/g, " ");
+  const etaDe =
+    job.estimated_arrival_at != null
+      ? new Date(job.estimated_arrival_at).toLocaleString("de-DE", {
+          dateStyle: "medium",
+          timeStyle: "short",
+        })
+      : null;
+  const etaAr =
+    job.estimated_arrival_at != null
+      ? new Date(job.estimated_arrival_at).toLocaleString("ar", {
+          dateStyle: "medium",
+          timeStyle: "short",
+        })
+      : null;
+  const distStr = job.distance_km != null ? `${job.distance_km} km` : "—";
+
+  const driverBlock =
+    options.driver && options.driver.full_name
+      ? `
+  <table cellpadding="0" cellspacing="0" width="100%" style="margin-bottom:20px; background:#f8fafc; border-radius:12px; border:1px solid #e2e8f0;">
+    <tr><td style="padding:18px;">
+      <p style="margin:0 0 10px 0; font-size:15px; font-weight:bold; color:${headerBlue};">Ihr Fahrer / سائقكم</p>
+      <table cellpadding="0" cellspacing="0"><tr>
+        <td style="vertical-align:top; padding-left:16px;" dir="rtl">
+          ${options.driver.personal_photo_url ? `<img src="${escapeHtml(options.driver.personal_photo_url)}" alt="" width="88" height="88" style="border-radius:50%; object-fit:cover; display:block;" />` : ""}
+        </td>
+        <td style="vertical-align:top; font-size:14px; color:#334155;">
+          <p style="margin:0 0 6px 0;"><strong>${escapeHtml(options.driver.full_name)}</strong></p>
+          <p style="margin:0 0 4px 0; color:#64748b;">${options.driver.star_rating != null ? `${options.driver.star_rating.toFixed(1)} ⭐` : "—"}</p>
+          <p style="margin:0 0 4px 0;">📞 ${escapeHtml(options.driver.phone)}</p>
+          <p style="margin:0 0 4px 0;">🚗 ${escapeHtml(options.driver.vehicle_plate || "—")}</p>
+          <p style="margin:0;">🗣 ${escapeHtml(options.driver.languages_spoken || "—")}</p>
+        </td>
+      </tr></table>
+    </td></tr>
+  </table>`
+      : `
+  <p style="margin:0 0 16px 0; padding:12px; background:#fff7ed; border-radius:8px; font-size:14px; color:#9a3412; border:1px solid #fed7aa;">
+    Hinweis / ملاحظة: Sobald ein Fahrer zugewiesen ist, sehen Sie auf der Tracking-Seite Foto und Kontakt. / سيظهر صورة وبيانات السائق على صفحة التتبع بعد تعيينه.
+  </p>`;
+
+  return `
+<!DOCTYPE html>
+<html lang="ar">
+<head><meta charset="utf-8"><title>TransPool24 – تتبع الطلب</title></head>
+<body style="margin:0; font-family:'Segoe UI',Tahoma,Arial,sans-serif; background:#eef2f6;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:${headerBlue}; padding:22px;">
+    <tr><td align="center"><img src="${LOGO_BLUE_URL}" alt="TransPool24" width="220" height="64" style="display:block; max-width:220px; height:auto;" /></td></tr>
+  </table>
+  <table width="100%" cellpadding="0" cellspacing="0" style="max-width:620px; margin:0 auto; padding:28px 16px;">
+    <tr><td>
+      <div style="background:#fff; border-radius:14px; padding:26px; box-shadow:0 2px 14px rgba(0,0,0,0.07);">
+        <div dir="rtl" style="text-align:right; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:18px;">
+          <p style="margin:0 0 10px 0; font-size:19px; font-weight:bold; color:${headerBlue};">عزيزنا العميل ${escapeHtml(companyName)}،</p>
+          <p style="margin:0 0 10px 0; font-size:15px; color:#334155; line-height:1.65;">
+            نشكر ثقتكم بـ TransPool24. نعمل بكل احترافية لإيصال شحنتكم بأمان وفي الوقت المتفق عليه.
+          </p>
+          <p style="margin:0 0 10px 0; font-size:15px; color:#334155; line-height:1.65;">
+            من خلال الرابط أدناه يمكنكم متابعة <strong>حالة الطلب</strong> و<strong>وقت الوصول التقريبي</strong> عند توفرهما.
+            ستظهر <strong>الخريطة التفاعلية ومسار السائق المباشر</strong> على الصفحة تلقائياً بمجرد تحديث موقعه.
+          </p>
+          <p style="margin:0; font-size:14px; color:#64748b;">رقم الطلب: <strong>${escapeHtml(orderRef)}</strong> · المسافة التقريبية: ${escapeHtml(distStr)}</p>
+          ${etaAr ? `<p style="margin:10px 0 0 0; font-size:14px; color:#0f766e;">الوصول المتوقع (إن وُجد): <strong>${escapeHtml(etaAr)}</strong></p>` : ""}
+        </div>
+        <div dir="ltr" style="margin-bottom:20px;">
+          <p style="margin:0 0 8px 0; font-size:17px; font-weight:bold; color:${headerBlue};">Sehr geehrte Damen und Herren,</p>
+          <p style="margin:0 0 10px 0; font-size:15px; color:#334155; line-height:1.55;">
+            vielen Dank für Ihr Vertrauen in TransPool24. Auf der folgenden Seite sehen Sie den <strong>aktuellen Status</strong>
+            und – sobald verfügbar – die <strong>voraussichtliche Ankunftszeit</strong>.
+          </p>
+          <p style="margin:0 0 10px 0; font-size:15px; color:#334155; line-height:1.55;">
+            Sobald der Fahrer sein GPS teilt, erscheint automatisch eine <strong>Live-Karte</strong> und die <strong>Fahrspur</strong>.
+            Bis dahin sehen Sie die geplante Route (Abholung → Zustellung) zur Orientierung.
+          </p>
+          <p style="margin:0; font-size:14px; color:#64748b;">Auftrag <strong>#${escapeHtml(orderRef)}</strong> · Status: ${escapeHtml(statusDe)} · Distanz: ${escapeHtml(distStr)}</p>
+          ${etaDe ? `<p style="margin:8px 0 0 0; font-size:14px; color:#0f766e;">Voraussichtliche Ankunft: <strong>${escapeHtml(etaDe)}</strong></p>` : ""}
+        </div>
+        ${driverBlock}
+        <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse:collapse; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:18px;">
+          <tr style="background:#f8fafc;"><td style="color:#64748b; width:32%;">Abholung / الاستلام</td><td>${escapeHtml(job.pickup_address)}</td></tr>
+          <tr><td style="color:#64748b;">Lieferung / التسليم</td><td>${escapeHtml(job.delivery_address)}</td></tr>
+        </table>
+        <p style="margin:0 0 14px 0; text-align:center;">
+          <a href="${escapeHref(options.trackOrderUrl)}" style="display:inline-block; padding:16px 28px; background:linear-gradient(135deg,#e85d04 0%,#f48c06 100%); color:#fff !important; text-decoration:none; border-radius:12px; font-weight:bold; font-size:17px; box-shadow:0 4px 18px rgba(232,93,4,0.35);">
+            تتبع طلبك الآن · Jetzt live verfolgen
+          </a>
+        </p>
+        <p style="margin:0 0 8px 0; text-align:center; font-size:14px;">
+          <a href="${escapeHref(options.googleMapsDirectionsUrl)}" style="color:${headerBlue}; text-decoration:underline;">Route in Google Maps öffnen / فتح المسار في خرائط Google</a>
+        </p>
+        <p style="margin:16px 0 0 0; font-size:12px; color:#94a3b8; text-align:center;">TransPool24 · Pforzheim &amp; Region · Diese E-Mail enthält keinen PDF-Anhang.</p>
+      </div>
+    </td></tr>
+  </table>
+</body>
+</html>`.trim();
+}
+
+export async function sendTrackingUpdateEmail(
+  to: string,
+  job: Job,
+  options: {
+    trackOrderUrl: string;
+    googleMapsDirectionsUrl: string;
+    driver?: OrderEmailDriverInfo | null;
+  }
+): Promise<{ success: boolean; error?: string }> {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    return { success: false, error: "RESEND_API_KEY not set" };
+  }
+  const orderRef = job.order_number != null ? String(job.order_number) : job.id.slice(0, 8);
+  const resend = new Resend(apiKey);
+  try {
+    const { error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [to],
+      subject: `TransPool24 – تتبع طلبك #${orderRef} · Live-Tracking #${orderRef}`,
+      html: buildTrackingUpdateHtml(job, options),
+    });
+    if (error) {
+      const raw =
+        typeof error === "string"
+          ? error
+          : error && typeof error === "object" && "message" in error
+            ? String((error as { message: unknown }).message)
+            : JSON.stringify(error);
+      return { success: false, error: raw };
+    }
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "Unknown error" };
+  }
+}
 const WHATSAPP_GROUP_LINK = "https://chat.whatsapp.com/ESup6od1fkHCixxMrT162q?mode=gi_t";
 const QR_WHATSAPP_URL = `https://api.qrserver.com/v1/create-qr-code/?size=140x140&bgcolor=FFFFFF&color=000000&data=${encodeURIComponent(WHATSAPP_GROUP_LINK)}`;
 const ORANGE = "#e85d04";

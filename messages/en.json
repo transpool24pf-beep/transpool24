@@ -132,7 +132,19 @@
     "trackNotDelivered": "In progress",
     "trackDeliveredLabel": "Delivery status",
     "trackRefresh": "Refresh",
-    "trackNoPosition": "No live GPS position yet. A map appears when the driver location is updated."
+    "trackNoPosition": "No live GPS position yet. A map appears when the driver location is updated.",
+    "trackYourDriver": "Your driver",
+    "trackDriverName": "Name",
+    "trackDriverPhone": "Phone",
+    "trackDriverPlate": "Vehicle plate",
+    "trackDriverLanguages": "Languages",
+    "trackDriverPending": "Your driver will appear here as soon as one is assigned. You can still follow the planned route on the map.",
+    "trackDistance": "Distance (approx.)",
+    "trackMapTitle": "Map & route",
+    "trackMapHint": "Gray dashed line: planned route (pickup → delivery). Orange line: live GPS trail when the driver shares their location. The live marker appears as soon as we receive a position update.",
+    "trackLiveMarker": "Current vehicle position",
+    "trackNoGeocode": "We could not load the automatic map for these addresses. Open the route in Google Maps instead.",
+    "trackOpenGoogleDirections": "Open route in Google Maps"
   },
   "footer": {
     "rights": "All rights reserved.",
