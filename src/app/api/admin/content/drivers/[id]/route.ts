@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin-api";
-import { createClient } from "@/lib/supabase";
+import { createServerSupabase } from "@/lib/supabase";
 
 export async function PUT(
   request: Request,
@@ -12,7 +12,7 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    const supabase = createClient();
+    const supabase = createServerSupabase();
 
     const { data, error } = await supabase
       .from("homepage_drivers")
@@ -46,7 +46,7 @@ export async function DELETE(
 
   try {
     const { id } = await params;
-    const supabase = createClient();
+    const supabase = createServerSupabase();
 
     const { error } = await supabase.from("homepage_drivers").delete().eq("id", id);
 

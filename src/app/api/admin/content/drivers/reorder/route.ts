@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin-api";
-import { createClient } from "@/lib/supabase";
+import { createServerSupabase } from "@/lib/supabase";
 
 export async function POST(request: Request) {
   const err = await requireAdmin();
@@ -8,7 +8,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const supabase = createClient();
+    const supabase = createServerSupabase();
 
     // Update all orders in a transaction-like manner
     const updates = body.drivers.map((d: { id: number; order: number }) =>

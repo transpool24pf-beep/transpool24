@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin-api";
-import { createClient } from "@/lib/supabase";
+import { createServerSupabase } from "@/lib/supabase";
 
 export async function GET() {
   const err = await requireAdmin();
   if (err) return err;
 
   try {
-    const supabase = createClient();
+    const supabase = createServerSupabase();
     const { data, error } = await supabase
       .from("homepage_drivers")
       .select("*")
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const supabase = createClient();
+    const supabase = createServerSupabase();
 
     // Get max order
     const { data: maxData } = await supabase
