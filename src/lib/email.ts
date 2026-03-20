@@ -210,7 +210,7 @@ export async function sendOrderConfirmationEmail(
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com";
 const LOGO_BLUE_URL = `${SITE_URL}/356.png`;
-/** Full-width header banner (600×90) – from Snapshot; served from /public */
+/** Full-width header banner (600×90) – generated from assets/Snapshot_1.PNG; served as /public/email-header.png */
 const EMAIL_HEADER_BANNER_URL = `${SITE_URL}/email-header.png`;
 
 /** Top-of-email header: same visual strip width as before (~600px), fixed height ~90px */
