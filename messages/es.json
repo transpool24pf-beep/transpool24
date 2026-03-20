@@ -21,6 +21,10 @@
       "trustDesc": "Precio fijo por distancia y tamaño de carga.",
       "local": "Local y conectado",
       "localDesc": "En Pforzheim, conectados con la región."
+    },
+    "drivers": {
+      "title": "Nuestros Conductores",
+      "subtitle": "Descubra lo que dicen nuestros clientes sobre nuestros conductores profesionales"
     }
   },
   "order": {

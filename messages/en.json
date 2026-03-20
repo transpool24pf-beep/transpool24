@@ -21,6 +21,10 @@
       "trustDesc": "Fixed price by distance and cargo size.",
       "local": "Local & connected",
       "localDesc": "Rooted in Pforzheim, connected to the region."
+    },
+    "drivers": {
+      "title": "Our Drivers",
+      "subtitle": "See what our customers say about our professional drivers"
     }
   },
   "order": {

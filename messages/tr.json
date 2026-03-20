@@ -21,6 +21,10 @@
       "trustDesc": "Mesafe ve yük boyutuna göre sabit fiyat.",
       "local": "Yerel ve bağlı",
       "localDesc": "Pforzheim'da köklü, bölgeye bağlı."
+    },
+    "drivers": {
+      "title": "Sürücülerimiz",
+      "subtitle": "Müşterilerimizin profesyonel sürücülerimiz hakkında söylediklerini görün"
     }
   },
   "order": {

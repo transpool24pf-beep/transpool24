@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { DriversCarousel } from "@/components/DriversCarousel";
 
 export default async function HomePage({
   params,
@@ -109,6 +110,9 @@ export default async function HomePage({
             </div>
           </div>
         </section>
+
+        {/* Drivers Carousel Section */}
+        <DriversCarousel />
 
         {/* CTA Section - مع صورة الشاحنة */}
         <section className="bg-gradient-to-br from-gray-50 to-white py-20 sm:py-24">

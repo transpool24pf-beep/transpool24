@@ -21,6 +21,10 @@
       "trustDesc": "Festpreis nach Strecke und Ladungsgröße.",
       "local": "Lokal & vernetzt",
       "localDesc": "Verwurzelt in Pforzheim, Verbindung in die Region."
+    },
+    "drivers": {
+      "title": "Unsere Fahrer",
+      "subtitle": "Erfahren Sie, was unsere Kunden über unsere professionellen Fahrer sagen"
     }
   },
   "order": {

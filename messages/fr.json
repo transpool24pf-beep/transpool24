@@ -21,6 +21,10 @@
       "trustDesc": "Prix fixe selon distance et taille de chargement.",
       "local": "Local et connecté",
       "localDesc": "Enracinés à Pforzheim, connectés à la région."
+    },
+    "drivers": {
+      "title": "Nos Chauffeurs",
+      "subtitle": "Découvrez ce que nos clients disent de nos chauffeurs professionnels"
     }
   },
   "order": {
