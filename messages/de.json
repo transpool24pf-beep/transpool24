@@ -250,7 +250,12 @@
     "podNotImage": "Bitte ein Bild (JPEG, PNG oder WebP) wählen.",
     "podTooLarge": "Maximal 5 MB.",
     "podUploadFailed": "Upload fehlgeschlagen.",
-    "podReadFailed": "Datei konnte nicht gelesen werden."
+    "podReadFailed": "Datei konnte nicht gelesen werden.",
+    "gpsMandatoryShort": "Pflicht: Zuerst Live-Standort starten – erst danach Lieferfoto. Ohne GPS keine Zustellbestätigung.",
+    "gpsMandatoryTitle": "Pflicht: Live-Standort für den Kunden",
+    "gpsMandatoryBody": "Tippen Sie auf die Schaltfläche und erlauben Sie den Standortzugriff. Erst nach mindestens einer erfolgreichen Übertragung erscheint Ihre Position auf der Kunden-Tracking-Seite und Sie können das Lieferfoto hochladen.",
+    "gpsOkForCustomer": "Standort wird übermittelt – Kunden-Tracking ist aktiv.",
+    "gpsRequiredBeforePod": "Bitte zuerst oben „Standortfreigabe starten“ und warten, bis eine Position gesendet wurde. Ohne Live-GPS ist kein Lieferfoto möglich."
   },
   "support": {
     "title": "Technischer Support & Kontakt",

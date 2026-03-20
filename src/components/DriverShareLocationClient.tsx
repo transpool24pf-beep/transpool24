@@ -16,6 +16,7 @@ type ValidateResponse = {
   pod_photo_url?: string | null;
   pod_completed_at?: string | null;
   delivery_complete?: boolean;
+  has_live_location?: boolean;
   error?: string;
 };
 
@@ -48,8 +49,12 @@ export function DriverShareLocationClient({
   const [podErr, setPodErr] = useState<string | null>(null);
   const [podOk, setPodOk] = useState<string | null>(null);
   const [confirmCode, setConfirmCode] = useState("");
+  /** Server already has ≥1 GPS ping (customer can see driver on track page) */
+  const [hasLiveLocationFromServer, setHasLiveLocationFromServer] = useState(false);
   const watchId = useRef<number | null>(null);
   const lastPostAt = useRef(0);
+
+  const locationOkForPod = hasLiveLocationFromServer || lastSent != null;
 
   const sendPosition = useCallback(
     async (lat: number, lng: number, accuracy?: number | null) => {
@@ -72,6 +77,7 @@ export function DriverShareLocationClient({
         const data = await res.json();
         if (!res.ok) throw new Error(typeof data.error === "string" ? data.error : "Failed");
         setLastSent(data.recorded_at ?? new Date().toISOString());
+        setHasLiveLocationFromServer(true);
         setMsg(t("sentOk"));
         setErr(null);
       } catch (e) {
@@ -100,6 +106,7 @@ export function DriverShareLocationClient({
         setDurationMinutes(data.duration_minutes ?? null);
         setDeliveryComplete(Boolean(data.delivery_complete));
         setPodPhotoUrl(data.pod_photo_url ?? null);
+        setHasLiveLocationFromServer(Boolean(data.has_live_location));
       })
       .catch(() => {
         setValid(false);
@@ -221,6 +228,9 @@ export function DriverShareLocationClient({
       <div className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
         <h2 className="text-lg font-semibold text-[var(--primary)]">{t("title")}</h2>
         <p className="mt-2 text-sm text-[var(--foreground)]/80">{t("intro")}</p>
+        <p className="mt-2 rounded-lg border border-amber-200 bg-amber-50/90 px-3 py-2 text-sm font-medium text-amber-950">
+          {t("gpsMandatoryShort")}
+        </p>
         <dl className="mt-4 space-y-2 text-sm">
           <div>
             <dt className="text-[var(--foreground)]/60">{t("orderRef")}</dt>
@@ -301,14 +311,65 @@ export function DriverShareLocationClient({
         </div>
       )}
 
+      <div className="rounded-xl border-2 border-[#b91c1c]/40 bg-red-50/50 p-5 shadow-sm">
+        <h3 className="text-base font-bold text-[#7f1d1d]">{t("gpsMandatoryTitle")}</h3>
+        <p className="mt-2 text-sm text-[#450a0a]/90">{t("gpsMandatoryBody")}</p>
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+          {!sharing ? (
+            <button
+              type="button"
+              onClick={startSharing}
+              className="rounded-xl bg-[#b91c1c] px-6 py-3.5 text-center font-semibold text-white shadow-sm hover:bg-[#991b1b]"
+            >
+              {t("startButton")}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={stopSharing}
+              className="rounded-xl border-2 border-red-400 bg-white px-6 py-3.5 text-center font-semibold text-red-900 hover:bg-red-50"
+            >
+              {t("stopButton")}
+            </button>
+          )}
+        </div>
+        {locationOkForPod && (
+          <p className="mt-3 text-sm font-semibold text-green-800">{t("gpsOkForCustomer")}</p>
+        )}
+        {msg && sharing && <p className="mt-2 text-sm text-green-800">{msg}</p>}
+        {err && sharing === false && <p className="mt-2 text-sm text-red-700">{err}</p>}
+        {lastSent && (
+          <p className="mt-2 text-xs text-[var(--foreground)]/65">
+            {t("lastSent")}:{" "}
+            {new Date(lastSent).toLocaleString(
+              locale === "de" ? "de-DE" : locale === "en" ? "en-GB" : `${locale}-${locale.toUpperCase()}`
+            )}
+          </p>
+        )}
+        <p className="mt-2 text-xs text-[#450a0a]/80">{t("keepOpen")}</p>
+      </div>
+
       <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-4 text-sm text-amber-950/90">
         <p className="font-medium">{t("privacyTitle")}</p>
         <p className="mt-1">{t("privacyBody")}</p>
       </div>
 
-      <div className="rounded-xl border-2 border-emerald-200 bg-emerald-50/40 p-6 shadow-sm">
+      <div
+        className={`rounded-xl border-2 p-6 shadow-sm ${
+          deliveryComplete
+            ? "border-emerald-200 bg-emerald-50/40"
+            : locationOkForPod
+              ? "border-emerald-200 bg-emerald-50/40"
+              : "border-slate-300 bg-slate-50/80"
+        }`}
+      >
         <h3 className="text-base font-semibold text-[var(--primary)]">{t("podTitle")}</h3>
         <p className="mt-2 text-sm text-[var(--foreground)]/80">{t("podIntro")}</p>
+        {!deliveryComplete && !locationOkForPod && (
+          <p className="mt-3 rounded-lg border border-amber-300 bg-amber-100/80 px-3 py-2 text-sm font-medium text-amber-950">
+            {t("gpsRequiredBeforePod")}
+          </p>
+        )}
         {deliveryComplete ? (
           <div className="mt-4 space-y-2">
             <p className="text-sm font-medium text-emerald-900">{t("podDone")}</p>
@@ -322,7 +383,7 @@ export function DriverShareLocationClient({
             ) : null}
           </div>
         ) : (
-          <div className="mt-4 space-y-3">
+          <div className={`mt-4 space-y-3 ${!locationOkForPod ? "pointer-events-none opacity-55" : ""}`}>
             <label className="block text-xs font-medium text-[var(--foreground)]/70">{t("podCodeLabel")}</label>
             <input
               type="text"
@@ -331,10 +392,21 @@ export function DriverShareLocationClient({
               placeholder={t("podCodePlaceholder")}
               className="w-full max-w-md rounded-lg border-2 border-[#0d2137]/20 px-3 py-2 text-sm"
               maxLength={64}
+              disabled={!locationOkForPod}
             />
             <div>
-              <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-[#0d2137] px-4 py-3 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50">
-                <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" disabled={podUploading} onChange={onPickDeliveryPhoto} />
+              <label
+                className={`inline-flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white ${
+                  locationOkForPod ? "cursor-pointer bg-[#0d2137] hover:opacity-90" : "cursor-not-allowed bg-slate-400"
+                }`}
+              >
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  disabled={podUploading || !locationOkForPod}
+                  onChange={onPickDeliveryPhoto}
+                />
                 {podUploading ? t("podUploading") : t("podChoosePhoto")}
               </label>
             </div>
@@ -343,39 +415,6 @@ export function DriverShareLocationClient({
         {podErr && <p className="mt-2 text-sm text-red-700">{podErr}</p>}
         {podOk && <p className="mt-2 text-sm text-green-800">{podOk}</p>}
       </div>
-
-      <div className="flex flex-col gap-3 sm:flex-row">
-        {!sharing ? (
-          <button
-            type="button"
-            onClick={startSharing}
-            className="rounded-xl bg-[#0d2137] px-6 py-3.5 text-center font-semibold text-white shadow-sm hover:opacity-90"
-          >
-            {t("startButton")}
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={stopSharing}
-            className="rounded-xl border-2 border-red-300 bg-red-50 px-6 py-3.5 text-center font-semibold text-red-900 hover:bg-red-100"
-          >
-            {t("stopButton")}
-          </button>
-        )}
-      </div>
-
-      {msg && <p className="text-sm text-green-800">{msg}</p>}
-      {err && sharing === false && <p className="text-sm text-red-700">{err}</p>}
-      {lastSent && (
-        <p className="text-xs text-[var(--foreground)]/60">
-          {t("lastSent")}:{" "}
-          {new Date(lastSent).toLocaleString(
-            locale === "de" ? "de-DE" : locale === "en" ? "en-GB" : `${locale}-${locale.toUpperCase()}`
-          )}
-        </p>
-      )}
-
-      <p className="text-xs text-[var(--foreground)]/50">{t("keepOpen")}</p>
     </div>
   );
 }

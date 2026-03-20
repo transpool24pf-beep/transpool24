@@ -250,7 +250,12 @@
     "podNotImage": "Please choose an image (JPEG, PNG or WebP).",
     "podTooLarge": "Maximum 5 MB.",
     "podUploadFailed": "Upload failed.",
-    "podReadFailed": "Could not read the file."
+    "podReadFailed": "Could not read the file.",
+    "gpsMandatoryShort": "Required: Start live location first, then delivery photo. No GPS → no delivery confirmation.",
+    "gpsMandatoryTitle": "Required: Live location for the customer",
+    "gpsMandatoryBody": "Tap the button and allow location access. After at least one successful update, you appear on the customer tracking page and you can upload the delivery photo.",
+    "gpsOkForCustomer": "Location is being sent – customer tracking is active.",
+    "gpsRequiredBeforePod": "Please start location sharing above and wait until a position is sent. Delivery photo is not possible without live GPS."
   },
   "support": {
     "title": "Technical Support & Contact",

@@ -250,7 +250,12 @@
     "podNotImage": "Lütfen JPEG, PNG veya WebP seçin.",
     "podTooLarge": "En fazla 5 MB.",
     "podUploadFailed": "Yükleme başarısız.",
-    "podReadFailed": "Dosya okunamadı."
+    "podReadFailed": "Dosya okunamadı.",
+    "gpsMandatoryShort": "Zorunlu: Önce canlı konum, sonra teslim fotoğrafı.",
+    "gpsMandatoryTitle": "Zorunlu: Müşteri için canlı konum",
+    "gpsMandatoryBody": "Konuma izin verin. En az bir başarılı gönderimden sonra müşteri haritada sizi görür ve teslim fotoğrafı yükleyebilirsiniz.",
+    "gpsOkForCustomer": "Konum gönderiliyor – müşteri takibi aktif.",
+    "gpsRequiredBeforePod": "Önce yukarıda konum paylaşımını başlatın. Canlı GPS olmadan teslim fotoğrafı yok."
   },
   "support": {
     "title": "Teknik destek ve iletişim",

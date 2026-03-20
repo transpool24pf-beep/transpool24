@@ -788,11 +788,12 @@ export default function AdminOrderDetailPage({
       <div className="rounded-2xl border-2 border-[#0d2137]/10 bg-white p-6 shadow-lg">
         <h2 className="mb-2 text-lg font-semibold text-[#0d2137]">Live-Tracking, ETA, Liefernachweis (POD)</h2>
         <p className="mb-4 text-sm text-[#0d2137]/65">
-          Für den Kunden unter{" "}
-          <code className="rounded bg-[#0d2137]/10 px-1">/de/order/track?job_id=…&amp;token=…</code> – SQL-Migrationen{" "}
-          <code className="rounded bg-[#0d2137]/10 px-1">roadmap_foundation.sql</code> in Supabase ausführen. Der Fahrer kann auf
-          dem <strong>GPS-Link</strong> ein <strong>Lieferfoto hochladen</strong> – dann wird der Auftrag automatisch als zugestellt
-          markiert und das Bild erscheint hier.
+          Kunden-Tracking:{" "}
+          <code className="rounded bg-[#0d2137]/10 px-1">/de/order/track?job_id=…&amp;token=…</code>.{" "}
+          <strong>Pflicht für den Fahrer:</strong> Zuerst Live-Standort über den <strong>Fahrer-GPS-Link</strong> freigeben (mindestens
+          eine Position) – erst danach kann er das Lieferfoto senden; ohne GPS kein POD-Upload. Beim ersten GPS-Ping wird der Status
+          ggf. auf <strong>Unterwegs</strong> gesetzt und eine <strong>ETA</strong> aus der Fahrzeit des Auftrags vorbefüllt, sofern
+          noch leer. Lieferfoto setzt <strong>Zugestellt</strong> und erscheint hier automatisch.
         </p>
         <div className="flex flex-wrap gap-2 border-b border-[#0d2137]/10 pb-4">
           <button

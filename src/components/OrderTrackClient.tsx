@@ -288,6 +288,15 @@ export function OrderTrackClient({
         </dl>
       </div>
 
+      {!delivered &&
+        !hasLivePosition &&
+        job.logistics_status !== "cancelled" &&
+        job.logistics_status !== "draft" && (
+          <div className="rounded-lg border border-sky-200 bg-sky-50/90 p-4 text-sm text-sky-950">
+            {t("trackNoPosition")}
+          </div>
+        )}
+
       {showMap && (
         <div className="space-y-2">
           <h2 className="text-lg font-semibold text-[var(--primary)]">{t("trackMapTitle")}</h2>

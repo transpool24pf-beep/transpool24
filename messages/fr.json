@@ -250,7 +250,12 @@
     "podNotImage": "Choisissez une image JPEG, PNG ou WebP.",
     "podTooLarge": "5 Mo maximum.",
     "podUploadFailed": "Échec de l’envoi.",
-    "podReadFailed": "Lecture du fichier impossible."
+    "podReadFailed": "Lecture du fichier impossible.",
+    "gpsMandatoryShort": "Obligatoire : d’abord la position en direct, puis la photo de livraison.",
+    "gpsMandatoryTitle": "Obligatoire : position en direct pour le client",
+    "gpsMandatoryBody": "Autorisez la géolocalisation. Après au moins une transmission réussie, le client vous voit sur la carte et vous pouvez envoyer la photo de livraison.",
+    "gpsOkForCustomer": "Position transmise – le suivi client est actif.",
+    "gpsRequiredBeforePod": "Démarrez d’abord le partage de position ci-dessus. Pas de photo de livraison sans GPS en direct."
   },
   "support": {
     "title": "Support technique et contact",

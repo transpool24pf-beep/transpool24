@@ -250,7 +250,12 @@
     "podNotImage": "Elija JPEG, PNG o WebP.",
     "podTooLarge": "Máximo 5 MB.",
     "podUploadFailed": "Error al subir.",
-    "podReadFailed": "No se pudo leer el archivo."
+    "podReadFailed": "No se pudo leer el archivo.",
+    "gpsMandatoryShort": "Obligatorio: primero ubicación en vivo, luego foto de entrega.",
+    "gpsMandatoryTitle": "Obligatorio: ubicación en vivo para el cliente",
+    "gpsMandatoryBody": "Permita el acceso a la ubicación. Tras al menos una actualización correcta, el cliente le verá en el mapa y podrá subir la foto de entrega.",
+    "gpsOkForCustomer": "Ubicación enviada – el seguimiento del cliente está activo.",
+    "gpsRequiredBeforePod": "Inicie primero el uso compartido de ubicación arriba. Sin GPS en vivo no hay foto de entrega."
   },
   "support": {
     "title": "Soporte técnico y contacto",

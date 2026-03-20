@@ -18,7 +18,7 @@ export async function GET(req: Request) {
   const { data: job, error } = await supabase
     .from("jobs")
     .select(
-      "id, order_number, logistics_status, pickup_address, delivery_address, driver_tracking_token, distance_km, duration_minutes, pod_photo_url, pod_completed_at"
+      "id, order_number, logistics_status, pickup_address, delivery_address, driver_tracking_token, distance_km, duration_minutes, pod_photo_url, pod_completed_at, last_driver_location_at"
     )
     .eq("id", jobId)
     .maybeSingle();
@@ -30,6 +30,7 @@ export async function GET(req: Request) {
   }
   const deliveryComplete =
     Boolean(job.pod_completed_at) || job.logistics_status === "delivered";
+  const hasLiveLocation = Boolean(job.last_driver_location_at);
   return NextResponse.json({
     ok: true,
     order_number: job.order_number,
@@ -41,6 +42,8 @@ export async function GET(req: Request) {
     pod_photo_url: job.pod_photo_url ?? null,
     pod_completed_at: job.pod_completed_at ?? null,
     delivery_complete: deliveryComplete,
+    last_driver_location_at: job.last_driver_location_at ?? null,
+    has_live_location: hasLiveLocation,
   });
 }
 

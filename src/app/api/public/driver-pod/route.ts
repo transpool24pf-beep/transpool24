@@ -28,7 +28,9 @@ export async function POST(req: Request) {
     const supabase = createServerSupabase();
     const { data: job, error: fetchErr } = await supabase
       .from("jobs")
-      .select("id, driver_tracking_token, logistics_status, pod_completed_at, pod_photo_url")
+      .select(
+        "id, driver_tracking_token, logistics_status, pod_completed_at, pod_photo_url, last_driver_location_at"
+      )
       .eq("id", jobId)
       .maybeSingle();
 
@@ -57,6 +59,18 @@ export async function POST(req: Request) {
       return NextResponse.json(
         { error: "Auftrag noch nicht freigegeben für Zustellnachweis." },
         { status: 400 }
+      );
+    }
+
+    /** Pflicht: mindestens eine Live-Position wurde bereits an den Kunden-Tracker gemeldet */
+    if (!job.last_driver_location_at) {
+      return NextResponse.json(
+        {
+          error:
+            "Live-Standort ist Pflicht: Bitte zuerst „Standortfreigabe starten“ und warten, bis eine Position übertragen wurde. Erst danach Lieferfoto hochladen.",
+          code: "LOCATION_REQUIRED",
+        },
+        { status: 403 }
       );
     }
 
