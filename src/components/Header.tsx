@@ -7,12 +7,22 @@ import { useTranslations, useLocale } from "next-intl";
 import { useState, useRef, useEffect } from "react";
 import { locales, type Locale } from "@/i18n/routing";
 
+const localeFlags: Record<Locale, string> = {
+  de: "🇩🇪",
+  en: "🇬🇧",
+  tr: "🇹🇷",
+  fr: "🇫🇷",
+  es: "🇪🇸",
+  ar: "🇸🇦",
+};
+
 const localeLabels: Record<Locale, string> = {
   de: "DE",
   en: "EN",
   tr: "TR",
   fr: "FR",
   es: "ES",
+  ar: "AR",
 };
 
 type HeaderProps = { hideLogo?: boolean };
@@ -76,14 +86,15 @@ export function Header({ hideLogo }: HeaderProps) {
               {localeLabels[locale]} ▾
             </button>
             {langOpen && (
-              <div className="absolute right-0 top-full mt-1 w-40 rounded-lg border border-[#0d2137]/10 bg-[var(--background)] py-1 shadow-lg">
+              <div className="absolute right-0 top-full mt-1 w-44 rounded-lg border border-[#0d2137]/10 bg-[var(--background)] py-1 shadow-lg">
                 {locales.map((loc) => (
                   <Link
                     key={loc}
                     href={`/${loc}${basePath === "/" ? "" : basePath}`}
-                    className="block px-3 py-2 text-sm hover:bg-[#0d2137]/5"
+                    className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-[#0d2137]/5"
                     onClick={() => setLangOpen(false)}
                   >
+                    <span className="text-base">{localeFlags[loc]}</span>
                     {localeLabels[loc]}
                   </Link>
                 ))}
