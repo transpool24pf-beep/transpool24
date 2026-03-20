@@ -24,7 +24,24 @@
     },
     "drivers": {
       "title": "Nos Chauffeurs",
-      "subtitle": "Découvrez ce que nos clients disent de nos chauffeurs professionnels"
+      "subtitle": "Découvrez ce que nos clients disent de nos chauffeurs professionnels",
+      "loading": "Chargement…",
+      "demoNotice": "Données de démonstration – seront automatiquement remplacées par de vrais chauffeurs une fois ajoutés",
+      "f1_name": "Ahmed Mohammed",
+      "f1_photo": "https://ui-avatars.com/api/?name=Ahmed+Mohammed&background=e85d04&color=fff&size=128",
+      "f1_rating": 5,
+      "f1_comment": "Excellent service et chauffeur professionnel. Livraison rapide et sûre.",
+      "f1_customerName": "Transport Moderne SARL",
+      "f2_name": "Mohammed Ali",
+      "f2_photo": "https://ui-avatars.com/api/?name=Mohammed+Ali&background=e85d04&color=fff&size=128",
+      "f2_rating": 5,
+      "f2_comment": "Chauffeur fiable et courtois. Fortement recommandé.",
+      "f2_customerName": "Logistique du Golfe",
+      "f3_name": "Khalid Hassan",
+      "f3_photo": "https://ui-avatars.com/api/?name=Khalid+Hassan&background=e85d04&color=fff&size=128",
+      "f3_rating": 4,
+      "f3_comment": "Très bonne expérience. Le chauffeur était ponctuel et précis.",
+      "f3_customerName": "Transport Moyen-Orient"
     }
   },
   "order": {

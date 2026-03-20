@@ -24,7 +24,24 @@
     },
     "drivers": {
       "title": "Nuestros Conductores",
-      "subtitle": "Descubra lo que dicen nuestros clientes sobre nuestros conductores profesionales"
+      "subtitle": "Descubra lo que dicen nuestros clientes sobre nuestros conductores profesionales",
+      "loading": "Cargando…",
+      "demoNotice": "Datos de demostración – se reemplazarán automáticamente con conductores reales una vez agregados",
+      "f1_name": "Ahmed Mohammed",
+      "f1_photo": "https://ui-avatars.com/api/?name=Ahmed+Mohammed&background=e85d04&color=fff&size=128",
+      "f1_rating": 5,
+      "f1_comment": "Servicio excelente y conductor profesional. Entrega rápida y segura.",
+      "f1_customerName": "Transporte Moderno S.L.",
+      "f2_name": "Mohammed Ali",
+      "f2_photo": "https://ui-avatars.com/api/?name=Mohammed+Ali&background=e85d04&color=fff&size=128",
+      "f2_rating": 5,
+      "f2_comment": "Conductor confiable y cortés. Muy recomendado.",
+      "f2_customerName": "Logística del Golfo",
+      "f3_name": "Khalid Hassan",
+      "f3_photo": "https://ui-avatars.com/api/?name=Khalid+Hassan&background=e85d04&color=fff&size=128",
+      "f3_rating": 4,
+      "f3_comment": "Muy buena experiencia. El conductor fue puntual y preciso.",
+      "f3_customerName": "Transporte Medio Oriente"
     }
   },
   "order": {

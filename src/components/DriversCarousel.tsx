@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useTranslations } from "next-intl";
 
 interface Driver {
@@ -56,6 +56,44 @@ export function DriversCarousel() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Generate demo drivers from translations when no real data
+  const demoDrivers = useMemo((): Driver[] => {
+    try {
+      return [
+        {
+          id: -1,
+          name: t("f1_name"),
+          photo: t("f1_photo"),
+          rating: 5, // Fixed rating from translation file
+          comment: t("f1_comment"),
+          customerName: t("f1_customerName"),
+        },
+        {
+          id: -2,
+          name: t("f2_name"),
+          photo: t("f2_photo"),
+          rating: 5, // Fixed rating from translation file
+          comment: t("f2_comment"),
+          customerName: t("f2_customerName"),
+        },
+        {
+          id: -3,
+          name: t("f3_name"),
+          photo: t("f3_photo"),
+          rating: 4, // Fixed rating from translation file
+          comment: t("f3_comment"),
+          customerName: t("f3_customerName"),
+        },
+      ];
+    } catch (error) {
+      console.error("Error loading demo drivers:", error);
+      return [];
+    }
+  }, [t]);
+
+  const displayDrivers = drivers.length > 0 ? drivers : demoDrivers;
+  const isDemo = drivers.length === 0;
+
   const checkScrollability = () => {
     if (!scrollContainerRef.current) return;
     const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
@@ -64,17 +102,19 @@ export function DriversCarousel() {
   };
 
   useEffect(() => {
-    checkScrollability();
+    const id = requestAnimationFrame(() => checkScrollability());
     const container = scrollContainerRef.current;
     if (container) {
       container.addEventListener("scroll", checkScrollability);
       window.addEventListener("resize", checkScrollability);
       return () => {
+        cancelAnimationFrame(id);
         container.removeEventListener("scroll", checkScrollability);
         window.removeEventListener("resize", checkScrollability);
       };
     }
-  }, []);
+    return () => cancelAnimationFrame(id);
+  }, [displayDrivers.length]);
 
   const scroll = (direction: "left" | "right") => {
     if (!scrollContainerRef.current) return;
@@ -95,17 +135,14 @@ export function DriversCarousel() {
       <section className="bg-gradient-to-br from-gray-50 to-white py-20 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <p className="text-[var(--foreground)]/70">Laden…</p>
+            <p className="text-[var(--foreground)]/70">{t("loading")}</p>
           </div>
         </div>
       </section>
     );
   }
 
-  if (drivers.length === 0) {
-    return null; // Don't show section if no drivers
-  }
-
+  // Always render the section with demo drivers if no real data
   return (
     <section className="bg-gradient-to-br from-gray-50 to-white py-20 sm:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -116,6 +153,11 @@ export function DriversCarousel() {
           <p className="mt-4 text-lg text-[var(--foreground)]/70">
             {t("subtitle")}
           </p>
+          {isDemo && (
+            <p className="mt-2 text-sm text-[var(--foreground)]/50 italic">
+              {t("demoNotice")}
+            </p>
+          )}
         </div>
 
         <div className="relative mt-16">
@@ -176,7 +218,7 @@ export function DriversCarousel() {
               msOverflowStyle: "none",
             }}
           >
-            {drivers.map((driver) => (
+            {displayDrivers.map((driver) => (
               <div
                 key={driver.id}
                 className="group min-w-[320px] max-w-[380px] flex-shrink-0 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
@@ -226,7 +268,7 @@ export function DriversCarousel() {
 
           {/* Pagination Dots */}
           <div className="mt-8 flex justify-center gap-2">
-            {drivers.map((_, index) => (
+            {displayDrivers.map((_, index) => (
               <button
                 key={index}
                 type="button"

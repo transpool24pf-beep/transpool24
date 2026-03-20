@@ -24,7 +24,24 @@
     },
     "drivers": {
       "title": "Sürücülerimiz",
-      "subtitle": "Müşterilerimizin profesyonel sürücülerimiz hakkında söylediklerini görün"
+      "subtitle": "Müşterilerimizin profesyonel sürücülerimiz hakkında söylediklerini görün",
+      "loading": "Yükleniyor…",
+      "demoNotice": "Demo veriler – gerçek sürücüler eklendiğinde otomatik olarak değiştirilecek",
+      "f1_name": "Ahmed Mohammed",
+      "f1_photo": "https://ui-avatars.com/api/?name=Ahmed+Mohammed&background=e85d04&color=fff&size=128",
+      "f1_rating": 5,
+      "f1_comment": "Mükemmel hizmet ve profesyonel sürücü. Hızlı ve güvenli teslimat.",
+      "f1_customerName": "Modern Taşımacılık A.Ş.",
+      "f2_name": "Mohammed Ali",
+      "f2_photo": "https://ui-avatars.com/api/?name=Mohammed+Ali&background=e85d04&color=fff&size=128",
+      "f2_rating": 5,
+      "f2_comment": "Güvenilir ve nazik sürücü. Kesinlikle tavsiye edilir.",
+      "f2_customerName": "Körfez Lojistik",
+      "f3_name": "Khalid Hassan",
+      "f3_photo": "https://ui-avatars.com/api/?name=Khalid+Hassan&background=e85d04&color=fff&size=128",
+      "f3_rating": 4,
+      "f3_comment": "Çok iyi bir deneyim. Sürücü dakik ve hassastı.",
+      "f3_customerName": "Orta Doğu Taşımacılık"
     }
   },
   "order": {

@@ -24,7 +24,24 @@
     },
     "drivers": {
       "title": "Unsere Fahrer",
-      "subtitle": "Erfahren Sie, was unsere Kunden über unsere professionellen Fahrer sagen"
+      "subtitle": "Erfahren Sie, was unsere Kunden über unsere professionellen Fahrer sagen",
+      "loading": "Laden…",
+      "demoNotice": "Demo-Daten – werden automatisch durch echte Fahrer ersetzt, sobald welche hinzugefügt werden",
+      "f1_name": "Ahmed Mohammed",
+      "f1_photo": "https://ui-avatars.com/api/?name=Ahmed+Mohammed&background=e85d04&color=fff&size=128",
+      "f1_rating": 5,
+      "f1_comment": "Ausgezeichneter Service und professioneller Fahrer. Schnelle und sichere Lieferung.",
+      "f1_customerName": "Moderne Transport GmbH",
+      "f2_name": "Mohammed Ali",
+      "f2_photo": "https://ui-avatars.com/api/?name=Mohammed+Ali&background=e85d04&color=fff&size=128",
+      "f2_rating": 5,
+      "f2_comment": "Zuverlässiger und höflicher Fahrer. Sehr empfehlenswert.",
+      "f2_customerName": "Golf Logistik",
+      "f3_name": "Khalid Hassan",
+      "f3_photo": "https://ui-avatars.com/api/?name=Khalid+Hassan&background=e85d04&color=fff&size=128",
+      "f3_rating": 4,
+      "f3_comment": "Sehr gute Erfahrung. Der Fahrer war pünktlich und präzise.",
+      "f3_customerName": "Mittlerer Osten Transport"
     }
   },
   "order": {

@@ -20,6 +20,7 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [isAdding, setIsAdding] = useState(false);
   const [formData, setFormData] = useState<Driver>({
     name: "",
     photo: "",
@@ -43,6 +44,7 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
 
   const handleAdd = () => {
     setEditingId(null);
+    setIsAdding(true);
     setFormData({
       name: "",
       photo: "",
@@ -96,6 +98,7 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
           setDrivers([...drivers, data.driver]);
         }
         setEditingId(null);
+        setIsAdding(false);
         setFormData({
           name: "",
           photo: "",
@@ -160,7 +163,7 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
         </button>
       </div>
 
-      {(editingId !== null || formData.name) && (
+      {(editingId !== null || isAdding) && (
         <form onSubmit={handleSubmit} className="mb-8 rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-medium text-[#0d2137]">
             {editingId ? "Fahrer bearbeiten" : "Neuer Fahrer"}
@@ -231,6 +234,7 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
               type="button"
               onClick={() => {
                 setEditingId(null);
+                setIsAdding(false);
                 setFormData({
                   name: "",
                   photo: "",

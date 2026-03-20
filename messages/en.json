@@ -24,7 +24,24 @@
     },
     "drivers": {
       "title": "Our Drivers",
-      "subtitle": "See what our customers say about our professional drivers"
+      "subtitle": "See what our customers say about our professional drivers",
+      "loading": "Loading…",
+      "demoNotice": "Demo data – will be automatically replaced with real drivers once added",
+      "f1_name": "Ahmed Mohammed",
+      "f1_photo": "https://ui-avatars.com/api/?name=Ahmed+Mohammed&background=e85d04&color=fff&size=128",
+      "f1_rating": 5,
+      "f1_comment": "Excellent service and professional driver. Fast and safe delivery.",
+      "f1_customerName": "Modern Transport Co.",
+      "f2_name": "Mohammed Ali",
+      "f2_photo": "https://ui-avatars.com/api/?name=Mohammed+Ali&background=e85d04&color=fff&size=128",
+      "f2_rating": 5,
+      "f2_comment": "Reliable and courteous driver. Highly recommended.",
+      "f2_customerName": "Gulf Logistics",
+      "f3_name": "Khalid Hassan",
+      "f3_photo": "https://ui-avatars.com/api/?name=Khalid+Hassan&background=e85d04&color=fff&size=128",
+      "f3_rating": 4,
+      "f3_comment": "Very good experience. The driver was punctual and precise.",
+      "f3_customerName": "Middle East Transport"
     }
   },
   "order": {

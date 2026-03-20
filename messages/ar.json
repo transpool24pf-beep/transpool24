@@ -24,7 +24,24 @@
     },
     "drivers": {
       "title": "سائقونا",
-      "subtitle": "اكتشف ما يقوله عملاؤنا عن سائقينا المحترفين"
+      "subtitle": "اكتشف ما يقوله عملاؤنا عن سائقينا المحترفين",
+      "loading": "جاري التحميل…",
+      "demoNotice": "بيانات تجريبية - سيتم استبدالها بالسائقين الحقيقيين عند إضافتهم",
+      "f1_name": "أحمد محمد",
+      "f1_photo": "https://ui-avatars.com/api/?name=Ahmad+Mohammad&background=e85d04&color=fff&size=128",
+      "f1_rating": 5,
+      "f1_comment": "خدمة ممتازة وسائق محترف. توصيل سريع وآمن.",
+      "f1_customerName": "شركة النقل الحديث",
+      "f2_name": "محمد علي",
+      "f2_photo": "https://ui-avatars.com/api/?name=Mohammad+Ali&background=e85d04&color=fff&size=128",
+      "f2_rating": 5,
+      "f2_comment": "سائق موثوق ومهذب. أنصح به بشدة.",
+      "f2_customerName": "مؤسسة الخليج",
+      "f3_name": "خالد حسن",
+      "f3_photo": "https://ui-avatars.com/api/?name=Khalid+Hassan&background=e85d04&color=fff&size=128",
+      "f3_rating": 4,
+      "f3_comment": "تجربة جيدة جداً. السائق كان دقيقاً في المواعيد.",
+      "f3_customerName": "شركة الشرق الأوسط"
     }
   },
   "order": {
