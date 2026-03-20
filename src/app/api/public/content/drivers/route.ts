@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
+import { mapHomepageDriverRow, type HomepageDriverRow } from "@/lib/homepage-drivers-map";
 
 // Public API for fetching drivers (used by homepage)
 export async function GET() {
@@ -12,15 +13,7 @@ export async function GET() {
 
     if (error) throw error;
 
-    // Transform to match DriversCarousel interface
-    const drivers = (data || []).map((d) => ({
-      id: d.id,
-      name: d.name,
-      photo: d.photo,
-      rating: d.rating,
-      comment: d.comment,
-      customerName: d.customer_name,
-    }));
+    const drivers = (data || []).map((d) => mapHomepageDriverRow(d as HomepageDriverRow));
 
     return NextResponse.json({ drivers });
   } catch (error) {

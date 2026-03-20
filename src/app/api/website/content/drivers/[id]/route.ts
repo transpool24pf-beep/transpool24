@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
-import { requireAdmin } from "@/lib/admin-api";
+import { requireWebsiteAdmin } from "@/lib/website-admin-api";
 import { createServerSupabase } from "@/lib/supabase";
+import { mapHomepageDriverRow, type HomepageDriverRow } from "@/lib/homepage-drivers-map";
 
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const err = await requireAdmin();
+  const err = await requireWebsiteAdmin();
   if (err) return err;
 
   try {
@@ -30,18 +31,18 @@ export async function PUT(
 
     if (error) throw error;
 
-    return NextResponse.json({ driver: data });
+    return NextResponse.json({ driver: mapHomepageDriverRow(data as HomepageDriverRow) });
   } catch (error) {
-    console.error("[admin/content/drivers PUT]", error);
+    console.error("[website/content/drivers PUT]", error);
     return NextResponse.json({ error: "Failed to update driver" }, { status: 500 });
   }
 }
 
 export async function DELETE(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const err = await requireAdmin();
+  const err = await requireWebsiteAdmin();
   if (err) return err;
 
   try {
@@ -54,7 +55,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("[admin/content/drivers DELETE]", error);
+    console.error("[website/content/drivers DELETE]", error);
     return NextResponse.json({ error: "Failed to delete driver" }, { status: 500 });
   }
 }

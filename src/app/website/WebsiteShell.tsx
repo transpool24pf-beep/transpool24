@@ -5,28 +5,21 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const NAV = [
-  { href: "/admin/orders", label: "Aufträge" },
-  { href: "/admin/reports", label: "Berichte" },
-  { href: "/admin/driver-applications", label: "Fahrerbewerbungen" },
-  { href: "/admin/drivers", label: "Fahrer" },
-  { href: "/admin/settings", label: "Einstellungen" },
-  { href: "/admin/support", label: "Support-Nachrichten" },
-];
+const NAV = [{ href: "/website", label: "Homepage – Bewertungen" }];
 
-export function AdminShell({ children }: { children: React.ReactNode }) {
+export function WebsiteShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [checked, setChecked] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
-    if (pathname === "/admin/login") {
+    if (pathname === "/website/login") {
       setChecked(true);
       setAuthenticated(false);
       return;
     }
-    fetch("/api/admin/me")
+    fetch("/api/website/me")
       .then((r) => {
         if (r.ok) setAuthenticated(true);
         else setAuthenticated(false);
@@ -36,7 +29,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   }, [pathname]);
 
   const handleLogout = () => {
-    fetch("/api/admin/logout", { method: "POST" }).then(() => router.push("/admin/login"));
+    fetch("/api/website/logout", { method: "POST" }).then(() => router.push("/website/login"));
   };
 
   if (!checked) {
@@ -47,12 +40,12 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (pathname === "/admin/login") {
+  if (pathname === "/website/login") {
     return <>{children}</>;
   }
 
   if (!authenticated) {
-    router.replace("/admin/login");
+    router.replace("/website/login");
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#0d2137] text-white">
         <p>Weiterleitung zur Anmeldung…</p>
@@ -62,10 +55,10 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-[#e8eaed]">
-      <header className="fixed left-0 right-0 top-0 z-10 border-b border-[#0d2137]/10 bg-[#0d2137] px-4 py-3 text-white shadow-sm">
+      <header className="fixed left-0 right-0 top-0 z-10 border-b border-[#0d2137]/10 bg-[#e85d04] px-4 py-3 text-white shadow-sm">
         <div className="flex items-center justify-between">
-          <Link href="/admin/orders" className="text-lg font-semibold tracking-tight">
-            TransPool24 – Admin
+          <Link href="/website" className="text-lg font-semibold tracking-tight">
+            TransPool24 – Website (nur Inhalt)
           </Link>
           <div className="relative h-10 w-32 shrink-0">
             <Image
@@ -75,27 +68,22 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               className="object-contain object-right"
               priority
             />
-            <div className="absolute left-2 top-1/2 h-5 w-5 -translate-y-1/2 rounded-sm bg-[#0d2137]" aria-hidden />
-            <div className="absolute right-2 top-1/2 h-5 w-5 -translate-y-1/2 rounded-sm bg-[#0d2137]" aria-hidden />
           </div>
         </div>
       </header>
       <main className="flex min-h-screen flex-1 flex-col pt-14">
-        <div
-          className={`mx-auto flex-1 px-4 py-8 ${
-            pathname === "/admin/orders" ||
-            pathname?.startsWith("/admin/driver-applications") ||
-            pathname === "/admin/reports"
-              ? "max-w-[98%] xl:max-w-7xl"
-              : "max-w-4xl"
-          }`}
-        >
-          {children}
-        </div>
+        <div className="mx-auto flex-1 max-w-4xl px-4 py-8">{children}</div>
         <footer className="border-t border-[#0d2137]/10 bg-white py-2 text-center text-xs text-[#0d2137]/60">
-          <a href="https://www.transpool24.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#0d2137]">
+          <a
+            href="https://www.transpool24.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-[#0d2137]"
+          >
             www.transpool24.com
           </a>
+          <span className="mx-2">·</span>
+          <span>Keine Aufträge / keine Kundendaten hier</span>
         </footer>
       </main>
       <aside className="sticky top-14 h-[calc(100vh-3.5rem)] w-56 shrink-0 border-l border-[#0d2137]/10 bg-white shadow-sm">
@@ -106,7 +94,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               href={href}
               className={`rounded-lg px-4 py-3 text-sm font-medium transition ${
                 pathname === href
-                  ? "bg-[#0d2137] text-white"
+                  ? "bg-[#e85d04] text-white"
                   : "text-[#0d2137]/80 hover:bg-[#0d2137]/5 hover:text-[#0d2137]"
               }`}
             >
