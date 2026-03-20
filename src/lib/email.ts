@@ -90,9 +90,7 @@ function buildConfirmationHtml(
 <html dir="ltr" lang="de">
 <head><meta charset="utf-8"><title>Auftragsbestätigung – TransPool24</title></head>
 <body style="margin:0; font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f4f4;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background: ${headerBlue}; padding: 24px;">
-    <tr><td align="center"><img src="${LOGO_BLUE_URL}" alt="TransPool24" width="240" height="70" style="display:block; max-width:240px; height:auto; margin:0 auto;" /></td></tr>
-  </table>
+  ${emailHeaderBannerHtml()}
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; padding: 32px 20px;">
     <tr><td>
       <div style="background: #fff; border-radius: 12px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
@@ -211,9 +209,26 @@ export async function sendOrderConfirmationEmail(
 }
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com";
-const LOGO_URL = `${SITE_URL}/345remov.png`;
-const LOGO_ORANGE_URL = `${SITE_URL}/567.png`;
 const LOGO_BLUE_URL = `${SITE_URL}/356.png`;
+/** Full-width header banner (600×90) – from Snapshot; served from /public */
+const EMAIL_HEADER_BANNER_URL = `${SITE_URL}/email-header.png`;
+
+/** Top-of-email header: same visual strip width as before (~600px), fixed height ~90px */
+function emailHeaderBannerHtml(): string {
+  const bg = "#0d2137";
+  return `
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:${bg};">
+    <tr>
+      <td align="center" style="padding:0; line-height:0; font-size:0;">
+        <img src="${EMAIL_HEADER_BANNER_URL}" alt="TransPool24" width="600" height="90" style="display:block; width:100%; max-width:600px; height:90px; margin:0 auto; border:0; outline:none;" />
+      </td>
+    </tr>
+  </table>`;
+}
+
+export function buildEmailHeaderBannerHtml(): string {
+  return emailHeaderBannerHtml();
+}
 
 /** Dedicated tracking email: German only, driver card, no PDF (Resend). */
 function buildTrackingUpdateHtml(
@@ -267,9 +282,7 @@ function buildTrackingUpdateHtml(
 <html lang="de">
 <head><meta charset="utf-8"><title>TransPool24 – Sendungsverfolgung</title></head>
 <body style="margin:0; font-family:'Segoe UI',Tahoma,Arial,sans-serif; background:#eef2f6;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background:${headerBlue}; padding:22px;">
-    <tr><td align="center"><img src="${LOGO_BLUE_URL}" alt="TransPool24" width="220" height="64" style="display:block; max-width:220px; height:auto;" /></td></tr>
-  </table>
+  ${emailHeaderBannerHtml()}
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width:620px; margin:0 auto; padding:28px 16px;">
     <tr><td>
       <div style="background:#fff; border-radius:14px; padding:26px; box-shadow:0 2px 14px rgba(0,0,0,0.07);">
@@ -372,14 +385,10 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
   <title>TransPool24 – Fahrer-Anfrage genehmigt</title>
 </head>
 <body style="margin:0; padding:0; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background:#f0f0f0;">
+  ${emailHeaderBannerHtml()}
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f0f0; padding: 24px 16px;">
     <tr><td align="center">
       <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.08);">
-        <tr>
-          <td style="background:${ORANGE}; padding: 28px 32px; text-align: center;">
-            <img src="${LOGO_ORANGE_URL}" alt="TransPool24" width="400" height="110" style="height:110px; width:auto; max-width:400px; display:block; margin:0 auto;" />
-          </td>
-        </tr>
         <tr>
           <td style="padding: 28px 24px;">
             ${driverPhoto ? `<p style="text-align:center; margin:0 0 16px 0;"><img src="${driverPhoto}" alt="" width="120" height="120" style="width:120px; height:120px; border-radius:50%; object-fit:cover; display:inline-block; border:4px solid ${ORANGE};" /></p>` : ""}
@@ -482,10 +491,8 @@ function buildDriverPaymentInvoiceEmailHtml(data: DriverPaymentInvoiceEmailData)
 <html dir="ltr" lang="de">
 <head><meta charset="utf-8"><title>Zahlungsnachweis – TransPool24</title></head>
 <body style="margin:0; font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f4f4;">
+  ${emailHeaderBannerHtml()}
   <table width="100%" cellpadding="0" cellspacing="0" style="background: #fff; border-bottom: 1px solid #eee;"><tr><td align="right" style="padding: 8px 24px;"><a href="${SITE_URL}" style="color:#000; text-decoration:underline; font-size:13px;">www.transpool24.com</a></td></tr></table>
-  <table width="100%" cellpadding="0" cellspacing="0" style="background: ${headerBlue}; padding: 28px 24px;">
-    <tr><td align="center"><img src="${LOGO_BLUE_URL}" alt="TransPool24" width="320" height="90" style="display:block; max-width:320px; height:auto; max-height:90px; margin:0 auto;" /></td></tr>
-  </table>
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; padding: 32px 20px;">
     <tr><td>
       <div style="background: ${cardBg}; border-radius: 12px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">

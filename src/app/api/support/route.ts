@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import { buildEmailHeaderBannerHtml } from "@/lib/email";
 import { createServerSupabase } from "@/lib/supabase";
 
 function getFromEmail(): string {
@@ -91,14 +92,24 @@ export async function POST(req: Request) {
           ? `[TransPool24 Support] Kunde: ${name}`
           : `[TransPool24 Support] ${name} (Fahrer #${driverNumber})`;
       const html = `
-      <p><strong>Typ:</strong> ${escapeHtml(requesterType === "customer" ? "Kunde" : "Fahrer")}</p>
-      <p><strong>Name:</strong> ${escapeHtml(name)}</p>
-      <p><strong>Email:</strong> ${escapeHtml(email)}</p>
-      <p><strong>Fahrernummer:</strong> ${driverNumber != null ? escapeHtml(String(driverNumber)) : "—"}</p>
-      ${jobId ? `<p><strong>Job-ID:</strong> ${escapeHtml(jobId)}</p>` : ""}
-      <p><strong>Message:</strong></p>
-      <pre style="white-space:pre-wrap; background:#f5f5f5; padding:12px; border-radius:8px;">${escapeHtml(message)}</pre>
-    `;
+<!DOCTYPE html>
+<html lang="de">
+<head><meta charset="utf-8" /></head>
+<body style="margin:0; font-family:'Segoe UI',Tahoma,sans-serif; background:#f4f4f4;">
+${buildEmailHeaderBannerHtml()}
+<div style="max-width:600px; margin:0 auto; padding:24px 20px;">
+  <div style="background:#fff; border-radius:12px; padding:24px; box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+    <p><strong>Typ:</strong> ${escapeHtml(requesterType === "customer" ? "Kunde" : "Fahrer")}</p>
+    <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+    <p><strong>E-Mail:</strong> ${escapeHtml(email)}</p>
+    <p><strong>Fahrernummer:</strong> ${driverNumber != null ? escapeHtml(String(driverNumber)) : "—"}</p>
+    ${jobId ? `<p><strong>Job-ID:</strong> ${escapeHtml(jobId)}</p>` : ""}
+    <p><strong>Nachricht:</strong></p>
+    <pre style="white-space:pre-wrap; background:#f5f5f5; padding:12px; border-radius:8px;">${escapeHtml(message)}</pre>
+  </div>
+</div>
+</body>
+</html>`;
       const { error } = await resend.emails.send({
         from: getFromEmail(),
         to: [to],
