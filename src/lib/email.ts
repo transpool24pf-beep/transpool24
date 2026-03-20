@@ -210,17 +210,23 @@ export async function sendOrderConfirmationEmail(
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com";
 const LOGO_BLUE_URL = `${SITE_URL}/356.png`;
-/** Full-width header banner (600×90) – generated from assets/Snapshot_1.PNG; served as /public/email-header.png */
-const EMAIL_HEADER_BANNER_URL = `${SITE_URL}/email-header.png`;
+/** Banner from assets/Snapshot_1.PNG → public/transpool24-email-banner.png. Bump EMAIL_HEADER_CACHE_BUST after each image replace (defeats Gmail/proxy cache). */
+const EMAIL_HEADER_CACHE_BUST =
+  process.env.EMAIL_HEADER_CACHE_BUST?.trim() || "20260320a";
+const EMAIL_HEADER_WIDTH = 600;
+const EMAIL_HEADER_HEIGHT = 120;
+const EMAIL_HEADER_BANNER_URL = `${SITE_URL}/transpool24-email-banner.png?v=${encodeURIComponent(EMAIL_HEADER_CACHE_BUST)}`;
 
-/** Top-of-email header: same visual strip width as before (~600px), fixed height ~90px */
+/** Top-of-email header (full width in clients, max 600px) */
 function emailHeaderBannerHtml(): string {
   const bg = "#0d2137";
+  const h = EMAIL_HEADER_HEIGHT;
+  const w = EMAIL_HEADER_WIDTH;
   return `
   <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:${bg};">
     <tr>
       <td align="center" style="padding:0; line-height:0; font-size:0;">
-        <img src="${EMAIL_HEADER_BANNER_URL}" alt="TransPool24" width="600" height="90" style="display:block; width:100%; max-width:600px; height:90px; margin:0 auto; border:0; outline:none;" />
+        <img src="${EMAIL_HEADER_BANNER_URL}" alt="TransPool24" width="${w}" height="${h}" style="display:block; width:100%; max-width:${w}px; height:${h}px; margin:0 auto; border:0; outline:none;" />
       </td>
     </tr>
   </table>`;

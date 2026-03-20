@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: "/(favicon.ico|favicon-32.png|favicon-48.png|icon.png)",
+        source: "/(favicon.ico|favicon-32.png|favicon-48.png|icon.png|email-header.png|transpool24-email-banner.png)",
         headers: [
           { key: "Cache-Control", value: "public, max-age=0, must-revalidate" },
         ],
