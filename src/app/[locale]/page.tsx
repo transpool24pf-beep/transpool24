@@ -34,6 +34,11 @@ export default async function HomePage({
               <p className="mt-4 text-lg text-white/90">
                 {t("subtitle")}
               </p>
+              <div className="mt-8 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 px-6 py-4">
+                <p className="text-xl font-semibold text-white leading-relaxed">
+                  {t("quote")}
+                </p>
+              </div>
               <Link
                 href={`/${locale}/order`}
                 className="mt-8 inline-block rounded-lg bg-[var(--accent)] px-6 py-3 text-lg font-semibold text-white transition hover:opacity-90"
