@@ -227,7 +227,15 @@
     "sendFailed": "Error al enviar.",
     "stopped": "Detenido.",
     "lastSent": "Último envío",
-    "keepOpen": "Mantenga la página abierta en ruta."
+    "keepOpen": "Mantenga la página abierta en ruta.",
+    "navTitle": "Navegación",
+    "navIntro": "Abre Google Maps.",
+    "navPickup": "🚗 Ir al punto de recogida",
+    "navDelivery": "🚗 Ir a la entrega",
+    "navFullRoute": "🛣️ Ruta completa",
+    "approxDistance": "Distancia aprox.",
+    "approxDriveTime": "Tiempo de conducción aprox.",
+    "routeInfoHint": "Según el pedido."
   },
   "support": {
     "title": "Soporte técnico y contacto",

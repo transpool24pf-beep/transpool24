@@ -17,7 +17,9 @@ export async function GET(req: Request) {
   const supabase = createServerSupabase();
   const { data: job, error } = await supabase
     .from("jobs")
-    .select("id, order_number, logistics_status, pickup_address, delivery_address, driver_tracking_token")
+    .select(
+      "id, order_number, logistics_status, pickup_address, delivery_address, driver_tracking_token, distance_km, duration_minutes"
+    )
     .eq("id", jobId)
     .maybeSingle();
   if (error || !job) {
@@ -32,6 +34,8 @@ export async function GET(req: Request) {
     logistics_status: job.logistics_status,
     pickup_address: job.pickup_address,
     delivery_address: job.delivery_address,
+    distance_km: job.distance_km ?? null,
+    duration_minutes: job.duration_minutes ?? null,
   });
 }
 

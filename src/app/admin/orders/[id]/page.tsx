@@ -42,6 +42,7 @@ type DriverOption = {
   full_name: string;
   driver_number: number | null;
   source: string;
+  phone: string;
 };
 
 /** سعر السائق: إما المحفوظ أو 18 × مسافة الذهاب والإياب (بالمليم) */
@@ -174,10 +175,20 @@ export default function AdminOrderDetailPage({
   useEffect(() => {
     fetch("/api/admin/drivers")
       .then((r) => r.json())
-      .then((list: { id: string; full_name: string; driver_number: number | null; source: string }[]) => {
-        const fromApps = (list ?? []).filter((d) => d.source === "application" && d.driver_number != null);
-        setDrivers(fromApps.map((d) => ({ id: d.id, full_name: d.full_name, driver_number: d.driver_number, source: d.source })));
-      })
+      .then(
+        (list: { id: string; full_name: string; driver_number: number | null; source: string; phone?: string | null }[]) => {
+          const fromApps = (list ?? []).filter((d) => d.source === "application" && d.driver_number != null);
+          setDrivers(
+            fromApps.map((d) => ({
+              id: d.id,
+              full_name: d.full_name,
+              driver_number: d.driver_number,
+              source: d.source,
+              phone: (d.phone ?? "").trim(),
+            }))
+          );
+        }
+      )
       .catch(() => setDrivers([]));
   }, []);
 
@@ -278,6 +289,68 @@ export default function AdminOrderDetailPage({
     const digits = order.phone.replace(/\D/g, "");
     if (!digits) return;
     window.open(`https://wa.me/${digits}`, "_blank", "noopener");
+  };
+
+  /** روابط Google Maps بنقرة واحدة + رابط صفحة مشاركة GPS للزبون */
+  const openWhatsAppDriverNavLinks = async () => {
+    if (!order) return;
+    if (!order.assigned_driver_application_id) {
+      alert("اختر السائق من القائمة أولاً.");
+      return;
+    }
+    const driverRow = drivers.find((d) => d.id === order.assigned_driver_application_id);
+    if (!driverRow?.phone) {
+      alert("لا يوجد رقم هاتف/واتساب مسجل لهذا السائق في ملف طلب السائق.");
+      return;
+    }
+    const digits = driverRow.phone.replace(/\D/g, "");
+    if (!digits) {
+      alert("رقم السائق غير صالح للواتساب.");
+      return;
+    }
+    const pickupUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(order.pickup_address)}&travelmode=driving`;
+    const deliveryUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(order.delivery_address)}&travelmode=driving`;
+    const routeUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(order.pickup_address)}&destination=${encodeURIComponent(order.delivery_address)}&travelmode=driving`;
+    const orderRef = order.order_number != null ? String(order.order_number) : order.id.slice(0, 8);
+    const distStr = order.distance_km != null ? `${order.distance_km} km` : "—";
+
+    let gpsLine = "";
+    try {
+      const r = await fetch(`/api/admin/orders/${order.id}/driver-share-link`, { method: "POST" });
+      const j = (await r.json()) as { url?: string };
+      if (r.ok && j.url) {
+        gpsLine = [
+          "",
+          "📡 Live-Standort (für Kunden) / مشاركة الموقع للزبون:",
+          j.url,
+          "(Link öffnen → Standortfreigabe / افتح الرابط ثم اضغط مشاركة الموقع)",
+          "",
+        ].join("\n");
+        const full = await fetch(`/api/admin/orders/${order.id}`).then((x) => x.json());
+        setOrder(full as Job);
+      }
+    } catch {
+      /* GPS link optional */
+    }
+
+    const text = [
+      "🚚 TransPool24 – Auftrag / طلب #" + orderRef,
+      "",
+      "📍 1) Abholung / الاستلام – Navigation (eine Taste):",
+      pickupUrl,
+      "",
+      "📍 2) Lieferung / التسليم – Navigation:",
+      deliveryUrl,
+      "",
+      "🛣️ 3) Ganze Route / المسار كامل (Abholung → Lieferung):",
+      routeUrl,
+      "",
+      "📏 Distanz ca. / المسافة تقريباً: " + distStr,
+      gpsLine,
+      "Viel Erfolg! / بالتوفيق!",
+    ].join("\n");
+
+    window.open(`https://wa.me/${digits}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
   };
 
   const openEmailClient = () => {
@@ -569,6 +642,16 @@ export default function AdminOrderDetailPage({
               className="flex items-center justify-center gap-2 rounded-xl border-2 border-[#25D366] bg-[#25D366]/10 px-4 py-3 font-medium text-[#25D366] hover:bg-[#25D366]/20"
             >
               واتساب العميل ({order.phone})
+            </button>
+            <button
+              type="button"
+              onClick={() => void openWhatsAppDriverNavLinks()}
+              className="flex flex-col items-center justify-center gap-1 rounded-xl border-2 border-emerald-700 bg-emerald-700 px-4 py-3 text-center font-medium text-white shadow-sm hover:bg-emerald-800"
+            >
+              <span>واتساب السائق: استلام + تسليم + خرائط</span>
+              <span className="text-xs font-normal opacity-90">
+                روابط نقرة واحدة (Google Maps) + إنشاء رابط التتبع للزبون
+              </span>
             </button>
             {order.customer_email && (
               <>

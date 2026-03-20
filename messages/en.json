@@ -227,7 +227,15 @@
     "sendFailed": "Could not send position. Check connection.",
     "stopped": "Sharing stopped.",
     "lastSent": "Last update sent",
-    "keepOpen": "Tip: keep this page open in the foreground during the trip for best updates."
+    "keepOpen": "Tip: keep this page open in the foreground during the trip for best updates.",
+    "navTitle": "Navigation (one tap)",
+    "navIntro": "Opens Google Maps with turn-by-turn directions. Use after you start the trip.",
+    "navPickup": "🚗 Drive to pickup",
+    "navDelivery": "📦 Drive to delivery",
+    "navFullRoute": "🛣️ Full route: pickup → delivery",
+    "approxDistance": "Approx. distance",
+    "approxDriveTime": "Approx. drive time (one way)",
+    "routeInfoHint": "From the order; traffic may differ."
   },
   "support": {
     "title": "Technical Support & Contact",

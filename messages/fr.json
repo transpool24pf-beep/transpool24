@@ -227,7 +227,15 @@
     "sendFailed": "Échec d’envoi.",
     "stopped": "Partage arrêté.",
     "lastSent": "Dernier envoi",
-    "keepOpen": "Gardez la page ouverte pendant le trajet."
+    "keepOpen": "Gardez la page ouverte pendant le trajet.",
+    "navTitle": "Navigation",
+    "navIntro": "Ouvre Google Maps.",
+    "navPickup": "🚗 Aller à l’enlèvement",
+    "navDelivery": "🚗 Aller à la livraison",
+    "navFullRoute": "🛣️ Trajet complet",
+    "approxDistance": "Distance approx.",
+    "approxDriveTime": "Temps de conduite approx.",
+    "routeInfoHint": "Selon la commande."
   },
   "support": {
     "title": "Support technique et contact",

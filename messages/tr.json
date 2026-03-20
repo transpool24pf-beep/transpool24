@@ -227,7 +227,15 @@
     "sendFailed": "Gönderilemedi.",
     "stopped": "Durduruldu.",
     "lastSent": "Son gönderim",
-    "keepOpen": "Seyir sırasında sayfayı açık tutun."
+    "keepOpen": "Seyir sırasında sayfayı açık tutun.",
+    "navTitle": "Navigasyon",
+    "navIntro": "Google Haritalar’ı açar.",
+    "navPickup": "🚗 Alım noktasına git",
+    "navDelivery": "🚗 Teslimata git",
+    "navFullRoute": "🛣️ Tam rota",
+    "approxDistance": "Yaklaşık mesafe",
+    "approxDriveTime": "Yaklaşık sürüş süresi",
+    "routeInfoHint": "Siparişe göre."
   },
   "support": {
     "title": "Teknik destek ve iletişim",

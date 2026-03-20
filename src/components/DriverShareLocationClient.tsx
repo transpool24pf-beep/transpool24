@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
+import { mapsNavigateToDestination, mapsRoutePickupToDelivery } from "@/lib/google-maps-links";
 
 type ValidateResponse = {
   ok?: boolean;
@@ -10,6 +11,8 @@ type ValidateResponse = {
   logistics_status?: string;
   pickup_address?: string;
   delivery_address?: string;
+  distance_km?: number | null;
+  duration_minutes?: number | null;
   error?: string;
 };
 
@@ -30,6 +33,8 @@ export function DriverShareLocationClient({
   const [status, setStatus] = useState<string>("");
   const [pickup, setPickup] = useState("");
   const [delivery, setDelivery] = useState("");
+  const [distanceKm, setDistanceKm] = useState<number | null>(null);
+  const [durationMinutes, setDurationMinutes] = useState<number | null>(null);
   const [sharing, setSharing] = useState(false);
   const [lastSent, setLastSent] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
@@ -82,6 +87,8 @@ export function DriverShareLocationClient({
         setStatus(data.logistics_status ?? "");
         setPickup(data.pickup_address ?? "");
         setDelivery(data.delivery_address ?? "");
+        setDistanceKm(data.distance_km ?? null);
+        setDurationMinutes(data.duration_minutes ?? null);
       })
       .catch(() => {
         setValid(false);
@@ -175,7 +182,61 @@ export function DriverShareLocationClient({
             </div>
           )}
         </dl>
+        {(distanceKm != null || durationMinutes != null) && (
+          <p className="mt-3 rounded-lg bg-[#0d2137]/[0.04] px-3 py-2 text-sm text-[var(--foreground)]/85">
+            {distanceKm != null && (
+              <span className="me-3">
+                {t("approxDistance")}: <strong>{distanceKm} km</strong>
+              </span>
+            )}
+            {durationMinutes != null && (
+              <span>
+                {t("approxDriveTime")}: <strong>{durationMinutes} min</strong>
+              </span>
+            )}
+            <span className="mt-1 block text-xs text-[var(--foreground)]/55">{t("routeInfoHint")}</span>
+          </p>
+        )}
       </div>
+
+      {(pickup || delivery) && (
+        <div className="rounded-xl border border-[#0d2137]/10 bg-white p-5 shadow-sm">
+          <h3 className="mb-3 text-base font-semibold text-[var(--primary)]">{t("navTitle")}</h3>
+          <p className="mb-3 text-sm text-[var(--foreground)]/75">{t("navIntro")}</p>
+          <div className="flex flex-col gap-2">
+            {pickup ? (
+              <a
+                href={mapsNavigateToDestination(pickup)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-xl bg-emerald-600 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-emerald-700"
+              >
+                {t("navPickup")}
+              </a>
+            ) : null}
+            {delivery ? (
+              <a
+                href={mapsNavigateToDestination(delivery)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-xl bg-blue-700 px-4 py-3 text-center text-sm font-semibold text-white hover:bg-blue-800"
+              >
+                {t("navDelivery")}
+              </a>
+            ) : null}
+            {pickup && delivery ? (
+              <a
+                href={mapsRoutePickupToDelivery(pickup, delivery)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-xl border-2 border-[#0d2137] bg-[#0d2137]/5 px-4 py-3 text-center text-sm font-semibold text-[#0d2137] hover:bg-[#0d2137]/10"
+              >
+                {t("navFullRoute")}
+              </a>
+            ) : null}
+          </div>
+        </div>
+      )}
 
       <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-4 text-sm text-amber-950/90">
         <p className="font-medium">{t("privacyTitle")}</p>

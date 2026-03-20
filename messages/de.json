@@ -227,7 +227,15 @@
     "sendFailed": "Position konnte nicht gesendet werden. Verbindung prüfen.",
     "stopped": "Teilen beendet.",
     "lastSent": "Letzte Übertragung",
-    "keepOpen": "Tipp: Seite während der Fahrt im Vordergrund offen lassen für zuverlässige Updates."
+    "keepOpen": "Tipp: Seite während der Fahrt im Vordergrund offen lassen für zuverlässige Updates.",
+    "navTitle": "Navigation (ein Tippen)",
+    "navIntro": "Öffnet Google Maps mit Route. Nach Fahrtbeginn nutzen.",
+    "navPickup": "🚗 Zur Abholung navigieren",
+    "navDelivery": "🚗 Zur Lieferung navigieren",
+    "navFullRoute": "🛣️ Gesamtroute Abholung → Lieferung",
+    "approxDistance": "Ca. Distanz",
+    "approxDriveTime": "Ca. Fahrzeit (eine Richtung)",
+    "routeInfoHint": "Aus dem Auftrag; Verkehr kann abweichen."
   },
   "support": {
     "title": "Technischer Support & Kontakt",
