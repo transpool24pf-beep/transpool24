@@ -237,7 +237,20 @@
     "navFullRoute": "🛣️ Ruta completa",
     "approxDistance": "Distancia aprox.",
     "approxDriveTime": "Tiempo de conducción aprox.",
-    "routeInfoHint": "Según el pedido."
+    "routeInfoHint": "Según el pedido.",
+    "podTitle": "Confirmar entrega (foto)",
+    "podIntro": "Después de la entrega, suba una foto. El pedido se marca como entregado automáticamente.",
+    "podCodeLabel": "Opcional: código de confirmación del destinatario",
+    "podCodePlaceholder": "p. ej. código de firma",
+    "podChoosePhoto": "Elegir foto de entrega y enviar",
+    "podUploading": "Subiendo…",
+    "podUploadOk": "Prueba de entrega guardada. ¡Gracias!",
+    "podAlreadyDone": "La entrega ya estaba confirmada.",
+    "podDone": "Entrega confirmada",
+    "podNotImage": "Elija JPEG, PNG o WebP.",
+    "podTooLarge": "Máximo 5 MB.",
+    "podUploadFailed": "Error al subir.",
+    "podReadFailed": "No se pudo leer el archivo."
   },
   "support": {
     "title": "Soporte técnico y contacto",

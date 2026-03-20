@@ -61,7 +61,7 @@ function buildConfirmationHtml(
         <td>
           <p style="margin: 0 0 4px 0;"><strong>${escapeHtml(driver.full_name)}</strong></p>
           <p style="margin: 0 0 4px 0; color: #64748b;">${driver.star_rating != null ? driver.star_rating.toFixed(1) : "—"} Sterne</p>
-          <p style="margin: 0 0 4px 0;">Telefon: ${escapeHtml(driver.phone)}</p>
+          <p style="margin: 0 0 4px 0;">Telefonnummer: ${escapeHtml(driver.phone)}</p>
           <p style="margin: 0 0 4px 0;">Kennzeichen: ${escapeHtml(driver.vehicle_plate || "—")}</p>
           <p style="margin: 0;">Sprachen: ${escapeHtml(driver.languages_spoken || "—")}</p>
         </td>
@@ -85,19 +85,25 @@ function buildConfirmationHtml(
       ? `<p style="margin-top: 16px;"><a href="${trackOrderUrl}" style="display: inline-block; padding: 12px 24px; background: #0d2137; color: #fff !important; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 15px;">Auftrag live verfolgen (Status &amp; ETA)</a></p>`
       : "";
 
+  const salutationExtra =
+    companyName && companyName !== "Kunde"
+      ? `<p style="margin:6px 0 0 0; font-size:16px; color:#334155;">${escapeHtml(companyName)}</p>`
+      : "";
+
   return `
 <!DOCTYPE html>
 <html dir="ltr" lang="de">
-<head><meta charset="utf-8"><title>Auftragsbestätigung – TransPool24</title></head>
-<body style="margin:0; font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f4f4;">
+<head><meta charset="utf-8">${emailDeHeadMeta()}<title>Auftragsbestätigung – TransPool24</title></head>
+<body style="margin:0; font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f4f4; direction:ltr; text-align:left;">
   ${emailHeaderBannerHtml()}
-  <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; padding: 32px 20px;">
-    <tr><td>
-      <div style="background: #fff; border-radius: 12px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+  <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; padding: 32px 20px; direction:ltr;">
+    <tr><td style="text-align:left;">
+      <div style="background: #fff; border-radius: 12px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); direction:ltr; text-align:left;">
         ${driverSection}
-        <p style="margin: ${driver ? "24" : "0"}px 0 8px 0; font-size: 20px; color: #0d2137; font-weight: bold;">Hallo ${escapeHtml(companyName)},</p>
-        <p style="margin: 0 0 16px 0; font-size: 16px; color: #334155;">Vielen Dank, dass Sie TransPool24 gewählt haben.</p>
-        <p style="margin: 0 0 16px 0; font-size: 15px; color: #475569;">Diese E-Mail bestätigt den erfolgreichen Abschluss Ihres Vertrags. Sie können nun die von Ihnen angeforderten Dienstleistungen nutzen.</p>
+        <p style="margin: ${driver ? "24" : "0"}px 0 0 0; font-size: 20px; color: #0d2137; font-weight: bold;">Sehr geehrte Damen und Herren,</p>
+        ${salutationExtra}
+        <p style="margin: 16px 0 16px 0; font-size: 16px; color: #334155;">Vielen Dank für Ihr Vertrauen in TransPool24.</p>
+        <p style="margin: 0 0 16px 0; font-size: 15px; color: #475569;">Diese E-Mail bestätigt den erfolgreichen Abschluss Ihres Auftrags. Sie können nun die von Ihnen angeforderten Leistungen in Anspruch nehmen.</p>
         <p style="margin: 0 0 12px 0; font-size: 16px; font-weight: bold; color: #0d2137;">Ihre Vertragsdetails:</p>
         <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse: collapse; font-size: 14px; border: 1px solid #e2e8f0; border-radius: 8px;">
           <tr style="background: #f8fafc;"><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Auftragsnummer</td><td style="border-bottom: 1px solid #e2e8f0;">${orderRef}</td></tr>
@@ -143,6 +149,30 @@ function escapeHtml(s: string): string {
 
 function escapeHref(u: string): string {
   return u.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+}
+
+/** Formal German labels for logistics_status (raw English is auto-translated by Gmail to Arabic etc.). */
+function logisticsStatusLabelDe(status: string | null | undefined): string {
+  const s = String(status ?? "")
+    .toLowerCase()
+    .trim();
+  const map: Record<string, string> = {
+    draft: "Entwurf",
+    confirmed: "Bestätigt",
+    paid: "Bezahlt",
+    assigned: "Zugewiesen",
+    in_transit: "Unterwegs",
+    delivered: "Zugestellt",
+    cancelled: "Storniert",
+  };
+  if (!s) return "—";
+  return map[s] ?? s.replace(/_/g, " ");
+}
+
+/** Discourage Gmail “Translate message” / wrong RTL for German-only transactional mail. */
+function emailDeHeadMeta(): string {
+  return `<meta http-equiv="Content-Language" content="de" />
+<meta name="google" content="notranslate" />`;
 }
 
 export async function sendOrderConfirmationEmail(
@@ -247,8 +277,8 @@ function buildTrackingUpdateHtml(
 ): string {
   const headerBlue = "#0d2137";
   const orderRef = job.order_number != null ? String(job.order_number) : job.id.slice(0, 8);
-  const companyName = (job.company_name || "").trim() || "Kundin / Kunde";
-  const statusDe = (job.logistics_status || "").replace(/_/g, " ");
+  const companyName = (job.company_name || "").trim();
+  const statusDe = logisticsStatusLabelDe(job.logistics_status);
   const etaDe =
     job.estimated_arrival_at != null
       ? new Date(job.estimated_arrival_at).toLocaleString("de-DE", {
@@ -271,7 +301,7 @@ function buildTrackingUpdateHtml(
         <td style="vertical-align:top; font-size:14px; color:#334155;">
           <p style="margin:0 0 6px 0;"><strong>${escapeHtml(options.driver.full_name)}</strong></p>
           <p style="margin:0 0 4px 0; color:#64748b;">${options.driver.star_rating != null ? `${options.driver.star_rating.toFixed(1)} Sterne` : "—"}</p>
-          <p style="margin:0 0 4px 0;">Telefon: ${escapeHtml(options.driver.phone)}</p>
+          <p style="margin:0 0 4px 0;">Telefonnummer: ${escapeHtml(options.driver.phone)}</p>
           <p style="margin:0 0 4px 0;">Kennzeichen: ${escapeHtml(options.driver.vehicle_plate || "—")}</p>
           <p style="margin:0;">Sprachen: ${escapeHtml(options.driver.languages_spoken || "—")}</p>
         </td>
@@ -280,28 +310,36 @@ function buildTrackingUpdateHtml(
   </table>`
       : `
   <p style="margin:0 0 16px 0; padding:12px; background:#fff7ed; border-radius:8px; font-size:14px; color:#9a3412; border:1px solid #fed7aa;">
-    Hinweis: Sobald ein Fahrer zugewiesen ist, sehen Sie auf der Tracking-Seite Foto und Kontaktdaten.
+    Hinweis: Sobald ein Fahrer zugewiesen ist, finden Sie auf der Tracking-Seite Foto und Kontaktdaten.
   </p>`;
+
+  const companyLine =
+    companyName.length > 0
+      ? `<p style="margin:6px 0 0 0; font-size:15px; color:#334155;">${escapeHtml(companyName)}</p>`
+      : "";
 
   return `
 <!DOCTYPE html>
-<html lang="de">
-<head><meta charset="utf-8"><title>TransPool24 – Sendungsverfolgung</title></head>
-<body style="margin:0; font-family:'Segoe UI',Tahoma,Arial,sans-serif; background:#eef2f6;">
+<html dir="ltr" lang="de">
+<head><meta charset="utf-8">${emailDeHeadMeta()}<title>TransPool24 – Sendungsverfolgung</title></head>
+<body style="margin:0; font-family:'Segoe UI',Tahoma,Arial,sans-serif; background:#eef2f6; direction:ltr; text-align:left;">
   ${emailHeaderBannerHtml()}
-  <table width="100%" cellpadding="0" cellspacing="0" style="max-width:620px; margin:0 auto; padding:28px 16px;">
-    <tr><td>
-      <div style="background:#fff; border-radius:14px; padding:26px; box-shadow:0 2px 14px rgba(0,0,0,0.07);">
-        <p style="margin:0 0 8px 0; font-size:17px; font-weight:bold; color:${headerBlue};">Sehr geehrte Damen und Herren, ${escapeHtml(companyName)},</p>
-        <p style="margin:0 0 10px 0; font-size:15px; color:#334155; line-height:1.55;">
-          vielen Dank für Ihr Vertrauen in TransPool24. Auf der folgenden Seite sehen Sie den <strong>aktuellen Status</strong>
-          und – sobald verfügbar – die <strong>voraussichtliche Ankunftszeit</strong>.
+  <table width="100%" cellpadding="0" cellspacing="0" style="max-width:620px; margin:0 auto; padding:28px 16px; direction:ltr;">
+    <tr><td style="text-align:left;">
+      <div style="background:#fff; border-radius:14px; padding:26px; box-shadow:0 2px 14px rgba(0,0,0,0.07); direction:ltr; text-align:left;">
+        <p style="margin:0 0 0 0; font-size:17px; font-weight:bold; color:${headerBlue};">Sehr geehrte Damen und Herren,</p>
+        ${companyLine}
+        <p style="margin:14px 0 10px 0; font-size:15px; color:#334155; line-height:1.6;">
+          Vielen Dank für Ihr Vertrauen in TransPool24. Auf der verlinkten Seite finden Sie den <strong>aktuellen Lieferstatus</strong>
+          sowie – sobald verfügbar – die <strong>voraussichtliche Ankunftszeit</strong>.
         </p>
-        <p style="margin:0 0 10px 0; font-size:15px; color:#334155; line-height:1.55;">
-          Sobald der Fahrer sein GPS teilt, erscheint automatisch eine <strong>Live-Karte</strong> und die <strong>Fahrspur</strong>.
-          Bis dahin sehen Sie die geplante Route (Abholung → Zustellung) zur Orientierung.
+        <p style="margin:0 0 10px 0; font-size:15px; color:#334155; line-height:1.6;">
+          Sobald der zugewiesene Fahrer seinen Standort (GPS) teilt, erscheint automatisch eine <strong>Live-Karte</strong> mit <strong>Fahrspur</strong>.
+          Bis dahin dient die geplante Route (Abholung → Zustellung) zur Orientierung.
         </p>
-        <p style="margin:0 0 18px 0; font-size:14px; color:#64748b;">Auftrag <strong>#${escapeHtml(orderRef)}</strong> · Status: ${escapeHtml(statusDe)} · Distanz (ca.): ${escapeHtml(distStr)}</p>
+        <p style="margin:0 0 18px 0; font-size:14px; color:#64748b;">Auftragsnummer: <strong>#${escapeHtml(orderRef)}</strong><br />
+        Status: <strong>${escapeHtml(statusDe)}</strong><br />
+        Distanz (ca.): <strong>${escapeHtml(distStr)}</strong></p>
         ${etaDe ? `<p style="margin:-12px 0 18px 0; font-size:14px; color:#0f766e;">Voraussichtliche Ankunft: <strong>${escapeHtml(etaDe)}</strong></p>` : ""}
         ${driverBlock}
         <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse:collapse; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:18px;">
@@ -387,17 +425,18 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
 <html dir="ltr" lang="de">
 <head>
   <meta charset="utf-8">
+  ${emailDeHeadMeta()}
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>TransPool24 – Fahrer-Anfrage genehmigt</title>
 </head>
-<body style="margin:0; padding:0; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background:#f0f0f0;">
+<body style="margin:0; padding:0; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background:#f0f0f0; direction:ltr; text-align:left;">
   ${emailHeaderBannerHtml()}
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f0f0; padding: 24px 16px;">
     <tr><td align="center">
       <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.08);">
         <tr>
           <td style="padding: 28px 24px;">
-            ${driverPhoto ? `<p style="text-align:center; margin:0 0 16px 0;"><img src="${driverPhoto}" alt="" width="120" height="120" style="width:120px; height:120px; border-radius:50%; object-fit:cover; display:inline-block; border:4px solid ${ORANGE};" /></p>` : ""}
+            ${driverPhoto ? `<p style="text-align:center; margin:0 0 16px 0;"><img src="${escapeHref(driverPhoto)}" alt="" width="120" height="120" style="width:120px; height:120px; border-radius:50%; object-fit:cover; display:inline-block; border:4px solid ${ORANGE};" /></p>` : ""}
             <table width="100%" cellpadding="0" cellspacing="0">
               <tr>
                 <td style="width:48px; vertical-align:top; padding-top:4px;">
@@ -407,22 +446,21 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
                   <h1 style="margin:0 0 8px 0; font-size:22px; font-weight:700; color:#0d2137;">
                     Ihre Anfrage zur Aufnahme als Fahrer bei TransPool24 wurde genehmigt.
                   </h1>
-                  <p style="margin:0; font-size:15px; color:#333;">
-                    Hallo ${data.full_name || "Fahrer"},
-                  </p>
+                  <p style="margin:0; font-size:15px; color:#333;">Sehr geehrte Damen und Herren,</p>
+                  ${(data.full_name || "").trim() ? `<p style="margin:6px 0 0 0; font-size:15px; color:#333;">${escapeHtml((data.full_name || "").trim())}</p>` : ""}
                 </td>
               </tr>
             </table>
             <p style="margin:20px 0 0 0; font-size:15px; color:#444; line-height:1.6;">
-              Wir freuen uns, Ihnen mitzuteilen, dass Ihre Anfrage genehmigt wurde. Sie können jetzt der Fahrergruppe beitreten und Aufträge entgegennehmen. Sie warten auf Ihre erste Aufgabe zur Annahme.
+              Wir freuen uns, Ihnen mitteilen zu dürfen, dass Ihre Anfrage genehmigt wurde. Treten Sie der Fahrergruppe bei WhatsApp bei, um Aufträge zu erhalten und anzunehmen. Wir freuen uns auf Ihre erste Zusage.
             </p>
             <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px; background:#f5f5f5; border-radius:10px; padding: 20px;">
               <tr><td>
                 <table width="100%" cellpadding="4" cellspacing="0">
                   <tr><td style="text-align:left; font-weight:600; color:#0d2137;">Fahrernummer:</td><td style="text-align:right;">#${driverNum}</td></tr>
-                  <tr><td style="text-align:left; font-weight:600; color:#0d2137;">Name:</td><td style="text-align:right;">${data.full_name || "—"}</td></tr>
+                  <tr><td style="text-align:left; font-weight:600; color:#0d2137;">Name:</td><td style="text-align:right;">${escapeHtml(data.full_name || "—")}</td></tr>
                   <tr><td style="text-align:left; font-weight:600; color:#0d2137;">Genehmigungsdatum:</td><td style="text-align:right;">${dateStr}</td></tr>
-                  ${data.vehicle_plate ? `<tr><td style="text-align:left; font-weight:600; color:#0d2137;">Kennzeichen:</td><td style="text-align:right;">${data.vehicle_plate}</td></tr>` : ""}
+                  ${data.vehicle_plate ? `<tr><td style="text-align:left; font-weight:600; color:#0d2137;">Kennzeichen:</td><td style="text-align:right;">${escapeHtml(data.vehicle_plate)}</td></tr>` : ""}
                 </table>
               </td></tr>
             </table>
@@ -495,13 +533,13 @@ function buildDriverPaymentInvoiceEmailHtml(data: DriverPaymentInvoiceEmailData)
   return `
 <!DOCTYPE html>
 <html dir="ltr" lang="de">
-<head><meta charset="utf-8"><title>Zahlungsnachweis – TransPool24</title></head>
-<body style="margin:0; font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f4f4;">
+<head><meta charset="utf-8">${emailDeHeadMeta()}<title>Zahlungsnachweis – TransPool24</title></head>
+<body style="margin:0; font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f4f4; direction:ltr; text-align:left;">
   ${emailHeaderBannerHtml()}
   <table width="100%" cellpadding="0" cellspacing="0" style="background: #fff; border-bottom: 1px solid #eee;"><tr><td align="right" style="padding: 8px 24px;"><a href="${SITE_URL}" style="color:#000; text-decoration:underline; font-size:13px;">www.transpool24.com</a></td></tr></table>
-  <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; padding: 32px 20px;">
-    <tr><td>
-      <div style="background: ${cardBg}; border-radius: 12px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.08);">
+  <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; padding: 32px 20px; direction:ltr;">
+    <tr><td style="text-align:left;">
+      <div style="background: ${cardBg}; border-radius: 12px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); direction:ltr; text-align:left;">
         <table width="100%" cellpadding="0" cellspacing="0">
           <tr>
             <td width="48" style="vertical-align:top;"><div style="width:40px; height:40px; background: #0d2137; border-radius: 8px;"></div></td>
@@ -510,8 +548,8 @@ function buildDriverPaymentInvoiceEmailHtml(data: DriverPaymentInvoiceEmailData)
             </td>
           </tr>
         </table>
-        <p style="margin: 20px 0 0 0; font-size: 16px; color: #333;">Guten Tag,</p>
-        <p style="margin: 8px 0 16px 0; font-size: 15px; color: #555;">Sie finden den Zahlungsnachweis als PDF-Datei im Anhang.</p>
+        <p style="margin: 20px 0 0 0; font-size: 16px; color: #333;">Sehr geehrte Damen und Herren,</p>
+        <p style="margin: 8px 0 16px 0; font-size: 15px; color: #555;">den Zahlungsnachweis finden Sie als PDF-Datei im Anhang dieser E-Mail.</p>
         <div style="background: ${summaryBg}; border-radius: 10px; padding: 20px; margin: 20px 0;">
           <table width="100%" cellpadding="4" cellspacing="0" style="font-size: 14px;">
             <tr><td style="color:#555;"><strong>Rechnungsnummer:</strong></td><td style="text-align:left;">${data.invoice_number}</td></tr>
@@ -523,7 +561,7 @@ function buildDriverPaymentInvoiceEmailHtml(data: DriverPaymentInvoiceEmailData)
             <tr><td style="color:#0d2137; padding-top:8px;"><strong>Gesamtbetrag:</strong></td><td style="text-align:left; padding-top:8px;"><strong>${data.total_eur} EUR</strong></td></tr>
           </table>
         </div>
-        <p style="margin: 20px 0 0 0; font-size: 14px; color: #666;">Brauchen Sie Hilfe? TransPool24 Kundenservice – Telefon: +49 176 29767442 – E-Mail: transpool24@hotmail.com</p>
+        <p style="margin: 20px 0 0 0; font-size: 14px; color: #666;">Benötigen Sie Unterstützung? TransPool24 Kundenservice – Telefonnummer: +49 176 29767442 – E-Mail: transpool24@hotmail.com</p>
         <p style="margin: 12px 0 0 0; font-size: 13px;"><a href="https://www.linkedin.com/in/trans-pool-1235803b8" style="color:#0d2137;">LinkedIn</a> · Servicezeiten: rund um die Uhr</p>
       </div>
     </td></tr>

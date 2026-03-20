@@ -353,11 +353,6 @@ export default function AdminOrderDetailPage({
     window.open(`https://wa.me/${digits}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
   };
 
-  const openEmailClient = () => {
-    if (!order?.customer_email) return;
-    window.location.href = `mailto:${order.customer_email}`;
-  };
-
   const downloadInvoice = (type: "customer" | "driver") => {
     if (!order) return;
     window.open(`/api/admin/invoice?job_id=${encodeURIComponent(order.id)}&type=${type}`, "_blank");
@@ -449,6 +444,7 @@ export default function AdminOrderDetailPage({
       body: JSON.stringify({
         id: order.id,
         pod_completed_at: new Date().toISOString(),
+        logistics_status: "delivered",
       }),
     })
       .then(async (r) => {
@@ -546,6 +542,76 @@ export default function AdminOrderDetailPage({
             <div>
               <dt className="text-[#0d2137]/60">Datum (Erstellung)</dt>
               <dd>{new Date(order.created_at).toLocaleDateString("de-DE")}</dd>
+            </div>
+            <div>
+              <dt className="text-[#0d2137]/60">Zahlung (Kunde)</dt>
+              <dd className="flex flex-wrap items-center gap-2">
+                <span
+                  className={
+                    order.payment_status === "paid"
+                      ? "rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-900"
+                      : order.payment_status === "pending"
+                        ? "rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-900"
+                        : "rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-800"
+                  }
+                >
+                  {order.payment_status === "paid"
+                    ? "Bezahlt"
+                    : order.payment_status === "pending"
+                      ? "Ausstehend"
+                      : order.payment_status === "refunded"
+                        ? "Erstattet"
+                        : order.payment_status === "failed"
+                          ? "Fehlgeschlagen"
+                          : order.payment_status}
+                </span>
+                {order.payment_status !== "paid" ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!order || !window.confirm("Kundenzahlung als „bezahlt“ bestätigen? (z. B. Nachnahme / Überweisung geprüft)")) return;
+                      fetch("/api/admin/orders", {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ id: order.id, payment_status: "paid" }),
+                      })
+                        .then(async (r) => {
+                          const data = await r.json();
+                          if (!r.ok) throw new Error(typeof data.error === "string" ? data.error : "Fehler");
+                          return data as Job;
+                        })
+                        .then((data) => setOrder((prev) => (prev ? { ...prev, ...data } : null)))
+                        .then(() => alert("Zahlungsstatus: Bezahlt gespeichert. PDF-Rechnung zeigt „Bezahlt“."))
+                        .catch((e) => alert(e instanceof Error ? e.message : "Fehler"));
+                    }}
+                    className="rounded-lg bg-emerald-600 px-3 py-1 text-xs font-semibold text-white hover:bg-emerald-700"
+                  >
+                    Als bezahlt markieren
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (!order || !window.confirm("Zahlungsstatus wieder auf „ausstehend“ setzen?")) return;
+                      fetch("/api/admin/orders", {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ id: order.id, payment_status: "pending" }),
+                      })
+                        .then(async (r) => {
+                          const data = await r.json();
+                          if (!r.ok) throw new Error(typeof data.error === "string" ? data.error : "Fehler");
+                          return data as Job;
+                        })
+                        .then((data) => setOrder((prev) => (prev ? { ...prev, ...data } : null)))
+                        .catch((e) => alert(e instanceof Error ? e.message : "Fehler"));
+                    }}
+                    className="rounded-lg border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-900 hover:bg-amber-100"
+                  >
+                    Auf ausstehend setzen
+                  </button>
+                )}
+              </dd>
             </div>
             {order.preferred_pickup_at && (
               <div>
@@ -678,13 +744,6 @@ export default function AdminOrderDetailPage({
                 </div>
                 <button
                   type="button"
-                  onClick={openEmailClient}
-                  className="flex items-center justify-center gap-2 rounded-xl border-2 border-[#0d2137]/20 bg-white px-4 py-3 font-medium text-[#0d2137] hover:bg-[#0d2137]/5"
-                >
-                  E-Mail-Programm öffnen: {order.customer_email}
-                </button>
-                <button
-                  type="button"
                   onClick={sendEmailToCustomer}
                   disabled={sending || !order.assigned_driver_application_id}
                   className="flex items-center justify-center gap-2 rounded-xl bg-[var(--accent)] px-4 py-3 font-medium text-white hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
@@ -731,7 +790,9 @@ export default function AdminOrderDetailPage({
         <p className="mb-4 text-sm text-[#0d2137]/65">
           Für den Kunden unter{" "}
           <code className="rounded bg-[#0d2137]/10 px-1">/de/order/track?job_id=…&amp;token=…</code> – SQL-Migrationen{" "}
-          <code className="rounded bg-[#0d2137]/10 px-1">roadmap_foundation.sql</code> in Supabase ausführen.
+          <code className="rounded bg-[#0d2137]/10 px-1">roadmap_foundation.sql</code> in Supabase ausführen. Der Fahrer kann auf
+          dem <strong>GPS-Link</strong> ein <strong>Lieferfoto hochladen</strong> – dann wird der Auftrag automatisch als zugestellt
+          markiert und das Bild erscheint hier.
         </p>
         <div className="flex flex-wrap gap-2 border-b border-[#0d2137]/10 pb-4">
           <button
@@ -783,10 +844,24 @@ export default function AdminOrderDetailPage({
           </div>
           <div className="space-y-3">
             <p className="text-sm font-medium text-[#0d2137]">Liefernachweis (URLs / Code)</p>
+            {order.pod_photo_url ? (
+              <div className="space-y-2">
+                <p className="text-xs font-medium text-emerald-800">Lieferfoto (vom Fahrer oder URL)</p>
+                <a
+                  href={order.pod_photo_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block max-w-full overflow-hidden rounded-lg border-2 border-emerald-200"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={order.pod_photo_url} alt="Liefernachweis" className="max-h-48 w-auto max-w-full object-contain" />
+                </a>
+              </div>
+            ) : null}
             <input
               value={podPhoto}
               onChange={(e) => setPodPhoto(e.target.value)}
-              placeholder="Foto-URL Liefernachweis"
+              placeholder="Foto-URL Liefernachweis (manuell, falls kein Upload)"
               className="w-full rounded-lg border-2 border-[#0d2137]/20 px-3 py-2 text-sm"
             />
             <input

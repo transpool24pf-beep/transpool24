@@ -9,7 +9,9 @@ export async function GET() {
   const supabase = createServerSupabase();
   const { data: jobs, error } = await supabase
     .from("jobs")
-    .select("id, price_cents, logistics_status, created_at, assigned_driver_application_id");
+    .select(
+      "id, order_number, company_name, price_cents, logistics_status, payment_status, created_at, assigned_driver_application_id"
+    );
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
@@ -24,6 +26,27 @@ export async function GET() {
   const assignedCount = list.filter((j) => j.assigned_driver_application_id != null).length;
   const deliveredCount = list.filter((j) => j.logistics_status === "delivered").length;
   const cancelledCount = list.filter((j) => j.logistics_status === "cancelled").length;
+  const paidJobs = list.filter(
+    (j) => j.payment_status === "paid" && j.logistics_status !== "cancelled"
+  );
+  const paidOrderCount = paidJobs.length;
+  const paidRevenueCents = paidJobs.reduce((s, j) => s + (j.price_cents ?? 0), 0);
+  const byPayment: Record<string, number> = {};
+  for (const j of list) {
+    const ps = j.payment_status ?? "unknown";
+    byPayment[ps] = (byPayment[ps] ?? 0) + 1;
+  }
+  const paidInvoices = paidJobs
+    .slice()
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 100)
+    .map((j) => ({
+      id: j.id,
+      order_number: j.order_number,
+      company_name: j.company_name ?? "",
+      price_cents: j.price_cents ?? 0,
+      created_at: j.created_at,
+    }));
   return NextResponse.json({
     totalOrders,
     revenueEur: (revenueCents / 100).toFixed(2),
@@ -32,5 +55,9 @@ export async function GET() {
     deliveredCount,
     cancelledCount,
     cancelRatePercent: totalOrders > 0 ? ((cancelledCount / totalOrders) * 100).toFixed(1) : "0",
+    paidOrderCount,
+    paidRevenueEur: (paidRevenueCents / 100).toFixed(2),
+    byPayment,
+    paidInvoices,
   });
 }

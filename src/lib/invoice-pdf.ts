@@ -153,7 +153,31 @@ export async function generateInvoicePdf(
     : amountCents;
   const totalEur = (totalCents / 100).toFixed(2);
   draw(`Gesamtbetrag: € ${totalEur}`, { size: 12, bold: true });
-  y -= 24;
+  y -= 16;
+
+  if (type === "customer") {
+    const ps = job.payment_status;
+    const payLabel =
+      ps === "paid"
+        ? "Bezahlt"
+        : ps === "pending"
+          ? "Ausstehend"
+          : ps === "refunded"
+            ? "Erstattet"
+            : ps === "failed"
+              ? "Fehlgeschlagen"
+              : String(ps ?? "—");
+    draw(`Zahlungsstatus: ${payLabel}`, { size: 10, bold: true });
+    if (job.pod_completed_at) {
+      draw(
+        `Liefernachweis: Zugestellt am ${new Date(job.pod_completed_at).toLocaleString("de-DE")}`,
+        { size: 9 }
+      );
+    }
+    y -= 8;
+  }
+
+  y -= 8;
 
   draw("Vielen Dank für Ihren Auftrag.", { size: 9 });
   y -= 8;

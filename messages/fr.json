@@ -237,7 +237,20 @@
     "navFullRoute": "🛣️ Trajet complet",
     "approxDistance": "Distance approx.",
     "approxDriveTime": "Temps de conduite approx.",
-    "routeInfoHint": "Selon la commande."
+    "routeInfoHint": "Selon la commande.",
+    "podTitle": "Confirmer la livraison (photo)",
+    "podIntro": "Après la livraison, envoyez une photo de remise. La commande est marquée livrée automatiquement.",
+    "podCodeLabel": "Optionnel : code de confirmation du destinataire",
+    "podCodePlaceholder": "ex. code de signature",
+    "podChoosePhoto": "Choisir une photo et envoyer",
+    "podUploading": "Envoi…",
+    "podUploadOk": "Preuve de livraison enregistrée. Merci !",
+    "podAlreadyDone": "La livraison était déjà confirmée.",
+    "podDone": "Livraison confirmée",
+    "podNotImage": "Choisissez une image JPEG, PNG ou WebP.",
+    "podTooLarge": "5 Mo maximum.",
+    "podUploadFailed": "Échec de l’envoi.",
+    "podReadFailed": "Lecture du fichier impossible."
   },
   "support": {
     "title": "Support technique et contact",

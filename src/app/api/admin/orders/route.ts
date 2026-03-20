@@ -29,6 +29,13 @@ export async function PATCH(req: Request) {
   if (assigned_driver_id !== undefined) updates.assigned_driver_id = assigned_driver_id || null;
   if (assigned_driver_application_id !== undefined) updates.assigned_driver_application_id = assigned_driver_application_id || null;
   if (body.driver_price_cents !== undefined) updates.driver_price_cents = body.driver_price_cents == null ? null : Number(body.driver_price_cents);
+  if (body.payment_status !== undefined) {
+    const ps = String(body.payment_status);
+    if (!["pending", "paid", "refunded", "failed"].includes(ps)) {
+      return NextResponse.json({ error: "Invalid payment_status" }, { status: 400 });
+    }
+    updates.payment_status = ps;
+  }
   // ETA / POD / tracking (roadmap_foundation.sql)
   if (body.estimated_arrival_at !== undefined) updates.estimated_arrival_at = body.estimated_arrival_at || null;
   if (body.eta_minutes_remaining !== undefined) {

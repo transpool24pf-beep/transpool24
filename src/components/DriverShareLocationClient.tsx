@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ChangeEvent } from "react";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { mapsNavigateToDestination, mapsRoutePickupToDelivery } from "@/lib/google-maps-links";
@@ -13,6 +13,9 @@ type ValidateResponse = {
   delivery_address?: string;
   distance_km?: number | null;
   duration_minutes?: number | null;
+  pod_photo_url?: string | null;
+  pod_completed_at?: string | null;
+  delivery_complete?: boolean;
   error?: string;
 };
 
@@ -39,6 +42,12 @@ export function DriverShareLocationClient({
   const [lastSent, setLastSent] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [deliveryComplete, setDeliveryComplete] = useState(false);
+  const [podPhotoUrl, setPodPhotoUrl] = useState<string | null>(null);
+  const [podUploading, setPodUploading] = useState(false);
+  const [podErr, setPodErr] = useState<string | null>(null);
+  const [podOk, setPodOk] = useState<string | null>(null);
+  const [confirmCode, setConfirmCode] = useState("");
   const watchId = useRef<number | null>(null);
   const lastPostAt = useRef(0);
 
@@ -89,6 +98,8 @@ export function DriverShareLocationClient({
         setDelivery(data.delivery_address ?? "");
         setDistanceKm(data.distance_km ?? null);
         setDurationMinutes(data.duration_minutes ?? null);
+        setDeliveryComplete(Boolean(data.delivery_complete));
+        setPodPhotoUrl(data.pod_photo_url ?? null);
       })
       .catch(() => {
         setValid(false);
@@ -125,6 +136,58 @@ export function DriverShareLocationClient({
       { enableHighAccuracy: true, maximumAge: 10_000, timeout: 20_000 }
     );
   }, [jobId, token, sendPosition, stopSharing, t]);
+
+  const onPickDeliveryPhoto = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      e.target.value = "";
+      if (!file || !jobId || !token) return;
+      if (!file.type.startsWith("image/")) {
+        setPodErr(t("podNotImage"));
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setPodErr(t("podTooLarge"));
+        return;
+      }
+      setPodErr(null);
+      setPodOk(null);
+      setPodUploading(true);
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = reader.result as string;
+        void fetch("/api/public/driver-pod", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            job_id: jobId,
+            token,
+            base64: dataUrl,
+            filename: file.name,
+            confirmation_code: confirmCode.trim() || undefined,
+          }),
+        })
+          .then(async (res) => {
+            const data = (await res.json()) as { error?: string; pod_photo_url?: string; already_completed?: boolean };
+            if (!res.ok) throw new Error(typeof data.error === "string" ? data.error : t("podUploadFailed"));
+            return data;
+          })
+          .then((data) => {
+            if (data.pod_photo_url) setPodPhotoUrl(data.pod_photo_url);
+            setDeliveryComplete(true);
+            setPodOk(data.already_completed ? t("podAlreadyDone") : t("podUploadOk"));
+          })
+          .catch((er) => setPodErr(er instanceof Error ? er.message : t("podUploadFailed")))
+          .finally(() => setPodUploading(false));
+      };
+      reader.onerror = () => {
+        setPodUploading(false);
+        setPodErr(t("podReadFailed"));
+      };
+      reader.readAsDataURL(file);
+    },
+    [jobId, token, confirmCode, t]
+  );
 
   useEffect(() => {
     return () => {
@@ -241,6 +304,44 @@ export function DriverShareLocationClient({
       <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-4 text-sm text-amber-950/90">
         <p className="font-medium">{t("privacyTitle")}</p>
         <p className="mt-1">{t("privacyBody")}</p>
+      </div>
+
+      <div className="rounded-xl border-2 border-emerald-200 bg-emerald-50/40 p-6 shadow-sm">
+        <h3 className="text-base font-semibold text-[var(--primary)]">{t("podTitle")}</h3>
+        <p className="mt-2 text-sm text-[var(--foreground)]/80">{t("podIntro")}</p>
+        {deliveryComplete ? (
+          <div className="mt-4 space-y-2">
+            <p className="text-sm font-medium text-emerald-900">{t("podDone")}</p>
+            {podPhotoUrl ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={podPhotoUrl}
+                alt=""
+                className="max-h-56 w-full max-w-md rounded-lg border border-emerald-200 object-contain"
+              />
+            ) : null}
+          </div>
+        ) : (
+          <div className="mt-4 space-y-3">
+            <label className="block text-xs font-medium text-[var(--foreground)]/70">{t("podCodeLabel")}</label>
+            <input
+              type="text"
+              value={confirmCode}
+              onChange={(e) => setConfirmCode(e.target.value)}
+              placeholder={t("podCodePlaceholder")}
+              className="w-full max-w-md rounded-lg border-2 border-[#0d2137]/20 px-3 py-2 text-sm"
+              maxLength={64}
+            />
+            <div>
+              <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-[#0d2137] px-4 py-3 text-sm font-semibold text-white hover:opacity-90 disabled:opacity-50">
+                <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" disabled={podUploading} onChange={onPickDeliveryPhoto} />
+                {podUploading ? t("podUploading") : t("podChoosePhoto")}
+              </label>
+            </div>
+          </div>
+        )}
+        {podErr && <p className="mt-2 text-sm text-red-700">{podErr}</p>}
+        {podOk && <p className="mt-2 text-sm text-green-800">{podOk}</p>}
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row">

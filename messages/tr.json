@@ -237,7 +237,20 @@
     "navFullRoute": "🛣️ Tam rota",
     "approxDistance": "Yaklaşık mesafe",
     "approxDriveTime": "Yaklaşık sürüş süresi",
-    "routeInfoHint": "Siparişe göre."
+    "routeInfoHint": "Siparişe göre.",
+    "podTitle": "Teslimatı onayla (fotoğraf)",
+    "podIntro": "Teslimattan sonra bir teslim fotoğrafı yükleyin. Sipariş otomatik olarak teslim edildi olarak işaretlenir.",
+    "podCodeLabel": "İsteğe bağlı: alıcı onay kodu",
+    "podCodePlaceholder": "ör. imza kodu",
+    "podChoosePhoto": "Teslim fotoğrafı seç ve gönder",
+    "podUploading": "Yükleniyor…",
+    "podUploadOk": "Teslim kanıtı kaydedildi. Teşekkürler!",
+    "podAlreadyDone": "Teslimat zaten onaylanmıştı.",
+    "podDone": "Teslimat onaylandı",
+    "podNotImage": "Lütfen JPEG, PNG veya WebP seçin.",
+    "podTooLarge": "En fazla 5 MB.",
+    "podUploadFailed": "Yükleme başarısız.",
+    "podReadFailed": "Dosya okunamadı."
   },
   "support": {
     "title": "Teknik destek ve iletişim",

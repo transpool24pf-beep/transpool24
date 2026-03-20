@@ -237,7 +237,20 @@
     "navFullRoute": "🛣️ Gesamtroute Abholung → Lieferung",
     "approxDistance": "Ca. Distanz",
     "approxDriveTime": "Ca. Fahrzeit (eine Richtung)",
-    "routeInfoHint": "Aus dem Auftrag; Verkehr kann abweichen."
+    "routeInfoHint": "Aus dem Auftrag; Verkehr kann abweichen.",
+    "podTitle": "Zustellung bestätigen (Foto)",
+    "podIntro": "Nach der Lieferung bitte ein Foto der Übergabe hochladen. Der Auftrag wird dann automatisch als zugestellt markiert und das Bild erscheint in der Disposition.",
+    "podCodeLabel": "Optional: Bestätigungscode vom Empfänger",
+    "podCodePlaceholder": "z. B. Unterschrift-Code oder PIN",
+    "podChoosePhoto": "Lieferfoto auswählen & senden",
+    "podUploading": "Wird hochgeladen…",
+    "podUploadOk": "Liefernachweis gespeichert. Vielen Dank!",
+    "podAlreadyDone": "Zustellung war bereits bestätigt.",
+    "podDone": "Zustellung bestätigt",
+    "podNotImage": "Bitte ein Bild (JPEG, PNG oder WebP) wählen.",
+    "podTooLarge": "Maximal 5 MB.",
+    "podUploadFailed": "Upload fehlgeschlagen.",
+    "podReadFailed": "Datei konnte nicht gelesen werden."
   },
   "support": {
     "title": "Technischer Support & Kontakt",

@@ -1,0 +1,11 @@
+-- Driver POD photos are uploaded via API to Storage bucket: driver-documents
+-- Path prefix: pod/{job_id}/...
+--
+-- Ensure the bucket exists and is public (or use signed URLs – then adjust getPublicUrl usage):
+--   Dashboard → Storage → New bucket → name: driver-documents → Public bucket ✓
+--
+-- If the bucket is private, add a policy allowing public read on objects under pod/:
+-- (Example; adjust to your RLS setup.)
+--
+-- INSERT INTO storage.buckets (id, name, public) VALUES ('driver-documents', 'driver-documents', true)
+-- ON CONFLICT (id) DO UPDATE SET public = true;

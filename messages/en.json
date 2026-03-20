@@ -237,7 +237,20 @@
     "navFullRoute": "🛣️ Full route: pickup → delivery",
     "approxDistance": "Approx. distance",
     "approxDriveTime": "Approx. drive time (one way)",
-    "routeInfoHint": "From the order; traffic may differ."
+    "routeInfoHint": "From the order; traffic may differ.",
+    "podTitle": "Confirm delivery (photo)",
+    "podIntro": "After delivery, upload a handover photo. The job is marked delivered automatically and dispatch will see the image.",
+    "podCodeLabel": "Optional: recipient confirmation code",
+    "podCodePlaceholder": "e.g. signature code or PIN",
+    "podChoosePhoto": "Choose delivery photo & send",
+    "podUploading": "Uploading…",
+    "podUploadOk": "Proof of delivery saved. Thank you!",
+    "podAlreadyDone": "Delivery was already confirmed.",
+    "podDone": "Delivery confirmed",
+    "podNotImage": "Please choose an image (JPEG, PNG or WebP).",
+    "podTooLarge": "Maximum 5 MB.",
+    "podUploadFailed": "Upload failed.",
+    "podReadFailed": "Could not read the file."
   },
   "support": {
     "title": "Technical Support & Contact",
