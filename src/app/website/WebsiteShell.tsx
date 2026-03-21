@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 const NAV = [
   { href: "/website", label: "Homepage – Bewertungen" },
+  { href: "/website/hero", label: "Homepage – Hero (Bild & Texte)" },
   { href: "/website/transport", label: "Homepage – Transport-Kacheln" },
   { href: "/website/why", label: "Homepage – Warum TransPool24?" },
   { href: "/website/why-media", label: "Homepage – Medien (Why)" },

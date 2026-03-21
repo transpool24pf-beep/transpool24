@@ -6,6 +6,9 @@ import { Footer } from "@/components/Footer";
 import { DriversCarousel } from "@/components/DriversCarousel";
 import { HomeTransportOperations } from "@/components/HomeTransportOperations";
 import { GermanyConnectSection } from "@/components/GermanyConnectSection";
+import { getHomepageHero } from "@/lib/homepage-hero";
+
+const FALLBACK_IMAGE = "/images/5677.png";
 
 export default async function HomePage({
   params,
@@ -14,40 +17,59 @@ export default async function HomePage({
 }) {
   const { locale } = await params;
   const t = await getTranslations("home");
+  const hero = await getHomepageHero(locale);
+
+  const heroImage = hero.imageUrl || FALLBACK_IMAGE;
+  const heroHeadline = hero.headline || t("heroHeadline");
+  const heroSubtitle = hero.subtitle || t("subtitle");
+  const heroCta = hero.cta || t("cta");
 
   return (
     <>
       <Header />
       <main className="min-h-[calc(100vh-8rem)]">
-        {/* Hero — sennder-style: full-bleed image, orange headline box, single CTA */}
+        {/* Hero — CMS-driven, ornamental frames, single CTA */}
         <section className="relative min-h-[min(90vh,42rem)] overflow-hidden">
           <div className="absolute inset-0">
             <Image
-              src="/images/5677.png"
+              src={heroImage}
               alt=""
               fill
               className="object-cover object-center"
               priority
               sizes="100vw"
+              unoptimized={heroImage.startsWith("http")}
             />
             <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent rtl:bg-gradient-to-l rtl:from-black/70 rtl:via-black/40 rtl:to-transparent" />
           </div>
           <div className="relative flex min-h-[min(90vh,42rem)] flex-col justify-center px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
             <div className="mx-auto w-full max-w-7xl">
               <div className="max-w-2xl">
-                <div className="inline-block rounded-lg bg-[var(--accent)] px-6 py-5 shadow-[0_8px_30px_rgba(232,93,4,0.35)] sm:px-8 sm:py-6">
-                  <h1 className="text-2xl font-bold leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl">
-                    {t("heroHeadline")}
+                {/* Ornamental headline frame — double border, decorative corners */}
+                <div
+                  className="relative inline-block rounded-xl border-2 border-white/55 bg-[var(--accent)] px-7 py-6 sm:px-9 sm:py-7"
+                  style={{
+                    boxShadow:
+                      "0 8px 32px rgba(232,93,4,0.4), inset 0 0 0 1px rgba(255,255,255,0.3), 0 0 0 3px rgba(255,255,255,0.12)",
+                  }}
+                >
+                  <div className="absolute left-2 top-2 h-5 w-5 border-l-2 border-t-2 border-white/60 rounded-tl" aria-hidden />
+                  <div className="absolute right-2 top-2 h-5 w-5 border-r-2 border-t-2 border-white/60 rounded-tr" aria-hidden />
+                  <div className="absolute bottom-2 left-2 h-5 w-5 border-b-2 border-l-2 border-white/60 rounded-bl" aria-hidden />
+                  <div className="absolute bottom-2 right-2 h-5 w-5 border-b-2 border-r-2 border-white/60 rounded-br" aria-hidden />
+                  <h1 className="relative text-2xl font-bold leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl">
+                    {heroHeadline}
                   </h1>
                 </div>
                 <p className="mt-6 max-w-xl text-lg text-white/95 sm:text-xl">
-                  {t("subtitle")}
+                  {heroSubtitle}
                 </p>
+                {/* Ornamental CTA button */}
                 <Link
                   href={`/${locale}/order`}
-                  className="mt-10 inline-flex items-center gap-2 rounded-xl bg-[var(--accent)] px-10 py-4 text-lg font-bold text-white shadow-lg transition hover:brightness-110"
+                  className="mt-10 inline-flex items-center gap-2 rounded-xl border-2 border-white/50 bg-[var(--accent)] px-10 py-4 text-lg font-bold text-white shadow-[0_4px_20px_rgba(0,0,0,0.3),inset_0_0_0_1px_rgba(255,255,255,0.2)] transition hover:brightness-110"
                 >
-                  {t("cta")}
+                  {heroCta}
                   <svg className="h-5 w-5 rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
