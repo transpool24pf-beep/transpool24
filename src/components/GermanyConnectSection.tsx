@@ -1,54 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { useId } from "react";
+import { useId, useMemo } from "react";
 import { useTranslations } from "next-intl";
+import {
+  GERMANY_HUBS,
+  GERMANY_MAP_VIEWBOX,
+  GERMANY_OUTLINE_PATH,
+  germanyHubRoutes,
+} from "@/lib/germany-outline-map";
 
 type Props = { locale: string };
 
 /**
- * Stylized Germany map with animated connection lines between hub cities (Sennder-inspired layout).
- * Coordinates are in viewBox space; paths approximate intra-Germany flows.
+ * Germany section: geographic country outline (simplified real boundary) + animated hub connections.
  */
 export function GermanyConnectSection({ locale }: Props) {
   const t = useTranslations("home.germanyMap");
   const clipId = useId().replace(/:/g, "");
-
-  const hubs = [
-    { cx: 248, cy: 52, key: "hamburg" },
-    { cx: 318, cy: 78, key: "berlin" },
-    { cx: 172, cy: 92, key: "nrw" },
-    { cx: 198, cy: 118, key: "frankfurt" },
-    { cx: 214, cy: 158, key: "stuttgart" },
-    { cx: 268, cy: 188, key: "munich" },
-  ] as const;
-
-  const routes: { d: string; delay: string }[] = [
-    {
-      d: "M 248 52 Q 285 62 318 78",
-      delay: "0s",
-    },
-    {
-      d: "M 318 78 Q 250 85 172 92",
-      delay: "0.4s",
-    },
-    {
-      d: "M 172 92 Q 185 105 198 118",
-      delay: "0.8s",
-    },
-    {
-      d: "M 198 118 Q 206 138 214 158",
-      delay: "1.2s",
-    },
-    {
-      d: "M 214 158 Q 240 175 268 188",
-      delay: "1.6s",
-    },
-    {
-      d: "M 268 188 Q 265 120 248 52",
-      delay: "2s",
-    },
-  ];
+  const routes = useMemo(() => germanyHubRoutes(), []);
 
   return (
     <section
@@ -97,26 +67,27 @@ export function GermanyConnectSection({ locale }: Props) {
           </div>
 
           <div className="order-1 flex justify-center lg:order-2 lg:justify-end">
-            <div className="relative aspect-square w-full max-w-[min(100%,420px)]">
+            <div className="relative aspect-square w-full max-w-[min(100%,440px)]">
               <div className="absolute inset-0 rounded-full bg-white/10 shadow-[inset_0_0_60px_rgba(0,0,0,0.15)] ring-1 ring-white/20" />
-              <div className="relative flex h-full w-full items-center justify-center p-[10%]">
+              <div className="relative flex h-full w-full items-center justify-center p-[8%] sm:p-[10%]">
                 <svg
-                  viewBox="0 0 400 240"
-                  className="h-auto w-full drop-shadow-lg"
+                  viewBox={GERMANY_MAP_VIEWBOX}
+                  preserveAspectRatio="xMidYMid meet"
+                  className="h-auto w-full max-h-[min(100%,420px)] drop-shadow-lg"
                   role="img"
                   aria-label={t("mapAria")}
                 >
                   <defs>
                     <clipPath id={clipId}>
-                      <path d="M 155 28 L 210 22 L 268 32 L 312 48 L 338 72 L 348 98 L 342 128 L 352 152 L 338 178 L 318 198 L 288 212 L 252 218 L 218 214 L 188 205 L 162 188 L 138 158 L 128 122 L 132 88 L 142 52 Z" />
+                      <path d={GERMANY_OUTLINE_PATH} />
                     </clipPath>
                   </defs>
 
                   <path
-                    fill="rgba(255,255,255,0.14)"
-                    stroke="rgba(255,255,255,0.35)"
-                    strokeWidth={1.2}
-                    d="M 155 28 L 210 22 L 268 32 L 312 48 L 338 72 L 348 98 L 342 128 L 352 152 L 338 178 L 318 198 L 288 212 L 252 218 L 218 214 L 188 205 L 162 188 L 138 158 L 128 122 L 132 88 L 142 52 Z"
+                    fill="rgba(255,255,255,0.16)"
+                    stroke="rgba(255,255,255,0.45)"
+                    strokeWidth={1.25}
+                    d={GERMANY_OUTLINE_PATH}
                   />
 
                   <g clipPath={`url(#${clipId})`}>
@@ -125,22 +96,22 @@ export function GermanyConnectSection({ locale }: Props) {
                         key={i}
                         d={r.d}
                         fill="none"
-                        stroke="rgba(255,255,255,0.55)"
-                        strokeWidth={2}
+                        stroke="rgba(255,255,255,0.6)"
+                        strokeWidth={2.2}
                         strokeLinecap="round"
-                        strokeDasharray="6 14"
+                        strokeDasharray="8 16"
                         className="germany-map-flow-line"
                         style={{ animationDelay: r.delay }}
                       />
                     ))}
                   </g>
 
-                  {hubs.map((h) => (
+                  {GERMANY_HUBS.map((h) => (
                     <circle
                       key={h.key}
                       cx={h.cx}
                       cy={h.cy}
-                      r={5}
+                      r={5.5}
                       className="fill-white drop-shadow-md"
                     />
                   ))}
@@ -150,7 +121,6 @@ export function GermanyConnectSection({ locale }: Props) {
           </div>
         </div>
       </div>
-
     </section>
   );
 }
