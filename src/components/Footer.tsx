@@ -91,11 +91,11 @@ export function Footer() {
                 <Image
                   src="/356.png"
                   alt="TransPool24"
-                  width={677}
-                  height={369}
+                  width={633}
+                  height={325}
                   quality={100}
-                  className="h-14 w-auto max-h-14 object-contain sm:h-16 sm:max-h-16 md:h-[4.25rem] md:max-h-[4.25rem]"
-                  sizes="(max-width: 768px) 240px, 300px"
+                  className="h-16 w-auto max-h-16 object-contain object-top sm:h-[4.5rem] sm:max-h-[4.5rem] md:h-20 md:max-h-20"
+                  sizes="(max-width: 768px) 280px, 340px"
                 />
               </Link>
               <p className="mt-5 max-w-xs text-center text-sm text-white/65 lg:text-start">{t("brandTagline")}</p>
