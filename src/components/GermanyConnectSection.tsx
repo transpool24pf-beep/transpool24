@@ -4,21 +4,20 @@ import Link from "next/link";
 import { useId, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import {
-  GERMANY_HUBS,
-  GERMANY_MAP_VIEWBOX,
-  GERMANY_OUTLINE_PATH,
-  germanyHubRoutes,
-} from "@/lib/germany-outline-map";
+  GERMANY_LANDS,
+  GERMANY_STATES_VIEWBOX,
+  germanyLandLoopRoutes,
+} from "@/lib/germany-states-map";
 
 type Props = { locale: string };
 
 /**
- * Germany section: geographic country outline (simplified real boundary) + animated hub connections.
+ * Germany with all 16 Bundesländer (real administrative boundaries) + animated inter-state lines.
  */
 export function GermanyConnectSection({ locale }: Props) {
   const t = useTranslations("home.germanyMap");
   const clipId = useId().replace(/:/g, "");
-  const routes = useMemo(() => germanyHubRoutes(), []);
+  const routes = useMemo(() => germanyLandLoopRoutes(), []);
 
   return (
     <section
@@ -67,28 +66,34 @@ export function GermanyConnectSection({ locale }: Props) {
           </div>
 
           <div className="order-1 flex justify-center lg:order-2 lg:justify-end">
-            <div className="relative aspect-square w-full max-w-[min(100%,440px)]">
+            <div className="relative aspect-square w-full max-w-[min(100%,460px)]">
               <div className="absolute inset-0 rounded-full bg-white/10 shadow-[inset_0_0_60px_rgba(0,0,0,0.15)] ring-1 ring-white/20" />
-              <div className="relative flex h-full w-full items-center justify-center p-[8%] sm:p-[10%]">
+              <div className="relative flex h-full w-full items-center justify-center p-[6%] sm:p-[8%]">
                 <svg
-                  viewBox={GERMANY_MAP_VIEWBOX}
+                  viewBox={GERMANY_STATES_VIEWBOX}
                   preserveAspectRatio="xMidYMid meet"
-                  className="h-auto w-full max-h-[min(100%,420px)] drop-shadow-lg"
+                  className="h-auto w-full max-h-[min(100%,440px)] drop-shadow-lg"
                   role="img"
                   aria-label={t("mapAria")}
                 >
                   <defs>
                     <clipPath id={clipId}>
-                      <path d={GERMANY_OUTLINE_PATH} />
+                      {GERMANY_LANDS.map((s) => (
+                        <path key={s.id} d={s.path} />
+                      ))}
                     </clipPath>
                   </defs>
 
-                  <path
-                    fill="rgba(255,255,255,0.16)"
-                    stroke="rgba(255,255,255,0.45)"
-                    strokeWidth={1.25}
-                    d={GERMANY_OUTLINE_PATH}
-                  />
+                  {GERMANY_LANDS.map((s) => (
+                    <path
+                      key={s.id}
+                      d={s.path}
+                      fill="rgba(255,255,255,0.07)"
+                      stroke="rgba(255,255,255,0.5)"
+                      strokeWidth={1.1}
+                      className="transition-colors duration-200 hover:fill-white/15"
+                    />
+                  ))}
 
                   <g clipPath={`url(#${clipId})`}>
                     {routes.map((r, i) => (
@@ -96,24 +101,18 @@ export function GermanyConnectSection({ locale }: Props) {
                         key={i}
                         d={r.d}
                         fill="none"
-                        stroke="rgba(255,255,255,0.6)"
-                        strokeWidth={2.2}
+                        stroke="rgba(255,255,255,0.65)"
+                        strokeWidth={2.4}
                         strokeLinecap="round"
-                        strokeDasharray="8 16"
+                        strokeDasharray="10 18"
                         className="germany-map-flow-line"
                         style={{ animationDelay: r.delay }}
                       />
                     ))}
                   </g>
 
-                  {GERMANY_HUBS.map((h) => (
-                    <circle
-                      key={h.key}
-                      cx={h.cx}
-                      cy={h.cy}
-                      r={5.5}
-                      className="fill-white drop-shadow-md"
-                    />
+                  {GERMANY_LANDS.map((s) => (
+                    <circle key={`dot-${s.id}`} cx={s.cx} cy={s.cy} r={3.8} className="fill-white/95" />
                   ))}
                 </svg>
               </div>

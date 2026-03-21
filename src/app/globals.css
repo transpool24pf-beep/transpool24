@@ -24,12 +24,13 @@ body {
   font-family: var(--font-sans), system-ui, sans-serif;
 }
 
+/* Stepped dash = “hopping” motion along inter–Bundesland routes */
 @keyframes germany-map-dash-flow {
   to {
-    stroke-dashoffset: -120;
+    stroke-dashoffset: -140;
   }
 }
 
 .germany-map-flow-line {
-  animation: germany-map-dash-flow 3.5s linear infinite;
+  animation: germany-map-dash-flow 3.2s steps(10) infinite;
 }
