@@ -15,10 +15,13 @@ interface Driver {
 
 type Props = { apiBase: string };
 
+const PHOTO_UPLOAD_URL = "/api/website/content/drivers/upload";
+
 export function WebsiteHomepageDriversClient({ apiBase }: Props) {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [photoUploading, setPhotoUploading] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [formData, setFormData] = useState<Driver>({
@@ -109,12 +112,52 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
         });
         alert("Gespeichert.");
       } else {
-        alert("Speichern fehlgeschlagen.");
+        const errBody = await res.json().catch(() => ({}));
+        const msg =
+          typeof (errBody as { error?: string }).error === "string"
+            ? (errBody as { error: string }).error
+            : "Speichern fehlgeschlagen.";
+        alert(msg);
       }
     } catch {
       alert("Anfrage fehlgeschlagen.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handlePhotoFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      alert("Bitte ein Bild wählen (JPEG, PNG oder WebP).");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Datei zu groß (max. 5 MB).");
+      return;
+    }
+    setPhotoUploading(true);
+    try {
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = () => reject(new Error("read failed"));
+        reader.readAsDataURL(file);
+      });
+      const res = await fetch(PHOTO_UPLOAD_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ base64: dataUrl, filename: file.name }),
+      });
+      const data = (await res.json()) as { url?: string; error?: string };
+      if (!res.ok) throw new Error(data.error || "Upload fehlgeschlagen.");
+      if (data.url) setFormData((prev) => ({ ...prev, photo: data.url! }));
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Upload fehlgeschlagen.");
+    } finally {
+      setPhotoUploading(false);
     }
   };
 
@@ -179,15 +222,55 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
                 className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
               />
             </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium text-[#0d2137]/80">Foto URL</label>
-              <input
-                type="url"
-                value={formData.photo}
-                onChange={(e) => setFormData({ ...formData, photo: e.target.value })}
-                placeholder="https://ui-avatars.com/api/?name=..."
-                className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-              />
+            <div className="sm:col-span-2">
+              <label className="mb-1 block text-sm font-medium text-[#0d2137]/80">Foto</label>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+                <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border-2 border-[var(--accent)]/30 bg-gray-100">
+                  {formData.photo ? (
+                    <Image
+                      src={formData.photo}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      unoptimized
+                      onError={(ev) => {
+                        (ev.target as HTMLImageElement).src =
+                          `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name || "?")}&background=e85d04&color=fff&size=128`;
+                      }}
+                    />
+                  ) : (
+                    <span className="flex h-full w-full items-center justify-center text-xs text-[#0d2137]/40">
+                      —
+                    </span>
+                  )}
+                </div>
+                <div className="min-w-0 flex-1 space-y-2">
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={handlePhotoFile}
+                    disabled={photoUploading}
+                    className="block w-full text-sm text-[#0d2137] file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--accent)] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:opacity-95 disabled:opacity-50"
+                  />
+                  <p className="text-xs text-[#0d2137]/60">
+                    Bild von Ihrem Computer hochladen (JPEG/PNG/WebP, max. 5 MB). Wird in Supabase Storage
+                    gespeichert und als öffentliche URL im Eintrag verwendet.
+                  </p>
+                  <div>
+                    <label className="mb-1 block text-xs font-medium text-[#0d2137]/70">
+                      Bild-URL (optional, statt Upload)
+                    </label>
+                    <input
+                      type="url"
+                      value={formData.photo}
+                      onChange={(e) => setFormData({ ...formData, photo: e.target.value })}
+                      placeholder="https://… (externe Links funktionieren oft nicht – Upload bevorzugen)"
+                      className="w-full rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                    />
+                  </div>
+                  {photoUploading && <p className="text-sm text-[var(--accent)]">Wird hochgeladen…</p>}
+                </div>
+              </div>
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium text-[#0d2137]/80">Bewertung (1-5)</label>
@@ -282,6 +365,10 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
                     fill
                     className="object-cover"
                     unoptimized
+                    onError={(ev) => {
+                      (ev.target as HTMLImageElement).src =
+                        `https://ui-avatars.com/api/?name=${encodeURIComponent(driver.name)}&background=e85d04&color=fff&size=128`;
+                    }}
                   />
                 </div>
                 <div className="min-w-0 flex-1">

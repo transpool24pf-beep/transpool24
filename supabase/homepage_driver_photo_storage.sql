@@ -1,0 +1,9 @@
+-- Homepage driver testimonial photos are uploaded via /api/website/content/drivers/upload
+-- into bucket: driver-documents, path prefix: homepage-drivers/
+--
+-- Requirements (Supabase Dashboard → Storage):
+-- 1. Bucket "driver-documents" exists (same as driver applications / POD).
+-- 2. Bucket should be **public** so getPublicUrl() works in the browser.
+--    See pod_driver_upload_notes.sql
+--
+-- No extra table is required; the public URL is stored in homepage_drivers.photo.
