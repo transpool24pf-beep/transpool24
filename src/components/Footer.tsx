@@ -83,9 +83,13 @@ export function Footer() {
         <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
           <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
             <div className="flex flex-col items-center lg:col-span-4 lg:items-start">
-              <Link href={`/${locale}`} className="inline-block rounded-xl bg-white/95 p-3 shadow-md ring-1 ring-white/10">
+              <Link
+                href={`/${locale}`}
+                className="inline-flex rounded-lg transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/35 focus-visible:ring-offset-2 focus-visible:ring-offset-[#1c2128]"
+                aria-label="TransPool24"
+              >
                 <Image
-                  src="/345remov.png"
+                  src="/356.png"
                   alt="TransPool24"
                   width={677}
                   height={369}

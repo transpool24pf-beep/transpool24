@@ -87,7 +87,8 @@ export function WebsiteWhyTranspool24Client() {
         <strong className="text-[#0d2137]">Abschlussbereich (orange CTA + dunkle Fußzeile):</strong> Wird am Ende aller öffentlichen Seiten mit{" "}
         <code className="rounded bg-[#0d2137]/5 px-1">Footer</code> angezeigt (Startseite, Why, Support, Auftrag, Fahrer, …). Texte pflegen Sie in{" "}
         <code className="rounded bg-[#0d2137]/5 px-1">messages/*.json</code> →{" "}
-        <code className="rounded bg-[#0d2137]/5 px-1">infoPageClosing</code>.
+        <code className="rounded bg-[#0d2137]/5 px-1">infoPageClosing</code>. Footer-Logo (transparent):{" "}
+        <code className="rounded bg-[#0d2137]/5 px-1">public/356.png</code> — Austausch per Deployment/Git, nicht im JSON.
       </p>
 
       <div className="mb-4 flex flex-wrap items-center gap-3">
