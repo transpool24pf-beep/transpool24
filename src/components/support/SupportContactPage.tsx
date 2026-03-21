@@ -343,14 +343,25 @@ export function SupportContactPage() {
 
           <aside className="lg:sticky lg:top-24">
             <div className="overflow-hidden rounded-2xl border border-[#0d2137]/10 shadow-lg">
-              <div className="relative aspect-[4/3] bg-[#f4f6f8]">
-                <Image
-                  src="/images/van1.png"
-                  alt={t("heroImageAlt")}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 400px"
-                />
+              <div className="flex flex-col items-center justify-center bg-gradient-to-br from-[#ff8c42] via-[#f07828] to-[#e85d04] px-6 py-12 text-white">
+                <div className="rounded-full bg-white/15 p-3 ring-2 ring-white/35">
+                  <Image src="/logo.png" alt="TransPool24" width={64} height={64} className="h-16 w-16 object-contain" />
+                </div>
+                <p className="mt-4 text-center text-xs font-semibold uppercase tracking-wider text-white/90">TransPool24</p>
+                <svg
+                  className="mx-auto mt-6 h-14 w-14 text-white/90"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.25}
+                  aria-hidden
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                  />
+                </svg>
               </div>
               <div className="border-t border-[#0d2137]/10 bg-white p-6">
                 <h3 className="text-lg font-bold text-[#0d2137]">{t("officesTitle")}</h3>
