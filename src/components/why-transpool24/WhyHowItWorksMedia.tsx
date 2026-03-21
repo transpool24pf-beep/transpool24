@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { useMemo, useState } from "react";
 import { resolveWhyVideoEmbed } from "@/lib/why-video-embed";
+import { WhyCmsImage } from "./WhyCmsImage";
 
 type Props = {
   sceneImageUrl: string;
@@ -12,8 +12,6 @@ type Props = {
 export function WhyHowItWorksMedia({ sceneImageUrl, howVideoUrl }: Props) {
   const [iframeOn, setIframeOn] = useState(false);
   const embed = useMemo(() => resolveWhyVideoEmbed(howVideoUrl), [howVideoUrl]);
-
-  const unoptimizedImg = sceneImageUrl.startsWith("http");
 
   if (embed.kind === "file") {
     return (
@@ -35,13 +33,12 @@ export function WhyHowItWorksMedia({ sceneImageUrl, howVideoUrl }: Props) {
       <div className="relative aspect-[4/3] min-h-[220px] overflow-hidden rounded-2xl ring-2 ring-white/20 shadow-xl">
         {!iframeOn ? (
           <>
-            <Image
+            <WhyCmsImage
               src={sceneImageUrl}
               alt=""
               fill
               className="object-cover"
               sizes="(max-width: 1024px) 100vw, 50vw"
-              unoptimized={unoptimizedImg}
             />
             <div className="absolute inset-0 bg-[#0d2137]/25" />
             <button
@@ -76,13 +73,12 @@ export function WhyHowItWorksMedia({ sceneImageUrl, howVideoUrl }: Props) {
 
   return (
     <div className="relative aspect-[4/3] min-h-[220px] overflow-hidden rounded-2xl ring-2 ring-white/20 shadow-xl">
-      <Image
+      <WhyCmsImage
         src={sceneImageUrl}
         alt=""
         fill
         className="object-cover"
         sizes="(max-width: 1024px) 100vw, 50vw"
-        unoptimized={unoptimizedImg}
       />
       <div className="absolute inset-0 flex items-center justify-center bg-[#0d2137]/20">
         <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--accent)]/90 text-white shadow-xl ring-4 ring-white/30">

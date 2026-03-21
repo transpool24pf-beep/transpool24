@@ -1,8 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 import type { WhyPagePayload } from "@/lib/why-transpool24-types";
 import { WhyTranspool24Icon } from "./WhyTranspool24Icon";
 import { WhyHowItWorksMedia } from "./WhyHowItWorksMedia";
+import { WhyCmsImage } from "./WhyCmsImage";
 
 type Props = { data: WhyPagePayload; locale: string };
 
@@ -110,14 +110,13 @@ export function WhyTranspool24Content({ data, locale }: Props) {
           <div className="px-6 pb-10 sm:px-10 sm:pb-12">
             <div className="rounded-[1.15rem] bg-gradient-to-br from-[var(--accent)] via-[#f5a623] to-[#ff8c42] p-[3px] shadow-lg shadow-[var(--accent)]/15 sm:rounded-[1.35rem] sm:p-1">
               <div className="relative aspect-[21/9] min-h-[200px] overflow-hidden rounded-[1rem] bg-[#0d2137]/5 ring-1 ring-black/5 sm:aspect-[2.4/1] sm:rounded-[1.15rem]">
-                <Image
+                <WhyCmsImage
                   src={data.heroImageUrl}
                   alt=""
                   fill
                   className="object-cover"
                   sizes="(max-width: 1152px) 100vw, 1152px"
                   priority
-                  unoptimized={data.heroImageUrl.startsWith("http")}
                 />
               </div>
             </div>

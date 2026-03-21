@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { locales, type Locale } from "@/i18n/routing";
 import { parseFetchJson } from "@/lib/parse-fetch-json";
 import { putFileToSupabaseSignedUrl } from "@/lib/upload-supabase-signed-url";
 import { normalizeWhyAssetUrl } from "@/lib/why-asset-url";
+import { WhyCmsImage } from "@/components/why-transpool24/WhyCmsImage";
 
 const MAX_IMAGE_BYTES = 15 * 1024 * 1024;
 const MAX_VIDEO_BYTES = 200 * 1024 * 1024;
@@ -112,7 +112,13 @@ export function WebsiteWhyMediaClient() {
       <h1 className="mb-2 text-2xl font-semibold text-[#0d2137]">Homepage – Medien (Why-Seite)</h1>
       <p className="mb-6 text-sm text-[#0d2137]/70">
         Uploads gehen <strong>direkt zu Supabase</strong> (signierte URL) — umgeht das Vercel-Limit für große Dateien.
-        Lokale Bilder bitte als <code className="rounded bg-[#0d2137]/5 px-1">/images/…</code> eintragen, nicht{" "}
+        Öffentliche URL-Form:{" "}
+        <code className="rounded bg-[#0d2137]/5 px-1 break-all">
+          …/object/public/driver-documents/why-page-media/…
+        </code>{" "}
+        (Bucket <code className="rounded bg-[#0d2137]/5 px-1">driver-documents</code>, nicht{" "}
+        <code className="rounded bg-[#0d2137]/5 px-1">media/…</code>). Lokale Bilder:{" "}
+        <code className="rounded bg-[#0d2137]/5 px-1">/images/…</code>, nicht{" "}
         <code className="rounded bg-[#0d2137]/5 px-1">./images/…</code>. Speicherort:{" "}
         <code className="rounded bg-[#0d2137]/5 px-1">why-page-media/{`{locale}`}/</code> im Bucket{" "}
         <code className="rounded bg-[#0d2137]/5 px-1">driver-documents</code>.
@@ -169,13 +175,7 @@ export function WebsiteWhyMediaClient() {
             <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-start">
               <div className="relative h-32 w-full max-w-md overflow-hidden rounded-lg border border-[#0d2137]/10 bg-gray-100 sm:h-36">
                 {heroImageUrl ? (
-                  <Image
-                    src={heroImageUrl}
-                    alt=""
-                    fill
-                    className="object-cover"
-                    unoptimized={heroImageUrl.startsWith("http")}
-                  />
+                  <WhyCmsImage src={heroImageUrl} alt="" fill className="object-cover" />
                 ) : (
                   <span className="flex h-full items-center justify-center text-sm text-[#0d2137]/40">Kein Bild</span>
                 )}
@@ -213,13 +213,7 @@ export function WebsiteWhyMediaClient() {
             <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-start">
               <div className="relative h-40 w-full max-w-xs overflow-hidden rounded-lg border border-[#0d2137]/10 bg-gray-100">
                 {sceneImageUrl ? (
-                  <Image
-                    src={sceneImageUrl}
-                    alt=""
-                    fill
-                    className="object-cover"
-                    unoptimized={sceneImageUrl.startsWith("http")}
-                  />
+                  <WhyCmsImage src={sceneImageUrl} alt="" fill className="object-cover" />
                 ) : (
                   <span className="flex h-full items-center justify-center text-sm text-[#0d2137]/40">Kein Bild</span>
                 )}
