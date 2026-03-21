@@ -33,7 +33,7 @@ export default async function HomePage({
           </div>
           <div className="relative mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
             <div className="max-w-3xl">
-              <h1 className="text-4xl font-extrabold leading-tight drop-shadow-[0_2px_14px_rgba(0,0,0,0.28)] sm:text-5xl md:text-6xl lg:text-7xl">
+              <h1 className="whitespace-pre-line text-4xl font-extrabold leading-tight drop-shadow-[0_2px_14px_rgba(0,0,0,0.28)] sm:text-5xl md:text-6xl lg:text-7xl">
                 {t("title")}
               </h1>
               <p className="mt-6 text-xl text-white/95 drop-shadow-[0_1px_8px_rgba(0,0,0,0.22)] sm:text-2xl">

@@ -49,21 +49,23 @@ export function Header({ hideLogo }: HeaderProps) {
     <header className="sticky top-0 z-50 border-b border-[#0d2137]/10 bg-[var(--background)]/95 backdrop-blur">
       <div className="mx-auto flex min-h-[4.25rem] items-center justify-between px-4 py-2 sm:px-6 max-w-6xl">
         {!hideLogo ? (
-          <Link href={`/${locale}`} className="flex items-center gap-3">
+          <Link
+            href={`/${locale}`}
+            className="flex shrink-0 items-center py-1"
+            aria-label="TransPool24"
+          >
             <Image
-              src="/images/logo.png"
+              src="/images/123.png"
               alt="TransPool24"
-              width={64}
-              height={64}
-              className="h-14 w-14 object-contain sm:h-16 sm:w-16"
+              width={352}
+              height={192}
+              className="h-12 w-auto max-h-[3.25rem] max-w-[min(72vw,17.5rem)] object-contain object-start sm:h-[3.75rem] sm:max-h-[3.75rem] sm:max-w-[min(75vw,20rem)] md:h-[4.5rem] md:max-h-[4.5rem] md:max-w-[min(78vw,22rem)]"
               priority
+              sizes="(max-width: 768px) 72vw, 352px"
             />
-            <span className="text-xl font-semibold text-[var(--primary)] sm:text-2xl">
-              Trans<span className="text-[var(--accent)]">Pool</span>24
-            </span>
           </Link>
         ) : (
-          <div className="w-[180px]" aria-hidden />
+          <div className="min-w-[12rem] sm:min-w-[14rem] md:min-w-[16rem]" aria-hidden />
         )}
         <nav className="flex items-center gap-4">
           <Link
