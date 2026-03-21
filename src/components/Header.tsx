@@ -47,25 +47,26 @@ export function Header({ hideLogo }: HeaderProps) {
 
   return (
     <header className="sticky top-0 z-50 border-b border-[#0d2137]/10 bg-[var(--background)]/95 backdrop-blur">
-      <div className="mx-auto flex min-h-[4.25rem] items-center justify-between px-4 py-2 sm:px-6 max-w-6xl">
+      <div className="mx-auto flex min-h-[4.75rem] items-center justify-between px-4 py-2 sm:min-h-[5.25rem] md:min-h-[6rem] sm:px-6 max-w-6xl">
         {!hideLogo ? (
           <Link
             href={`/${locale}`}
-            className="flex shrink-0 items-center py-1"
+            className="flex shrink-0 items-center py-0.5"
             aria-label="TransPool24"
           >
             <Image
-              src="/images/123.png"
+              src="/345remov.png"
               alt="TransPool24"
-              width={352}
-              height={192}
-              className="h-12 w-auto max-h-[3.25rem] max-w-[min(72vw,17.5rem)] object-contain object-start sm:h-[3.75rem] sm:max-h-[3.75rem] sm:max-w-[min(75vw,20rem)] md:h-[4.5rem] md:max-h-[4.5rem] md:max-w-[min(78vw,22rem)]"
+              width={677}
+              height={369}
+              quality={100}
+              className="h-[3.75rem] w-auto max-h-[3.75rem] max-w-[min(90vw,21rem)] object-contain object-start sm:h-[4.5rem] sm:max-h-[4.5rem] sm:max-w-[min(90vw,25rem)] md:h-[5.25rem] md:max-h-[5.25rem] md:max-w-[min(92vw,29rem)] lg:h-[5.75rem] lg:max-h-[5.75rem] lg:max-w-[min(92vw,32rem)]"
               priority
-              sizes="(max-width: 768px) 72vw, 352px"
+              sizes="(max-width: 640px) 90vw, (max-width: 1024px) 25rem, 32rem"
             />
           </Link>
         ) : (
-          <div className="min-w-[12rem] sm:min-w-[14rem] md:min-w-[16rem]" aria-hidden />
+          <div className="min-w-[14rem] sm:min-w-[18rem] md:min-w-[22rem] lg:min-w-[24rem]" aria-hidden />
         )}
         <nav className="flex items-center gap-4">
           <Link
