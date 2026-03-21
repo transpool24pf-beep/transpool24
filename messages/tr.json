@@ -195,6 +195,26 @@
     "rights": "Tüm hakları saklıdır.",
     "region": "Pforzheim ve bölge"
   },
+  "infoPageClosing": {
+    "ctaHeadline": "Güvenilir taşımacılığa hazır mısınız?",
+    "ctaSub": "Pforzheim’de köklüyüz — yazın veya dakikalar içinde çevrimiçi rezervasyon yapın.",
+    "ctaButton": "İletişim",
+    "brandTagline": "Hızlı, güvenilir, şeffaf. Taşıma siparişlerini çevrimiçi verin.",
+    "navAria": "Alt bilgi",
+    "colExplore": "Keşfet",
+    "colInfo": "Bilgi",
+    "colSocial": "Sosyal medya",
+    "linkHome": "Ana sayfa",
+    "linkWhy": "Neden TransPool24?",
+    "linkContact": "İletişim",
+    "linkPrivacy": "Gizlilik",
+    "linkImprint": "Künye",
+    "linkTerms": "Şartlar",
+    "socialLinkedin": "LinkedIn",
+    "socialInstagram": "Instagram",
+    "copyright": "© {year} TransPool24. Tüm hakları saklıdır.",
+    "languageLabel": "Dil"
+  },
   "driver": {
     "step1Name": "Temel bilgiler",
     "step2Name": "Kişisel bilgiler",

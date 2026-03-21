@@ -195,6 +195,26 @@
     "rights": "Todos los derechos reservados.",
     "region": "Pforzheim y región"
   },
+  "infoPageClosing": {
+    "ctaHeadline": "¿Listo para transportes fiables?",
+    "ctaSub": "Con base en Pforzheim — escríbanos o reserve en línea en minutos.",
+    "ctaButton": "Contacto",
+    "brandTagline": "Rápido, fiable, transparente. Reserve transportes en línea.",
+    "navAria": "Pie de página",
+    "colExplore": "Explorar",
+    "colInfo": "Información",
+    "colSocial": "Redes sociales",
+    "linkHome": "Inicio",
+    "linkWhy": "¿Por qué TransPool24?",
+    "linkContact": "Contacto",
+    "linkPrivacy": "Privacidad",
+    "linkImprint": "Aviso legal",
+    "linkTerms": "Términos",
+    "socialLinkedin": "LinkedIn",
+    "socialInstagram": "Instagram",
+    "copyright": "© {year} TransPool24. Todos los derechos reservados.",
+    "languageLabel": "Idioma"
+  },
   "driver": {
     "step1Name": "Datos básicos",
     "step2Name": "Información personal",

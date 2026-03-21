@@ -195,6 +195,26 @@
     "rights": "Alle Rechte vorbehalten.",
     "region": "Pforzheim & Region"
   },
+  "infoPageClosing": {
+    "ctaHeadline": "Bereit für zuverlässige Transporte?",
+    "ctaSub": "Wir sind in Pforzheim verwurzelt und für Sie da — schreiben Sie uns oder buchen Sie direkt online.",
+    "ctaButton": "Kontakt",
+    "brandTagline": "Schnell, zuverlässig, transparent. Transportaufträge einfach online buchen.",
+    "navAria": "Fußzeile Informationen",
+    "colExplore": "Entdecken",
+    "colInfo": "Informationen",
+    "colSocial": "Social Media",
+    "linkHome": "Startseite",
+    "linkWhy": "Warum TransPool24?",
+    "linkContact": "Kontakt",
+    "linkPrivacy": "Datenschutz",
+    "linkImprint": "Impressum",
+    "linkTerms": "AGB",
+    "socialLinkedin": "LinkedIn",
+    "socialInstagram": "Instagram",
+    "copyright": "© {year} TransPool24. Alle Rechte vorbehalten.",
+    "languageLabel": "Sprache"
+  },
   "driver": {
     "step1Name": "Grunddaten",
     "step2Name": "Persönliche Angaben",

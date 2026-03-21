@@ -195,6 +195,26 @@
     "rights": "جميع الحقوق محفوظة.",
     "region": "بفورتسهايم والمنطقة"
   },
+  "infoPageClosing": {
+    "ctaHeadline": "جاهزون لنقلات موثوقة؟",
+    "ctaSub": "نحن في بفورتسهايم — راسلنا أو احجز طلبك أونلاين بسهولة.",
+    "ctaButton": "اتصل",
+    "brandTagline": "سريع، موثوق، شفاف. احجز طلبات النقل أونلاين.",
+    "navAria": "تذييل معلومات",
+    "colExplore": "استكشف",
+    "colInfo": "معلومات",
+    "colSocial": "وسائل التواصل",
+    "linkHome": "الرئيسية",
+    "linkWhy": "لماذا TransPool24؟",
+    "linkContact": "اتصل بنا",
+    "linkPrivacy": "الخصوصية",
+    "linkImprint": "بيانات النشر",
+    "linkTerms": "الشروط",
+    "socialLinkedin": "لينكد إن",
+    "socialInstagram": "إنستغرام",
+    "copyright": "© {year} TransPool24. جميع الحقوق محفوظة.",
+    "languageLabel": "اللغة"
+  },
   "driver": {
     "step1Name": "البيانات الأساسية",
     "step2Name": "المعلومات الشخصية",

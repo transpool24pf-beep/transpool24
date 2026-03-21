@@ -3,6 +3,7 @@ import type { WhyPagePayload } from "@/lib/why-transpool24-types";
 import { WhyTranspool24Icon } from "./WhyTranspool24Icon";
 import { WhyHowItWorksMedia } from "./WhyHowItWorksMedia";
 import { WhyCmsImage } from "./WhyCmsImage";
+import { WhyPageInformationClosing } from "./WhyPageInformationClosing";
 
 type Props = { data: WhyPagePayload; locale: string };
 
@@ -13,7 +14,7 @@ export function WhyTranspool24Content({ data, locale }: Props) {
   const faqCol2 = data.faqs.slice(faqMid);
 
   return (
-    <div className="bg-[#f4f6f8] pb-20 pt-6 sm:pb-28 sm:pt-10" dir={rtl ? "rtl" : "ltr"}>
+    <div className="bg-[#f4f6f8] pb-0 pt-6 sm:pt-10" dir={rtl ? "rtl" : "ltr"}>
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <article className="overflow-hidden rounded-[1.25rem] border border-[#0d2137]/8 bg-white shadow-sm sm:rounded-[1.75rem]">
           <div className="border-b border-[#0d2137]/6 bg-gradient-to-br from-[#f8fafc] to-white px-6 py-10 sm:px-10 sm:py-12">
@@ -197,6 +198,8 @@ export function WhyTranspool24Content({ data, locale }: Props) {
           </div>
         </section>
       </div>
+
+      <WhyPageInformationClosing locale={locale} />
     </div>
   );
 }

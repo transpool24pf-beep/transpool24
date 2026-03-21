@@ -195,6 +195,26 @@
     "rights": "All rights reserved.",
     "region": "Pforzheim & Region"
   },
+  "infoPageClosing": {
+    "ctaHeadline": "Ready for reliable transport?",
+    "ctaSub": "Rooted in Pforzheim — message us or book online in minutes.",
+    "ctaButton": "Contact",
+    "brandTagline": "Fast, reliable, transparent. Book transport orders online.",
+    "navAria": "Footer information",
+    "colExplore": "Explore",
+    "colInfo": "Information",
+    "colSocial": "Social media",
+    "linkHome": "Home",
+    "linkWhy": "Why TransPool24?",
+    "linkContact": "Contact",
+    "linkPrivacy": "Privacy",
+    "linkImprint": "Imprint",
+    "linkTerms": "Terms",
+    "socialLinkedin": "LinkedIn",
+    "socialInstagram": "Instagram",
+    "copyright": "© {year} TransPool24. All rights reserved.",
+    "languageLabel": "Language"
+  },
   "driver": {
     "step1Name": "Basic data",
     "step2Name": "Personal information",
