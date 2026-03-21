@@ -3,9 +3,14 @@
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { locales, type Locale } from "@/i18n/routing";
+import { parseFetchJson } from "@/lib/parse-fetch-json";
+import { putFileToSupabaseSignedUrl } from "@/lib/upload-supabase-signed-url";
+import { normalizeWhyAssetUrl } from "@/lib/why-asset-url";
 
-const IMAGE_UPLOAD = "/api/website/content/why-transpool24/upload-image";
-const VIDEO_UPLOAD = "/api/website/content/why-transpool24/upload-video";
+const MAX_IMAGE_BYTES = 15 * 1024 * 1024;
+const MAX_VIDEO_BYTES = 200 * 1024 * 1024;
+
+type PresignOk = { signedUrl: string; publicUrl: string; error?: string };
 
 export function WebsiteWhyMediaClient() {
   const [locale, setLocale] = useState<Locale>("de");
@@ -22,11 +27,11 @@ export function WebsiteWhyMediaClient() {
     setMessage(null);
     try {
       const res = await fetch(`/api/website/content/why-transpool24?locale=${locale}`);
-      const data = await res.json();
+      const data = await parseFetchJson<{ payload?: { heroImageUrl?: string; sceneImageUrl?: string; howVideoUrl?: string }; error?: string }>(res);
       if (!res.ok) throw new Error(data.error || "Laden fehlgeschlagen");
-      setHeroImageUrl(data.payload.heroImageUrl || "");
-      setSceneImageUrl(data.payload.sceneImageUrl || "");
-      setHowVideoUrl(data.payload.howVideoUrl || "");
+      setHeroImageUrl(normalizeWhyAssetUrl(data.payload?.heroImageUrl || ""));
+      setSceneImageUrl(normalizeWhyAssetUrl(data.payload?.sceneImageUrl || ""));
+      setHowVideoUrl((data.payload?.howVideoUrl || "").trim());
     } catch (e) {
       setMessage(e instanceof Error ? e.message : "Laden fehlgeschlagen");
     } finally {
@@ -38,70 +43,39 @@ export function WebsiteWhyMediaClient() {
     load();
   }, [load]);
 
-  const readFileBase64 = (file: File) =>
-    new Promise<string>((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = () => reject(new Error("read failed"));
-      reader.readAsDataURL(file);
-    });
+  const presignAndUpload = async (file: File, kind: "image" | "video", slot: "hero" | "scene" | "video") => {
+    if (kind === "image" && file.size > MAX_IMAGE_BYTES) {
+      alert(`Bild max. ${MAX_IMAGE_BYTES / (1024 * 1024)} MB.`);
+      return;
+    }
+    if (kind === "video" && file.size > MAX_VIDEO_BYTES) {
+      alert(`Video max. ${MAX_VIDEO_BYTES / (1024 * 1024)} MB.`);
+      return;
+    }
 
-  const uploadImage = async (kind: "hero" | "scene", file: File) => {
-    if (!file.type.startsWith("image/")) {
-      alert("Bitte ein Bild wählen (JPEG, PNG, WebP).");
-      return;
-    }
-    if (file.size > 6 * 1024 * 1024) {
-      alert("Max. 6 MB.");
-      return;
-    }
-    setUploading(kind);
+    setUploading(slot);
     setMessage(null);
     try {
-      const base64 = await readFileBase64(file);
-      const res = await fetch(IMAGE_UPLOAD, {
+      const pres = await fetch("/api/website/content/why-transpool24/presign-upload", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ locale, base64, filename: file.name }),
+        body: JSON.stringify({
+          locale,
+          filename: file.name,
+          contentType: file.type || (kind === "image" ? "image/jpeg" : "video/mp4"),
+          kind,
+          fileSize: file.size,
+        }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Upload fehlgeschlagen");
-      if (data.url) {
-        if (kind === "hero") setHeroImageUrl(data.url);
-        else setSceneImageUrl(data.url);
-      }
-    } catch (e) {
-      alert(e instanceof Error ? e.message : "Upload fehlgeschlagen");
-    } finally {
-      setUploading(null);
-    }
-  };
-
-  const uploadVideoFile = async (file: File) => {
-    const ok =
-      file.type === "video/mp4" ||
-      file.type === "video/webm" ||
-      file.type === "video/quicktime";
-    if (!ok) {
-      alert("Nur MP4, WebM oder MOV.");
-      return;
-    }
-    if (file.size > 80 * 1024 * 1024) {
-      alert("Max. 80 MB.");
-      return;
-    }
-    setUploading("video");
-    setMessage(null);
-    try {
-      const base64 = await readFileBase64(file);
-      const res = await fetch(VIDEO_UPLOAD, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ locale, base64, filename: file.name }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Upload fehlgeschlagen");
-      if (data.url) setHowVideoUrl(data.url);
+      const j = await parseFetchJson<PresignOk>(pres);
+      if (!pres.ok || !j.signedUrl) throw new Error(j.error || "Presign fehlgeschlagen");
+      await putFileToSupabaseSignedUrl(j.signedUrl, file, true);
+      const pub = j.publicUrl;
+      if (!pub) throw new Error("Keine öffentliche URL zurückgegeben.");
+      if (slot === "hero") setHeroImageUrl(pub);
+      else if (slot === "scene") setSceneImageUrl(pub);
+      else setHowVideoUrl(pub);
+      setMessage("Upload fertig — bitte „Medien speichern“ klicken, damit die Seite die URLs in der Datenbank hat.");
     } catch (e) {
       alert(e instanceof Error ? e.message : "Upload fehlgeschlagen");
     } finally {
@@ -118,14 +92,14 @@ export function WebsiteWhyMediaClient() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           locale,
-          heroImageUrl,
-          sceneImageUrl,
-          howVideoUrl,
+          heroImageUrl: normalizeWhyAssetUrl(heroImageUrl),
+          sceneImageUrl: normalizeWhyAssetUrl(sceneImageUrl),
+          howVideoUrl: howVideoUrl.trim(),
         }),
       });
-      const data = await res.json();
+      const data = await parseFetchJson<{ error?: string }>(res);
       if (!res.ok) throw new Error(data.error || "Speichern fehlgeschlagen");
-      setMessage("Gespeichert. Änderungen sind auf /" + locale + "/why sichtbar.");
+      setMessage(`Gespeichert. Seite /${locale}/why lädt Inhalte live aus der Datenbank (nicht aus dem Build-Cache).`);
     } catch (e) {
       setMessage(e instanceof Error ? e.message : "Speichern fehlgeschlagen");
     } finally {
@@ -137,8 +111,9 @@ export function WebsiteWhyMediaClient() {
     <div>
       <h1 className="mb-2 text-2xl font-semibold text-[#0d2137]">Homepage – Medien (Why-Seite)</h1>
       <p className="mb-6 text-sm text-[#0d2137]/70">
-        Großes Bild über den FAQs, Poster für den Block „So funktioniert’s“, optional Video (YouTube/Vimeo-Link oder
-        hochgeladene MP4/WebM-URL). Speicherort:{" "}
+        Uploads gehen <strong>direkt zu Supabase</strong> (signierte URL) — umgeht das Vercel-Limit für große Dateien.
+        Lokale Bilder bitte als <code className="rounded bg-[#0d2137]/5 px-1">/images/…</code> eintragen, nicht{" "}
+        <code className="rounded bg-[#0d2137]/5 px-1">./images/…</code>. Speicherort:{" "}
         <code className="rounded bg-[#0d2137]/5 px-1">why-page-media/{`{locale}`}/</code> im Bucket{" "}
         <code className="rounded bg-[#0d2137]/5 px-1">driver-documents</code>.
       </p>
@@ -175,7 +150,11 @@ export function WebsiteWhyMediaClient() {
       </div>
 
       {message && (
-        <p className={`mb-4 text-sm ${message.startsWith("Gespeichert") ? "text-green-700" : "text-red-700"}`}>
+        <p
+          className={`mb-4 text-sm ${
+            message.startsWith("Gespeichert") || message.startsWith("Upload fertig") ? "text-green-700" : "text-red-700"
+          }`}
+        >
           {message}
         </p>
       )}
@@ -186,11 +165,17 @@ export function WebsiteWhyMediaClient() {
         <div className="space-y-8">
           <section className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
             <h2 className="text-lg font-semibold text-[#0d2137]">Großes Bild (über FAQs)</h2>
-            <p className="mt-1 text-sm text-[#0d2137]/65">Breites Panorama — empfohlen 21:9 oder ähnlich.</p>
+            <p className="mt-1 text-sm text-[#0d2137]/65">Breites Panorama — empfohlen 21:9 oder ähnlich. Max. 15 MB.</p>
             <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-start">
               <div className="relative h-32 w-full max-w-md overflow-hidden rounded-lg border border-[#0d2137]/10 bg-gray-100 sm:h-36">
                 {heroImageUrl ? (
-                  <Image src={heroImageUrl} alt="" fill className="object-cover" unoptimized={heroImageUrl.startsWith("http")} />
+                  <Image
+                    src={heroImageUrl}
+                    alt=""
+                    fill
+                    className="object-cover"
+                    unoptimized={heroImageUrl.startsWith("http")}
+                  />
                 ) : (
                   <span className="flex h-full items-center justify-center text-sm text-[#0d2137]/40">Kein Bild</span>
                 )}
@@ -203,15 +188,16 @@ export function WebsiteWhyMediaClient() {
                   onChange={(e) => {
                     const f = e.target.files?.[0];
                     e.target.value = "";
-                    if (f) void uploadImage("hero", f);
+                    if (f) void presignAndUpload(f, "image", "hero");
                   }}
                   className="block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--accent)] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white"
                 />
                 <label className="block text-xs font-medium text-[#0d2137]/70">Bild-URL</label>
                 <input
-                  type="url"
+                  type="text"
                   value={heroImageUrl}
                   onChange={(e) => setHeroImageUrl(e.target.value)}
+                  onBlur={() => setHeroImageUrl(normalizeWhyAssetUrl(heroImageUrl))}
                   className="w-full rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm"
                   placeholder="https://… oder /images/van1.png"
                 />
@@ -222,12 +208,18 @@ export function WebsiteWhyMediaClient() {
           <section className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
             <h2 className="text-lg font-semibold text-[#0d2137]">Poster / Szenenbild („So funktioniert’s“)</h2>
             <p className="mt-1 text-sm text-[#0d2137]/65">
-              Wird als Vorschaubild gezeigt; bei YouTube/Vimeo öffnet Klick auf Play das eingebettete Video.
+              Vorschaubild; bei YouTube/Vimeo öffnet Play das eingebettete Video. Max. 15 MB.
             </p>
             <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-start">
               <div className="relative h-40 w-full max-w-xs overflow-hidden rounded-lg border border-[#0d2137]/10 bg-gray-100">
                 {sceneImageUrl ? (
-                  <Image src={sceneImageUrl} alt="" fill className="object-cover" unoptimized={sceneImageUrl.startsWith("http")} />
+                  <Image
+                    src={sceneImageUrl}
+                    alt=""
+                    fill
+                    className="object-cover"
+                    unoptimized={sceneImageUrl.startsWith("http")}
+                  />
                 ) : (
                   <span className="flex h-full items-center justify-center text-sm text-[#0d2137]/40">Kein Bild</span>
                 )}
@@ -240,15 +232,16 @@ export function WebsiteWhyMediaClient() {
                   onChange={(e) => {
                     const f = e.target.files?.[0];
                     e.target.value = "";
-                    if (f) void uploadImage("scene", f);
+                    if (f) void presignAndUpload(f, "image", "scene");
                   }}
                   className="block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--accent)] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white"
                 />
                 <label className="block text-xs font-medium text-[#0d2137]/70">Bild-URL</label>
                 <input
-                  type="url"
+                  type="text"
                   value={sceneImageUrl}
                   onChange={(e) => setSceneImageUrl(e.target.value)}
+                  onBlur={() => setSceneImageUrl(normalizeWhyAssetUrl(sceneImageUrl))}
                   className="w-full rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm"
                   placeholder="https://… oder /images/van2.png"
                 />
@@ -259,8 +252,8 @@ export function WebsiteWhyMediaClient() {
           <section className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
             <h2 className="text-lg font-semibold text-[#0d2137]">Video</h2>
             <p className="mt-1 text-sm text-[#0d2137]/65">
-              YouTube- oder Vimeo-Link (z. B. https://www.youtube.com/watch?v=…) oder direkte .mp4/.webm-URL (z. B. nach
-              Upload unten). Leer lassen = nur Poster mit dekorativem Play-Icon.
+              YouTube/Vimeo-Link oder direkte .mp4/.webm-URL. Datei-Upload: max. 200 MB, direkt zu Supabase. Leer = nur
+              Poster mit Play-Dekoration.
             </p>
             <textarea
               value={howVideoUrl}
@@ -277,11 +270,10 @@ export function WebsiteWhyMediaClient() {
                 onChange={(e) => {
                   const f = e.target.files?.[0];
                   e.target.value = "";
-                  if (f) void uploadVideoFile(f);
+                  if (f) void presignAndUpload(f, "video", "video");
                 }}
                 className="block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-[#0d2137] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white"
               />
-              <p className="mt-2 text-xs text-[#0d2137]/60">MP4, WebM oder MOV, max. 80 MB. Nach Upload erscheint die öffentliche URL im Feld oben.</p>
             </div>
             <button
               type="button"

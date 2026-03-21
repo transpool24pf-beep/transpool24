@@ -3,6 +3,10 @@ import { WhyTranspool24Content } from "@/components/why-transpool24/WhyTranspool
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
+/** Always read latest CMS/Supabase payload (not SSG snapshot). */
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function generateMetadata({
   params,
 }: {

@@ -4,6 +4,7 @@ import { createServerSupabase } from "@/lib/supabase";
 import { getWhyPagePayload } from "@/lib/get-why-page-payload";
 import { defaultWhyPayloadForLocale } from "@/lib/why-transpool24-defaults";
 import { isValidWhyPayload, type WhyPagePayload } from "@/lib/why-transpool24-types";
+import { normalizeWhyAssetUrl } from "@/lib/why-asset-url";
 import { locales } from "@/i18n/routing";
 
 export async function GET(request: Request) {
@@ -72,9 +73,9 @@ export async function PATCH(request: Request) {
 
     const current = await getWhyPagePayload(locale);
     const next = { ...current };
-    if (typeof body.heroImageUrl === "string") next.heroImageUrl = body.heroImageUrl;
-    if (typeof body.sceneImageUrl === "string") next.sceneImageUrl = body.sceneImageUrl;
-    if (typeof body.howVideoUrl === "string") next.howVideoUrl = body.howVideoUrl;
+    if (typeof body.heroImageUrl === "string") next.heroImageUrl = normalizeWhyAssetUrl(body.heroImageUrl);
+    if (typeof body.sceneImageUrl === "string") next.sceneImageUrl = normalizeWhyAssetUrl(body.sceneImageUrl);
+    if (typeof body.howVideoUrl === "string") next.howVideoUrl = body.howVideoUrl.trim();
 
     if (!isValidWhyPayload(next)) {
       return NextResponse.json({ error: "Invalid payload after merge" }, { status: 400 });

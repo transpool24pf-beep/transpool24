@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { locales, type Locale } from "@/i18n/routing";
+import { parseFetchJson } from "@/lib/parse-fetch-json";
 
 export function WebsiteWhyTranspool24Client() {
   const [locale, setLocale] = useState<Locale>("de");
@@ -15,7 +16,7 @@ export function WebsiteWhyTranspool24Client() {
     setMessage(null);
     try {
       const res = await fetch(`/api/website/content/why-transpool24?locale=${locale}`);
-      const data = await res.json();
+      const data = await parseFetchJson<{ payload?: unknown; error?: string }>(res);
       if (!res.ok) throw new Error(data.error || "Laden fehlgeschlagen");
       setJsonText(JSON.stringify(data.payload, null, 2));
     } catch (e) {
@@ -45,7 +46,7 @@ export function WebsiteWhyTranspool24Client() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ locale, payload }),
       });
-      const data = await res.json();
+      const data = await parseFetchJson<{ error?: string }>(res);
       if (!res.ok) throw new Error(data.error || "Speichern fehlgeschlagen");
       setMessage("Gespeichert.");
     } catch (e) {
@@ -63,7 +64,7 @@ export function WebsiteWhyTranspool24Client() {
       const res = await fetch(`/api/website/content/why-transpool24?locale=${locale}`, {
         method: "DELETE",
       });
-      const data = await res.json();
+      const data = await parseFetchJson<{ payload?: unknown; error?: string }>(res);
       if (!res.ok) throw new Error(data.error || "Zurücksetzen fehlgeschlagen");
       setJsonText(JSON.stringify(data.payload, null, 2));
       setMessage("Auf Standard zurückgesetzt (nur Anzeige — bei Bedarf speichern).");
