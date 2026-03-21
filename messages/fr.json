@@ -213,7 +213,10 @@
     "socialLinkedin": "LinkedIn",
     "socialInstagram": "Instagram",
     "copyright": "© {year} TransPool24. Tous droits réservés.",
-    "languageLabel": "Langue"
+    "languageLabel": "Langue",
+    "socialTiktok": "TikTok",
+    "socialFacebook": "Facebook",
+    "socialYoutube": "YouTube"
   },
   "driver": {
     "step1Name": "Données de base",
@@ -335,5 +338,97 @@
     "sending": "Envoi en cours…",
     "success": "Merci. Votre message a été envoyé. Nous vous répondrons bientôt.",
     "error": "Le message n'a pas pu être envoyé. Veuillez réessayer plus tard."
+  },
+  "privacyPolicy": {
+    "metaTitle": "Politique de confidentialité | TransPool24",
+    "metaDescription": "Traitement des données personnelles chez TransPool24 (RGPD).",
+    "breadcrumbHome": "Accueil",
+    "breadcrumbCurrent": "Confidentialité",
+    "pageTitle": "Politique de confidentialité",
+    "pageLead": "This privacy notice explains, in accordance with Articles 13 and 14 GDPR, how we process personal data when you visit our website, use our online booking for transport services, or apply as a driver.",
+    "updated": "Dernière mise à jour : mars 2026",
+    "tocTitle": "Sur cette page",
+    "contactTitle": "Contact confidentialité",
+    "contactCta": "Envoyer un message",
+    "contactEmailLabel": "E-mail",
+    "privacyEmail": "transpool24@hotmail.com",
+    "socialTitle": "Réseaux sociaux",
+    "socialIntro": "When you visit our social media profiles, platform operators may process personal data (e.g. IP address). Please refer to each provider’s privacy policy:",
+    "toc": {
+      "scope": "1. Objet et champ d’application",
+      "controller": "2. Responsable du traitement",
+      "processing": "3. Données traitées",
+      "legal": "4. Bases juridiques",
+      "retention": "5. Conservation et destinataires",
+      "rights": "6. Vos droits",
+      "changes": "7. Modifications"
+    },
+    "s1": {
+      "title": "1. Purpose and scope",
+      "p1": "TransPool24 provides transport and logistics services focused on Pforzheim and the region. We only process personal data where necessary to operate the website, conclude and perform contracts, comply with legal obligations, or based on your consent.",
+      "p2": "This notice covers our public website, the booking / order process, communication by email or contact form, and driver applications.",
+      "p3": "We do not use solely automated decision-making including profiling within the meaning of Art. 22 GDPR."
+    },
+    "s2": {
+      "title": "2. Controller",
+      "p1": "The controller under GDPR is TransPool24 (see imprint / website for contact). For privacy requests use the email above or our contact form.",
+      "p2": "Where we use processors (e.g. hosting, payment, email), this is done under Art. 28 GDPR agreements."
+    },
+    "s3": {
+      "title": "3. What data we process?",
+      "intro": "The table lists typical categories. Depending on your use, some items may not apply.",
+      "colData": "Data categories",
+      "colPurpose": "Purpose",
+      "colLegal": "Legal basis",
+      "r1": {
+        "data": "Booking master data: name, company, addresses, phone, email, order details",
+        "purpose": "Performing the transport, processing the booking, communication",
+        "legal": "Art. 6(1)(b) GDPR (contract); where applicable (a) (consent)"
+      },
+      "r2": {
+        "data": "Payment data (via Stripe): payment status, limited card metadata — no full card numbers stored by us",
+        "purpose": "Payment processing",
+        "legal": "Art. 6(1)(b) GDPR; Art. 6(1)(c) for tax/legal retention"
+      },
+      "r3": {
+        "data": "Driver application data: identity, contact, licence, vehicle, ID documents if provided",
+        "purpose": "Reviewing applications, pre-contract steps",
+        "legal": "Art. 6(1)(b) GDPR; § 26 BDSG where applicable"
+      },
+      "r4": {
+        "data": "Technical data: IP address, date/time, browser type, server logs where needed",
+        "purpose": "Secure operation of the site, limited troubleshooting",
+        "legal": "Art. 6(1)(f) GDPR (legitimate interest in secure operation)"
+      },
+      "outro": "If drivers share live location, we process location data only as described in the relevant feature and on the stated legal basis."
+    },
+    "s4": {
+      "title": "4. Legal bases",
+      "p1": "Contract performance (Art. 6(1)(b)): booking and providing the transport service.",
+      "p2": "Legitimate interests (Art. 6(1)(f)): IT security, fraud prevention, anonymised statistics where your interests do not override.",
+      "p3": "Consent (Art. 6(1)(a)): only where we ask explicitly — you may withdraw consent for the future."
+    },
+    "s5": {
+      "title": "5. Retention, sharing and transfers",
+      "p1": "We keep data only as long as needed for the purposes above or as required by law (e.g. commercial/tax retention).",
+      "p2": "We share data with third parties only if needed for the contract (e.g. payment provider, hosting), we are legally required, or you have consented.",
+      "p3": "If data is transferred outside the EEA, we rely where required on adequacy decisions or appropriate safeguards under Art. 44 ff. GDPR."
+    },
+    "s6": {
+      "title": "6. Your rights",
+      "intro": "Subject to legal requirements, you have in particular:",
+      "a": "Access (Art. 15 GDPR)",
+      "b": "Rectification (Art. 16 GDPR)",
+      "c": "Erasure (Art. 17 GDPR) and restriction (Art. 18 GDPR)",
+      "d": "Data portability (Art. 20 GDPR) where applicable",
+      "e": "Objection to processing based on Art. 6(1)(f) GDPR (Art. 21 GDPR)",
+      "f": "Withdraw consent for the future (Art. 7(3) GDPR)",
+      "outro": "You may lodge a complaint with a supervisory authority (Art. 77 GDPR)."
+    },
+    "s7": {
+      "title": "7. Changes",
+      "p1": "We update this notice when processing or legal requirements change. The current version is on this page with the “Last updated” date.",
+      "p2": "Please review it when you use new features."
+    }
   }
 }

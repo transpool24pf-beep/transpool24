@@ -10,6 +10,7 @@ const NAV = [
   { href: "/website/transport", label: "Homepage – Transport-Kacheln" },
   { href: "/website/why", label: "Homepage – Warum TransPool24?" },
   { href: "/website/why-media", label: "Homepage – Medien (Why)" },
+  { href: "/website/social", label: "Footer – Social Media URLs" },
 ];
 
 export function WebsiteShell({ children }: { children: React.ReactNode }) {

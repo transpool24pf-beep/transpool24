@@ -213,7 +213,10 @@
     "socialLinkedin": "LinkedIn",
     "socialInstagram": "Instagram",
     "copyright": "© {year} TransPool24. Alle Rechte vorbehalten.",
-    "languageLabel": "Sprache"
+    "languageLabel": "Sprache",
+    "socialTiktok": "TikTok",
+    "socialFacebook": "Facebook",
+    "socialYoutube": "YouTube"
   },
   "driver": {
     "step1Name": "Grunddaten",
@@ -335,5 +338,97 @@
     "sending": "Wird gesendet…",
     "success": "Vielen Dank. Ihre Nachricht wurde gesendet. Wir melden uns in Kürze.",
     "error": "Nachricht konnte nicht gesendet werden. Bitte versuchen Sie es später erneut."
+  },
+  "privacyPolicy": {
+    "metaTitle": "Datenschutzerklärung | TransPool24",
+    "metaDescription": "Informationen zur Verarbeitung personenbezogener Daten bei TransPool24 (Website, Buchung, Fahrerbewerbungen) gemäß DSGVO.",
+    "breadcrumbHome": "Startseite",
+    "breadcrumbCurrent": "Datenschutz",
+    "pageTitle": "Datenschutzerklärung",
+    "pageLead": "Diese Datenschutzerklärung informiert Sie gemäß Art. 13 und 14 EU-Datenschutz-Grundverordnung (DSGVO) über die Verarbeitung personenbezogener Daten beim Besuch unserer Website, bei der Nutzung unseres Online-Buchungssystems für Transportleistungen sowie bei Bewerbungen als Fahrerin oder Fahrer.",
+    "updated": "Stand: März 2026",
+    "tocTitle": "Auf dieser Seite",
+    "contactTitle": "Kontakt Datenschutz",
+    "contactCta": "Nachricht senden",
+    "contactEmailLabel": "E-Mail",
+    "privacyEmail": "transpool24@hotmail.com",
+    "socialTitle": "Social Media und Drittanbieter",
+    "socialIntro": "Wenn Sie unsere Profile in sozialen Netzwerken besuchen, können die Betreiber der Plattformen personenbezogene Daten verarbeiten (z. B. IP-Adresse, Nutzungsverhalten). Wir verweisen auf die Datenschutzhinweise der jeweiligen Anbieter:",
+    "toc": {
+      "scope": "1. Zweck und Geltungsbereich",
+      "controller": "2. Verantwortliche Stelle",
+      "processing": "3. Welche Daten verarbeiten wir?",
+      "legal": "4. Rechtsgrundlagen",
+      "retention": "5. Speicherdauer und Empfänger",
+      "rights": "6. Ihre Rechte",
+      "changes": "7. Änderung dieser Erklärung"
+    },
+    "s1": {
+      "title": "1. Zweck und Geltungsbereich",
+      "p1": "TransPool24 bietet Transport- und Logistikdienstleistungen mit Schwerpunkt Pforzheim und Umgebung an. Personenbezogene Daten verarbeiten wir nur, soweit dies zur Bereitstellung der Website, zur Vertragsanbahnung und -durchführung, zur Erfüllung rechtlicher Pflichten oder auf Grundlage Ihrer Einwilligung erforderlich ist.",
+      "p2": "Gegenstand dieser Erklärung sind unsere öffentliche Website, das Buchungsformular bzw. der Bestellprozess, die Kommunikation per E-Mail oder Kontaktformular sowie der Bewerbungsprozess für Fahrerinnen und Fahrer.",
+      "p3": "Eine automatisierte Entscheidungsfindung einschließlich Profiling im Sinne von Art. 22 DSGVO findet nicht statt."
+    },
+    "s2": {
+      "title": "2. Verantwortliche Stelle",
+      "p1": "Verantwortlich im Sinne der DSGVO ist TransPool24 (Kontaktdaten siehe Impressum bzw. Website). Für datenschutzrechtliche Anfragen erreichen Sie uns unter der oben genannten E-Mail-Adresse oder über unser Kontaktformular.",
+      "p2": "Sofern wir Auftragsverarbeiter einsetzen (z. B. Hosting, Zahlungsdienstleister, E-Mail-Versand), geschieht dies auf Grundlage eines Vertrags nach Art. 28 DSGVO."
+    },
+    "s3": {
+      "title": "3. Welche Daten verarbeiten wir?",
+      "intro": "Die folgende Übersicht beschreibt typische Kategorien personenbezogener Daten in Zusammenhang mit unseren Angeboten. Je nach Nutzung können einzelne Punkte entfallen oder ergänzt werden.",
+      "colData": "Datenkategorien",
+      "colPurpose": "Zweck",
+      "colLegal": "Rechtsgrundlage",
+      "r1": {
+        "data": "Stammdaten Buchung: Name, Firma, Adressen, Telefon, E-Mail, Auftragsdetails",
+        "purpose": "Durchführung des Transportauftrags, Abwicklung der Buchung, Kommunikation",
+        "legal": "Art. 6 Abs. 1 lit. b DSGVO (Vertrag); ggf. lit. a (Einwilligung)"
+      },
+      "r2": {
+        "data": "Zahlungsdaten (über Stripe): Zahlungsstatus, ggf. abgekürzte Kartendaten — keine vollständigen Kartennummern bei uns",
+        "purpose": "Zahlungsabwicklung",
+        "legal": "Art. 6 Abs. 1 lit. b DSGVO; Art. 6 Abs. 1 lit. c bei steuerlichen Pflichten"
+      },
+      "r3": {
+        "data": "Bewerbungsdaten Fahrer: Identität, Kontakt, Führerschein, Fahrzeug, ggf. Ausweisdokumente",
+        "purpose": "Prüfung und Bearbeitung der Bewerbung, Vertragsanbahnung",
+        "legal": "Art. 6 Abs. 1 lit. b DSGVO; § 26 BDSG soweit anwendbar"
+      },
+      "r4": {
+        "data": "Technische Daten: IP-Adresse, Datum/Uhrzeit, Browsertyp, ggf. Logfiles",
+        "purpose": "Betrieb und Sicherheit der Website, Fehleranalyse in begrenztem Umfang",
+        "legal": "Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an sicherem Betrieb)"
+      },
+      "outro": "Bei aktiver Standortfreigabe durch Fahrer (z. B. für Live-Tracking) verarbeiten wir Standortdaten nur im jeweils beschriebenen Umfang und auf der angegebenen Rechtsgrundlage. Details entnehmen Sie bitte der jeweiligen Funktionsbeschreibung."
+    },
+    "s4": {
+      "title": "4. Rechtsgrundlagen im Überblick",
+      "p1": "Vertragsdurchführung (Art. 6 Abs. 1 lit. b DSGVO): Buchung und Erbringung der Transportleistung, zugehörige Kommunikation.",
+      "p2": "Berechtigtes Interesse (Art. 6 Abs. 1 lit. f DSGVO): IT-Sicherheit, Missbrauchsprävention, statistische Auswertungen in anonymisierter Form, soweit nicht Ihre Interessen überwiegen.",
+      "p3": "Einwilligung (Art. 6 Abs. 1 lit. a DSGVO): nur, wenn wir Sie ausdrücklich darum bitten und Sie zustimmen — Sie können eine erteilte Einwilligung mit Wirkung für die Zukunft widerrufen."
+    },
+    "s5": {
+      "title": "5. Speicherdauer, Weitergabe und Drittlandübermittlung",
+      "p1": "Wir speichern personenbezogene Daten nur so lange, wie dies für die genannten Zwecke erforderlich ist oder gesetzliche Aufbewahrungsfristen bestehen (z. B. handels- oder steuerrechtlich).",
+      "p2": "Eine Weitergabe an Dritte erfolgt nur, wenn dies zur Vertragserfüllung notwendig ist (z. B. Zahlungsdienstleister, technischer Hosting-Provider), wir gesetzlich verpflichtet sind oder Sie eingewilligt haben.",
+      "p3": "Sofern Daten in ein Drittland übermittelt werden (z. B. US-Dienste), stützen wir uns — soweit erforderlich — auf Angemessenheitsbeschlüsse oder geeignete Garantien gemäß Art. 44 ff. DSGVO und informieren Sie gesondert, sofern gesetzlich nötig."
+    },
+    "s6": {
+      "title": "6. Ihre Rechte",
+      "intro": "Sie haben — soweit die gesetzlichen Voraussetzungen erfüllt sind — insbesondere folgende Rechte:",
+      "a": "Auskunft über die zu Ihrer Person gespeicherten Daten (Art. 15 DSGVO)",
+      "b": "Berichtigung unrichtiger Daten (Art. 16 DSGVO)",
+      "c": "Löschung (Art. 17 DSGVO) und Einschränkung der Verarbeitung (Art. 18 DSGVO)",
+      "d": "Datenübertragbarkeit (Art. 20 DSGVO), soweit anwendbar",
+      "e": "Widerspruch gegen Verarbeitungen auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO (Art. 21 DSGVO)",
+      "f": "Widerruf einer Einwilligung mit Wirkung für die Zukunft (Art. 7 Abs. 3 DSGVO)",
+      "outro": "Sie haben zudem das Recht, sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren (Art. 77 DSGVO). Zuständig ist insbesondere die Behörde Ihres gewöhnlichen Aufenthaltsorts oder unseres Standorts."
+    },
+    "s7": {
+      "title": "7. Änderung dieser Datenschutzerklärung",
+      "p1": "Wir passen diese Erklärung an, wenn sich unsere Datenverarbeitung oder rechtliche Rahmenbedingungen ändern. Die jeweils aktuelle Version finden Sie auf dieser Seite mit Datum „Stand“.",
+      "p2": "Bitte prüfen Sie die Erklärung bei wiederkehrendem Besuch, insbesondere wenn Sie neue Funktionen nutzen."
+    }
   }
 }
