@@ -12,7 +12,9 @@ export async function getWhyPagePayload(locale: string): Promise<WhyPagePayload>
       .eq("locale", locale)
       .maybeSingle();
     if (error || !data?.payload) return base;
-    if (isValidWhyPayload(data.payload)) return data.payload as WhyPagePayload;
+    if (isValidWhyPayload(data.payload)) {
+      return { ...base, ...(data.payload as WhyPagePayload) };
+    }
   } catch {
     /* missing table or env in dev */
   }

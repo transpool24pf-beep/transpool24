@@ -93,6 +93,7 @@ export const whyPageEn: WhyPagePayload = {
   closingLine: "We look forward to moving your next shipment safely.",
   heroImageUrl: "/images/van1.png",
   sceneImageUrl: "/images/van2.png",
+  howVideoUrl: "",
   howTitle: "How TransPool24 works",
   howSteps: [
     {

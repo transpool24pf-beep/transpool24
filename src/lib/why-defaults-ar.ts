@@ -85,6 +85,7 @@ export const whyPageAr: WhyPagePayload = {
   closingLine: "نتمنى لك شحنة آمنة تالية.",
   heroImageUrl: "/images/van1.png",
   sceneImageUrl: "/images/van2.png",
+  howVideoUrl: "",
   howTitle: "كيف يعمل TransPool24",
   howSteps: [
     {

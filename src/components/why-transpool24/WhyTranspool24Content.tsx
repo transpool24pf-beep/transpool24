@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { WhyPagePayload } from "@/lib/why-transpool24-types";
 import { WhyTranspool24Icon } from "./WhyTranspool24Icon";
+import { WhyHowItWorksMedia } from "./WhyHowItWorksMedia";
 
 type Props = { data: WhyPagePayload; locale: string };
 
@@ -107,16 +108,18 @@ export function WhyTranspool24Content({ data, locale }: Props) {
           </div>
 
           <div className="px-6 pb-10 sm:px-10 sm:pb-12">
-            <div className="relative aspect-[21/9] min-h-[200px] overflow-hidden rounded-2xl bg-[#0d2137]/5 shadow-inner sm:aspect-[2.4/1]">
-              <Image
-                src={data.heroImageUrl}
-                alt=""
-                fill
-                className="object-cover"
-                sizes="(max-width: 1152px) 100vw, 1152px"
-                priority
-                unoptimized={data.heroImageUrl.startsWith("http")}
-              />
+            <div className="rounded-[1.15rem] bg-gradient-to-br from-[var(--accent)] via-[#f5a623] to-[#ff8c42] p-[3px] shadow-lg shadow-[var(--accent)]/15 sm:rounded-[1.35rem] sm:p-1">
+              <div className="relative aspect-[21/9] min-h-[200px] overflow-hidden rounded-[1rem] bg-[#0d2137]/5 ring-1 ring-black/5 sm:aspect-[2.4/1] sm:rounded-[1.15rem]">
+                <Image
+                  src={data.heroImageUrl}
+                  alt=""
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1152px) 100vw, 1152px"
+                  priority
+                  unoptimized={data.heroImageUrl.startsWith("http")}
+                />
+              </div>
             </div>
           </div>
 
@@ -188,23 +191,10 @@ export function WhyTranspool24Content({ data, locale }: Props) {
                 <span aria-hidden>→</span>
               </Link>
             </div>
-            <div className="relative aspect-[4/3] min-h-[220px] overflow-hidden rounded-2xl ring-2 ring-white/20">
-              <Image
-                src={data.sceneImageUrl}
-                alt=""
-                fill
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                unoptimized={data.sceneImageUrl.startsWith("http")}
-              />
-              <div className="absolute inset-0 flex items-center justify-center bg-[#0d2137]/20">
-                <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[var(--accent)] text-white shadow-xl ring-4 ring-white/30">
-                  <svg className="ml-1 h-7 w-7" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </span>
-              </div>
-            </div>
+            <WhyHowItWorksMedia
+              sceneImageUrl={data.sceneImageUrl}
+              howVideoUrl={data.howVideoUrl ?? ""}
+            />
           </div>
         </section>
       </div>

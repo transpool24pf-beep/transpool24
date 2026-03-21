@@ -36,6 +36,8 @@ export type WhyPagePayload = {
   closingLine: string;
   heroImageUrl: string;
   sceneImageUrl: string;
+  /** YouTube/Vimeo page or embed URL, or direct .mp4/.webm (e.g. Supabase public URL) */
+  howVideoUrl: string;
   howTitle: string;
   howSteps: WhyHowStep[];
   howCta: string;
