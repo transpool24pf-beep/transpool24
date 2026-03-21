@@ -344,8 +344,15 @@ export function SupportContactPage() {
           <aside className="lg:sticky lg:top-24">
             <div className="overflow-hidden rounded-2xl border border-[#0d2137]/10 shadow-lg">
               <div className="flex flex-col items-center justify-center bg-gradient-to-br from-[#ff8c42] via-[#f07828] to-[#e85d04] px-6 py-12 text-white">
-                <div className="rounded-full bg-white/15 p-3 ring-2 ring-white/35">
-                  <Image src="/logo.png" alt="TransPool24" width={64} height={64} className="h-16 w-16 object-contain" />
+                <div className="relative h-32 w-32 shrink-0 overflow-hidden rounded-full ring-2 ring-white/40 shadow-[0_4px_24px_rgba(0,0,0,0.15)] sm:h-36 sm:w-36">
+                  <Image
+                    src="/4566.png"
+                    alt="TransPool24"
+                    fill
+                    className="object-cover object-center"
+                    sizes="(max-width: 640px) 128px, 144px"
+                    priority
+                  />
                 </div>
                 <p className="mt-4 text-center text-xs font-semibold uppercase tracking-wider text-white/90">TransPool24</p>
                 <svg
