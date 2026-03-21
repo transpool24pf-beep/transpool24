@@ -19,24 +19,24 @@ export default async function HomePage({
     <>
       <Header />
       <main className="min-h-[calc(100vh-8rem)]">
-        {/* Hero Section - برتقالي مع صورة شاحنة */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-[var(--accent)] via-[#f27a1a] to-[#e85d04] text-white">
+        {/* Hero — برتقالي أفتح مع صورة الشاحنة */}
+        <section className="relative overflow-hidden bg-gradient-to-br from-[#ffc9a3] via-[#ffb07a] to-[#f28a4a] text-white">
           <div className="absolute inset-0">
             <Image
               src="/images/van1.png"
               alt=""
               fill
-              className="object-cover object-center opacity-30"
+              className="object-cover object-center opacity-45"
               priority
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-[var(--accent)]/90 via-[var(--accent)]/80 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#e85d04]/50 via-[#e85d04]/38 to-transparent" />
           </div>
           <div className="relative mx-auto max-w-7xl px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
             <div className="max-w-3xl">
-              <h1 className="text-4xl font-extrabold leading-tight sm:text-5xl md:text-6xl lg:text-7xl">
+              <h1 className="text-4xl font-extrabold leading-tight drop-shadow-[0_2px_14px_rgba(0,0,0,0.28)] sm:text-5xl md:text-6xl lg:text-7xl">
                 {t("title")}
               </h1>
-              <p className="mt-6 text-xl text-white/95 sm:text-2xl">
+              <p className="mt-6 text-xl text-white/95 drop-shadow-[0_1px_8px_rgba(0,0,0,0.22)] sm:text-2xl">
                 {t("subtitle")}
               </p>
               <div className="mt-10 rounded-2xl bg-white/15 backdrop-blur-md border border-white/30 px-8 py-6 shadow-xl">

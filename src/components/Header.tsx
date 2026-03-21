@@ -47,22 +47,23 @@ export function Header({ hideLogo }: HeaderProps) {
 
   return (
     <header className="sticky top-0 z-50 border-b border-[#0d2137]/10 bg-[var(--background)]/95 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+      <div className="mx-auto flex min-h-[4.25rem] items-center justify-between px-4 py-2 sm:px-6 max-w-6xl">
         {!hideLogo ? (
-          <Link href={`/${locale}`} className="flex items-center gap-2">
+          <Link href={`/${locale}`} className="flex items-center gap-3">
             <Image
               src="/images/logo.png"
               alt="TransPool24"
-              width={48}
-              height={48}
-              className="h-10 w-10 object-contain"
+              width={64}
+              height={64}
+              className="h-14 w-14 object-contain sm:h-16 sm:w-16"
+              priority
             />
-            <span className="text-lg font-semibold text-[var(--primary)]">
+            <span className="text-xl font-semibold text-[var(--primary)] sm:text-2xl">
               Trans<span className="text-[var(--accent)]">Pool</span>24
             </span>
           </Link>
         ) : (
-          <div className="w-[136px]" aria-hidden />
+          <div className="w-[180px]" aria-hidden />
         )}
         <nav className="flex items-center gap-4">
           <Link
