@@ -43,6 +43,16 @@
       "f3_comment": "Très bonne expérience. Le chauffeur était ponctuel et précis.",
       "f3_customerName": "Transport Moyen-Orient"
     },
+    "transportOps": {
+      "title": "Services de transport populaires",
+      "subtitle": "Du mobilier aux véhicules — nous transportons l’essentiel.",
+      "loading": "Chargement…",
+      "demoNotice": "Tuiles de démo — ajoutez vos images et titres dans le CMS du site (Tuiles transport).",
+      "d1_title": "Livraison de meubles",
+      "d2_title": "Transport de motos",
+      "d3_title": "Transport de voitures",
+      "d4_title": "Homme et camionnette"
+    },
     "germanyMap": {
       "eyebrow": "Nous relions l'Allemagne",
       "headline": "De Pforzheim à toute l'Allemagne — un réseau fiable",

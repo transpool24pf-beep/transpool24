@@ -43,6 +43,16 @@
       "f3_comment": "Çok iyi bir deneyim. Sürücü dakik ve hassastı.",
       "f3_customerName": "Orta Doğu Taşımacılık"
     },
+    "transportOps": {
+      "title": "Popüler taşımacılık hizmetleri",
+      "subtitle": "Mobilyadan araçlara — önemli olan her şeyi taşıyoruz.",
+      "loading": "Yükleniyor…",
+      "demoNotice": "Demo kutucukları — görselleri ve başlıkları site CMS’inde (Taşıma kutucukları) ekleyin.",
+      "d1_title": "Mobilya teslimatı",
+      "d2_title": "Motosiklet taşıma",
+      "d3_title": "Araç taşıma",
+      "d4_title": "Şoför ve minibüs"
+    },
     "germanyMap": {
       "eyebrow": "Almanya'yı birbirine bağlıyoruz",
       "headline": "Pforzheim'dan tüm Almanya'ya — güvenilir bir lojistik ağı",

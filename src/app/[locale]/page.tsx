@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { DriversCarousel } from "@/components/DriversCarousel";
+import { HomeTransportOperations } from "@/components/HomeTransportOperations";
 import { GermanyConnectSection } from "@/components/GermanyConnectSection";
 
 export default async function HomePage({
@@ -114,6 +115,8 @@ export default async function HomePage({
 
         {/* Drivers Carousel Section */}
         <DriversCarousel />
+
+        <HomeTransportOperations />
 
         <GermanyConnectSection locale={locale} />
 

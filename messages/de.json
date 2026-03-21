@@ -43,6 +43,16 @@
       "f3_comment": "Sehr gute Erfahrung. Der Fahrer war pünktlich und präzise.",
       "f3_customerName": "Mittlerer Osten Transport"
     },
+    "transportOps": {
+      "title": "Beliebte Transportleistungen",
+      "subtitle": "Von Möbeln bis Fahrzeugen — wir bringen Ihre Sendung sicher ans Ziel.",
+      "loading": "Laden…",
+      "demoNotice": "Demo-Kacheln — eigene Bilder und Titel im Website-CMS unter „Transport-Kacheln“ pflegen.",
+      "d1_title": "Möbeltransport",
+      "d2_title": "Motorradtransport",
+      "d3_title": "Autotransport",
+      "d4_title": "Mann und Transporter"
+    },
     "germanyMap": {
       "eyebrow": "Wir verbinden Deutschland",
       "headline": "Von Pforzheim ins ganze Land — zuverlässig vernetzt",

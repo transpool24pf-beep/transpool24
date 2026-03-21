@@ -43,6 +43,16 @@
       "f3_comment": "Very good experience. The driver was punctual and precise.",
       "f3_customerName": "Middle East Transport"
     },
+    "transportOps": {
+      "title": "Popular transport services",
+      "subtitle": "From furniture to vehicles — we move what matters to you.",
+      "loading": "Loading…",
+      "demoNotice": "Demo tiles — add your own images and titles in the Website CMS (Transport tiles).",
+      "d1_title": "Furniture delivery",
+      "d2_title": "Motorcycle transport",
+      "d3_title": "Car transport",
+      "d4_title": "Man and van"
+    },
     "germanyMap": {
       "eyebrow": "We connect Germany",
       "headline": "From Pforzheim across Germany — a reliable logistics network",

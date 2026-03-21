@@ -5,7 +5,10 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const NAV = [{ href: "/website", label: "Homepage – Bewertungen" }];
+const NAV = [
+  { href: "/website", label: "Homepage – Bewertungen" },
+  { href: "/website/transport", label: "Homepage – Transport-Kacheln" },
+];
 
 export function WebsiteShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
