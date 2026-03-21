@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 const NAV = [
   { href: "/website", label: "Homepage – Bewertungen" },
   { href: "/website/transport", label: "Homepage – Transport-Kacheln" },
+  { href: "/website/why", label: "Homepage – Warum TransPool24?" },
 ];
 
 export function WebsiteShell({ children }: { children: React.ReactNode }) {

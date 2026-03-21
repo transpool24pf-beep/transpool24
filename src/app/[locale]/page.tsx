@@ -69,7 +69,10 @@ export default async function HomePage({
               {t("features.title")}
             </h2>
             <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              <div className="group rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1">
+              <Link
+                href={`/${locale}/why`}
+                className="group block rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
+              >
                 <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--accent)]/10">
                   <svg className="h-6 w-6 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
@@ -81,8 +84,17 @@ export default async function HomePage({
                 <p className="mt-3 text-[var(--foreground)]/70 leading-relaxed">
                   {t("features.speedDesc")}
                 </p>
-              </div>
-              <div className="group rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1">
+                <span className="mt-4 inline-flex items-center text-sm font-semibold text-[var(--accent)] group-hover:underline">
+                  {t("features.readMore")}
+                  <span className="ms-1" aria-hidden>
+                    →
+                  </span>
+                </span>
+              </Link>
+              <Link
+                href={`/${locale}/why`}
+                className="group block rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
+              >
                 <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--accent)]/10">
                   <svg className="h-6 w-6 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -94,8 +106,17 @@ export default async function HomePage({
                 <p className="mt-3 text-[var(--foreground)]/70 leading-relaxed">
                   {t("features.trustDesc")}
                 </p>
-              </div>
-              <div className="group rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 sm:col-span-2 lg:col-span-1">
+                <span className="mt-4 inline-flex items-center text-sm font-semibold text-[var(--accent)] group-hover:underline">
+                  {t("features.readMore")}
+                  <span className="ms-1" aria-hidden>
+                    →
+                  </span>
+                </span>
+              </Link>
+              <Link
+                href={`/${locale}/why`}
+                className="group block rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1 sm:col-span-2 lg:col-span-1"
+              >
                 <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--accent)]/10">
                   <svg className="h-6 w-6 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -108,7 +129,13 @@ export default async function HomePage({
                 <p className="mt-3 text-[var(--foreground)]/70 leading-relaxed">
                   {t("features.localDesc")}
                 </p>
-              </div>
+                <span className="mt-4 inline-flex items-center text-sm font-semibold text-[var(--accent)] group-hover:underline">
+                  {t("features.readMore")}
+                  <span className="ms-1" aria-hidden>
+                    →
+                  </span>
+                </span>
+              </Link>
             </div>
           </div>
         </section>
