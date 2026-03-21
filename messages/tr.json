@@ -63,6 +63,13 @@
       "speedDesc": "Birkaç adımda rezervasyon, ödeme ve operasyon — hızlı ve sade.",
       "cta": "Şimdi rezervasyon",
       "mapAria": "Bölgeler arasında hareketli bağlantı çizgileri olan Almanya haritası"
+    },
+    "driverCta": {
+      "eyebrow": "Profesyonel sürücüler için",
+      "sectionTitle": "TransPool24'te şoför olun",
+      "headline": "Pforzheim ve bölgedeki ağımıza katılın",
+      "body": "Adil saatlik ücret, net süreçler ve yolda size destek olan bir ekip — birkaç adımda başvurun.",
+      "logoAlt": "TransPool24"
     }
   },
   "order": {

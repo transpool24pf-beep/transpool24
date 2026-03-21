@@ -63,6 +63,13 @@
       "speedDesc": "Réservation, paiement et traitement en quelques étapes — simple et rapide.",
       "cta": "Réserver",
       "mapAria": "Carte de l'Allemagne avec lignes de connexion animées entre les régions"
+    },
+    "driverCta": {
+      "eyebrow": "Pour les chauffeurs professionnels",
+      "sectionTitle": "Roulez avec TransPool24",
+      "headline": "Rejoignez notre réseau à Pforzheim et dans la région",
+      "body": "Rémunération horaire équitable, processus clairs et une équipe qui vous soutient sur la route — postulez en quelques étapes.",
+      "logoAlt": "TransPool24"
     }
   },
   "order": {

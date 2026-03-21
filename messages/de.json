@@ -63,6 +63,13 @@
       "speedDesc": "Buchung, Bezahlung und Abwicklung in wenigen Schritten — schnell und unkompliziert.",
       "cta": "Jetzt buchen",
       "mapAria": "Karte Deutschlands mit animierten Verbindungslinien zwischen Regionen"
+    },
+    "driverCta": {
+      "eyebrow": "Für Berufsfahrer",
+      "sectionTitle": "Fahren Sie mit TransPool24",
+      "headline": "Werden Sie Teil unseres Netzwerks in Pforzheim und der Region",
+      "body": "Faire Stundenvergütung, klare Abläufe und ein Team, das Sie unterstützt — bewerben Sie sich in wenigen Schritten.",
+      "logoAlt": "TransPool24"
     }
   },
   "order": {

@@ -63,6 +63,13 @@
       "speedDesc": "Book, pay, and get moving in a few steps — fast and straightforward.",
       "cta": "Book now",
       "mapAria": "Map of Germany with animated connection lines between regions"
+    },
+    "driverCta": {
+      "eyebrow": "For professional drivers",
+      "sectionTitle": "Drive with TransPool24",
+      "headline": "Join our network in Pforzheim and the region",
+      "body": "Fair hourly pay, clear processes, and a team that supports you on the road — apply in a few steps.",
+      "logoAlt": "TransPool24"
     }
   },
   "order": {

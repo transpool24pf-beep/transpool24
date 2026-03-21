@@ -23,11 +23,12 @@ export default async function HomePage({
         <section className="relative overflow-hidden bg-gradient-to-br from-[#ffc9a3] via-[#ffb07a] to-[#f28a4a] text-white">
           <div className="absolute inset-0">
             <Image
-              src="/images/van1.png"
+              src="/images/5677.png"
               alt=""
               fill
-              className="object-cover object-center opacity-45"
+              className="object-cover object-center opacity-40"
               priority
+              sizes="100vw"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-[#e85d04]/50 via-[#e85d04]/38 to-transparent" />
           </div>
@@ -147,40 +148,52 @@ export default async function HomePage({
 
         <GermanyConnectSection locale={locale} />
 
-        {/* CTA Section - مع صورة الشاحنة */}
-        <section className="bg-gradient-to-br from-gray-50 to-white py-20 sm:py-24">
+        {/* Driver CTA — immersive card (sennder-style), single “Become a driver” action */}
+        <section className="bg-[#f5f5f5] py-20 sm:py-28">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-2xl">
-              <div className="grid gap-8 lg:grid-cols-2">
-                <div className="relative h-64 sm:h-80 lg:h-full lg:min-h-[400px]">
-                  <Image
-                    src="/images/van2.png"
-                    alt="TransPool24"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div className="flex flex-col justify-center px-8 py-12 sm:px-12">
-                  <h3 className="text-3xl font-bold text-[var(--primary)] sm:text-4xl">
-                    TransPool24 – {t("features.local")}
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">
+              {t("driverCta.eyebrow")}
+            </p>
+            <h2 className="mt-2 max-w-3xl text-3xl font-bold tracking-tight text-[#0d2137] sm:text-4xl">
+              {t("driverCta.sectionTitle")}
+            </h2>
+            <div className="relative mt-10 min-h-[min(32rem,85vh)] overflow-hidden rounded-3xl shadow-[0_24px_60px_-12px_rgba(0,0,0,0.35)] ring-1 ring-black/10 sm:min-h-[28rem]">
+              <div className="absolute inset-0">
+                <Image
+                  src="/images/5677.png"
+                  alt=""
+                  fill
+                  className="object-cover object-center"
+                  sizes="(max-width: 1280px) 100vw, 1280px"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/88 via-black/55 to-black/30" />
+                <div className="absolute inset-0 bg-gradient-to-r from-black/45 to-transparent rtl:bg-gradient-to-l" />
+              </div>
+              <div className="relative z-10 flex min-h-[min(32rem,85vh)] flex-col justify-end gap-12 px-8 py-12 sm:min-h-[28rem] sm:px-12 sm:py-14 lg:flex-row lg:items-end lg:justify-between lg:gap-16">
+                <div className="max-w-2xl border-s-4 border-[var(--accent)] ps-5 sm:ps-6">
+                  <h3 className="text-3xl font-bold leading-[1.15] text-white drop-shadow-sm sm:text-4xl lg:text-[2.35rem]">
+                    {t("driverCta.headline")}
                   </h3>
-                  <p className="mt-4 text-lg text-[var(--foreground)]/80 leading-relaxed">
-                    {t("features.localDesc")}
+                  <p className="mt-5 max-w-xl text-base leading-relaxed text-white/92 sm:text-lg">
+                    {t("driverCta.body")}
                   </p>
-                  <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-                    <Link
-                      href={`/${locale}/order`}
-                      className="inline-flex items-center justify-center rounded-xl bg-[var(--accent)] px-8 py-4 font-semibold text-white shadow-lg transition-all hover:scale-105 hover:shadow-xl"
-                    >
-                      {t("cta")}
-                    </Link>
-                    <Link
-                      href={`/${locale}/driver`}
-                      className="inline-flex items-center justify-center rounded-xl border-2 border-[var(--accent)] bg-white px-8 py-4 font-semibold text-[var(--accent)] transition-all hover:bg-[var(--accent)]/5 hover:scale-105"
-                    >
-                      {t("driverSignup")}
-                    </Link>
+                </div>
+                <div className="flex flex-col items-center gap-6 pb-1 lg:items-end">
+                  <div className="relative h-36 w-36 shrink-0 overflow-hidden rounded-full ring-[3px] ring-white/45 shadow-[0_8px_32px_rgba(0,0,0,0.4)] sm:h-40 sm:w-40">
+                    <Image
+                      src="/4566.png"
+                      alt={t("driverCta.logoAlt")}
+                      fill
+                      className="object-cover object-center"
+                      sizes="160px"
+                    />
                   </div>
+                  <Link
+                    href={`/${locale}/driver`}
+                    className="inline-flex w-full min-w-[min(100%,16rem)] max-w-xs items-center justify-center rounded-xl bg-[var(--accent)] px-10 py-4 text-center text-base font-bold text-white shadow-lg transition hover:brightness-110 sm:text-lg"
+                  >
+                    {t("driverSignup")}
+                  </Link>
                 </div>
               </div>
             </div>
