@@ -1,8 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useRef, useEffect, useMemo } from "react";
-import { useTranslations } from "next-intl";
+import { useEffect, useMemo, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 
 interface Driver {
   id: number;
@@ -15,15 +15,11 @@ interface Driver {
 
 function StarRating({ rating }: { rating: number }) {
   return (
-    <div className="flex items-center gap-0.5">
+    <div className="flex shrink-0 items-center gap-0.5" aria-hidden>
       {[1, 2, 3, 4, 5].map((star) => (
         <svg
           key={star}
-          className={`h-5 w-5 ${
-            star <= rating
-              ? "text-[var(--accent)]"
-              : "text-gray-300"
-          }`}
+          className={`h-4 w-4 sm:h-5 sm:w-5 ${star <= rating ? "text-amber-400" : "text-gray-200"}`}
           fill="currentColor"
           viewBox="0 0 20 20"
         >
@@ -34,29 +30,26 @@ function StarRating({ rating }: { rating: number }) {
   );
 }
 
+function isMiddleOfTriple(index: number, total: number) {
+  if (total < 3) return false;
+  return index % 3 === 1;
+}
+
 export function DriversCarousel() {
   const t = useTranslations("home.drivers");
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
+  const locale = useLocale();
+  const isRtl = locale === "ar";
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch drivers from API
   useEffect(() => {
     fetch("/api/public/content/drivers")
       .then((r) => r.json())
-      .then((data) => {
-        setDrivers(data.drivers || []);
-      })
-      .catch(() => {
-        // Fallback to empty array on error
-        setDrivers([]);
-      })
+      .then((data) => setDrivers(data.drivers || []))
+      .catch(() => setDrivers([]))
       .finally(() => setLoading(false));
   }, []);
 
-  // Generate demo drivers from translations when no real data
   const demoDrivers = useMemo((): Driver[] => {
     try {
       return [
@@ -64,7 +57,7 @@ export function DriversCarousel() {
           id: -1,
           name: t("f1_name"),
           photo: t("f1_photo"),
-          rating: 5, // Fixed rating from translation file
+          rating: 5,
           comment: t("f1_comment"),
           customerName: t("f1_customerName"),
         },
@@ -72,7 +65,7 @@ export function DriversCarousel() {
           id: -2,
           name: t("f2_name"),
           photo: t("f2_photo"),
-          rating: 5, // Fixed rating from translation file
+          rating: 5,
           comment: t("f2_comment"),
           customerName: t("f2_customerName"),
         },
@@ -80,211 +73,114 @@ export function DriversCarousel() {
           id: -3,
           name: t("f3_name"),
           photo: t("f3_photo"),
-          rating: 4, // Fixed rating from translation file
+          rating: 4,
           comment: t("f3_comment"),
           customerName: t("f3_customerName"),
         },
       ];
-    } catch (error) {
-      console.error("Error loading demo drivers:", error);
+    } catch {
       return [];
     }
   }, [t]);
 
   const displayDrivers = drivers.length > 0 ? drivers : demoDrivers;
   const isDemo = drivers.length === 0;
-
-  const checkScrollability = () => {
-    if (!scrollContainerRef.current) return;
-    const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-    setCanScrollLeft(scrollLeft > 0);
-    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
-  };
-
-  useEffect(() => {
-    const id = requestAnimationFrame(() => checkScrollability());
-    const container = scrollContainerRef.current;
-    if (container) {
-      container.addEventListener("scroll", checkScrollability);
-      window.addEventListener("resize", checkScrollability);
-      return () => {
-        cancelAnimationFrame(id);
-        container.removeEventListener("scroll", checkScrollability);
-        window.removeEventListener("resize", checkScrollability);
-      };
-    }
-    return () => cancelAnimationFrame(id);
-  }, [displayDrivers.length]);
-
-  const scroll = (direction: "left" | "right") => {
-    if (!scrollContainerRef.current) return;
-    const container = scrollContainerRef.current;
-    const scrollAmount = container.clientWidth * 0.8;
-    const targetScroll =
-      direction === "left"
-        ? container.scrollLeft - scrollAmount
-        : container.scrollLeft + scrollAmount;
-    container.scrollTo({
-      left: targetScroll,
-      behavior: "smooth",
-    });
-  };
+  const total = displayDrivers.length;
 
   if (loading) {
     return (
-      <section className="bg-gradient-to-br from-gray-50 to-white py-20 sm:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <p className="text-[var(--foreground)]/70">{t("loading")}</p>
-          </div>
+      <section
+        className="relative overflow-hidden rounded-tr-[2.75rem] bg-gradient-to-br from-[#0f3536] via-[#164848] to-[#0a2324] sm:rounded-tr-[4.5rem] md:rounded-tr-[5.5rem]"
+        aria-busy="true"
+      >
+        <div
+          className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-[var(--accent)]/10 blur-3xl"
+          aria-hidden
+        />
+        <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+          <p className="text-center text-lg text-white/80">{t("loading")}</p>
         </div>
       </section>
     );
   }
 
-  // Always render the section with demo drivers if no real data
   return (
-    <section className="bg-gradient-to-br from-gray-50 to-white py-20 sm:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold text-[var(--primary)] sm:text-4xl">
+    <section
+      className="relative overflow-hidden rounded-tr-[2.75rem] bg-gradient-to-br from-[#0f3536] via-[#164848] to-[#0a2324] sm:rounded-tr-[4.5rem] md:rounded-tr-[5.5rem]"
+      aria-labelledby="drivers-section-title"
+    >
+      <div
+        className="pointer-events-none absolute -right-20 -top-28 h-96 w-96 rounded-full bg-[var(--accent)]/12 blur-3xl"
+        aria-hidden
+      />
+      <div
+        className="pointer-events-none absolute -bottom-32 left-0 h-72 w-72 rounded-full bg-teal-400/5 blur-3xl"
+        aria-hidden
+      />
+
+      <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+        <div className="max-w-3xl">
+          <h2
+            id="drivers-section-title"
+            className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl"
+          >
             {t("title")}
           </h2>
-          <p className="mt-4 text-lg text-[var(--foreground)]/70">
-            {t("subtitle")}
-          </p>
+          <p className="mt-3 text-lg text-white/85 sm:text-xl">{t("subtitle")}</p>
           {isDemo && (
-            <p className="mt-2 text-sm text-[var(--foreground)]/50 italic">
-              {t("demoNotice")}
-            </p>
+            <p className="mt-2 text-sm text-white/55">{t("demoNotice")}</p>
           )}
         </div>
 
-        <div className="relative mt-16">
-          {/* Navigation Buttons */}
-          <button
-            type="button"
-            onClick={() => scroll("left")}
-            disabled={!canScrollLeft}
-            className={`absolute left-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white p-3 shadow-lg transition-all hover:scale-110 disabled:opacity-30 disabled:cursor-not-allowed ${
-              !canScrollLeft ? "hidden" : ""
-            }`}
-            aria-label="Previous"
-          >
-            <svg
-              className="h-6 w-6 text-[var(--accent)]"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </button>
-          <button
-            type="button"
-            onClick={() => scroll("right")}
-            disabled={!canScrollRight}
-            className={`absolute right-0 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white p-3 shadow-lg transition-all hover:scale-110 disabled:opacity-30 disabled:cursor-not-allowed ${
-              !canScrollRight ? "hidden" : ""
-            }`}
-            aria-label="Next"
-          >
-            <svg
-              className="h-6 w-6 text-[var(--accent)]"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </button>
-
-          {/* Carousel Container */}
-          <div
-            ref={scrollContainerRef}
-            className="flex gap-6 overflow-x-auto scrollbar-hide scroll-smooth pb-4"
-            style={{
-              scrollbarWidth: "none",
-              msOverflowStyle: "none",
-            }}
-          >
-            {displayDrivers.map((driver) => (
-              <div
-                key={driver.id}
-                className="group min-w-[320px] max-w-[380px] flex-shrink-0 rounded-2xl border border-gray-200 bg-white p-8 shadow-sm transition-all hover:shadow-xl hover:-translate-y-1"
-              >
-                <div className="flex flex-col items-center text-center">
-                  {/* Driver Photo */}
-                  <div className="relative h-24 w-24 overflow-hidden rounded-full border-4 border-[var(--accent)]/20 bg-gray-100">
-                    <Image
-                      src={driver.photo}
-                      alt={driver.name}
-                      fill
-                      className="object-cover"
-                      onError={(e) => {
-                        // Fallback to placeholder if image fails
-                        const target = e.target as HTMLImageElement;
-                        target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                          driver.name
-                        )}&background=e85d04&color=fff&size=128`;
-                      }}
-                      unoptimized
-                    />
-                  </div>
-
-                  {/* Driver Name */}
-                  <h3 className="mt-6 text-xl font-bold text-[var(--primary)]">
-                    {driver.name}
-                  </h3>
-
-                  {/* Star Rating */}
-                  <div className="mt-3">
+        <ul className="mt-12 grid list-none grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-7 lg:mt-14 lg:grid-cols-3 lg:gap-8">
+          {displayDrivers.map((driver, index) => {
+            const highlighted = isMiddleOfTriple(index, total);
+            return (
+              <li key={driver.id} className="relative">
+                {highlighted && (
+                  <div
+                    className="pointer-events-none absolute inset-0 -m-3 rounded-[1.35rem] bg-white/20 opacity-70 shadow-[0_0_60px_20px_rgba(255,255,255,0.12)] blur-xl sm:-m-4"
+                    aria-hidden
+                  />
+                )}
+                <article
+                  dir={isRtl ? "rtl" : "ltr"}
+                  className={`relative flex h-full flex-col rounded-2xl bg-white p-5 shadow-md ring-1 ring-black/[0.04] transition duration-300 sm:p-6 ${
+                    highlighted ? "shadow-xl shadow-black/10 ring-white/40 sm:scale-[1.02]" : "hover:shadow-lg"
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex min-w-0 flex-1 items-center gap-3">
+                      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-gray-100 ring-2 ring-gray-100 sm:h-14 sm:w-14">
+                        <Image
+                          src={driver.photo}
+                          alt=""
+                          fill
+                          className="object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(driver.name)}&background=e85d04&color=fff&size=128`;
+                          }}
+                          unoptimized
+                        />
+                      </div>
+                      <h3 className="truncate text-base font-bold text-[var(--primary)] sm:text-lg">{driver.name}</h3>
+                    </div>
                     <StarRating rating={driver.rating} />
                   </div>
 
-                  {/* Customer Comment */}
-                  <p className="mt-6 text-[var(--foreground)]/70 leading-relaxed italic">
-                    "{driver.comment}"
+                  <p className="mt-4 flex-1 text-start text-sm leading-relaxed text-[var(--foreground)]/75 sm:text-[0.9375rem]">
+                    &ldquo;{driver.comment}&rdquo;
                   </p>
-
-                  {/* Customer Name */}
-                  <p className="mt-4 text-sm font-semibold text-[var(--foreground)]/60">
-                    — {driver.customerName}
+                  <p className="mt-4 text-start text-xs font-semibold uppercase tracking-wide text-[var(--foreground)]/50 sm:text-sm sm:normal-case sm:tracking-normal">
+                    {driver.customerName}
                   </p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Pagination Dots */}
-          <div className="mt-8 flex justify-center gap-2">
-            {displayDrivers.map((_, index) => (
-              <button
-                key={index}
-                type="button"
-                className="h-2 w-2 rounded-full bg-gray-300 transition-all hover:bg-[var(--accent)]"
-                aria-label={`Go to slide ${index + 1}`}
-              />
-            ))}
-          </div>
-        </div>
+                </article>
+              </li>
+            );
+          })}
+        </ul>
       </div>
-
-      <style jsx global>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
     </section>
   );
 }
