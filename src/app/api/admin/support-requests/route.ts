@@ -8,14 +8,20 @@ export async function GET() {
   const supabase = createServerSupabase();
   const { data: requests, error } = await supabase
     .from("support_requests")
-    .select("id, driver_number, name, email, message, created_at")
+    .select(
+      "id, driver_number, name, email, message, created_at, requester_type, customer_email, job_id, phone_e164, first_name, last_name, company, country, inquiry_type, comm_language, page_locale, privacy_accepted, marketing_opt_in, admin_reply",
+    )
     .order("created_at", { ascending: false });
   if (error) {
     console.error("[admin/support-requests]", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
   const list = requests ?? [];
-  const driverNumbers = [...new Set(list.map((r) => r.driver_number))];
+  const driverNumbers = [
+    ...new Set(
+      list.map((r) => r.driver_number).filter((n): n is number => n != null && !Number.isNaN(n)),
+    ),
+  ];
   let driverMap: Record<number, { full_name: string; phone: string; city: string; id: string }> = {};
   if (driverNumbers.length > 0) {
     const { data: drivers } = await supabase
