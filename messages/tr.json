@@ -42,6 +42,16 @@
       "f3_rating": 4,
       "f3_comment": "Çok iyi bir deneyim. Sürücü dakik ve hassastı.",
       "f3_customerName": "Orta Doğu Taşımacılık"
+    },
+    "germanyMap": {
+      "eyebrow": "Almanya'yı birbirine bağlıyoruz",
+      "headline": "Pforzheim'dan tüm Almanya'ya — güvenilir bir lojistik ağı",
+      "body1": "Eyaletler arası taşımaları; rotaları, zaman pencerelerini ve bölgesel süreçleri bilen ekiplerle koordine edin.",
+      "body2": "Sürücülerimiz sizin dilinizi konuşuyor — rezervasyondan teslimata kadar anlaşılır ve yakın.",
+      "speedTitle": "Hız",
+      "speedDesc": "Birkaç adımda rezervasyon, ödeme ve operasyon — hızlı ve sade.",
+      "cta": "Şimdi rezervasyon",
+      "mapAria": "Bölgeler arasında hareketli bağlantı çizgileri olan Almanya haritası"
     }
   },
   "order": {

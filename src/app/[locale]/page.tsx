@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { DriversCarousel } from "@/components/DriversCarousel";
+import { GermanyConnectSection } from "@/components/GermanyConnectSection";
 
 export default async function HomePage({
   params,
@@ -113,6 +114,8 @@ export default async function HomePage({
 
         {/* Drivers Carousel Section */}
         <DriversCarousel />
+
+        <GermanyConnectSection locale={locale} />
 
         {/* CTA Section - مع صورة الشاحنة */}
         <section className="bg-gradient-to-br from-gray-50 to-white py-20 sm:py-24">

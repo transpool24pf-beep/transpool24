@@ -23,3 +23,13 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
 }
+
+@keyframes germany-map-dash-flow {
+  to {
+    stroke-dashoffset: -120;
+  }
+}
+
+.germany-map-flow-line {
+  animation: germany-map-dash-flow 3.5s linear infinite;
+}

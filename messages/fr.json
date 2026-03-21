@@ -42,6 +42,16 @@
       "f3_rating": 4,
       "f3_comment": "Très bonne expérience. Le chauffeur était ponctuel et précis.",
       "f3_customerName": "Transport Moyen-Orient"
+    },
+    "germanyMap": {
+      "eyebrow": "Nous relions l'Allemagne",
+      "headline": "De Pforzheim à toute l'Allemagne — un réseau fiable",
+      "body1": "Coordonnez vos transports entre les Länder avec des équipes qui connaissent les routes, les créneaux et les flux régionaux.",
+      "body2": "Nos chauffeurs parlent votre langue — de la réservation à la livraison, clair et proche de vous.",
+      "speedTitle": "Rapidité",
+      "speedDesc": "Réservation, paiement et traitement en quelques étapes — simple et rapide.",
+      "cta": "Réserver",
+      "mapAria": "Carte de l'Allemagne avec lignes de connexion animées entre les régions"
     }
   },
   "order": {

@@ -42,6 +42,16 @@
       "f3_rating": 4,
       "f3_comment": "Very good experience. The driver was punctual and precise.",
       "f3_customerName": "Middle East Transport"
+    },
+    "germanyMap": {
+      "eyebrow": "We connect Germany",
+      "headline": "From Pforzheim across Germany — a reliable logistics network",
+      "body1": "Coordinate transports between federal states with teams that know routes, time windows, and regional workflows.",
+      "body2": "Our drivers speak your language — from booking to delivery, clear and approachable.",
+      "speedTitle": "Speed",
+      "speedDesc": "Book, pay, and get moving in a few steps — fast and straightforward.",
+      "cta": "Book now",
+      "mapAria": "Map of Germany with animated connection lines between regions"
     }
   },
   "order": {

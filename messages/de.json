@@ -42,6 +42,16 @@
       "f3_rating": 4,
       "f3_comment": "Sehr gute Erfahrung. Der Fahrer war pünktlich und präzise.",
       "f3_customerName": "Mittlerer Osten Transport"
+    },
+    "germanyMap": {
+      "eyebrow": "Wir verbinden Deutschland",
+      "headline": "Von Pforzheim ins ganze Land — zuverlässig vernetzt",
+      "body1": "Koordinieren Sie Transporte zwischen den Bundesländern — mit Teams, die Strecken, Zeitfenster und regionale Abläufe kennen.",
+      "body2": "Unsere Fahrer sprechen Ihre Sprache — von der Buchung bis zur Lieferung klar, nahbar und professionell.",
+      "speedTitle": "Schnelligkeit",
+      "speedDesc": "Buchung, Bezahlung und Abwicklung in wenigen Schritten — schnell und unkompliziert.",
+      "cta": "Jetzt buchen",
+      "mapAria": "Karte Deutschlands mit animierten Verbindungslinien zwischen Regionen"
     }
   },
   "order": {
