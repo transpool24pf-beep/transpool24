@@ -84,9 +84,10 @@ export function WebsiteWhyTranspool24Client() {
         Tabelle <code className="rounded bg-[#0d2137]/5 px-1">why_transpool24_locale</code> in Supabase ausführen.
       </p>
       <p className="mb-6 rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/[0.03] px-4 py-3 text-sm text-[#0d2137]/75">
-        <strong className="text-[#0d2137]">Abschlussbereich (orange Welle + dunkle Fußzeile):</strong> Er erscheint automatisch am Ende der öffentlichen Why-Seite. Texte, Buttons und Spaltenüberschriften pflegen Sie in den Dateien{" "}
-        <code className="rounded bg-[#0d2137]/5 px-1">messages/*.json</code> unter dem Schlüssel{" "}
-        <code className="rounded bg-[#0d2137]/5 px-1">infoPageClosing</code> (pro Sprache).
+        <strong className="text-[#0d2137]">Abschlussbereich (orange CTA + dunkle Fußzeile):</strong> Wird am Ende aller öffentlichen Seiten mit{" "}
+        <code className="rounded bg-[#0d2137]/5 px-1">Footer</code> angezeigt (Startseite, Why, Support, Auftrag, Fahrer, …). Texte pflegen Sie in{" "}
+        <code className="rounded bg-[#0d2137]/5 px-1">messages/*.json</code> →{" "}
+        <code className="rounded bg-[#0d2137]/5 px-1">infoPageClosing</code>.
       </p>
 
       <div className="mb-4 flex flex-wrap items-center gap-3">

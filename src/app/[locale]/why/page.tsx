@@ -1,6 +1,7 @@
 import { getWhyPagePayload } from "@/lib/get-why-page-payload";
 import { WhyTranspool24Content } from "@/components/why-transpool24/WhyTranspool24Content";
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 
 /** Always read latest CMS/Supabase payload (not SSG snapshot). */
 export const dynamic = "force-dynamic";
@@ -33,6 +34,7 @@ export default async function WhyTranspool24Page({
       <main>
         <WhyTranspool24Content data={data} locale={locale} />
       </main>
+      <Footer />
     </>
   );
 }

@@ -3,7 +3,6 @@ import type { WhyPagePayload } from "@/lib/why-transpool24-types";
 import { WhyTranspool24Icon } from "./WhyTranspool24Icon";
 import { WhyHowItWorksMedia } from "./WhyHowItWorksMedia";
 import { WhyCmsImage } from "./WhyCmsImage";
-import { WhyPageInformationClosing } from "./WhyPageInformationClosing";
 
 type Props = { data: WhyPagePayload; locale: string };
 
@@ -198,8 +197,6 @@ export function WhyTranspool24Content({ data, locale }: Props) {
           </div>
         </section>
       </div>
-
-      <WhyPageInformationClosing locale={locale} />
     </div>
   );
 }
