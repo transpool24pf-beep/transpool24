@@ -35,6 +35,35 @@ body {
   animation: germany-map-dash-flow 3.2s steps(10) infinite;
 }
 
+/* Order page: side DotLotties drift in opposite directions */
+@keyframes order-lottie-drift-a {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(14px);
+  }
+}
+
+@keyframes order-lottie-drift-b {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-14px);
+  }
+}
+
+.order-lottie-drift-a {
+  animation: order-lottie-drift-a 4.5s ease-in-out infinite;
+}
+
+.order-lottie-drift-b {
+  animation: order-lottie-drift-b 4.5s ease-in-out infinite;
+}
+
 /* Customer tracking: live driver position = large round photo (readable at map zoom) */
 .leaflet-driver-photo-marker {
   background: transparent !important;
