@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { DriverWizardForm } from "./DriverWizardForm";
+import { OrderRouteLottie } from "./OrderRouteLottie";
 
 const HERO_IMAGE = "/images/5677.png";
 
@@ -47,6 +48,18 @@ export function DriverPageClient({ locale }: { locale: string }) {
                   {t("heroTitle")}
                 </h1>
                 <p className="mt-5 text-lg leading-8 text-[#0d2137]">{t("heroLead")}</p>
+                <div className="mt-6 flex max-w-xl flex-col gap-4 rounded-2xl border border-[#0d2137]/12 bg-white/80 p-4 shadow-sm backdrop-blur-sm sm:flex-row sm:items-center sm:gap-5 sm:p-5">
+                  <div className="flex shrink-0 justify-center sm:justify-start">
+                    <OrderRouteLottie size="lg" className="[&_p]:hidden" />
+                  </div>
+                  <div className="min-w-0 text-center sm:text-start">
+                    <p className="text-sm font-semibold uppercase tracking-wide text-[var(--accent)]">
+                      {t("trackingTeaserEyebrow")}
+                    </p>
+                    <p className="mt-1 text-base font-semibold text-[#0d2137]">{t("trackingTeaserTitle")}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-[#0d2137]/75">{t("trackingTeaserBody")}</p>
+                  </div>
+                </div>
                 <button
                   type="button"
                   onClick={scrollToApply}

@@ -10,7 +10,7 @@ const WC_SCRIPT = "https://unpkg.com/@lottiefiles/dotlottie-wc@0.9.3/dist/dotlot
 type Props = {
   /** Shown under the animation (e.g. “Calculating route…”). */
   label?: string;
-  size?: "md" | "sm";
+  size?: "md" | "sm" | "lg";
   className?: string;
 };
 
@@ -21,7 +21,7 @@ type Props = {
 export function OrderRouteLottie({ label, size = "md", className = "" }: Props) {
   const [scriptReady, setScriptReady] = useState(false);
   const playerRef = useRef<HTMLDivElement>(null);
-  const dim = size === "sm" ? 88 : 120;
+  const dim = size === "sm" ? 88 : size === "lg" ? 132 : 120;
 
   useEffect(() => {
     if (!scriptReady || !playerRef.current) return;

@@ -93,7 +93,7 @@ export function WebsiteShell({ children }: { children: React.ReactNode }) {
           <span>Keine Aufträge / keine Kundendaten hier</span>
           <span className="mx-2">·</span>
           <span>
-            Öffentliche Buchung (/order): Lottie-Animation bei Streckenberechnung, Zusammenfassung &amp; Absenden
+            Öffentliche Buchung (/order): Lottie bei Strecke &amp; Zusammenfassung · Fahrer-Landing (/driver): Hinweis Live-Tracking
           </span>
         </footer>
       </main>
