@@ -250,6 +250,8 @@
     "whatsappPlaceholder": "15123456789",
     "servicePolicy": "Başvuru sürecini takip etmek için işe alım sorumlusunun benimle WhatsApp üzerinden iletişime geçmesini kabul ediyorum.",
     "idDocument": "Kimlik veya ikamet belgesi (görsel)",
+    "idDocumentFront": "Kimlik veya ikamet belgesi – ön yüz",
+    "idDocumentBack": "Kimlik veya ikamet belgesi – arka yüz",
     "licenseFront": "Ehliyet – ön yüz",
     "licenseBack": "Ehliyet – arka yüz",
     "taxNumber": "Vergi veya ticari numara",

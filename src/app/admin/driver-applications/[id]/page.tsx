@@ -33,6 +33,8 @@ type DriverApp = {
   }>;
   service_policy_accepted: boolean;
   id_document_url: string | null;
+  id_document_front_url: string | null;
+  id_document_back_url: string | null;
   license_front_url: string | null;
   license_back_url: string | null;
   tax_or_commercial_number: string | null;
@@ -606,11 +608,28 @@ export default function AdminDriverApplicationDetailPage({
       <div className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-lg font-semibold text-[#0d2137]">Dokumente & Fotos</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {app.id_document_url && (
+          {(app.id_document_front_url || app.id_document_url) && (
             <div>
-              <p className="mb-2 text-sm font-medium text-[#0d2137]/80">Ausweis / Aufenthalt</p>
-              <a href={app.id_document_url} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-lg border">
-                <img src={app.id_document_url} alt="" className="h-32 w-full object-cover" />
+              <p className="mb-2 text-sm font-medium text-[#0d2137]/80">Ausweis / Aufenthalt – Vorderseite</p>
+              <a
+                href={app.id_document_front_url || app.id_document_url || "#"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block overflow-hidden rounded-lg border"
+              >
+                <img
+                  src={app.id_document_front_url || app.id_document_url || ""}
+                  alt=""
+                  className="h-32 w-full object-cover"
+                />
+              </a>
+            </div>
+          )}
+          {app.id_document_back_url && (
+            <div>
+              <p className="mb-2 text-sm font-medium text-[#0d2137]/80">Ausweis / Aufenthalt – Rückseite</p>
+              <a href={app.id_document_back_url} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-lg border">
+                <img src={app.id_document_back_url} alt="" className="h-32 w-full object-cover" />
               </a>
             </div>
           )}

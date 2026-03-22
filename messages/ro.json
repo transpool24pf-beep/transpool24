@@ -250,6 +250,8 @@
     "whatsappPlaceholder": "15123456789",
     "servicePolicy": "Sunt de acord ca ofițerul de recrutare să mă contacteze prin WhatsApp pentru a urmări cererea mea.",
     "idDocument": "act de identitate sau permis de ședere (imagine)",
+    "idDocumentFront": "Act de identitate / permis de ședere – față",
+    "idDocumentBack": "Act de identitate / permis de ședere – verso",
     "licenseFront": "Permis de conducere – fata",
     "licenseBack": "Permis de conducere – înapoi",
     "taxNumber": "Număr fiscal sau comercial",

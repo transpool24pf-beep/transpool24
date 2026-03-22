@@ -24,6 +24,8 @@ alter table public.driver_applications enable row level security;
 alter table public.driver_applications
   add column if not exists service_policy_accepted boolean default false,
   add column if not exists id_document_url text,
+  add column if not exists id_document_front_url text,
+  add column if not exists id_document_back_url text,
   add column if not exists license_front_url text,
   add column if not exists license_back_url text,
   add column if not exists tax_or_commercial_number text,

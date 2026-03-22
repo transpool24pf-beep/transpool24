@@ -250,6 +250,8 @@
     "whatsappPlaceholder": "15123456789",
     "servicePolicy": "Zgadzam się, że osoba zajmująca się rekrutacją może kontaktować się ze mną za pośrednictwem WhatsApp w celu rozpatrzenia mojej aplikacji.",
     "idDocument": "Dowód osobisty lub zezwolenie na pobyt (zdjęcie)",
+    "idDocumentFront": "Dowód / zezwolenie na pobyt – przód",
+    "idDocumentBack": "Dowód / zezwolenie na pobyt – tył",
     "licenseFront": "Prawo jazdy – przód",
     "licenseBack": "Prawo jazdy – powrót",
     "taxNumber": "Numer podatkowy lub numer handlowy",

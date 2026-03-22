@@ -250,6 +250,8 @@
     "whatsappPlaceholder": "15123456789",
     "servicePolicy": "I agree that the recruitment officer may contact me via WhatsApp to follow up on my application.",
     "idDocument": "ID or residence permit (image)",
+    "idDocumentFront": "ID or residence permit – front",
+    "idDocumentBack": "ID or residence permit – back",
     "licenseFront": "Driving licence – front",
     "licenseBack": "Driving licence – back",
     "taxNumber": "Tax or commercial number",

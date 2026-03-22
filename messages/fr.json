@@ -250,6 +250,8 @@
     "whatsappPlaceholder": "15123456789",
     "servicePolicy": "J'accepte que le recruteur me contacte par WhatsApp pour le suivi de ma candidature.",
     "idDocument": "Pièce d'identité ou titre de séjour (image)",
+    "idDocumentFront": "Pièce d'identité / titre de séjour – recto",
+    "idDocumentBack": "Pièce d'identité / titre de séjour – verso",
     "licenseFront": "Permis de conduire – recto",
     "licenseBack": "Permis de conduire – verso",
     "taxNumber": "Numéro fiscal ou commercial",

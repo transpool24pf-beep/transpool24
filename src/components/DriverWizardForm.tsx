@@ -25,7 +25,8 @@ type FormData = {
   phoneCountryCode: string;
   phone: string;
   servicePolicyAccepted: boolean;
-  idDocumentUrl: string;
+  idDocumentFrontUrl: string;
+  idDocumentBackUrl: string;
   licenseFrontUrl: string;
   licenseBackUrl: string;
   taxOrCommercialNumber: string;
@@ -44,7 +45,8 @@ const initialForm: FormData = {
   phoneCountryCode: "+49",
   phone: "",
   servicePolicyAccepted: false,
-  idDocumentUrl: "",
+  idDocumentFrontUrl: "",
+  idDocumentBackUrl: "",
   licenseFrontUrl: "",
   licenseBackUrl: "",
   taxOrCommercialNumber: "",
@@ -71,6 +73,7 @@ function FileUploadBox({
   value,
   onChange,
   label,
+  fieldId,
   exampleSrc,
   exampleLabel,
   accept = "image/*",
@@ -82,6 +85,8 @@ function FileUploadBox({
   value: string;
   onChange: (url: string) => void;
   label: string;
+  /** Stable unique id for file input (avoid duplicate labels across locales) */
+  fieldId?: string;
   exampleSrc?: string;
   exampleLabel?: string;
   accept?: string;
@@ -93,6 +98,7 @@ function FileUploadBox({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const inputHtmlId = fieldId ?? `upload-${label.replace(/\s/g, "-").slice(0, 40)}`;
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -137,7 +143,7 @@ function FileUploadBox({
         accept={accept}
         onChange={handleFile}
         className="hidden"
-        id={label.replace(/\s/g, "-")}
+        id={inputHtmlId}
       />
       {value ? (
         <div className="flex items-center justify-between gap-2">
@@ -154,7 +160,7 @@ function FileUploadBox({
         </div>
       ) : (
         <label
-          htmlFor={label.replace(/\s/g, "-")}
+          htmlFor={inputHtmlId}
           className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#0d2137]/15 bg-white py-5 text-sm text-[#0d2137]/70 transition hover:border-[var(--accent)]/30 hover:bg-[#0d2137]/5"
         >
           {loading ? uploading : chooseFileOrDrag}
@@ -205,7 +211,8 @@ export function DriverWizardForm({
     form.servicePolicyAccepted;
 
   const step2Valid =
-    form.idDocumentUrl &&
+    form.idDocumentFrontUrl &&
+    form.idDocumentBackUrl &&
     form.licenseFrontUrl &&
     form.licenseBackUrl &&
     form.taxOrCommercialNumber.trim() &&
@@ -231,7 +238,8 @@ export function DriverWizardForm({
           phone: `${form.phoneCountryCode}${form.phone.replace(/\D/g, "")}`.replace(/^\+/, "+"),
           city: form.city,
           servicePolicyAccepted: form.servicePolicyAccepted,
-          idDocumentUrl: form.idDocumentUrl || null,
+          idDocumentFrontUrl: form.idDocumentFrontUrl || null,
+          idDocumentBackUrl: form.idDocumentBackUrl || null,
           licenseFrontUrl: form.licenseFrontUrl || null,
           licenseBackUrl: form.licenseBackUrl || null,
           taxOrCommercialNumber: form.taxOrCommercialNumber.trim() || null,
@@ -430,15 +438,27 @@ export function DriverWizardForm({
           <h2 className="text-xl font-bold text-[#0d2137]">{t("step2Title")}</h2>
           <div className="grid gap-6 sm:grid-cols-2">
             <FileUploadBox
-              label={t("idDocument")}
-              value={form.idDocumentUrl}
-              onChange={(url) => update("idDocumentUrl", url)}
+              fieldId="driver-id-doc-front"
+              label={t("idDocumentFront")}
+              value={form.idDocumentFrontUrl}
+              onChange={(url) => update("idDocumentFrontUrl", url)}
               chooseFileOrDrag={t("chooseFileOrDrag")}
               remove={t("remove")}
               uploading={t("uploading")}
               uploadFailed={t("uploadFailed")}
             />
             <FileUploadBox
+              fieldId="driver-id-doc-back"
+              label={t("idDocumentBack")}
+              value={form.idDocumentBackUrl}
+              onChange={(url) => update("idDocumentBackUrl", url)}
+              chooseFileOrDrag={t("chooseFileOrDrag")}
+              remove={t("remove")}
+              uploading={t("uploading")}
+              uploadFailed={t("uploadFailed")}
+            />
+            <FileUploadBox
+              fieldId="driver-license-front"
               label={t("licenseFront")}
               value={form.licenseFrontUrl}
               onChange={(url) => update("licenseFrontUrl", url)}
@@ -448,6 +468,7 @@ export function DriverWizardForm({
               uploadFailed={t("uploadFailed")}
             />
             <FileUploadBox
+              fieldId="driver-license-back"
               label={t("licenseBack")}
               value={form.licenseBackUrl}
               onChange={(url) => update("licenseBackUrl", url)}
@@ -468,6 +489,7 @@ export function DriverWizardForm({
             </div>
             <div className="sm:col-span-2">
               <FileUploadBox
+                fieldId="driver-personal-photo"
                 label={t("personalPhoto")}
                 value={form.personalPhotoUrl}
                 onChange={(url) => update("personalPhotoUrl", url)}
@@ -522,6 +544,7 @@ export function DriverWizardForm({
               />
             </div>
             <FileUploadBox
+              fieldId="driver-vehicle-docs"
               label={t("vehicleDocuments")}
               value={form.vehicleDocumentsUrl}
               onChange={(url) => update("vehicleDocumentsUrl", url)}
@@ -532,6 +555,7 @@ export function DriverWizardForm({
               uploadFailed={t("uploadFailed")}
             />
             <FileUploadBox
+              fieldId="driver-vehicle-photo"
               label={t("vehiclePhoto")}
               value={form.vehiclePhotoUrl}
               onChange={(url) => update("vehiclePhotoUrl", url)}

@@ -250,6 +250,8 @@
     "whatsappPlaceholder": "15123456789",
     "servicePolicy": "Ich stimme zu, dass mich die Personalabteilung per WhatsApp zur Verfolgung des Bewerbungsverfahrens kontaktieren darf.",
     "idDocument": "Ausweis oder Aufenthaltstitel (Bild)",
+    "idDocumentFront": "Ausweis / Aufenthaltstitel – Vorderseite",
+    "idDocumentBack": "Ausweis / Aufenthaltstitel – Rückseite",
     "licenseFront": "Führerschein – Vorderseite",
     "licenseBack": "Führerschein – Rückseite",
     "taxNumber": "Steuer- oder Handelsnummer",

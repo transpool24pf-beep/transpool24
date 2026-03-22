@@ -250,6 +250,8 @@
     "whatsappPlaceholder": "15123456789",
     "servicePolicy": "Acepto que el responsable de contratación me contacte por WhatsApp para el seguimiento de mi solicitud.",
     "idDocument": "DNI o permiso de residencia (imagen)",
+    "idDocumentFront": "DNI o permiso de residencia – anverso",
+    "idDocumentBack": "DNI o permiso de residencia – reverso",
     "licenseFront": "Carné de conducir – anverso",
     "licenseBack": "Carné de conducir – reverso",
     "taxNumber": "NIF o número comercial",

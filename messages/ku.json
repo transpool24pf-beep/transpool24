@@ -250,6 +250,8 @@
     "whatsappPlaceholder": "15123456789",
     "servicePolicy": "Ez dipejirînim ku karmendê peywirdarkirinê dikare bi min re bi WhatsApp re têkilî daynin da ku serlêdana min bişopînin.",
     "idDocument": "Nasname an destûra rûniştinê (wêne)",
+    "idDocumentFront": "Nasname an destûra rûniştinê – pêş",
+    "idDocumentBack": "Nasname an destûra rûniştinê – paş",
     "licenseFront": "Destûra ajotinê - pêş",
     "licenseBack": "Lîsansa ajotinê - paş",
     "taxNumber": "Hejmara bacê an bazirganî",

@@ -8,7 +8,13 @@ export async function POST(req: Request) {
   const phone = String(body.phone || "").trim();
   const city = String(body.city || "").trim();
   const service_policy_accepted = Boolean(body.servicePolicyAccepted);
-  const id_document_url = body.idDocumentUrl ? String(body.idDocumentUrl).trim() : null;
+  const id_document_front_url = body.idDocumentFrontUrl
+    ? String(body.idDocumentFrontUrl).trim()
+    : body.idDocumentUrl
+      ? String(body.idDocumentUrl).trim()
+      : null;
+  const id_document_back_url = body.idDocumentBackUrl ? String(body.idDocumentBackUrl).trim() : null;
+  const id_document_url = id_document_front_url || null;
   const license_front_url = body.licenseFrontUrl ? String(body.licenseFrontUrl).trim() : null;
   const license_back_url = body.licenseBackUrl ? String(body.licenseBackUrl).trim() : null;
   const tax_or_commercial_number = body.taxOrCommercialNumber ? String(body.taxOrCommercialNumber).trim() : null;
@@ -33,6 +39,12 @@ export async function POST(req: Request) {
   if (!work_policy_accepted) {
     return NextResponse.json({ error: "Work policy agreement required" }, { status: 400 });
   }
+  if (!id_document_front_url || !id_document_back_url) {
+    return NextResponse.json(
+      { error: "ID or residence permit: both front and back images are required" },
+      { status: 400 }
+    );
+  }
 
   const supabase = createServerSupabase();
   const { data, error } = await supabase
@@ -44,6 +56,8 @@ export async function POST(req: Request) {
       city,
       service_policy_accepted,
       id_document_url: id_document_url || null,
+      id_document_front_url: id_document_front_url || null,
+      id_document_back_url: id_document_back_url || null,
       license_front_url: license_front_url || null,
       license_back_url: license_back_url || null,
       tax_or_commercial_number: tax_or_commercial_number || null,

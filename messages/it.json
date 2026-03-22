@@ -250,6 +250,8 @@
     "whatsappPlaceholder": "15123456789",
     "servicePolicy": "Accetto che l'addetto al reclutamento possa contattarmi tramite WhatsApp per dare seguito alla mia candidatura.",
     "idDocument": "Carta d'identità o permesso di soggiorno (immagine)",
+    "idDocumentFront": "Carta d'identità / permesso di soggiorno – fronte",
+    "idDocumentBack": "Carta d'identità / permesso di soggiorno – retro",
     "licenseFront": "Patente di guida – anteriore",
     "licenseBack": "Patente di guida – indietro",
     "taxNumber": "Codice fiscale o commerciale",

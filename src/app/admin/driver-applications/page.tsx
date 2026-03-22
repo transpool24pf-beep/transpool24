@@ -45,7 +45,7 @@ export default function AdminDriverApplicationsPage() {
       {apiError && (
         <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
           {apiError} — SQL in Supabase ausführen: add_driver_applications.sql, add_driver_application_fields.sql,
-          add_driver_application_approve_reject.sql
+          add_driver_application_approve_reject.sql, add_id_document_front_back.sql
         </div>
       )}
       {loading ? (
