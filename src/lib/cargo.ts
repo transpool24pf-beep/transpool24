@@ -1,20 +1,13 @@
 export type CargoType = "euro_pallet" | "pallets_boxes" | "parcels";
 export type CargoSize = "XS" | "M" | "L";
 
-/** AnyVan-style cargo category: id, label key, suggested size, load/unload minutes */
+/** B2B cargo categories only (booking + invoices + emails). */
 export type CargoCategoryId =
-  | "furniture_general"
-  | "moving_services"
-  | "cars_vehicles"
-  | "motorcycles"
-  | "parcels"
-  | "piano"
-  | "industrial"
-  | "antiques"
-  | "vehicle_parts"
-  | "palletized"
-  | "office_relocation"
-  | "miscellaneous";
+  | "gold_precision_sensitive"
+  | "vehicle_parts_urgent"
+  | "wholesale_dry_food"
+  | "printing_packaging"
+  | "general_other";
 
 export const CARGO_CATEGORIES: {
   id: CargoCategoryId;
@@ -23,19 +16,78 @@ export const CARGO_CATEGORIES: {
   loadingMinutes: number;
   unloadingMinutes: number;
 }[] = [
-  { id: "furniture_general", labelKey: "cargoCatFurniture", suggestedSize: "M", loadingMinutes: 30, unloadingMinutes: 30 },
-  { id: "moving_services", labelKey: "cargoCatMoving", suggestedSize: "L", loadingMinutes: 45, unloadingMinutes: 45 },
-  { id: "cars_vehicles", labelKey: "cargoCatCars", suggestedSize: "L", loadingMinutes: 60, unloadingMinutes: 60 },
-  { id: "motorcycles", labelKey: "cargoCatMotorcycles", suggestedSize: "M", loadingMinutes: 30, unloadingMinutes: 30 },
-  { id: "parcels", labelKey: "cargoCatParcels", suggestedSize: "XS", loadingMinutes: 15, unloadingMinutes: 15 },
-  { id: "piano", labelKey: "cargoCatPiano", suggestedSize: "L", loadingMinutes: 60, unloadingMinutes: 60 },
-  { id: "industrial", labelKey: "cargoCatIndustrial", suggestedSize: "L", loadingMinutes: 45, unloadingMinutes: 45 },
-  { id: "antiques", labelKey: "cargoCatAntiques", suggestedSize: "M", loadingMinutes: 45, unloadingMinutes: 45 },
-  { id: "vehicle_parts", labelKey: "cargoCatVehicleParts", suggestedSize: "M", loadingMinutes: 20, unloadingMinutes: 20 },
-  { id: "palletized", labelKey: "cargoCatPalletized", suggestedSize: "L", loadingMinutes: 30, unloadingMinutes: 30 },
-  { id: "office_relocation", labelKey: "cargoCatOffice", suggestedSize: "L", loadingMinutes: 60, unloadingMinutes: 60 },
-  { id: "miscellaneous", labelKey: "cargoCatMisc", suggestedSize: "M", loadingMinutes: 30, unloadingMinutes: 30 },
+  {
+    id: "gold_precision_sensitive",
+    labelKey: "cargoCatGoldPrecision",
+    suggestedSize: "M",
+    loadingMinutes: 40,
+    unloadingMinutes: 40,
+  },
+  {
+    id: "vehicle_parts_urgent",
+    labelKey: "cargoCatVehiclePartsUrgent",
+    suggestedSize: "M",
+    loadingMinutes: 20,
+    unloadingMinutes: 20,
+  },
+  {
+    id: "wholesale_dry_food",
+    labelKey: "cargoCatWholesaleDryFood",
+    suggestedSize: "L",
+    loadingMinutes: 35,
+    unloadingMinutes: 35,
+  },
+  {
+    id: "printing_packaging",
+    labelKey: "cargoCatPrintingPackaging",
+    suggestedSize: "L",
+    loadingMinutes: 30,
+    unloadingMinutes: 30,
+  },
+  {
+    id: "general_other",
+    labelKey: "cargoCatGeneralOther",
+    suggestedSize: "M",
+    loadingMinutes: 30,
+    unloadingMinutes: 30,
+  },
 ];
+
+/** German labels for PDF, transactional emails, admin (single source). */
+export const CARGO_CATEGORY_LABEL_DE: Record<CargoCategoryId, string> = {
+  gold_precision_sensitive: "Gold / Präzisionsmaschinen (sensibel)",
+  vehicle_parts_urgent: "Kfz-Ersatzteile (eilig)",
+  wholesale_dry_food: "Großhandel & trockene Lebensmittel",
+  printing_packaging: "Druckereien & Verpackungsmaterial",
+  general_other: "Allgemeine Ware / Sonstiges",
+};
+
+/** Pre-B2B category ids still stored on old jobs — show readable German label. */
+export const LEGACY_CARGO_CATEGORY_LABEL_DE: Record<string, string> = {
+  furniture_general: "Möbel / Allgemein (alt)",
+  moving_services: "Umzugsdienstleistungen (alt)",
+  cars_vehicles: "Autos und Fahrzeuge (alt)",
+  motorcycles: "Motorräder (alt)",
+  parcels: "Verpackte Waren / Pakete (alt)",
+  piano: "Klavier (alt)",
+  industrial: "Industriegüter (alt)",
+  antiques: "Antiquitäten (alt)",
+  vehicle_parts: "Fahrzeugteile (alt)",
+  palletized: "Palettierter Gütertransport (alt)",
+  office_relocation: "Büroumzug (alt)",
+  miscellaneous: "Sonstiges (alt)",
+};
+
+export function isCargoCategoryId(id: unknown): id is CargoCategoryId {
+  return typeof id === "string" && CARGO_CATEGORIES.some((c) => c.id === id);
+}
+
+/** Label for PDF, emails, admin — German. */
+export function cargoCategoryLabelDe(id: string | null | undefined): string {
+  if (id == null || id === "") return "—";
+  if (isCargoCategoryId(id)) return CARGO_CATEGORY_LABEL_DE[id];
+  return LEGACY_CARGO_CATEGORY_LABEL_DE[id] ?? id;
+}
 
 export function getCargoCategory(id: CargoCategoryId | string | null) {
   if (!id) return null;

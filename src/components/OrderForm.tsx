@@ -195,7 +195,8 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
 
   const step1Complete = data.companyName.trim() !== "" && data.email.trim() !== "" && data.phone.trim() !== "";
   const step2Complete = data.pickupAddress.trim() !== "" && data.deliveryAddress.trim() !== "";
-  const step3Complete = data.serviceType !== "" && distanceFromRoute;
+  const step3Complete =
+    data.serviceType !== "" && distanceFromRoute && data.cargoCategory !== "";
 
   const oneWayMinutes = routeDurationMinutes ?? (data.distanceKm / 50) * 60;
   const roundTripMinutes = oneWayMinutes * 2;
@@ -375,7 +376,11 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
         }),
       });
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error || "Failed to confirm order");
+      if (!res.ok) {
+        const err = json.error as string | undefined;
+        if (err === "CARGO_CATEGORY_REQUIRED") throw new Error(t("cargoCategoryRequired"));
+        throw new Error(err || "Failed to confirm order");
+      }
       if (json.jobId && json.confirmationToken && json.whatsappLink) {
         setOrderConfirmed({
           jobId: json.jobId,
@@ -909,7 +914,7 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
             )}
             <p><strong>{t("serviceType")}:</strong> {data.serviceType ? t(SERVICE_OPTIONS.find((o) => o.value === data.serviceType)?.key ?? "serviceDriverCar") : "—"}</p>
             {data.cargoCategory && (
-              <p><strong>{t("cargoWhatToTransport")}:</strong> {t(CARGO_CATEGORIES.find((c) => c.id === data.cargoCategory)?.labelKey ?? "cargoCatMisc")}</p>
+              <p><strong>{t("cargoWhatToTransport")}:</strong> {t(CARGO_CATEGORIES.find((c) => c.id === data.cargoCategory)?.labelKey ?? "cargoCatGeneralOther")}</p>
             )}
             <p><strong>{t("cargoSize")}:</strong> {t(`cargo${data.cargoSize}` as "cargoXS")}</p>
             {(data.cargoLengthCm > 0 || data.cargoWidthCm > 0 || data.cargoHeightCm > 0 || data.cargoWeightKg > 0 || data.cargoType) && (

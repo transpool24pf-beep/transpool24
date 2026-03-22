@@ -3,7 +3,7 @@ import { createServerSupabase } from "@/lib/supabase";
 import { calculatePriceCents } from "@/lib/pricing";
 import { getPricingSettings } from "@/lib/settings";
 import { getRouteDistanceAndDuration } from "@/lib/route-distance-server";
-import { getLoadUnloadMinutes } from "@/lib/cargo";
+import { getLoadUnloadMinutes, isCargoCategoryId } from "@/lib/cargo";
 import { randomBytes, randomInt } from "crypto";
 
 const VALID_CARGO = ["XS", "M", "L"] as const;
@@ -45,6 +45,11 @@ export async function POST(req: Request) {
         { error: "Missing or invalid order fields" },
         { status: 400 }
       );
+    }
+
+    const cargoCat = cargoDetails && typeof cargoDetails === "object" ? (cargoDetails as { cargoCategory?: unknown }).cargoCategory : undefined;
+    if (cargoCat == null || cargoCat === "" || !isCargoCategoryId(cargoCat)) {
+      return NextResponse.json({ error: "CARGO_CATEGORY_REQUIRED" }, { status: 400 });
     }
 
     const departureTime =

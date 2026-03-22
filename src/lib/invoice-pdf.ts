@@ -1,6 +1,7 @@
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import type { Job } from "./supabase";
 import { PDF_COMPANY, getPdfLogoBytes } from "./pdf-company";
+import { cargoCategoryLabelDe } from "./cargo";
 
 export type InvoiceType = "customer" | "driver";
 
@@ -117,7 +118,7 @@ export async function generateInvoicePdf(
   draw(`Lieferung: ${job.delivery_address}${job.delivery_city ? `, ${job.delivery_city}` : ""}`);
   draw(`Ladung: ${job.cargo_size}`);
   const cd = job.cargo_details as Record<string, unknown> | null;
-  if (cd?.cargoCategory) draw(`Kategorie: ${String(cd.cargoCategory)}`);
+  if (cd?.cargoCategory) draw(`Kategorie: ${cargoCategoryLabelDe(String(cd.cargoCategory))}`);
   if (cd?.cargoLengthCm != null || cd?.cargoWidthCm != null || cd?.cargoHeightCm != null) {
     const l = cd.cargoLengthCm != null ? `${cd.cargoLengthCm}` : "-";
     const w = cd.cargoWidthCm != null ? `${cd.cargoWidthCm}` : "-";

@@ -1,6 +1,7 @@
 import { Resend } from "resend";
 import type { Job } from "./supabase";
 import { generateInvoicePdf } from "./invoice-pdf";
+import { cargoCategoryLabelDe } from "./cargo";
 
 const DEFAULT_FROM = "TransPool24 <onboarding@resend.dev>";
 
@@ -89,6 +90,12 @@ function buildConfirmationHtml(
     companyName && companyName !== "Kunde"
       ? `<p style="margin:6px 0 0 0; font-size:16px; color:#334155;">${escapeHtml(companyName)}</p>`
       : "";
+  const cd = job.cargo_details as Record<string, unknown> | null;
+  const cargoCatRaw = cd?.cargoCategory;
+  const cargoCategoryDe =
+    typeof cargoCatRaw === "string" && cargoCatRaw.length > 0
+      ? cargoCategoryLabelDe(cargoCatRaw)
+      : null;
 
   return `
 <!DOCTYPE html>
@@ -111,6 +118,7 @@ function buildConfirmationHtml(
           <tr style="background: #f8fafc;"><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Abholung</td><td style="border-bottom: 1px solid #e2e8f0;">${escapeHtml(job.pickup_address)}${job.pickup_city ? `, ${job.pickup_city}` : ""}</td></tr>
           <tr><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Lieferung</td><td style="border-bottom: 1px solid #e2e8f0;">${escapeHtml(job.delivery_address)}${job.delivery_city ? `, ${job.delivery_city}` : ""}</td></tr>
           <tr style="background: #f8fafc;"><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Ladung / Distanz</td><td style="border-bottom: 1px solid #e2e8f0;">${job.cargo_size}, ${job.distance_km ?? "—"} km</td></tr>
+          ${cargoCategoryDe ? `<tr><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Warenkategorie</td><td style="border-bottom: 1px solid #e2e8f0;">${escapeHtml(cargoCategoryDe)}</td></tr>` : ""}
           <tr><td style="color: #64748b;">Gesamtbetrag</td><td style="font-weight: bold;">€ ${totalEur}</td></tr>
         </table>
         <p style="margin: 16px 0 0 0; font-size: 14px; color: #64748b;">Sie können die Vertragsdetails in Ihrem Produktzugang in der Auftragszusammenfassung unten einsehen. Der angehängte PDF enthält Details zur Fahrt, zum Fahrer und zu den Firmeninformationen.</p>
@@ -287,6 +295,11 @@ function buildTrackingUpdateHtml(
         })
       : null;
   const distStr = job.distance_km != null ? `${job.distance_km} km` : "—";
+  const cdTrack = job.cargo_details as Record<string, unknown> | null;
+  const cargoCatTrack =
+    typeof cdTrack?.cargoCategory === "string" && cdTrack.cargoCategory.length > 0
+      ? cargoCategoryLabelDe(cdTrack.cargoCategory)
+      : null;
 
   const driverBlock =
     options.driver && options.driver.full_name
@@ -340,6 +353,7 @@ function buildTrackingUpdateHtml(
         <p style="margin:0 0 18px 0; font-size:14px; color:#64748b;">Auftragsnummer: <strong>#${escapeHtml(orderRef)}</strong><br />
         Status: <strong>${escapeHtml(statusDe)}</strong><br />
         Distanz (ca.): <strong>${escapeHtml(distStr)}</strong></p>
+        ${cargoCatTrack ? `<p style="margin:-8px 0 14px 0; font-size:14px; color:#64748b;">Warenkategorie: <strong>${escapeHtml(cargoCatTrack)}</strong></p>` : ""}
         ${etaDe ? `<p style="margin:-12px 0 18px 0; font-size:14px; color:#0f766e;">Voraussichtliche Ankunft: <strong>${escapeHtml(etaDe)}</strong></p>` : ""}
         ${driverBlock}
         <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse:collapse; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:18px;">

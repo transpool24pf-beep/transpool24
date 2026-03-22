@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { cargoCategoryLabelDe } from "@/lib/cargo";
 
 type Job = {
   id: string;
@@ -121,6 +122,10 @@ function buildWhatsAppMessage(o: Job): string {
     `${IC.ruler} Distanz: ${distanceStr}`,
     "",
     `${IC.truck} Ladung (Größe): ${o.cargo_size}`,
+    ...(typeof (o.cargo_details as { cargoCategory?: unknown } | null)?.cargoCategory === "string" &&
+    String((o.cargo_details as { cargoCategory: string }).cargoCategory).length > 0
+      ? [`${IC.clipboard} Warenkategorie: ${cargoCategoryLabelDe((o.cargo_details as { cargoCategory: string }).cargoCategory)}`]
+      : []),
     ...(volumeStr ? [`${IC.package} Maße (L×B×H): ${volumeStr}`] : []),
     ...(weightKg != null ? [`${IC.scale} Gewicht: ${weightKg} kg`] : []),
     `${IC.lorry} Leistung: ${serviceLabel}`,
@@ -676,6 +681,14 @@ export default function AdminOrderDetailPage({
               <dt className="text-[#0d2137]/60">Ladung (Größe)</dt>
               <dd>{order.cargo_size}</dd>
             </div>
+            {order.cargo_details &&
+              typeof (order.cargo_details as { cargoCategory?: unknown }).cargoCategory === "string" &&
+              String((order.cargo_details as { cargoCategory: string }).cargoCategory).length > 0 && (
+                <div>
+                  <dt className="text-[#0d2137]/60">Warenkategorie</dt>
+                  <dd>{cargoCategoryLabelDe((order.cargo_details as { cargoCategory: string }).cargoCategory)}</dd>
+                </div>
+              )}
             {(order.cargo_details && (typeof (order.cargo_details as { weightKg?: number }).weightKg === "number" || typeof (order.cargo_details as { cargoWeightKg?: number }).cargoWeightKg === "number")) && (
               <div>
                 <dt className="text-[#0d2137]/60">Gewicht</dt>
