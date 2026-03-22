@@ -6,36 +6,8 @@ import { usePathname } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { useState, useRef, useEffect } from "react";
 import { locales, type Locale } from "@/i18n/routing";
-
-const localeFlags: Record<Locale, string> = {
-  de: "🇩🇪",
-  en: "🇬🇧",
-  tr: "🇹🇷",
-  fr: "🇫🇷",
-  es: "🇪🇸",
-  ar: "🇸🇦",
-  ru: "🇷🇺",
-  pl: "🇵🇱",
-  ro: "🇷🇴",
-  ku: "🌐",
-  it: "🇮🇹",
-  uk: "🇺🇦",
-};
-
-const localeLabels: Record<Locale, string> = {
-  de: "DE",
-  en: "EN",
-  tr: "TR",
-  fr: "FR",
-  es: "ES",
-  ar: "AR",
-  ru: "RU",
-  pl: "PL",
-  ro: "RO",
-  ku: "KU",
-  it: "IT",
-  uk: "UK",
-};
+import { LOCALE_NATIVE_LABEL, LOCALE_SHORT_CODE } from "@/lib/locale-display";
+import { LocaleFlagIcon } from "@/components/LocaleFlagIcon";
 
 type HeaderProps = { hideLogo?: boolean };
 
@@ -98,22 +70,36 @@ export function Header({ hideLogo }: HeaderProps) {
               type="button"
               onClick={() => setLangOpen((o) => !o)}
               className="flex items-center gap-1 rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm font-medium text-[var(--foreground)]"
+              aria-expanded={langOpen}
+              aria-haspopup="listbox"
             >
-              {localeLabels[locale]} ▾
+              {LOCALE_SHORT_CODE[locale]} ▾
             </button>
             {langOpen && (
-              <div className="absolute right-0 top-full z-[60] mt-1 max-h-[min(70vh,22rem)] w-48 overflow-y-auto rounded-lg border border-[#0d2137]/10 bg-[var(--background)] py-1 shadow-lg">
-                {locales.map((loc) => (
-                  <Link
-                    key={loc}
-                    href={`/${loc}${basePath === "/" ? "" : basePath}`}
-                    className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-[#0d2137]/5"
-                    onClick={() => setLangOpen(false)}
-                  >
-                    <span className="text-base">{localeFlags[loc]}</span>
-                    {localeLabels[loc]}
-                  </Link>
-                ))}
+              <div
+                className="absolute right-0 top-full z-[60] mt-1 w-[min(22rem,calc(100vw-1.25rem))] rounded-xl border border-[#0d2137]/10 bg-[var(--background)] p-3 shadow-lg"
+                role="listbox"
+              >
+                <p className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-[#0d2137]/55">
+                  {t("language")}
+                </p>
+                <div className="grid grid-cols-2 gap-x-2 gap-y-0.5">
+                  {locales.map((loc) => (
+                    <Link
+                      key={loc}
+                      href={`/${loc}${basePath === "/" ? "" : basePath}`}
+                      role="option"
+                      aria-selected={loc === locale}
+                      className={`flex min-w-0 items-center gap-2 rounded-lg px-2 py-2 text-sm transition hover:bg-[#0d2137]/5 ${
+                        loc === locale ? "bg-[#0d2137]/[0.07] font-medium text-[#0d2137]" : "text-[var(--foreground)]"
+                      }`}
+                      onClick={() => setLangOpen(false)}
+                    >
+                      <LocaleFlagIcon locale={loc} />
+                      <span className="min-w-0 truncate leading-tight">{LOCALE_NATIVE_LABEL[loc]}</span>
+                    </Link>
+                  ))}
+                </div>
               </div>
             )}
           </div>

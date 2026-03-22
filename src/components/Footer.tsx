@@ -7,21 +7,8 @@ import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { locales, type Locale } from "@/i18n/routing";
 import type { SiteSocialMediaPayload } from "@/lib/site-social-media";
-
-const localeLabels: Record<Locale, string> = {
-  de: "DE",
-  en: "EN",
-  tr: "TR",
-  fr: "FR",
-  es: "ES",
-  ar: "AR",
-  ru: "RU",
-  pl: "PL",
-  ro: "RO",
-  ku: "KU",
-  it: "IT",
-  uk: "UK",
-};
+import { LOCALE_NATIVE_LABEL } from "@/lib/locale-display";
+import { LocaleFlagIcon } from "@/components/LocaleFlagIcon";
 
 const FALLBACK_LINKEDIN = "https://www.linkedin.com/in/trans-pool-1235803b8";
 const FALLBACK_INSTAGRAM = "https://www.instagram.com/transpool24/";
@@ -207,21 +194,24 @@ export function Footer() {
               >
                 transpool24.com
               </a>
-              <div className="flex flex-wrap items-center gap-2 border-white/10 sm:border-s sm:ps-4">
+              <div className="flex flex-col gap-2 border-white/10 sm:border-s sm:ps-4">
                 <span className="text-white/50">{t("languageLabel")}</span>
-                {locales.map((loc) => (
-                  <Link
-                    key={loc}
-                    href={`/${loc}${basePath === "/" ? "" : basePath}`}
-                    className={
-                      loc === locale
-                        ? "rounded-md bg-white/15 px-2 py-1 font-semibold text-white"
-                        : "rounded-md px-2 py-1 text-white/75 hover:bg-white/10 hover:text-white"
-                    }
-                  >
-                    {localeLabels[loc]}
-                  </Link>
-                ))}
+                <div className="grid max-w-[22rem] grid-cols-2 gap-x-3 gap-y-1">
+                  {locales.map((loc) => (
+                    <Link
+                      key={loc}
+                      href={`/${loc}${basePath === "/" ? "" : basePath}`}
+                      className={`flex min-w-0 items-center gap-2 rounded-md px-1 py-1 text-left text-[11px] sm:text-xs ${
+                        loc === locale
+                          ? "bg-white/15 font-semibold text-white"
+                          : "text-white/75 hover:bg-white/10 hover:text-white"
+                      }`}
+                    >
+                      <LocaleFlagIcon locale={loc} />
+                      <span className="min-w-0 truncate">{LOCALE_NATIVE_LABEL[loc]}</span>
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
