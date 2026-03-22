@@ -15,7 +15,7 @@ type Props = {
 
 /**
  * DotLottie via LottieFiles web component.
- * Loads the script once (Next dedupes by URL); mounts the player imperatively for React compatibility.
+ * Uses customElements.whenDefined so every instance becomes ready (Next may dedupe Script; onLoad is not guaranteed per instance).
  */
 export function OrderRouteLottie({
   src = DOTLOTTIE_ROUTE_PIN,
@@ -23,13 +23,38 @@ export function OrderRouteLottie({
   size = "md",
   className = "",
 }: Props) {
-  const [scriptReady, setScriptReady] = useState(false);
+  const [playerReady, setPlayerReady] = useState(false);
   const playerRef = useRef<HTMLDivElement>(null);
   const dim =
     size === "sm" ? 88 : size === "lg" ? 132 : size === "xl" ? 220 : 120;
 
   useEffect(() => {
-    if (!scriptReady || !playerRef.current) return;
+    if (typeof window === "undefined") return;
+
+    const markReady = () => setPlayerReady(true);
+
+    if (customElements.get("dotlottie-wc")) {
+      markReady();
+      return;
+    }
+
+    let cancelled = false;
+    customElements.whenDefined("dotlottie-wc").then(() => {
+      if (!cancelled) markReady();
+    });
+
+    const fallback = window.setTimeout(() => {
+      if (!cancelled && customElements.get("dotlottie-wc")) markReady();
+    }, 12_000);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(fallback);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!playerReady || !playerRef.current) return;
     const host = playerRef.current;
     host.replaceChildren();
     const el = document.createElement("dotlottie-wc");
@@ -43,13 +68,13 @@ export function OrderRouteLottie({
     return () => {
       host.replaceChildren();
     };
-  }, [scriptReady, dim, src]);
+  }, [playerReady, dim, src]);
 
   return (
     <div className={`flex flex-col items-center justify-center gap-2 ${className}`}>
-      <Script src={DOTLOTTIE_WC_SCRIPT} strategy="lazyOnload" type="module" onLoad={() => setScriptReady(true)} />
+      <Script src={DOTLOTTIE_WC_SCRIPT} strategy="afterInteractive" type="module" />
       <div className="relative" style={{ width: dim, height: dim }}>
-        {!scriptReady && (
+        {!playerReady && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
             <span
               className="h-9 w-9 animate-spin rounded-full border-2 border-[var(--accent)]/25 border-t-[var(--accent)]"

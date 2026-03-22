@@ -58,10 +58,13 @@ body {
 
 .order-lottie-drift-a {
   animation: order-lottie-drift-a 4.5s ease-in-out infinite;
+  will-change: transform;
 }
 
 .order-lottie-drift-b {
   animation: order-lottie-drift-b 4.5s ease-in-out infinite;
+  animation-delay: -2.25s;
+  will-change: transform;
 }
 
 /* Customer tracking: live driver position = large round photo (readable at map zoom) */
