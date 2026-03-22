@@ -95,6 +95,10 @@ export function WebsiteShell({ children }: { children: React.ReactNode }) {
           <span>
             Buchung (/order): Lottie Strecke/Zusammenfassung · seitliche Truck-Dekor (Desktop, gegenläufig) · Fahrer (/driver): Live-Tracking-Hinweis
           </span>
+          <br />
+          <span className="mt-1 inline-block" dir="rtl">
+            صفحة الحجز (/order): Lottie المسار والملخص · شاحنتان جانبيتان (سطح المكتب، حركة متعاكسة) · السائق (/driver): تلميح التتبع المباشر
+          </span>
         </footer>
       </main>
       <aside className="sticky top-14 h-[calc(100vh-3.5rem)] w-56 shrink-0 border-l border-[#0d2137]/10 bg-white shadow-sm">
