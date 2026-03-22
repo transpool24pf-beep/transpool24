@@ -1,0 +1,9 @@
+-- Optional: After deploying new B2B defaults in code (src/lib/why-defaults-*.ts),
+-- run this in Supabase SQL Editor if old marketing copy is still stored in CMS.
+-- Rows in why_transpool24_locale override code defaults for public /[locale]/why.
+--
+-- Entire table (all locales fall back to app defaults):
+-- DELETE FROM why_transpool24_locale;
+--
+-- Or only Arabic:
+-- DELETE FROM why_transpool24_locale WHERE locale = 'ar';

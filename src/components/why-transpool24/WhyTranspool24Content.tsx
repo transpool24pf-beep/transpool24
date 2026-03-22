@@ -1,10 +1,13 @@
 import Link from "next/link";
+import type { WhyIconId } from "@/lib/why-transpool24-types";
 import type { WhyPagePayload } from "@/lib/why-transpool24-types";
 import { WhyTranspool24Icon } from "./WhyTranspool24Icon";
 import { WhyHowItWorksMedia } from "./WhyHowItWorksMedia";
 import { WhyCmsImage } from "./WhyCmsImage";
 
 type Props = { data: WhyPagePayload; locale: string };
+
+const SERVICE_CARD_ICONS: WhyIconId[] = ["package", "truck", "clipboard", "shield"];
 
 export function WhyTranspool24Content({ data, locale }: Props) {
   const rtl = locale === "ar";
@@ -27,16 +30,16 @@ export function WhyTranspool24Content({ data, locale }: Props) {
           <div className="grid gap-10 px-6 py-10 sm:gap-12 sm:px-10 sm:py-12 lg:grid-cols-12 lg:gap-14">
             <div className="lg:col-span-8">
               <h2 className="text-xl font-bold text-[var(--primary)] sm:text-2xl">{data.introTitle}</h2>
-              <p className="mt-4 leading-relaxed text-[var(--foreground)]/80">{data.introLead}</p>
+              <p className="mt-4 whitespace-pre-line leading-relaxed text-[var(--foreground)]/80">{data.introLead}</p>
 
               <h3 className="mt-10 text-lg font-bold text-[var(--primary)]">{data.h2_1}</h3>
-              <p className="mt-3 leading-relaxed text-[var(--foreground)]/78">{data.p1}</p>
+              <p className="mt-3 whitespace-pre-line leading-relaxed text-[var(--foreground)]/78">{data.p1}</p>
 
               <h3 className="mt-8 text-lg font-bold text-[var(--primary)]">{data.h2_2}</h3>
-              <p className="mt-3 leading-relaxed text-[var(--foreground)]/78">{data.p2}</p>
+              <p className="mt-3 whitespace-pre-line leading-relaxed text-[var(--foreground)]/78">{data.p2}</p>
 
               <h3 className="mt-8 text-lg font-bold text-[var(--primary)]">{data.h2_3}</h3>
-              <p className="mt-3 leading-relaxed text-[var(--foreground)]/78">{data.p3}</p>
+              <p className="mt-3 whitespace-pre-line leading-relaxed text-[var(--foreground)]/78">{data.p3}</p>
             </div>
 
             <aside className="lg:col-span-4">
@@ -77,18 +80,18 @@ export function WhyTranspool24Content({ data, locale }: Props) {
 
           <div className="px-6 py-10 sm:px-10 sm:py-12">
             <h2 className="text-xl font-bold text-[var(--primary)] sm:text-2xl">{data.servicesTitle}</h2>
-            <p className="mt-3 max-w-3xl text-[var(--foreground)]/75">{data.servicesIntro}</p>
-            <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <p className="mt-3 max-w-3xl whitespace-pre-line text-[var(--foreground)]/75">{data.servicesIntro}</p>
+            <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-2">
               {data.serviceTypes.map((s, i) => (
                 <div
                   key={i}
                   className="rounded-2xl border border-[#0d2137]/10 bg-white p-6 shadow-sm transition hover:border-[var(--accent)]/25 hover:shadow-md"
                 >
                   <div className="mb-3 text-[var(--accent)]">
-                    <WhyTranspool24Icon id={i === 0 ? "package" : i === 1 ? "truck" : "shield"} />
+                    <WhyTranspool24Icon id={SERVICE_CARD_ICONS[i] ?? "package"} />
                   </div>
                   <h3 className="font-bold text-[var(--primary)]">{s.name}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-[var(--foreground)]/72">{s.body}</p>
+                  <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-[var(--foreground)]/72">{s.body}</p>
                 </div>
               ))}
             </div>
@@ -96,14 +99,14 @@ export function WhyTranspool24Content({ data, locale }: Props) {
 
           <div className="border-t border-[#0d2137]/6 px-6 py-10 sm:px-10 sm:py-12">
             <h2 className="text-xl font-bold text-[var(--primary)] sm:text-2xl">{data.platformTitle}</h2>
-            <p className="mt-4 max-w-3xl leading-relaxed text-[var(--foreground)]/78">{data.platformBody}</p>
+            <p className="mt-4 max-w-3xl whitespace-pre-line leading-relaxed text-[var(--foreground)]/78">{data.platformBody}</p>
           </div>
 
           <div className="px-6 pb-10 sm:px-10 sm:pb-12">
             <h2 className="text-xl font-bold text-[var(--primary)] sm:text-2xl">{data.completingTitle}</h2>
-            <p className="mt-4 leading-relaxed text-[var(--foreground)]/78">{data.completingP1}</p>
-            <p className="mt-4 leading-relaxed text-[var(--foreground)]/78">{data.completingP2}</p>
-            <p className="mt-4 leading-relaxed text-[var(--foreground)]/78">{data.completingP3}</p>
+            <p className="mt-4 whitespace-pre-line leading-relaxed text-[var(--foreground)]/78">{data.completingP1}</p>
+            <p className="mt-4 whitespace-pre-line leading-relaxed text-[var(--foreground)]/78">{data.completingP2}</p>
+            <p className="mt-4 whitespace-pre-line leading-relaxed text-[var(--foreground)]/78">{data.completingP3}</p>
             <p className="mt-8 text-lg font-medium text-[var(--accent)]">{data.closingLine}</p>
           </div>
 

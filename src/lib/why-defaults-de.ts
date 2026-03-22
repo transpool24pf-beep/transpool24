@@ -1,96 +1,100 @@
 import type { WhyPagePayload } from "./why-transpool24-types";
 
+/** B2B focus: companies, wholesale, retail, workshops — no private flat moves as core offer */
 export const whyPageDe: WhyPagePayload = {
-  metaTitle: "Warum TransPool24? | Leistungen, Vorteile & FAQ",
+  metaTitle: "Warum TransPool24? | B2B-Transport Pforzheim & Region",
   heroBadge: "Pforzheim · Baden-Württemberg · Deutschland",
-  headline: "Warum Unternehmen und Privatkunden TransPool24 wählen",
+  headline: "Warum Unternehmen und gewerbliche Partner TransPool24 nutzen",
   heroSub:
-    "Transporte online buchen mit klaren Preisen, geprüften Fahrern und schneller Abwicklung — vergleichbar mit Marktplätzen wie Shiply, aber mit Fokus auf unsere Region und Ihre Sprache.",
-  sidebarTitle: "Viele nutzen regionale Logistik-Plattformen",
+    "Wir organisieren Straßentransporte für Betriebe, Großhandel, Märkte und Werkstätten zwischen Pforzheim, Karlsruhe und der Region — mit klaren Preisen, verlässlichen Fahrern und digitaler Buchung. Kein Fokus auf private Wohnungsumzüge oder Möbeltransport als Kerngeschäft.",
+  sidebarTitle: "Was Gewerbekunden schätzen",
   sidebar: [
     {
       icon: "zap",
-      title: "Schnell & einfach",
-      body: "Buchung in wenigen Minuten: Adressen, Ladungsgröße und Leistungsart — danach sicher online bezahlen. Weniger Hin und Her am Telefon.",
+      title: "Schnell & planbar",
+      body: "Route, Fahrzeugkategorie und Leistungsstufe online — Festpreis vor der Zahlung. Ideal für Ersatzteile, Paletten und terminkritische Touren.",
     },
     {
       icon: "shield",
-      title: "Transparent & fair",
-      body: "Festpreis nach Entfernung und Kategorie. Sie sehen den Preis vor der Bestätigung — ohne versteckte Zusatzkosten.",
+      title: "Verlässlich statt Paket-Chaos",
+      body: "Sensible Ladung braucht einen zuverlässigen Carrier — nicht einen Standardpaketdienst, bei dem Sendungen „untergehen“. Klare Übergaben und nachvollziehbare Abläufe.",
     },
     {
       icon: "clipboard",
-      title: "Bewertete Fahrer",
-      body: "Unsere Fahrer werden von Kundinnen und Kunden bewertet. Sie arbeiten mit Profis, die Pforzheim und Routen in Deutschland kennen.",
+      title: "Regionale Profis",
+      body: "Fahrer, die Pforzheim, die Autoland-Region und Karlsruhe kennen — inkl. Zufahrten zu Autohäusern, Großmarkt und Industriegebieten.",
     },
   ],
-  introTitle: "Wenn Paketdienste nicht reichen",
+  introTitle: "Fokus auf Gewerbe & Handel — keine Privatumzüge",
   introLead:
-    "Möbel, Fahrzeuge, Paletten oder eilige Sendungen brauchen mehr als ein kleines Paketlabel. TransPool24 bringt Sie mit dem passenden Fahrzeug und Fahrer zusammen — ob Mann mit Transporter, Fahrzeugtransport oder sorgsame Handhabung wertvoller Güter.",
+    "TransPool24 richtet sich an Unternehmen: Fabriken, Großhändler, Supermärkte, Autohäuser, Druckereien und Zulieferer. Private Möbel- oder Wohnungsumzüge sind nicht unser Kerngeschäft.\n\nWir verbinden Sie mit passendem Fahrzeug und Fahrer für Paletten, Maschinenteile, trockene Lebensmittelkartons und mehr — transparent und buchbar wie eine moderne Logistikplattform.",
   h2_1: "Was ist TransPool24?",
-  p1: "TransPool24 ist eine digitale Buchungsplattform für Straßentransporte in und um Pforzheim, mit Reichweite in ganz Deutschland. Sie beschreiben Ihre Sendung, wählen die Leistungsstufe (nur Fahrer, Fahrer mit Fahrzeug, mit Helfer) und schließen die Zahlung online ab — wir steuern die Ausführung mit professionellen Fahrern.",
-  h2_2: "Tipps für eine reibungslose Buchung",
-  p2: "Maße und Gewicht möglichst genau angeben. Fotos helfen Fahrern bei der Fahrzeugwahl. Bei flexiblen Terminen ist die Verfügbarkeit oft besser. Wertvolle Güter sollten Sie frühzeitig benennen.",
-  h2_3: "Welche Transportarten wir abdecken",
-  p3: "Von Möbeln und Umzügen über Fahrzeuge, Motorräder, Paletten und Industriegüter — wir organisieren die passende Kapazität. Empfindliche oder hochwertige Sendungen sollten deklariert werden, damit Polster, Zurrgurte und Versicherungsfragen geklärt werden können.",
-  tipsTitle: "Fünf praktische Tipps vor der Buchung",
-  tipsIntro:
-    "Orientierung an bewährten Abläufen großer Transport-Marktplätze — angepasst an TransPool24.",
+  p1: "Eine digitale Buchungsplattform für gewerblichen Straßentransport in und um Pforzheim mit Reichweite in Baden-Württemberg und deutschlandweit. Sie beschreiben Strecke, Ladung und Leistungsstufe (nur Fahrer, Fahrer mit Fahrzeug, mit Helfer) und zahlen online — wir koordinieren die Ausführung mit professionellen Fahrern.\n\nGeeignet für B2B-Sendungen: vom Stapler-tauglichen Palettenauftrag bis zu sensiblen Ersatzteillieferungen.",
+  h2_2: "Die Region als Wirtschaftsraum",
+  p2: "Pforzheim (Goldstadt) steht für Schmuck, Uhren und Präzisionsmechanik. Baden-Württemberg ist Herzstück der Automobilindustrie — Mercedes, Porsche und ein dichtes Netz aus Autohäusern und Ersatzteillagern.\n\nDazwischen: Großhandel für Gastronomie und Einzelhandel in Karlsruhe, Druckereien und Verpackungsbetriebe. Genau dort entstehen die Touren, die wir unterstützen — zwischen Werk, Lager, Werkstatt und Markt.",
+  h2_3: "Warum Firmen mit uns fahren",
+  p3: "• Zuverlässigkeit: feste Ansprechpartner, klare Zeitfenster, dokumentierte Übergaben wo nötig.\n• Paletten & Stapler: viele Sendungen sind volle Paletten — effizientes Be- und Entladen mit Stapler möglich.\n• Faire Preise vor dem Kauf: Entfernung, Kategorie und Leistungsstufe bestimmen den Preis — ohne versteckte Post-Capture-Gebühren.\n• Kein Möbel-Umzugsportal: unser Auftraggeber ist typischerweise das Gewerbe, nicht der private Sofa-Umzug.",
+  tipsTitle: "Fünf Tipps für gewerbliche Buchungen",
+  tipsIntro: "Praxisnah für Lager, Werkstätten und Disposition — angepasst an TransPool24.",
   tips: [
     {
-      title: "Zufahrt und Zugang genau beschreiben",
+      title: "Palettenmaß und Zufahrt nennen",
       detail:
-        "Treppen, enge Straßen, Ladezonen und Zeitfenster erwähnen. Das vermeidet Überraschungen und hält die Preisgestaltung fair.",
+        "EU-Palette, Hubhöhe, Rampe oder Bordstein — das hilft, Fahrzeug und Zeit für Be-/Entladen richtig zu planen.",
+    },
+    {
+      title: "Ansprechpartner und Avis",
+      detail:
+        "Name und Telefon am Tor oder in der Warenannahme sparen Wartezeiten und vermeiden Suchfahrten.",
     },
     {
       title: "Fotos bei ungewöhnlicher Ladung",
       detail:
-        "Ein Bild der Ware und der Abholsituation hilft bei Fahrzeuggröße und Ladezeit.",
+        "Maschinenteile, sperrige Kartons oder empfindliche Verpackung — ein Bild erleichtert die Fahrzeugwahl.",
     },
     {
-      title: "Realistische Zeitplanung",
+      title: "Zeitfenster realistisch wählen",
       detail:
-        "Same-Day ist nicht immer möglich. Ein halber oder ganzer Tag Spielraum verbessert die Zuordnung.",
+        "Same-Day ist nicht immer frei. Ein halber oder ganzer Tag erhöht die Chance auf passenden Fahrer.",
     },
     {
-      title: "Kontaktdaten aktuell halten",
+      title: "Leistungsstufe passend wählen",
       detail:
-        "Erreichbare Telefonnummer und WhatsApp am Abholtag erleichtern die Übergabe.",
-    },
-    {
-      title: "Leistungsstufe früh festlegen",
-      detail:
-        "Nur Fahrer vs. mit Fahrzeug vs. mit Helfer ändert Aufwand und Preis — wählen Sie, was Sie wirklich brauchen.",
+        "Nur Fahrer vs. Fahrzeug vs. Helfer beeinflussen Aufwand und Preis — so buchen, wie die Rampe und das Gewicht es erfordern.",
     },
   ],
-  servicesTitle: "Transport- und Zustellleistungen",
+  servicesTitle: "Beispiele: Branchen, mit denen wir arbeiten",
   servicesIntro:
-    "Je nach Größe, Gewicht und Risiko gelten unterschiedliche Modelle — vergleichbar mit Kategorien großer Kuriermarktplätze.",
+    "Auszug aus der Region — kein Anspruch auf Vollständigkeit. Ihre Branche passt auch, wenn es um B2B-Transport auf der Straße geht.",
   serviceTypes: [
     {
-      name: "Mann mit Transporter / kleine Umzüge",
-      body: "Ideal für Möbel, Geräte und Touren in der Region. Verladung und Sicherung werden eingeplant.",
+      name: "Schmuck, Uhren & Präzision (Goldstadt Pforzheim)",
+      body: "Pforzheim ist für Gold, Schmuck und feinmechanische Anlagen bekannt.\n\nWas wir typischerweise fahren: Ersatzteile für Maschinen, nicht-wertvolle Rohstoffe in Versandkartons, oder große Lieferungen von Herstellern zu Händlern und nach Karlsruhe.\n\nVorteil: Diese Unternehmen zahlen für Zuverlässigkeit — sensible Ladung braucht einen vertrauenswürdigen Carrier, nicht einen Paketdienst, bei dem Sendungen verloren gehen.",
     },
     {
-      name: "Fahrzeug- & Motorradtransport",
-      body: "PKW und Motorräder brauchen Zurrgurte, Rampen oder Anhänger. Wir arbeiten mit Fahrern, die legale, versicherte Transporte anbieten.",
+      name: "KFZ-Ersatzteile & Autohäuser",
+      body: "Baden-Württemberg ist das Zentrum von Mercedes, Porsche und einem dichten Netz aus Werkstätten und Teilelagern.\n\nMit wem: große Autohäuser (Autohäuser), Teilegroßhändler und Zulieferer.\n\nWas wir fahren: Motoren, Getriebe oder eilige Ersatzteile, wenn das Fahrzeug des Endkunden in der Werkstatt steht.\n\nVorteil: Nachfrage ist häufig und planbar; die Honorierung für professionelle Ausführung ist solide.",
     },
     {
-      name: "Empfindliche & wertvolle Güter",
-      body: "Antiquitäten, Glas, Maschinen: Wert und Empfindlichkeit angeben. Fahrer können zusätzlichen Schutz vorschlagen.",
+      name: "Lebensmittel & Getränke (trocken, Karton)",
+      body: "Fokus auf trockene Ware ohne Kühlkette — damit bleiben Auflagen überschaubar.\n\nMit wem: Großhändler (Großhandel), die Restaurants und Supermärkte in Karlsruhe und Umgebung beliefern.\n\nWas wir fahren: Öl in Kartons, Konserven, Limonaden, Reinigungsmittel in Großgebinden.\n\nVorteil: stabile, schwere Ladung; langfristige Bezugsbeziehungen sind üblich.",
+    },
+    {
+      name: "Druckereien & Verpackung",
+      body: "Zwischen Pforzheim und Karlsruhe sitzen große Druck- und Verpackungsbetriebe.\n\nWas wir fahren: Paletten Papier, gedruckte Broschüren, Kartonagen für Industriekunden.\n\nVorteil: oft volle Paletten — Be- und Entladen geht schnell mit dem Gabelstapler (Stapler).",
     },
   ],
-  platformTitle: "So nutzen Sie TransPool24 für Ihre Sendung",
+  platformTitle: "So nutzen Sie TransPool24 als Firma",
   platformBody:
-    "Sie geben Abholung und Ziel, Kategorie und Wunschtermin ein. Sie erhalten einen klaren Preis, zahlen online, und wir weisen einen passenden Fahrer zu. Sie können den Fortschritt verfolgen und den Support bei Änderungen erreichen.",
-  completingTitle: "Die Zustellung erfolgreich abschließen",
+    "Sie tragen Abholung und Ziel, Kategorie (XS/M/L), Gewicht und Leistungsstufe ein. Sie sehen den Preis vor der Zahlung und buchen online. Wir weisen einen passenden Fahrer zu — Sie können den Ablauf verfolgen und den Support bei Änderungen erreichen.\n\nBuchungen richten sich an gewerbliche und institutionelle Auftraggeber; bei Fragen zu Sonderfällen hilft unser Team.",
+  completingTitle: "Zustellung professionell abschließen",
   completingP1:
-    "Vor der Abholung klären, wer übergibt, und bei Bedarf den Zustand dokumentieren (Fotos). Das erleichtert Rückfragen nach der Fahrt.",
+    "Klären Sie vor Abholung, wer die Ware übergibt, und dokumentieren Sie bei Bedarf den Zustand (Fotos) — das erleichtert Rückfragen.",
   completingP2:
-    "Am Transporttag erreichbar bleiben. Bei Zugangs- oder Zeitänderungen den Fahrer früh informieren.",
+    "Dispositions- oder Warenannahme soll am Liefertag erreichbar sein. Änderungen an Tor oder Zeit bitte früh mitteilen.",
   completingP3:
-    "Nach der Lieferung hilft Ihr Feedback, die Qualität zu sichern und anderen Kunden bei der Entscheidung.",
-  closingLine: "Wir freuen uns auf Ihren nächsten Transport — sicher und zuverlässig.",
+    "Ihr Feedback nach der Lieferung hilft, Qualität zu sichern — und anderen B2B-Kunden bei der Entscheidung.",
+  closingLine: "Wir freuen uns auf Ihren nächsten gewerblichen Transport.",
   heroImageUrl: "/images/van1.png",
   sceneImageUrl: "/images/van2.png",
   howVideoUrl: "",
@@ -98,67 +102,63 @@ export const whyPageDe: WhyPagePayload = {
   howSteps: [
     {
       title: "Online buchen",
-      body: "Route, Ladung und Leistungsart eingeben — verbindlichen Preis erhalten und sicher bezahlen.",
+      body: "Route, Ladung und Leistungsstufe — Festpreis sehen und sicher bezahlen.",
     },
     {
-      title: "Wir weisen einen Fahrer zu",
-      body: "Ein Profi-Fahrer wird für Ihr Zeitfenster mit dem passenden Fahrzeug eingeplant.",
+      title: "Fahrer zuweisen",
+      body: "Wir planen einen Profi mit passendem Fahrzeug für Ihr Zeitfenster.",
     },
     {
       title: "Transport & Übergabe",
-      body: "Ihre Güter werden transportiert und übergeben; Sie bleiben informiert.",
+      body: "Die Sendung wird gefahren und übergeben; Sie bleiben informiert.",
     },
   ],
   howCta: "Jetzt Transport buchen",
   faqTitle: "Häufig gestellte Fragen",
   faqs: [
     {
+      q: "Führt TransPool24 Privatumzüge durch?",
+      a: "Unser Fokus liegt auf gewerblichen Auftraggebern: Betriebe, Großhandel, Märkte, Werkstätten und Industrie. Private Wohnungsumzüge sind nicht das Kerngeschäft — bei Ausnahmefällen kontaktieren Sie uns bitte vorab.",
+    },
+    {
       q: "Liefert TransPool24 in meiner Region?",
-      a: "Wir sind in Pforzheim und Umgebung verwurzelt und organisieren Transporte deutschlandweit. Geben Sie Ihre Adressen im Formular ein, um die Verfügbarkeit für Ihre Strecke zu prüfen.",
+      a: "Wir sind in Pforzheim und Umgebung verwurzelt und organisieren Touren in Baden-Württemberg und deutschlandweit. Adressen im Formular prüfen die Machbarkeit.",
     },
     {
-      q: "Welche Fahrzeuggrößen gibt es?",
-      a: "Je nach Ladung von Transportern bis zu größeren Lkw. Genaue Maße und Gewicht helfen, die richtige Fahrzeugklasse zu wählen.",
+      q: "Welche Fahrzeuge gibt es?",
+      a: "Je nach XS/M/L und Gewicht — von Transportern bis größeren Nutzfahrzeugen. Genaue Maße und Paletteninfo verbessern die Zuordnung.",
     },
     {
-      q: "Wie erreiche ich den Support?",
-      a: "Nutzen Sie die Kontakt- und Supportmöglichkeiten auf der Website. Bei Fragen zur Buchung verweisen Sie auf Ihre Bestätigung.",
+      q: "Paletten und Stapler?",
+      a: "Viele B2B-Sendungen sind palettiert. Geben Sie an, ob Rampe, Torhöhe oder Bordsteinabsetzung vorliegt — dann planen wir Zeit und Fahrzeug passend.",
     },
     {
-      q: "Wer führt meinen Transport aus?",
-      a: "TransPool24 arbeitet mit professionellen Fahrern und Partnern. Der Fahrer wird nach Leistungsart und Fahrzeugbedarf zugewiesen.",
+      q: "Kühltransporte?",
+      a: "Unser Schwerpunkt für Lebensmittelbeschreibungen ist trockene Kartonware ohne Kühlkette. Für gekühlte Ware klären Sie bitte Anforderungen vorab mit dem Support.",
     },
     {
       q: "Wann sehe ich den Preis?",
-      a: "Den vollen Preis sehen Sie vor der Zahlung im Checkout. Er basiert auf Entfernung, Kategorie und gewählter Leistungsstufe.",
+      a: "Den vollen Preis sehen Sie vor der Zahlung im Checkout — abhängig von Strecke, Kategorie und Leistungsstufe.",
+    },
+    {
+      q: "Wer führt den Transport aus?",
+      a: "Professionelle Fahrer und Partner. Zuweisung nach Fahrzeugbedarf und gebuchter Leistungsstufe.",
     },
     {
       q: "Kann ich stornieren oder ändern?",
-      a: "Kontaktieren Sie uns schnellstmöglich. Ob Änderungen möglich sind, hängt vom Zeitpunkt und der Fahrerzuweisung ab — wir klären das individuell.",
+      a: "Bitte schnellstmöglich kontaktieren. Möglichkeit hängt vom Zeitpunkt und der Fahrerzuweisung ab.",
     },
     {
-      q: "Werden Güter im Fahrzeug gesichert?",
-      a: "Fahrer sichern Ladung fachgerecht (Gurte, Decken, Verkantung). Besondere Anforderungen bitte bei der Buchung angeben.",
+      q: "Wie erreiche ich den Support?",
+      a: "Über die Kontakt- und Supportwege auf der Website. Für laufende Buchungen: Bestätigung und Auftragsdetails.",
     },
     {
-      q: "Können Sachen in die oberen Stockwerke getragen werden?",
-      a: "Schweres Tragen oder fehlender Aufzug kann einen Helfer oder mehr Zeit erfordern. Wählen Sie „Fahrer mit Helfer“ oder sprechen Sie den Support an.",
+      q: "Ist die Zahlung sicher?",
+      a: "Online-Zahlung über etablierte Anbieter. Bestätigung nach erfolgreicher Zahlung.",
     },
     {
-      q: "Kann ich als Passagier mitfahren?",
-      a: "Personenbeförderung ist nicht Standard. Fragen Sie beim Buchen beim Support — abhängig von Versicherung und Zulassung.",
-    },
-    {
-      q: "Was wenn sich die Lieferadresse ändert?",
-      a: "Informieren Sie uns möglichst vor der Abholung. Routenänderungen können Preis und Zeit beeinflussen.",
-    },
-    {
-      q: "Wie vergleicht sich TransPool24 mit Shiply & Co.?",
-      a: "Plattformen wie Shiply bündeln viele Kurierdienste. TransPool24 bietet ähnliche Transparenz und professionelle Fahrer — mit regionalem Fokus, deutschsprachigem Support und Preisen für unser Netzwerk.",
-    },
-    {
-      q: "Ist meine Zahlung sicher?",
-      a: "Online-Zahlungen laufen über etablierte Zahlungsdienstleister. Nach erfolgreicher Zahlung erhalten Sie eine Bestätigung.",
+      q: "Vergleich zu Marktplätzen wie Shiply?",
+      a: "Ähnliche Idee: transparente Angebote und professionelle Ausführung — mit regionalem Fokus auf Pforzheim/Karlsruhe, deutschsprachigem Support und klarer Ausrichtung auf B2B-Transport.",
     },
   ],
 };
