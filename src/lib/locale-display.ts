@@ -47,3 +47,11 @@ export const LOCALE_EMOJI_FLAG: Record<Locale, string> = {
   it: "🇮🇹",
   uk: "🇺🇦",
 };
+
+/** Label for `<option>` in Website CMS (emoji + name + code; Kurdish has no emoji, use name + code). */
+export function localeCmsSelectLabel(l: Locale): string {
+  const code = LOCALE_SHORT_CODE[l];
+  const name = LOCALE_NATIVE_LABEL[l];
+  if (l === "ku") return `${name} (${code})`;
+  return `${LOCALE_EMOJI_FLAG[l]} ${name} (${code})`;
+}

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { locales, type Locale } from "@/i18n/routing";
+import { localeCmsSelectLabel } from "@/lib/locale-display";
 import { parseFetchJson } from "@/lib/parse-fetch-json";
 import { putFileToSupabaseSignedUrl } from "@/lib/upload-supabase-signed-url";
 import { normalizeWhyAssetUrl } from "@/lib/why-asset-url";
@@ -133,7 +134,7 @@ export function WebsiteWhyMediaClient() {
         >
           {locales.map((l) => (
             <option key={l} value={l}>
-              {l.toUpperCase()}
+              {localeCmsSelectLabel(l)}
             </option>
           ))}
         </select>

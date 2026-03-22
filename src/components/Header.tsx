@@ -69,11 +69,16 @@ export function Header({ hideLogo }: HeaderProps) {
             <button
               type="button"
               onClick={() => setLangOpen((o) => !o)}
-              className="flex items-center gap-1 rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm font-medium text-[var(--foreground)]"
+              className="flex items-center gap-2 rounded-lg border border-[#0d2137]/20 px-2.5 py-2 text-sm font-medium text-[var(--foreground)]"
               aria-expanded={langOpen}
               aria-haspopup="listbox"
+              aria-label={`${t("language")}: ${LOCALE_NATIVE_LABEL[locale]}`}
             >
-              {LOCALE_SHORT_CODE[locale]} ▾
+              <LocaleFlagIcon locale={locale} />
+              <span className="tabular-nums">{LOCALE_SHORT_CODE[locale]}</span>
+              <span className="text-[10px] leading-none text-[#0d2137]/70" aria-hidden>
+                ▾
+              </span>
             </button>
             {langOpen && (
               <div

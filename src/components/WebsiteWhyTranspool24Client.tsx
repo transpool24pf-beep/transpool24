@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { locales, type Locale } from "@/i18n/routing";
+import { localeCmsSelectLabel } from "@/lib/locale-display";
 import { parseFetchJson } from "@/lib/parse-fetch-json";
 
 export function WebsiteWhyTranspool24Client() {
@@ -100,7 +101,7 @@ export function WebsiteWhyTranspool24Client() {
         >
           {locales.map((l) => (
             <option key={l} value={l}>
-              {l.toUpperCase()}
+              {localeCmsSelectLabel(l)}
             </option>
           ))}
         </select>
