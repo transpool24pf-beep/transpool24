@@ -89,7 +89,9 @@ export function WebsiteWhyTranspool24Client() {
         <code className="rounded bg-[#0d2137]/5 px-1">src/lib/why-defaults-*.ts</code>
         ). Zeigt die Live-Seite noch alte Texte (z. B. Möbel / „zerbrechlich“)? Sprache wählen →{" "}
         <strong>Code-Standard</strong> — dann ist der DB-Eintrag gelöscht und die Seite nutzt sofort die neuen
-        B2B-Standardtexte.
+        B2B-Standardtexte. Außerdem: gespeicherte JSON ohne{" "}
+        <code className="rounded bg-[#0d2137]/5 px-1">contentRevision</code> ≥ aktuellem Stand im Code werden
+        automatisch ignoriert — die Live-Seite zeigt dann die Standardtexte aus dem Repository.
       </p>
       <p className="mb-6 rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/[0.03] px-4 py-3 text-sm text-[#0d2137]/75">
         <strong className="text-[#0d2137]">Abschlussbereich (orange CTA + dunkle Fußzeile):</strong> Wird am Ende aller öffentlichen Seiten mit{" "}
