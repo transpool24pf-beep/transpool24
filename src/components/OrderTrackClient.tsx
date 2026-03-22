@@ -143,6 +143,14 @@ export function OrderTrackClient({
     return `https://www.google.com/maps/dir/${encodeURIComponent(job.pickup_address)}/${encodeURIComponent(job.delivery_address)}`;
   }, [job]);
 
+  /** Opens Google Maps centered on live GPS with street-level zoom (better than plain ?q= for tracking). */
+  const googleMapsLiveTrackingUrl = useMemo(() => {
+    if (!hasLivePosition || lat == null || lng == null) return "";
+    const la = lat.toFixed(6);
+    const ln = lng.toFixed(6);
+    return `https://www.google.com/maps/@${la},${ln},17z`;
+  }, [hasLivePosition, lat, lng]);
+
   const showMap = Boolean(
     routePlan ||
       hasLivePosition ||
@@ -338,17 +346,15 @@ export function OrderTrackClient({
         </div>
       )}
 
-      {hasLivePosition && (
-        <div className="rounded-lg border border-[#0d2137]/10 bg-white p-3 text-center text-sm">
-          <a
-            href={`https://www.google.com/maps?q=${lat},${lng}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-medium text-[var(--accent)] hover:underline"
-          >
-            {t("trackMapLink")}
-          </a>
-        </div>
+      {hasLivePosition && googleMapsLiveTrackingUrl && (
+        <a
+          href={googleMapsLiveTrackingUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex w-full items-center justify-center rounded-xl bg-[var(--accent)] px-4 py-3.5 text-center text-sm font-semibold text-white shadow-md transition hover:opacity-95"
+        >
+          {t("trackMapLink")}
+        </a>
       )}
 
       <div className="flex flex-wrap gap-2">

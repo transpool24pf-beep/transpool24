@@ -194,7 +194,7 @@
     "trackDriverPending": "Your driver will appear here as soon as one is assigned. You can still follow the planned route on the map.",
     "trackDistance": "Distance (approx.)",
     "trackMapTitle": "Map & route",
-    "trackMapHint": "Gray dashed line: planned route (pickup → delivery). Orange line: live GPS trail when the driver shares their location. The live marker appears as soon as we receive a position update.",
+    "trackMapHint": "Gray dashed: planned route (pickup → delivery). Orange: live GPS trail. Large round marker: driver photo at the current position. The orange button opens Google Maps zoomed in on that spot for easier live tracking.",
     "trackLiveMarker": "Current vehicle position",
     "trackNoGeocode": "We could not load the automatic map for these addresses. Open the route in Google Maps instead.",
     "trackOpenGoogleDirections": "Open route in Google Maps"

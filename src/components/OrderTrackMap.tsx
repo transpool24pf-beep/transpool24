@@ -23,14 +23,15 @@ function escapeAttr(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/</g, "&lt;");
 }
 
+/** Larger on-map avatar so the driver is easy to recognize (see globals.css sizes). */
 function createDriverPhotoDivIcon(href: string): L.DivIcon {
   const safe = escapeAttr(href);
   return L.divIcon({
     className: "leaflet-driver-photo-marker",
-    html: `<div class="leaflet-driver-photo-marker__inner"><img src="${safe}" alt="" /></div>`,
-    iconSize: [54, 54],
-    iconAnchor: [27, 54],
-    popupAnchor: [0, -48],
+    html: `<div class="leaflet-driver-photo-marker__inner"><img src="${safe}" alt="" decoding="async" fetchpriority="high" /></div>`,
+    iconSize: [92, 92],
+    iconAnchor: [46, 92],
+    popupAnchor: [0, -84],
   });
 }
 
@@ -125,7 +126,7 @@ export function OrderTrackMap({
   if (boundsPoints.length === 0) return null;
 
   return (
-    <div className="h-[300px] w-full overflow-hidden rounded-xl border border-[#0d2137]/10 bg-white shadow-sm">
+    <div className="h-[min(420px,58vh)] min-h-[300px] w-full overflow-hidden rounded-xl border border-[#0d2137]/10 bg-white shadow-sm">
       <MapContainer center={center} zoom={9} className="h-full w-full" scrollWheelZoom>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -154,6 +155,7 @@ export function OrderTrackMap({
         {livePosition && (
           <Marker
             position={[livePosition.lat, livePosition.lng]}
+            zIndexOffset={2000}
             {...(liveIcon ? { icon: liveIcon } : {})}
           >
             <Popup>{liveLabel ?? "Live position"}</Popup>

@@ -35,19 +35,21 @@ body {
   animation: germany-map-dash-flow 3.2s steps(10) infinite;
 }
 
-/* Customer tracking: live driver position = round photo (not default blue pin) */
+/* Customer tracking: live driver position = large round photo (readable at map zoom) */
 .leaflet-driver-photo-marker {
   background: transparent !important;
   border: none !important;
 }
 
 .leaflet-driver-photo-marker__inner {
-  width: 48px;
-  height: 48px;
+  width: 80px;
+  height: 80px;
   border-radius: 9999px;
   overflow: hidden;
-  border: 3px solid #e85d04;
-  box-shadow: 0 2px 12px rgba(13, 33, 55, 0.4);
+  border: 4px solid #e85d04;
+  box-shadow:
+    0 4px 14px rgba(13, 33, 55, 0.45),
+    0 0 0 2px rgba(255, 255, 255, 0.95);
   background: #fff;
 }
 
@@ -55,5 +57,7 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center top;
   display: block;
+  image-rendering: auto;
 }

@@ -194,7 +194,7 @@
     "trackDriverPending": "Sobald ein Fahrer zugewiesen ist, sehen Sie Foto und Kontakt hier. Die geplante Route sehen Sie trotzdem auf der Karte.",
     "trackDistance": "Distanz (ca.)",
     "trackMapTitle": "Karte & Route",
-    "trackMapHint": "Grau gestrichelt: geplante Route (Abholung → Lieferung). Orange: Live-GPS-Verlauf, sobald der Fahrer den Standort teilt. Der Live-Marker erscheint mit dem nächsten Update.",
+    "trackMapHint": "Grau gestrichelt: geplante Route (Abholung → Lieferung). Orange: Live-GPS-Verlauf. Großer runder Marker: Fahrerfoto an der aktuellen Position. Der orangefarbene Button öffnet Google Maps mit starker Vergrößerung auf diese Position – bessere Ansicht zum Mitverfolgen.",
     "trackLiveMarker": "Aktuelle Position",
     "trackNoGeocode": "Für diese Adressen konnte keine automatische Karte geladen werden. Route stattdessen in Google Maps öffnen.",
     "trackOpenGoogleDirections": "Route in Google Maps öffnen"
