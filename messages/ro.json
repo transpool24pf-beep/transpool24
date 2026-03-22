@@ -263,6 +263,7 @@
     "vehiclePlatePlaceholder": "de ex. PF-AB 1234",
     "vehicleDocuments": "Documentele vehiculului",
     "vehiclePhoto": "Poza vehiculului",
+    "vehicleSectionHint": "Încărcați actele vehiculului și o fotografie exterioară ca în exemplu.",
     "examplePhoto": "Exemplu de fotografie",
     "chooseFileOrDrag": "Alegeți fișierul sau trageți imaginea aici",
     "remove": "Elimina",

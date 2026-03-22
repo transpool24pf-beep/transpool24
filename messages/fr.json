@@ -263,6 +263,7 @@
     "vehiclePlatePlaceholder": "ex. PF-AB 1234",
     "vehicleDocuments": "Documents du véhicule",
     "vehiclePhoto": "Photo du véhicule",
+    "vehicleSectionHint": "Téléchargez les papiers du véhicule et une photo extérieure comme l'exemple.",
     "examplePhoto": "Photo exemple",
     "chooseFileOrDrag": "Choisir un fichier ou glisser l'image ici",
     "remove": "Supprimer",

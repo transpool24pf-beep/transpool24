@@ -263,6 +263,7 @@
     "vehiclePlatePlaceholder": "напр. PF-AB 1234",
     "vehicleDocuments": "Документи на транспортний засіб",
     "vehiclePhoto": "Фото транспортного засобу",
+    "vehicleSectionHint": "Завантажте документи на ТЗ і зовнішнє фото, як у зразку.",
     "examplePhoto": "Зразок фото",
     "chooseFileOrDrag": "Виберіть файл або перетягніть зображення сюди",
     "remove": "видалити",

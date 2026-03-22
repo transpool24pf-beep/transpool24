@@ -263,6 +263,7 @@
     "vehiclePlatePlaceholder": "например ПФ-АБ 1234",
     "vehicleDocuments": "Документы на автомобиль",
     "vehiclePhoto": "Фото автомобиля",
+    "vehicleSectionHint": "Загрузите документы на ТС и внешнее фото, как в примере.",
     "examplePhoto": "Пример фотографии",
     "chooseFileOrDrag": "Выберите файл или перетащите изображение сюда",
     "remove": "Удалять",

@@ -263,6 +263,7 @@
     "vehiclePlatePlaceholder": "örn. PF-AB 1234",
     "vehicleDocuments": "Araç belgeleri",
     "vehiclePhoto": "Araç fotoğrafı",
+    "vehicleSectionHint": "Araç belgelerini ve örnekteki gibi dışarıdan bir fotoğraf yükleyin.",
     "examplePhoto": "Örnek fotoğraf",
     "chooseFileOrDrag": "Dosya seçin veya görseli buraya sürükleyin",
     "remove": "Kaldır",

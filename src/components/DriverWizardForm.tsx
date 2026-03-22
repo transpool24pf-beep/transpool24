@@ -24,7 +24,8 @@ const DriverCityMap = dynamic(
 );
 
 const CITIES = ["Pforzheim", "Stuttgart", "Karlsruhe", "Mannheim", "Heidelberg", "Sonstige"];
-const STEP_ICONS = ["📋", "🪪", "🚗", "✓"];
+/** 3 steps: basics → documents + vehicle → review */
+const STEP_ICONS = ["📋", "🪪", "✓"];
 
 type FormData = {
   city: string;
@@ -199,13 +200,19 @@ export function DriverWizardForm({
   useEffect(() => {
     const d = parseDriverWizardDraft();
     if (d) {
-      let s = Math.min(4, Math.max(1, d.step));
       if (d.step >= 5) {
         clearDriverWizardDraft();
-        s = 1;
+        setStep(1);
+      } else if (d.v === 2) {
+        setStep(Math.min(3, Math.max(1, d.step)));
+        setForm(mergeDriverWizardForm(d.form, initialCity || ""));
+      } else {
+        let s = d.step;
+        if (s === 4) s = 3;
+        else if (s === 3) s = 2;
+        setStep(Math.min(3, Math.max(1, s)));
+        setForm(mergeDriverWizardForm(d.form, initialCity || ""));
       }
-      setStep(s);
-      setForm(mergeDriverWizardForm(d.form, initialCity || ""));
     }
     setDraftRestored(true);
     // Intentionally once on mount: draft is shared across locales; re-running would reset edits if initialCity changed.
@@ -230,7 +237,7 @@ export function DriverWizardForm({
     if (!draftRestored) return;
     if (saveDraftTimer.current) clearTimeout(saveDraftTimer.current);
     saveDraftTimer.current = setTimeout(() => {
-      if (step >= 5) {
+      if (step >= 4) {
         clearDriverWizardDraft();
         return;
       }
@@ -254,22 +261,23 @@ export function DriverWizardForm({
     form.phone.trim() &&
     form.servicePolicyAccepted;
 
-  const step2Valid =
+  /** Step 2 = personal documents + vehicle (incl. sample vehicle photo) */
+  const personalAndVehicleValid =
     form.idDocumentFrontUrl &&
     form.idDocumentBackUrl &&
     form.licenseFrontUrl &&
     form.licenseBackUrl &&
     form.taxOrCommercialNumber.trim() &&
     form.personalPhotoUrl &&
-    form.languagesSpoken.trim();
+    form.languagesSpoken.trim() &&
+    form.vehiclePlate.trim() &&
+    form.vehicleDocumentsUrl &&
+    form.vehiclePhotoUrl;
 
-  const step3Valid =
-    form.vehiclePlate.trim() && form.vehicleDocumentsUrl && form.vehiclePhotoUrl;
-
-  const step4Valid = form.workPolicyAccepted;
+  const reviewStepValid = form.workPolicyAccepted;
 
   const handleSubmit = async () => {
-    if (!step4Valid) return;
+    if (!reviewStepValid) return;
     setSubmitError(null);
     setSubmitLoading(true);
     try {
@@ -298,7 +306,7 @@ export function DriverWizardForm({
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Absenden fehlgeschlagen");
       clearDriverWizardDraft();
-      setStep(5);
+      setStep(4);
     } catch (e) {
       setSubmitError(e instanceof Error ? e.message : "Absenden fehlgeschlagen");
     } finally {
@@ -308,12 +316,11 @@ export function DriverWizardForm({
 
   const stepLabels = [
     t("step1Name"),
-    t("step2Name"),
-    t("step3Name"),
+    `${t("step2Name")} · ${t("step3Name")}`,
     t("step4Name"),
   ];
 
-  if (step === 5) {
+  if (step === 4) {
     return (
       <div className="rounded-2xl border border-[#0d2137]/10 bg-white p-8 text-center shadow-lg">
         <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 text-4xl text-emerald-600">✓</div>
@@ -556,29 +563,11 @@ export function DriverWizardForm({
                 className="w-full rounded-xl border border-[#0d2137]/20 px-4 py-3"
               />
             </div>
-          </div>
-          <div className="mt-8 flex justify-between gap-4">
-            <button type="button" onClick={() => setStep(1)} className="rounded-xl border border-[#0d2137]/20 bg-white px-6 py-3 font-medium text-[#0d2137]">
-              {t("back")}
-            </button>
-            <button
-              type="button"
-              onClick={() => setStep(3)}
-              disabled={!step2Valid}
-              className="rounded-xl bg-[var(--accent)] px-8 py-3 font-semibold text-white disabled:opacity-50"
-            >
-              {t("continue")}
-            </button>
-          </div>
-        </>
-      )}
-
-      {/* Step 3 */}
-      {step === 3 && (
-        <>
-          <h2 className="text-xl font-bold text-[#0d2137]">{t("step3Title")}</h2>
-          <div className="space-y-6">
-            <div>
+            <div className="sm:col-span-2 mt-2 border-t border-[#0d2137]/10 pt-6">
+              <h3 className="mb-1 text-lg font-semibold text-[#0d2137]">{t("step3Title")}</h3>
+              <p className="text-sm text-[#0d2137]/65">{t("vehicleSectionHint")}</p>
+            </div>
+            <div className="sm:col-span-2">
               <label className="mb-1 block text-sm font-medium text-[#0d2137]">{t("vehiclePlate")}</label>
               <input
                 type="text"
@@ -588,38 +577,42 @@ export function DriverWizardForm({
                 className="w-full rounded-xl border border-[#0d2137]/20 px-4 py-3"
               />
             </div>
-            <FileUploadBox
-              fieldId="driver-vehicle-docs"
-              label={t("vehicleDocuments")}
-              value={form.vehicleDocumentsUrl}
-              onChange={(url) => update("vehicleDocumentsUrl", url)}
-              accept="image/*,.pdf"
-              chooseFileOrDrag={t("chooseFileOrDrag")}
-              remove={t("remove")}
-              uploading={t("uploading")}
-              uploadFailed={t("uploadFailed")}
-            />
-            <FileUploadBox
-              fieldId="driver-vehicle-photo"
-              label={t("vehiclePhoto")}
-              value={form.vehiclePhotoUrl}
-              onChange={(url) => update("vehiclePhotoUrl", url)}
-              exampleSrc="/images/5677.png"
-              exampleLabel={t("examplePhoto")}
-              chooseFileOrDrag={t("chooseFileOrDrag")}
-              remove={t("remove")}
-              uploading={t("uploading")}
-              uploadFailed={t("uploadFailed")}
-            />
+            <div className="sm:col-span-2">
+              <FileUploadBox
+                fieldId="driver-vehicle-docs"
+                label={t("vehicleDocuments")}
+                value={form.vehicleDocumentsUrl}
+                onChange={(url) => update("vehicleDocumentsUrl", url)}
+                accept="image/*,.pdf"
+                chooseFileOrDrag={t("chooseFileOrDrag")}
+                remove={t("remove")}
+                uploading={t("uploading")}
+                uploadFailed={t("uploadFailed")}
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <FileUploadBox
+                fieldId="driver-vehicle-photo"
+                label={t("vehiclePhoto")}
+                value={form.vehiclePhotoUrl}
+                onChange={(url) => update("vehiclePhotoUrl", url)}
+                exampleSrc="/images/5677.png"
+                exampleLabel={t("examplePhoto")}
+                chooseFileOrDrag={t("chooseFileOrDrag")}
+                remove={t("remove")}
+                uploading={t("uploading")}
+                uploadFailed={t("uploadFailed")}
+              />
+            </div>
           </div>
           <div className="mt-8 flex justify-between gap-4">
-            <button type="button" onClick={() => setStep(2)} className="rounded-xl border border-[#0d2137]/20 bg-white px-6 py-3 font-medium text-[#0d2137]">
+            <button type="button" onClick={() => setStep(1)} className="rounded-xl border border-[#0d2137]/20 bg-white px-6 py-3 font-medium text-[#0d2137]">
               {t("back")}
             </button>
             <button
               type="button"
-              onClick={() => setStep(4)}
-              disabled={!step3Valid}
+              onClick={() => setStep(3)}
+              disabled={!personalAndVehicleValid}
               className="rounded-xl bg-[var(--accent)] px-8 py-3 font-semibold text-white disabled:opacity-50"
             >
               {t("continue")}
@@ -628,8 +621,8 @@ export function DriverWizardForm({
         </>
       )}
 
-      {/* Step 4 */}
-      {step === 4 && (
+      {/* Step 3: review + work policy */}
+      {step === 3 && (
         <>
           <h2 className="text-xl font-bold text-[#0d2137]">{t("step4Title")}</h2>
           <div className="rounded-xl border border-[#0d2137]/15 bg-[#f8f9fa] p-4 text-sm">
@@ -658,13 +651,13 @@ export function DriverWizardForm({
           </div>
           {submitError && <p className="text-red-600 text-sm">{submitError}</p>}
           <div className="mt-8 flex justify-between gap-4">
-            <button type="button" onClick={() => setStep(3)} className="rounded-xl border border-[#0d2137]/20 bg-white px-6 py-3 font-medium text-[#0d2137]">
+            <button type="button" onClick={() => setStep(2)} className="rounded-xl border border-[#0d2137]/20 bg-white px-6 py-3 font-medium text-[#0d2137]">
               {t("back")}
             </button>
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={!step4Valid || submitLoading}
+              disabled={!reviewStepValid || submitLoading}
               className="rounded-xl bg-[var(--accent)] px-8 py-3 font-semibold text-white disabled:opacity-50"
             >
               {submitLoading ? t("submitting") : t("submit")}

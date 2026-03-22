@@ -263,6 +263,7 @@
     "vehiclePlatePlaceholder": "مثال: PF-AB 1234",
     "vehicleDocuments": "أوراق السيارة",
     "vehiclePhoto": "صورة السيارة",
+    "vehicleSectionHint": "ارفع أوراق المركبة وصورة خارجية واضحة كما في النموذج أدناه.",
     "examplePhoto": "نموذج صورة",
     "chooseFileOrDrag": "اختر ملفاً أو اسحب الصورة هنا",
     "remove": "إزالة",
