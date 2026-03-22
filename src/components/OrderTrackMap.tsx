@@ -29,9 +29,10 @@ function createDriverPhotoDivIcon(href: string): L.DivIcon {
   return L.divIcon({
     className: "leaflet-driver-photo-marker",
     html: `<div class="leaflet-driver-photo-marker__inner"><img src="${safe}" alt="" decoding="async" fetchpriority="high" /></div>`,
-    iconSize: [92, 92],
-    iconAnchor: [46, 92],
-    popupAnchor: [0, -84],
+    /* Must match .leaflet-driver-photo-marker__inner outer size (88×88) so Leaflet does not offset the graphic */
+    iconSize: [88, 88],
+    iconAnchor: [44, 88],
+    popupAnchor: [0, -80],
   });
 }
 
