@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createServerSupabase } from "@/lib/supabase";
-import { calculatePriceCents } from "@/lib/pricing";
+import { calculatePriceBreakdown } from "@/lib/pricing";
 import { getPricingSettings } from "@/lib/settings";
 import { getRouteDistanceKm } from "@/lib/route-distance-server";
 
@@ -64,12 +64,22 @@ export async function POST(req: Request) {
       }
       const serviceType = ["driver_only", "driver_car", "driver_car_assistant"].includes(body.serviceType) ? body.serviceType : "driver_car";
       const pricing = await getPricingSettings();
-      const priceCents = calculatePriceCents(distanceKm, cargoSize, null, {
+      const pricingOpts = {
         price_per_km_cents: pricing.price_per_km_cents,
         driver_hourly_rate_cents: pricing.driver_hourly_rate_cents,
         driver_only_hourly_cents: pricing.driver_only_hourly_cents,
         assistant_fee_cents: pricing.assistant_fee_cents,
-      }, serviceType);
+      };
+      const estimatedMinutes = Math.round((distanceKm / 50) * 60 * 2 + 60);
+      const breakdown = calculatePriceBreakdown(
+        distanceKm,
+        cargoSize,
+        null,
+        pricingOpts,
+        serviceType as "driver_only" | "driver_car" | "driver_car_assistant",
+        estimatedMinutes
+      );
+      const priceCents = breakdown.totalCents;
       const { data, error: insertError } = await supabase
         .from("jobs")
         .insert({
@@ -84,7 +94,9 @@ export async function POST(req: Request) {
           distance_km: distanceKm,
           price_cents: priceCents,
           assistant_price_cents:
-            serviceType === "driver_car_assistant" ? pricing.assistant_fee_cents ?? null : null,
+            serviceType === "driver_car_assistant" && breakdown.assistantCents > 0
+              ? breakdown.assistantCents
+              : null,
           payment_status: "pending",
           logistics_status: "draft",
         })

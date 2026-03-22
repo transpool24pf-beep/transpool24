@@ -4,8 +4,14 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { OrderRouteLottie } from "@/components/OrderRouteLottie";
-import { calculatePriceCents, formatPrice, type ServiceType } from "@/lib/pricing";
-import { volumeM3, suggestCargoSize, suggestVehicleLabel, getLoadUnloadMinutes, CARGO_CATEGORIES, type CargoType, type CargoCategoryId } from "@/lib/cargo";
+import {
+  calculatePriceBreakdown,
+  formatPrice,
+  splitHoursMinutesParts,
+  type ServiceType,
+  type PricingOptions,
+} from "@/lib/pricing";
+import { getLoadUnloadMinutes, CARGO_CATEGORIES, type CargoCategoryId } from "@/lib/cargo";
 
 const RouteMap = dynamic(
   () => import("@/components/RouteMapInner").then((m) => m.RouteMapInner),
@@ -104,12 +110,6 @@ const COUNTRY_CODES: { code: string; flag: string }[] = [
   { code: "+237", flag: "🇨🇲" },
 ];
 
-const CARGO_TYPE_OPTIONS: { value: CargoType; key: string }[] = [
-  { value: "euro_pallet", key: "cargoTypeEuroPallet" },
-  { value: "pallets_boxes", key: "cargoTypePalletsBoxes" },
-  { value: "parcels", key: "cargoTypeParcels" },
-];
-
 export type OrderFormData = {
   companyName: string;
   email: string;
@@ -122,12 +122,8 @@ export type OrderFormData = {
   cargoCategory: CargoCategoryId | "";
   serviceType: ServiceType | "";
   distanceKm: number;
-  cargoLengthCm: number;
-  cargoWidthCm: number;
-  cargoHeightCm: number;
   cargoWeightKg: number;
-  cargoType: CargoType | "";
-  stackable: boolean;
+  packageCount: number;
 };
 
 const initial: OrderFormData = {
@@ -142,12 +138,8 @@ const initial: OrderFormData = {
   cargoCategory: "",
   serviceType: "",
   distanceKm: DEFAULT_KM,
-  cargoLengthCm: 0,
-  cargoWidthCm: 0,
-  cargoHeightCm: 0,
   cargoWeightKg: 0,
-  cargoType: "",
-  stackable: false,
+  packageCount: 0,
 };
 
 export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrderConfirmed?: () => void }) {
@@ -167,6 +159,9 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
   const [distanceError, setDistanceError] = useState<string | null>(null);
   const [routeGeo, setRouteGeo] = useState<RouteGeo | null>(null);
   const [routeDurationMinutes, setRouteDurationMinutes] = useState<number | null>(null);
+  const [pricingOpts, setPricingOpts] = useState<PricingOptions | null>(null);
+  const [cargoPhotoUrls, setCargoPhotoUrls] = useState<string[]>([]);
+  const [photoUploading, setPhotoUploading] = useState(false);
   const [phoneCountryCode, setPhoneCountryCode] = useState("+49");
   const [countryCodeOpen, setCountryCodeOpen] = useState(false);
   const countryCodeRef = useRef<HTMLDivElement>(null);
@@ -196,24 +191,32 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
   const step1Complete = data.companyName.trim() !== "" && data.email.trim() !== "" && data.phone.trim() !== "";
   const step2Complete = data.pickupAddress.trim() !== "" && data.deliveryAddress.trim() !== "";
   const step3Complete =
-    data.serviceType !== "" && distanceFromRoute && data.cargoCategory !== "";
+    data.serviceType !== "" &&
+    distanceFromRoute &&
+    data.cargoCategory !== "" &&
+    data.cargoWeightKg > 0 &&
+    data.packageCount >= 1 &&
+    cargoPhotoUrls.length >= 1;
 
-  const oneWayMinutes = routeDurationMinutes ?? (data.distanceKm / 50) * 60;
+  const oneWayMinutes = Math.round(routeDurationMinutes ?? (data.distanceKm / 50) * 60);
   const roundTripMinutes = oneWayMinutes * 2;
   const { loadingMinutes, unloadingMinutes } = getLoadUnloadMinutes(
     data.cargoCategory || null,
     data.cargoWeightKg || 0
   );
-  const totalDriverMinutes = roundTripMinutes + loadingMinutes + unloadingMinutes;
-  const estimatedDurationMinutes = routeDurationMinutes ?? (data.distanceKm / 50) * 60;
-  const priceCents = calculatePriceCents(
+  const totalDriverMinutesRounded = Math.round(roundTripMinutes + loadingMinutes + unloadingMinutes);
+  const estimatedDurationMinutes = routeDurationMinutes ?? Math.round((data.distanceKm / 50) * 60);
+  const roundTripParts = splitHoursMinutesParts(roundTripMinutes);
+  const totalTimeParts = splitHoursMinutesParts(totalDriverMinutesRounded);
+  const priceBreakdown = calculatePriceBreakdown(
     data.distanceKm,
     data.cargoSize,
     estimatedDurationMinutes,
-    null,
+    pricingOpts,
     data.serviceType || "driver_car",
-    totalDriverMinutes
+    totalDriverMinutesRounded
   );
+  const priceCents = priceBreakdown.totalCents;
 
   const fetchSuggestions = useCallback((query: string, setter: (s: Suggestion[]) => void) => {
     if (query.length < 3) {
@@ -319,6 +322,36 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
     setError(null);
   };
 
+  const MAX_CARGO_PHOTOS = 8;
+
+  const uploadCargoPhotoFile = async (file: File) => {
+    if (cargoPhotoUrls.length >= MAX_CARGO_PHOTOS) return;
+    setPhotoUploading(true);
+    setError(null);
+    try {
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result));
+        reader.onerror = () => reject(new Error("read failed"));
+        reader.readAsDataURL(file);
+      });
+      const res = await fetch("/api/order-cargo-photos/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ base64: dataUrl, filename: file.name }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Upload failed");
+      if (typeof json.url === "string") {
+        setCargoPhotoUrls((prev) => [...prev, json.url]);
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Upload failed");
+    } finally {
+      setPhotoUploading(false);
+    }
+  };
+
   const next = () => {
     if (step < 4) {
       if (step === 2 && data.pickupAddress.trim() && data.deliveryAddress.trim()) {
@@ -355,30 +388,21 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
           serviceType: data.serviceType || "driver_car",
           distanceKm: data.distanceKm,
           priceCents,
-          cargoDetails:
-            data.cargoLengthCm > 0 ||
-            data.cargoWidthCm > 0 ||
-            data.cargoHeightCm > 0 ||
-            data.cargoWeightKg > 0 ||
-            data.cargoType ||
-            data.stackable ||
-            data.cargoCategory
-              ? {
-                  lengthCm: data.cargoLengthCm || null,
-                  widthCm: data.cargoWidthCm || null,
-                  heightCm: data.cargoHeightCm || null,
-                  weightKg: data.cargoWeightKg || null,
-                  cargoType: data.cargoType || null,
-                  stackable: data.stackable,
-                  cargoCategory: data.cargoCategory || null,
-                }
-              : null,
+          cargoDetails: {
+            weightKg: data.cargoWeightKg,
+            packageCount: data.packageCount,
+            photoUrls: cargoPhotoUrls,
+            cargoCategory: data.cargoCategory || null,
+          },
         }),
       });
       const json = await res.json();
       if (!res.ok) {
         const err = json.error as string | undefined;
         if (err === "CARGO_CATEGORY_REQUIRED") throw new Error(t("cargoCategoryRequired"));
+        if (err === "CARGO_WEIGHT_REQUIRED") throw new Error(t("cargoWeightRequired"));
+        if (err === "CARGO_PACKAGES_REQUIRED") throw new Error(t("cargoPackagesRequired"));
+        if (err === "CARGO_PHOTOS_REQUIRED") throw new Error(t("cargoPhotosRequired"));
         throw new Error(err || "Failed to confirm order");
       }
       if (json.jobId && json.confirmationToken && json.whatsappLink) {
@@ -714,104 +738,74 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
             )}
           </div>
           <div className="rounded-lg border border-[#0d2137]/15 bg-[#0d2137]/5 p-4">
-            <p className="mb-3 text-sm font-medium text-[var(--foreground)]">
-              {t("cargoDetails")}
-            </p>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <p className="mb-1 text-sm font-medium text-[var(--foreground)]">{t("cargoDetails")}</p>
+            <p className="mb-3 text-xs text-amber-800">{t("cargoDetailsMandatoryHint")}</p>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-xs text-[var(--foreground)]/80">{t("cargoLengthCm")}</label>
+                <label className="mb-1 block text-xs font-medium text-[var(--foreground)]/80">{t("cargoWeightKg")} *</label>
                 <input
                   type="number"
-                  min={0}
-                  value={data.cargoLengthCm || ""}
-                  onChange={(e) => {
-                    const v = Number(e.target.value) || 0;
-                    const vol = volumeM3(v, data.cargoWidthCm, data.cargoHeightCm);
-                    const size = suggestCargoSize(vol, data.cargoWeightKg);
-                    update({ cargoLengthCm: v, cargoSize: size });
-                  }}
-                  placeholder="120"
-                  className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs text-[var(--foreground)]/80">{t("cargoWidthCm")}</label>
-                <input
-                  type="number"
-                  min={0}
-                  value={data.cargoWidthCm || ""}
-                  onChange={(e) => {
-                    const v = Number(e.target.value) || 0;
-                    const vol = volumeM3(data.cargoLengthCm, v, data.cargoHeightCm);
-                    const size = suggestCargoSize(vol, data.cargoWeightKg);
-                    update({ cargoWidthCm: v, cargoSize: size });
-                  }}
-                  placeholder="80"
-                  className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs text-[var(--foreground)]/80">{t("cargoHeightCm")}</label>
-                <input
-                  type="number"
-                  min={0}
-                  value={data.cargoHeightCm || ""}
-                  onChange={(e) => {
-                    const v = Number(e.target.value) || 0;
-                    const vol = volumeM3(data.cargoLengthCm, data.cargoWidthCm, v);
-                    const size = suggestCargoSize(vol, data.cargoWeightKg);
-                    update({ cargoHeightCm: v, cargoSize: size });
-                  }}
-                  placeholder="100"
-                  className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs text-[var(--foreground)]/80">{t("cargoWeightKg")}</label>
-                <input
-                  type="number"
-                  min={0}
+                  min={1}
+                  step={1}
                   value={data.cargoWeightKg || ""}
-                  onChange={(e) => {
-                    const v = Number(e.target.value) || 0;
-                    const vol = volumeM3(data.cargoLengthCm, data.cargoWidthCm, data.cargoHeightCm);
-                    const size = suggestCargoSize(vol, v);
-                    update({ cargoWeightKg: v, cargoSize: size });
-                  }}
+                  onChange={(e) => update({ cargoWeightKg: Math.max(0, Number(e.target.value) || 0) })}
                   placeholder="250"
                   className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
                 />
               </div>
-            </div>
-            <div className="mt-3 flex flex-wrap items-center gap-4">
               <div>
-                <label className="mb-1 block text-xs text-[var(--foreground)]/80">{t("cargoType")}</label>
-                <select
-                  value={data.cargoType || ""}
-                  onChange={(e) => update({ cargoType: (e.target.value || "") as CargoType | "" })}
-                  className="rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
-                >
-                  <option value="">—</option>
-                  {CARGO_TYPE_OPTIONS.map(({ value, key }) => (
-                    <option key={value} value={value}>{t(key)}</option>
-                  ))}
-                </select>
-              </div>
-              <label className="flex cursor-pointer items-center gap-2 pt-5">
+                <label className="mb-1 block text-xs font-medium text-[var(--foreground)]/80">{t("packageCount")} *</label>
                 <input
-                  type="checkbox"
-                  checked={data.stackable}
-                  onChange={(e) => update({ stackable: e.target.checked })}
-                  className="rounded border-[#0d2137]/30 text-[var(--accent)]"
+                  type="number"
+                  min={1}
+                  step={1}
+                  value={data.packageCount || ""}
+                  onChange={(e) => update({ packageCount: Math.max(0, Math.floor(Number(e.target.value) || 0)) })}
+                  placeholder="1"
+                  className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
                 />
-                <span className="text-sm text-[var(--foreground)]/90">{t("stackable")}</span>
-              </label>
+              </div>
             </div>
-            {(data.cargoLengthCm > 0 || data.cargoWidthCm > 0 || data.cargoHeightCm > 0 || data.cargoWeightKg > 0) && (
-              <p className="mt-3 text-sm text-green-700">
-                {t("suggestedSize")}: {t(`cargo${data.cargoSize}` as "cargoXS")} — {t("suggestedVehicle")}: {suggestVehicleLabel(data.cargoSize)}
-              </p>
-            )}
+            <div className="mt-4">
+              <label className="mb-1 block text-xs font-medium text-[var(--foreground)]/80">{t("cargoPhotosLabel")} *</label>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                disabled={photoUploading || cargoPhotoUrls.length >= MAX_CARGO_PHOTOS}
+                onChange={(e) => {
+                  const files = e.target.files;
+                  if (!files?.length) return;
+                  void (async () => {
+                    for (const f of Array.from(files)) {
+                      if (cargoPhotoUrls.length >= MAX_CARGO_PHOTOS) break;
+                      await uploadCargoPhotoFile(f);
+                    }
+                    e.target.value = "";
+                  })();
+                }}
+                className="block w-full text-sm text-[var(--foreground)] file:mr-3 file:rounded file:border-0 file:bg-[var(--accent)] file:px-3 file:py-1.5 file:text-white"
+              />
+              <p className="mt-1 text-xs text-[var(--foreground)]/60">{t("cargoPhotosHint", { max: MAX_CARGO_PHOTOS })}</p>
+              {cargoPhotoUrls.length > 0 && (
+                <ul className="mt-2 flex flex-wrap gap-2">
+                  {cargoPhotoUrls.map((url, i) => (
+                    <li key={url + i} className="relative">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={url} alt="" className="h-16 w-16 rounded border border-[#0d2137]/20 object-cover" />
+                      <button
+                        type="button"
+                        aria-label={t("removePhoto")}
+                        className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-xs text-white"
+                        onClick={() => setCargoPhotoUrls((prev) => prev.filter((_, j) => j !== i))}
+                      >
+                        ×
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
@@ -843,7 +837,8 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
             ) : (
               <>
                 <p className="text-sm text-[var(--foreground)]/90">
-                  {t("roundTripTime")}: {Math.floor(roundTripMinutes / 60)} {t("hours")} {roundTripMinutes % 60} {t("minutes")}
+                  {t("roundTripTime")}: {roundTripParts.hours} {t("hours")}{" "}
+                  {roundTripParts.minutes} {t("minutes")}
                   {routeDurationMinutes != null && (
                     <span className="ml-1 text-green-700">({t("fromRoute")})</span>
                   )}
@@ -852,8 +847,16 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
                   {t("loadingUnloadingTime")}: {loadingMinutes} + {unloadingMinutes} {t("minutes")}
                 </p>
                 <p className="mt-2 text-sm font-semibold text-[var(--accent)]">
-                  {t("totalDriverTime")}: {(totalDriverMinutes / 60).toFixed(1)} {t("hours")}
+                  {t("totalDriverTime")}: {totalTimeParts.hours} {t("hours")} {totalTimeParts.minutes} {t("minutes")}
                 </p>
+                {data.serviceType === "driver_car_assistant" && (
+                  <p className="mt-2 text-sm text-[var(--foreground)]/90">
+                    <span className="font-medium text-[var(--accent)]">{t("assistantRatePerHour")}: </span>
+                    {formatPrice(pricingOpts?.assistant_fee_cents ?? 1630)}
+                    <span className="mx-1">·</span>
+                    {t("assistantChargeForTrip")}: {formatPrice(priceBreakdown.assistantCents)}
+                  </p>
+                )}
               </>
             )}
           </div>
@@ -880,8 +883,17 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
               />
             )}
           </div>
-          <div className="rounded-lg bg-[#0d2137]/5 p-4">
+          <div className="rounded-lg bg-[#0d2137]/5 p-4 space-y-1">
             <p className="text-sm text-[var(--foreground)]/80">{t("price")}</p>
+            {data.serviceType !== "driver_only" && (
+              <p className="text-xs text-[var(--foreground)]/65">
+                {t("priceBreakdownDistance")}: {formatPrice(priceBreakdown.distanceCents)} · {t("priceBreakdownDriverTime")}:{" "}
+                {formatPrice(priceBreakdown.driverTimeCents)}
+                {data.serviceType === "driver_car_assistant" && priceBreakdown.assistantCents > 0
+                  ? ` · ${t("priceBreakdownAssistant")}: ${formatPrice(priceBreakdown.assistantCents)}`
+                  : ""}
+              </p>
+            )}
             <p className="text-2xl font-bold text-[var(--accent)]">
               {formatPrice(priceCents)}
             </p>
@@ -917,9 +929,10 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
               <p><strong>{t("cargoWhatToTransport")}:</strong> {t(CARGO_CATEGORIES.find((c) => c.id === data.cargoCategory)?.labelKey ?? "cargoCatGeneralOther")}</p>
             )}
             <p><strong>{t("cargoSize")}:</strong> {t(`cargo${data.cargoSize}` as "cargoXS")}</p>
-            {(data.cargoLengthCm > 0 || data.cargoWidthCm > 0 || data.cargoHeightCm > 0 || data.cargoWeightKg > 0 || data.cargoType) && (
-              <p><strong>{t("cargoDetails")}:</strong> {[data.cargoLengthCm && `${data.cargoLengthCm}×${data.cargoWidthCm}×${data.cargoHeightCm} cm`, data.cargoWeightKg && `${data.cargoWeightKg} kg`, data.cargoType && t(CARGO_TYPE_OPTIONS.find((o) => o.value === data.cargoType)?.key ?? "cargoTypeEuroPallet"), data.stackable && t("stackable")].filter(Boolean).join(" · ")}</p>
-            )}
+            <p>
+              <strong>{t("cargoDetails")}:</strong> {data.cargoWeightKg} kg · {t("packageCount")}: {data.packageCount} ·{" "}
+              {t("cargoPhotosLabel")}: {cargoPhotoUrls.length}
+            </p>
             <p><strong>{t("distance")}:</strong> {data.distanceKm} km</p>
             <p className="pt-2 text-lg font-bold text-[var(--accent)]">
               {t("total")}: {formatPrice(priceCents)}

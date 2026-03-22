@@ -96,6 +96,20 @@ function buildConfirmationHtml(
     typeof cargoCatRaw === "string" && cargoCatRaw.length > 0
       ? cargoCategoryLabelDe(cargoCatRaw)
       : null;
+  const weightKgEmail = cd?.cargoWeightKg ?? cd?.weightKg;
+  const weightRow =
+    weightKgEmail != null && Number(weightKgEmail) > 0
+      ? `<tr><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Gewicht</td><td style="border-bottom: 1px solid #e2e8f0;">${escapeHtml(String(weightKgEmail))} kg</td></tr>`
+      : "";
+  const pkgRow =
+    cd?.packageCount != null && Number(cd.packageCount) >= 1
+      ? `<tr style="background: #f8fafc;"><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Pakete/Stück</td><td style="border-bottom: 1px solid #e2e8f0;">${escapeHtml(String(cd.packageCount))}</td></tr>`
+      : "";
+  const photoUrls = Array.isArray(cd?.photoUrls) ? (cd!.photoUrls as unknown[]).filter((u) => typeof u === "string") : [];
+  const photosRow =
+    photoUrls.length > 0
+      ? `<tr><td style="color: #64748b;">Ladungsfotos</td><td>${photoUrls.length} Foto(s) – siehe Auftrag im System</td></tr>`
+      : "";
 
   return `
 <!DOCTYPE html>
@@ -119,6 +133,9 @@ function buildConfirmationHtml(
           <tr><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Lieferung</td><td style="border-bottom: 1px solid #e2e8f0;">${escapeHtml(job.delivery_address)}${job.delivery_city ? `, ${job.delivery_city}` : ""}</td></tr>
           <tr style="background: #f8fafc;"><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Ladung / Distanz</td><td style="border-bottom: 1px solid #e2e8f0;">${job.cargo_size}, ${job.distance_km ?? "—"} km</td></tr>
           ${cargoCategoryDe ? `<tr><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Warenkategorie</td><td style="border-bottom: 1px solid #e2e8f0;">${escapeHtml(cargoCategoryDe)}</td></tr>` : ""}
+          ${weightRow}
+          ${pkgRow}
+          ${photosRow}
           <tr><td style="color: #64748b;">Gesamtbetrag</td><td style="font-weight: bold;">€ ${totalEur}</td></tr>
         </table>
         <p style="margin: 16px 0 0 0; font-size: 14px; color: #64748b;">Sie können die Vertragsdetails in Ihrem Produktzugang in der Auftragszusammenfassung unten einsehen. Der angehängte PDF enthält Details zur Fahrt, zum Fahrer und zu den Firmeninformationen.</p>

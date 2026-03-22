@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
-import { calculatePriceCents } from "@/lib/pricing";
+import { calculatePriceBreakdown } from "@/lib/pricing";
 import { getPricingSettings } from "@/lib/settings";
 import { getRouteDistanceAndDuration } from "@/lib/route-distance-server";
 import { getLoadUnloadMinutes, isCargoCategoryId } from "@/lib/cargo";
@@ -52,6 +52,23 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "CARGO_CATEGORY_REQUIRED" }, { status: 400 });
     }
 
+    const cd = cargoDetails && typeof cargoDetails === "object" ? (cargoDetails as Record<string, unknown>) : null;
+    const weightKgRaw = cd?.weightKg != null ? Number(cd.weightKg) : NaN;
+    const packageCountRaw = cd?.packageCount != null ? Number(cd.packageCount) : NaN;
+    const photoUrlsRaw = Array.isArray(cd?.photoUrls) ? (cd!.photoUrls as unknown[]) : [];
+    const photoUrls = photoUrlsRaw.filter(
+      (u): u is string => typeof u === "string" && /^https?:\/\//i.test(u.trim())
+    );
+    if (!Number.isFinite(weightKgRaw) || weightKgRaw <= 0) {
+      return NextResponse.json({ error: "CARGO_WEIGHT_REQUIRED" }, { status: 400 });
+    }
+    if (!Number.isFinite(packageCountRaw) || packageCountRaw < 1) {
+      return NextResponse.json({ error: "CARGO_PACKAGES_REQUIRED" }, { status: 400 });
+    }
+    if (photoUrls.length < 1) {
+      return NextResponse.json({ error: "CARGO_PHOTOS_REQUIRED" }, { status: 400 });
+    }
+
     const departureTime =
       pickupTime && !Number.isNaN(Date.parse(pickupTime)) ? new Date(pickupTime) : null;
     const route = await getRouteDistanceAndDuration(
@@ -68,30 +85,32 @@ export async function POST(req: Request) {
     const { distanceKm, durationMinutes } = route;
     const oneWayMinutes = durationMinutes ?? Math.round((distanceKm / 50) * 60);
     const roundTripMinutes = oneWayMinutes * 2;
-    const weightKg = cargoDetails?.weightKg != null ? Number(cargoDetails.weightKg) : 0;
+    const weightKg = weightKgRaw;
     const { loadingMinutes, unloadingMinutes } = getLoadUnloadMinutes(
       cargoDetails?.cargoCategory ?? null,
       weightKg
     );
-    const totalDriverMinutes = roundTripMinutes + loadingMinutes + unloadingMinutes;
+    const totalDriverMinutes = Math.round(roundTripMinutes + loadingMinutes + unloadingMinutes);
 
     const st = VALID_SERVICE_TYPES.includes(serviceType as (typeof VALID_SERVICE_TYPES)[number])
       ? (serviceType as (typeof VALID_SERVICE_TYPES)[number])
       : "driver_car";
     const pricing = await getPricingSettings();
-    const priceCents = calculatePriceCents(
+    const pricingOpts = {
+      price_per_km_cents: pricing.price_per_km_cents,
+      driver_hourly_rate_cents: pricing.driver_hourly_rate_cents,
+      driver_only_hourly_cents: pricing.driver_only_hourly_cents,
+      assistant_fee_cents: pricing.assistant_fee_cents,
+    };
+    const breakdown = calculatePriceBreakdown(
       distanceKm,
       cargoSize,
       durationMinutes ?? null,
-      {
-        price_per_km_cents: pricing.price_per_km_cents,
-        driver_hourly_rate_cents: pricing.driver_hourly_rate_cents,
-        driver_only_hourly_cents: pricing.driver_only_hourly_cents,
-        assistant_fee_cents: pricing.assistant_fee_cents,
-      },
+      pricingOpts,
       st,
       totalDriverMinutes
     );
+    const priceCents = breakdown.totalCents;
 
     /** Fahrerpreis = 18 × Hin- und Rückfahrt (Cent) — 18 Cent pro km Hin+Rück */
     const roundTripKm = distanceKm * 2;
@@ -124,6 +143,9 @@ export async function POST(req: Request) {
             ? {
                 ...cargoDetails,
                 cargoCategory: cargoDetails.cargoCategory ?? null,
+                weightKg,
+                packageCount: Math.round(packageCountRaw),
+                photoUrls,
                 roundTripMinutes,
                 loadingMinutes,
                 unloadingMinutes,
@@ -136,7 +158,9 @@ export async function POST(req: Request) {
         price_cents: priceCents,
         driver_price_cents: driverPriceCents,
         assistant_price_cents:
-          st === "driver_car_assistant" ? pricing.assistant_fee_cents ?? null : null,
+          st === "driver_car_assistant" && breakdown.assistantCents > 0
+            ? breakdown.assistantCents
+            : null,
         payment_status: "pending",
         logistics_status: "confirmed",
         confirmation_token: confirmationToken,
@@ -206,6 +230,7 @@ export async function POST(req: Request) {
       `Abholung: ${pickupAddress}`,
       `Lieferung: ${deliveryAddress}`,
       `Ladung: ${cargoSize} | ${distanceKm} km`,
+      `Gewicht: ${weightKg} kg | Stück/Pakete: ${Math.round(packageCountRaw)} | Fotos: ${photoUrls.length}`,
       `Betrag: ${(priceCents / 100).toFixed(2)} EUR`,
       `Ref: ${job.id}`,
     ].join("\n");

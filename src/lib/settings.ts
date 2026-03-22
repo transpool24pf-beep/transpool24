@@ -12,7 +12,7 @@ export const PRICING_DEFAULTS: PricingSettings = {
   price_per_km_cents: { XS: 80, M: 120, L: 200 },
   driver_hourly_rate_cents: 2500,
   driver_only_hourly_cents: 4500, // 45 EUR/h for driver-only
-  assistant_fee_cents: 1630, // 16.30 EUR per job (driver + car + assistant)
+  assistant_fee_cents: 1630, // 16.30 EUR/h for assistant (× total driver billing minutes / 60)
 };
 
 export async function getPricingSettings(): Promise<PricingSettings> {

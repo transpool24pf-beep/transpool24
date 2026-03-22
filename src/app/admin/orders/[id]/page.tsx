@@ -106,6 +106,14 @@ function buildWhatsAppMessage(o: Job): string {
     : o.cargo_details && typeof (o.cargo_details as { cargoWeightKg?: number }).cargoWeightKg === "number"
       ? (o.cargo_details as { cargoWeightKg: number }).cargoWeightKg
       : null;
+  const packageCount =
+    o.cargo_details && typeof (o.cargo_details as { packageCount?: unknown }).packageCount === "number"
+      ? (o.cargo_details as { packageCount: number }).packageCount
+      : null;
+  const photoUrls =
+    o.cargo_details && Array.isArray((o.cargo_details as { photoUrls?: unknown }).photoUrls)
+      ? ((o.cargo_details as { photoUrls: string[] }).photoUrls).filter((u) => typeof u === "string")
+      : [];
   const distanceStr = o.distance_km != null ? `${o.distance_km} km` : "—";
   const volumeStr = cargoVolumeStr(o.cargo_details);
   const serviceLabel = serviceTypeLabelDe(o.service_type);
@@ -128,6 +136,8 @@ function buildWhatsAppMessage(o: Job): string {
       : []),
     ...(volumeStr ? [`${IC.package} Maße (L×B×H): ${volumeStr}`] : []),
     ...(weightKg != null ? [`${IC.scale} Gewicht: ${weightKg} kg`] : []),
+    ...(packageCount != null ? [`${IC.package} Pakete/Stück: ${packageCount}`] : []),
+    ...(photoUrls.length > 0 ? [`📷 Fotos: ${photoUrls.length}`] : []),
     `${IC.lorry} Leistung: ${serviceLabel}`,
     `${IC.building} Firma: ${o.company_name}`,
     "",
@@ -695,6 +705,33 @@ export default function AdminOrderDetailPage({
                 <dd>{(order.cargo_details as { weightKg?: number; cargoWeightKg?: number }).weightKg ?? (order.cargo_details as { cargoWeightKg?: number }).cargoWeightKg} kg</dd>
               </div>
             )}
+            {order.cargo_details && typeof (order.cargo_details as { packageCount?: unknown }).packageCount === "number" && (
+              <div>
+                <dt className="text-[#0d2137]/60">Pakete / Stück</dt>
+                <dd>{(order.cargo_details as { packageCount: number }).packageCount}</dd>
+              </div>
+            )}
+            {order.cargo_details &&
+              Array.isArray((order.cargo_details as { photoUrls?: unknown }).photoUrls) &&
+              (order.cargo_details as { photoUrls: string[] }).photoUrls.length > 0 && (
+                <div className="sm:col-span-2">
+                  <dt className="text-[#0d2137]/60">Ladungsfotos</dt>
+                  <dd className="mt-2 flex flex-wrap gap-2">
+                    {(order.cargo_details as { photoUrls: string[] }).photoUrls.map((url, i) => (
+                      <a
+                        key={url + i}
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block overflow-hidden rounded-lg border border-[#0d2137]/15"
+                      >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={url} alt="" className="h-24 w-24 object-cover hover:opacity-90" />
+                      </a>
+                    ))}
+                  </dd>
+                </div>
+              )}
             <div>
               <dt className="text-[#0d2137]/60">Distanz</dt>
               <dd>{order.distance_km != null ? `${order.distance_km} km` : "—"}</dd>
@@ -721,7 +758,7 @@ export default function AdminOrderDetailPage({
                     }
                     onBlur={(e) => saveAssistantPriceEur(e.target.value)}
                     className="w-28 rounded-lg border-2 border-violet-200 bg-violet-50/50 px-2 py-1.5 text-sm font-semibold text-violet-900"
-                    title="Betrag für den Helfer (Gruppe); auch in WhatsApp & Fahrer-PDF"
+                    title="Berechnet aus Stundensatz × Fahrer-Gesamtzeit; manuell überschreibbar für WhatsApp & Fahrer-PDF"
                   />
                   <span className="ml-2 text-xs text-[#0d2137]/50">€ — speichert bei Fokuswechsel</span>
                 </dd>

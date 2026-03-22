@@ -1,0 +1,3 @@
+-- Order form cargo photos are uploaded to the existing public bucket "driver-documents"
+-- under path prefix: order-cargo/
+-- No new bucket required if "driver-documents" already exists (see add_driver_application_fields.sql).

@@ -127,6 +127,11 @@ export async function generateInvoicePdf(
   }
   const weightKg = cd?.cargoWeightKg ?? cd?.weightKg;
   if (weightKg != null) draw(`Gewicht: ${weightKg} kg`);
+  if (cd?.packageCount != null && Number(cd.packageCount) >= 1) {
+    draw(`Pakete/Stück: ${cd.packageCount}`);
+  }
+  const photoList = Array.isArray(cd?.photoUrls) ? (cd.photoUrls as unknown[]).filter((u) => typeof u === "string") : [];
+  if (photoList.length > 0) draw(`Ladungsfotos: ${photoList.length} (URLs im System)`);
   if (cd?.cargoType) draw(`Typ: ${String(cd.cargoType)}`);
   if (cd?.stackable != null) draw(`Stapelbar: ${cd.stackable ? "Ja" : "Nein"}`);
   const st =
