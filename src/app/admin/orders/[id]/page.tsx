@@ -309,7 +309,6 @@ export default function AdminOrderDetailPage({
       return;
     }
     const pickupUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(order.pickup_address)}&travelmode=driving`;
-    const routeUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(order.pickup_address)}&destination=${encodeURIComponent(order.delivery_address)}&travelmode=driving`;
     const orderRef = order.order_number != null ? String(order.order_number) : order.id.slice(0, 8);
     const distStr = order.distance_km != null ? `${order.distance_km} km` : "—";
 
@@ -339,7 +338,7 @@ export default function AdminOrderDetailPage({
 
     const trackingBlock = driverTrackUrl
       ? [
-          "📲 Sendungsverfolgung für den Kunden (während der Fahrt öffnen – der Kunde sieht die Sendung auf dem Weg zur Lieferung):",
+          "📲 Sendungsverfolgung (während der Fahrt verfügbar – der Kunde sieht die Sendung auf dem Weg zur Zustellung):",
           driverTrackUrl,
           "",
         ]
@@ -354,9 +353,6 @@ export default function AdminOrderDetailPage({
       ...customerLines,
       "📍 1) Zum Abholort (ein Tippen):",
       pickupUrl,
-      "",
-      "🛣️ 2) Gesamtfahrt von der Abholung bis zur Zustellung (ein Tippen) – Route in Google Maps:",
-      routeUrl,
       "",
       ...trackingBlock,
       "📏 Distanz (ca.): " + distStr,
@@ -732,9 +728,9 @@ export default function AdminOrderDetailPage({
               onClick={() => void openWhatsAppDriverNavLinks()}
               className="flex flex-col items-center justify-center gap-1 rounded-xl border-2 border-emerald-700 bg-emerald-700 px-4 py-3 text-center font-medium text-white shadow-sm hover:bg-emerald-800"
             >
-              <span>WhatsApp Fahrer: Kundendaten + Route + Sendungsverfolgung</span>
+              <span>WhatsApp Fahrer: Kundendaten + Abholort + Sendungsverfolgung</span>
               <span className="text-xs font-normal opacity-90">
-                Kunde/Kontakt, Abholort (1×), Gesamtstrecke, TransPool24-Link für Live-Tracking
+                Kunde/Kontakt, Abholort (1×), TransPool24-Link für Live-Tracking
               </span>
             </button>
             {order.customer_email && (
