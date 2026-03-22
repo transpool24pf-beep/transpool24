@@ -1,7 +1,17 @@
 import { getSupabase } from "@/lib/supabase";
 import { defaultWhyPayloadForLocale } from "@/lib/why-transpool24-defaults";
-import { isValidWhyPayload, type WhyPagePayload } from "@/lib/why-transpool24-types";
+import {
+  isValidWhyPayload,
+  WHY_PAGE_CONTENT_REVISION,
+  type WhyPagePayload,
+} from "@/lib/why-transpool24-types";
 import { normalizeWhyAssetUrl } from "@/lib/why-asset-url";
+
+function dbPayloadRevision(p: WhyPagePayload): number {
+  return typeof p.contentRevision === "number" && Number.isFinite(p.contentRevision)
+    ? p.contentRevision
+    : 0;
+}
 
 function normalizeWhyPayloadMedia(p: WhyPagePayload): WhyPagePayload {
   return {
@@ -23,7 +33,12 @@ export async function getWhyPagePayload(locale: string): Promise<WhyPagePayload>
       .maybeSingle();
     if (error || !data?.payload) return base;
     if (isValidWhyPayload(data.payload)) {
-      return normalizeWhyPayloadMedia({ ...base, ...(data.payload as WhyPagePayload) });
+      const fromDb = data.payload as WhyPagePayload;
+      // Old CMS rows (no / low revision) must not override new in-repo B2B defaults
+      if (dbPayloadRevision(fromDb) < WHY_PAGE_CONTENT_REVISION) {
+        return base;
+      }
+      return normalizeWhyPayloadMedia({ ...base, ...fromDb });
     }
   } catch {
     /* missing table or env in dev */

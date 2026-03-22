@@ -3,7 +3,11 @@ import { requireWebsiteAdmin } from "@/lib/website-admin-api";
 import { createServerSupabase } from "@/lib/supabase";
 import { getWhyPagePayload } from "@/lib/get-why-page-payload";
 import { defaultWhyPayloadForLocale } from "@/lib/why-transpool24-defaults";
-import { isValidWhyPayload, type WhyPagePayload } from "@/lib/why-transpool24-types";
+import {
+  isValidWhyPayload,
+  WHY_PAGE_CONTENT_REVISION,
+  type WhyPagePayload,
+} from "@/lib/why-transpool24-types";
 import { normalizeWhyAssetUrl } from "@/lib/why-asset-url";
 import { locales } from "@/i18n/routing";
 
@@ -72,7 +76,7 @@ export async function PATCH(request: Request) {
     }
 
     const current = await getWhyPagePayload(locale);
-    const next = { ...current };
+    const next = { ...current, contentRevision: WHY_PAGE_CONTENT_REVISION };
     if (typeof body.heroImageUrl === "string") next.heroImageUrl = normalizeWhyAssetUrl(body.heroImageUrl);
     if (typeof body.sceneImageUrl === "string") next.sceneImageUrl = normalizeWhyAssetUrl(body.sceneImageUrl);
     if (typeof body.howVideoUrl === "string") next.howVideoUrl = body.howVideoUrl.trim();

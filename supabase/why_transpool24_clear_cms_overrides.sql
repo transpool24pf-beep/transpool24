@@ -1,11 +1,7 @@
--- why_transpool24_locale OVERRIDES code defaults in src/lib/why-defaults-*.ts
--- If /ar/why (or any locale) still shows old copy (furniture, fragile goods, vehicle moves),
--- remove the stored row so the site uses the new B2B defaults from the repo.
+-- why_transpool24_locale: rows with payload.contentRevision < WHY_PAGE_CONTENT_REVISION (see
+-- src/lib/why-transpool24-types.ts) are IGNORED at runtime — the app uses code defaults instead.
+-- Manual DELETE is optional; bump WHY_PAGE_CONTENT_REVISION when shipping a new default copy.
 --
--- Option A — Website CMS: /website/why → language "ar" → button "Code-Standard" (calls DELETE API).
---
--- Option B — Supabase SQL Editor (all locales):
+-- Optional reset (forces one DB row to disappear; next save from CMS re-creates it):
 -- DELETE FROM why_transpool24_locale;
---
--- Option B — Arabic only:
 -- DELETE FROM why_transpool24_locale WHERE locale = 'ar';

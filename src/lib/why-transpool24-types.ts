@@ -6,7 +6,12 @@ export type WhyServiceType = { name: string; body: string };
 export type WhyFaq = { q: string; a: string };
 export type WhyHowStep = { title: string; body: string };
 
+/** Bump when default copy changes in code; DB rows below this revision are ignored (use code defaults). */
+export const WHY_PAGE_CONTENT_REVISION = 2;
+
 export type WhyPagePayload = {
+  /** Stored in CMS JSON; must match WHY_PAGE_CONTENT_REVISION to override code defaults */
+  contentRevision?: number;
   metaTitle: string;
   heroBadge: string;
   headline: string;

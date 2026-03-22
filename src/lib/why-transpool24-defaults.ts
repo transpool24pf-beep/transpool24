@@ -1,4 +1,5 @@
 import type { WhyPagePayload } from "./why-transpool24-types";
+import { WHY_PAGE_CONTENT_REVISION } from "./why-transpool24-types";
 import { whyPageAr } from "./why-defaults-ar";
 import { whyPageDe } from "./why-defaults-de";
 import { whyPageEn } from "./why-defaults-en";
@@ -31,5 +32,5 @@ export const WHY_PAGE_DEFAULTS: Record<Locale, WhyPagePayload> = {
 
 export function defaultWhyPayloadForLocale(locale: string): WhyPagePayload {
   const l = locales.includes(locale as Locale) ? (locale as Locale) : "de";
-  return WHY_PAGE_DEFAULTS[l];
+  return { ...WHY_PAGE_DEFAULTS[l], contentRevision: WHY_PAGE_CONTENT_REVISION };
 }
