@@ -309,44 +309,58 @@ export default function AdminOrderDetailPage({
       return;
     }
     const pickupUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(order.pickup_address)}&travelmode=driving`;
-    const deliveryUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(order.delivery_address)}&travelmode=driving`;
     const routeUrl = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(order.pickup_address)}&destination=${encodeURIComponent(order.delivery_address)}&travelmode=driving`;
     const orderRef = order.order_number != null ? String(order.order_number) : order.id.slice(0, 8);
     const distStr = order.distance_km != null ? `${order.distance_km} km` : "—";
 
-    let gpsLine = "";
+    let driverTrackUrl: string | null = null;
     try {
       const r = await fetch(`/api/admin/orders/${order.id}/driver-share-link`, { method: "POST" });
       const j = (await r.json()) as { url?: string };
       if (r.ok && j.url) {
-        gpsLine = [
-          "",
-          "📡 Live-Standort für den Kunden (bitte freigeben):",
-          j.url,
-          "(Link öffnen → Standortfreigabe starten)",
-          "",
-        ].join("\n");
+        driverTrackUrl = j.url;
         const full = await fetch(`/api/admin/orders/${order.id}`).then((x) => x.json());
         setOrder(full as Job);
       }
     } catch {
-      /* GPS link optional */
+      /* Tracking link optional */
     }
+
+    const customerLines = [
+      "👤 Kunde / Kontakt:",
+      `Firma: ${order.company_name || "—"}`,
+      `Telefon: ${order.phone || "—"}`,
+      ...(order.customer_email?.trim() ? [`E-Mail: ${order.customer_email.trim()}`] : []),
+      "",
+      `Abholung: ${order.pickup_address}`,
+      `Zustellung: ${order.delivery_address}`,
+      "",
+    ];
+
+    const trackingBlock = driverTrackUrl
+      ? [
+          "📲 Sendungsverfolgung für den Kunden (während der Fahrt öffnen – der Kunde sieht die Sendung auf dem Weg zur Lieferung):",
+          driverTrackUrl,
+          "",
+        ]
+      : [
+          "📲 Sendungsverfolgung: Link nicht erzeugt – in der Auftragsmaske „Fahrer-GPS-Link kopieren“ nutzen.",
+          "",
+        ];
 
     const text = [
       "🚚 TransPool24 – Auftrag #" + orderRef,
       "",
-      "📍 1) Navigation zur Abholung (ein Tippen):",
+      ...customerLines,
+      "📍 1) Zum Abholort (ein Tippen):",
       pickupUrl,
       "",
-      "📍 2) Navigation zur Zustellung:",
-      deliveryUrl,
-      "",
-      "🛣️ 3) Gesamtroute Abholung → Zustellung:",
+      "🛣️ 2) Gesamtfahrt von der Abholung bis zur Zustellung (ein Tippen) – Route in Google Maps:",
       routeUrl,
       "",
+      ...trackingBlock,
       "📏 Distanz (ca.): " + distStr,
-      gpsLine,
+      "",
       "Viel Erfolg!",
     ].join("\n");
 
@@ -718,9 +732,9 @@ export default function AdminOrderDetailPage({
               onClick={() => void openWhatsAppDriverNavLinks()}
               className="flex flex-col items-center justify-center gap-1 rounded-xl border-2 border-emerald-700 bg-emerald-700 px-4 py-3 text-center font-medium text-white shadow-sm hover:bg-emerald-800"
             >
-              <span>WhatsApp Fahrer: Abholung + Zustellung + Karten</span>
+              <span>WhatsApp Fahrer: Kundendaten + Route + Sendungsverfolgung</span>
               <span className="text-xs font-normal opacity-90">
-                Ein-Klick-Google-Maps-Links + Tracking-Link für Kunden erzeugen
+                Kunde/Kontakt, Abholort (1×), Gesamtstrecke, TransPool24-Link für Live-Tracking
               </span>
             </button>
             {order.customer_email && (
