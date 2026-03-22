@@ -9,6 +9,14 @@ import {
   WORK_POLICY_TITLE,
   WORK_POLICY_TEXT,
 } from "@/lib/driver-policy";
+import type { DriverWizardFormSnapshot } from "@/lib/driver-wizard-storage";
+import {
+  clearDriverWizardDraft,
+  driverWizardHasProgress,
+  mergeDriverWizardForm,
+  parseDriverWizardDraft,
+  saveDriverWizardDraft,
+} from "@/lib/driver-wizard-storage";
 
 const DriverCityMap = dynamic(
   () => import("@/components/DriverCityMap").then((m) => m.DriverCityMap),
@@ -180,17 +188,34 @@ export function DriverWizardForm({
 }) {
   const t = useTranslations("driver");
   const [step, setStep] = useState(1);
-  const [form, setForm] = useState<FormData>({
-    ...initialForm,
-    city: initialCity || "",
-  });
+  const [form, setForm] = useState<FormData>(() => mergeDriverWizardForm(undefined, initialCity || ""));
+  const [draftRestored, setDraftRestored] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [countryCodeOpen, setCountryCodeOpen] = useState(false);
   const countryCodeRef = useRef<HTMLDivElement>(null);
+  const saveDraftTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (initialCity) setForm((f) => ({ ...f, city: initialCity }));
+    const d = parseDriverWizardDraft();
+    if (d) {
+      let s = Math.min(4, Math.max(1, d.step));
+      if (d.step >= 5) {
+        clearDriverWizardDraft();
+        s = 1;
+      }
+      setStep(s);
+      setForm(mergeDriverWizardForm(d.form, initialCity || ""));
+    }
+    setDraftRestored(true);
+    // Intentionally once on mount: draft is shared across locales; re-running would reset edits if initialCity changed.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (initialCity) {
+      setForm((f) => ({ ...f, city: f.city?.trim() ? f.city : initialCity }));
+    }
   }, [initialCity]);
 
   useEffect(() => {
@@ -200,6 +225,25 @@ export function DriverWizardForm({
     document.addEventListener("mousedown", close);
     return () => document.removeEventListener("mousedown", close);
   }, []);
+
+  useEffect(() => {
+    if (!draftRestored) return;
+    if (saveDraftTimer.current) clearTimeout(saveDraftTimer.current);
+    saveDraftTimer.current = setTimeout(() => {
+      if (step >= 5) {
+        clearDriverWizardDraft();
+        return;
+      }
+      if (!driverWizardHasProgress(form, step)) {
+        clearDriverWizardDraft();
+        return;
+      }
+      saveDriverWizardDraft(step, form);
+    }, 400);
+    return () => {
+      if (saveDraftTimer.current) clearTimeout(saveDraftTimer.current);
+    };
+  }, [step, form, draftRestored]);
 
   const update = (k: keyof FormData, v: string | boolean) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -253,6 +297,7 @@ export function DriverWizardForm({
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Absenden fehlgeschlagen");
+      clearDriverWizardDraft();
       setStep(5);
     } catch (e) {
       setSubmitError(e instanceof Error ? e.message : "Absenden fehlgeschlagen");

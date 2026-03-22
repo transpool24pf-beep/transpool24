@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
+import { shouldOpenDriverFormFromDraft } from "@/lib/driver-wizard-storage";
 import { DriverWizardForm } from "./DriverWizardForm";
 import { OrderRouteLottie } from "./OrderRouteLottie";
 
@@ -13,6 +14,10 @@ export function DriverPageClient({ locale }: { locale: string }) {
   const [showForm, setShowForm] = useState(false);
   const [faqOpen, setFaqOpen] = useState<number | null>(null);
   const rtl = locale === "ar";
+
+  useEffect(() => {
+    if (shouldOpenDriverFormFromDraft()) setShowForm(true);
+  }, []);
 
   const faqItems = useMemo(
     () =>
