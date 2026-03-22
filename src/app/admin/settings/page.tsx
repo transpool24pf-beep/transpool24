@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 type Pricing = {
   price_per_km_cents?: Record<string, number>;
   driver_hourly_rate_cents?: number;
+  driver_only_hourly_cents?: number;
+  assistant_fee_cents?: number;
 };
 
 const SIZE_LABELS: Record<string, string> = {
@@ -29,8 +31,12 @@ export default function AdminSettingsPage() {
   const [pricing, setPricing] = useState<Pricing>({
     price_per_km_cents: { XS: 80, M: 120, L: 200 },
     driver_hourly_rate_cents: 2500,
+    driver_only_hourly_cents: 4500,
+    assistant_fee_cents: 1630,
   });
   const [driverRateEur, setDriverRateEur] = useState("25,00");
+  const [driverOnlyEur, setDriverOnlyEur] = useState("45,00");
+  const [assistantFeeEur, setAssistantFeeEur] = useState("16,30");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -38,12 +44,18 @@ export default function AdminSettingsPage() {
     fetch("/api/admin/settings")
       .then((r) => r.json())
       .then((data) => {
-        const cents = data.driver_hourly_rate_cents ?? 2500;
+        const withCar = data.driver_hourly_rate_cents ?? 2500;
+        const onlyDriver = data.driver_only_hourly_cents ?? 4500;
+        const assistant = data.assistant_fee_cents ?? 1630;
         setPricing({
           price_per_km_cents: data.price_per_km_cents ?? { XS: 80, M: 120, L: 200 },
-          driver_hourly_rate_cents: cents,
+          driver_hourly_rate_cents: withCar,
+          driver_only_hourly_cents: onlyDriver,
+          assistant_fee_cents: assistant,
         });
-        setDriverRateEur(formatEur(cents));
+        setDriverRateEur(formatEur(withCar));
+        setDriverOnlyEur(formatEur(onlyDriver));
+        setAssistantFeeEur(formatEur(assistant));
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -55,6 +67,8 @@ export default function AdminSettingsPage() {
     const toSave = {
       ...pricing,
       driver_hourly_rate_cents: parseEur(driverRateEur) || 2500,
+      driver_only_hourly_cents: parseEur(driverOnlyEur) || 4500,
+      assistant_fee_cents: parseEur(assistantFeeEur) || 1630,
     };
     fetch("/api/admin/settings", {
       method: "PUT",
@@ -114,9 +128,9 @@ export default function AdminSettingsPage() {
         </section>
 
         <section className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
-          <h2 className="mb-1 text-lg font-medium text-[#0d2137]">Fahrer-Stundenlohn (EUR)</h2>
+          <h2 className="mb-1 text-lg font-medium text-[#0d2137]">Stundenlohn: Fahrer mit Fahrzeug</h2>
           <p className="mb-4 text-sm text-[#0d2137]/60">
-            Für Routenzeit (z. B. Google). Betrag in Euro, z. B. 25,00.
+            Für die Zeitberechnung bei „Fahrer mit Auto“ (zusätzlich zum km-Preis). Z. B. 25,00 €/h.
           </p>
           <div className="max-w-xs">
             <input
@@ -128,6 +142,42 @@ export default function AdminSettingsPage() {
               className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2.5 text-lg focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
             />
             <p className="mt-1 text-xs text-[#0d2137]/50">Euro pro Stunde</p>
+          </div>
+        </section>
+
+        <section className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
+          <h2 className="mb-1 text-lg font-medium text-[#0d2137]">Stundenlohn: Nur Fahrer (ohne Fahrzeug)</h2>
+          <p className="mb-4 text-sm text-[#0d2137]/60">
+            Gilt für „Nur Fahrer“ – der Preis wird nur nach Fahrzeit berechnet (kein km-Anteil in der Formel).
+          </p>
+          <div className="max-w-xs">
+            <input
+              type="text"
+              inputMode="decimal"
+              value={driverOnlyEur}
+              onChange={(e) => setDriverOnlyEur(e.target.value)}
+              placeholder="45,00"
+              className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2.5 text-lg focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+            />
+            <p className="mt-1 text-xs text-[#0d2137]/50">Euro pro Stunde</p>
+          </div>
+        </section>
+
+        <section className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
+          <h2 className="mb-1 text-lg font-medium text-[#0d2137]">Aufpreis Beifahrer / Helfer</h2>
+          <p className="mb-4 text-sm text-[#0d2137]/60">
+            Fester Betrag pro Auftrag bei „Fahrer mit Auto + Helfer“ (einmalig, nicht pro Stunde).
+          </p>
+          <div className="max-w-xs">
+            <input
+              type="text"
+              inputMode="decimal"
+              value={assistantFeeEur}
+              onChange={(e) => setAssistantFeeEur(e.target.value)}
+              placeholder="16,30"
+              className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2.5 text-lg focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+            />
+            <p className="mt-1 text-xs text-[#0d2137]/50">Euro pro Auftrag</p>
           </div>
         </section>
 
