@@ -143,6 +143,7 @@
     "distanceRoute": "المسافة (مسار الطريق)",
     "distanceFromRouteLabel": "محسوبة من مسار الطريق الفعلي",
     "calculateDistance": "احسب المسافة الحقيقية",
+    "routeCalculating": "جاري حساب المسار…",
     "distanceRouteResult": "المسافة من مسار الطريق",
     "distanceManualHint": "تعذر الحساب تلقائياً — يمكنك إدخال المسافة يدوياً في الخطوة التالية",
     "km": "كم",

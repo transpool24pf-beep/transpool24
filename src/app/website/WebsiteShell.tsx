@@ -91,6 +91,10 @@ export function WebsiteShell({ children }: { children: React.ReactNode }) {
           </a>
           <span className="mx-2">·</span>
           <span>Keine Aufträge / keine Kundendaten hier</span>
+          <span className="mx-2">·</span>
+          <span>
+            Öffentliche Buchung (/order): Lottie-Animation bei Streckenberechnung, Zusammenfassung &amp; Absenden
+          </span>
         </footer>
       </main>
       <aside className="sticky top-14 h-[calc(100vh-3.5rem)] w-56 shrink-0 border-l border-[#0d2137]/10 bg-white shadow-sm">

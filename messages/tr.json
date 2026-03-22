@@ -143,6 +143,7 @@
     "distanceRoute": "Rota mesafesi",
     "distanceFromRouteLabel": "Gerçek rota üzerinden hesaplandı",
     "calculateDistance": "Gerçek mesafeyi hesapla",
+    "routeCalculating": "Rota hesaplanıyor…",
     "distanceRouteResult": "Rota mesafesi",
     "distanceManualHint": "Hesaplanamadı — mesafeyi sonraki adımda elle girin.",
     "km": "km",

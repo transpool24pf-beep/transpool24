@@ -143,6 +143,7 @@
     "distanceRoute": "Distancia por ruta",
     "distanceFromRouteLabel": "Calculada según ruta real",
     "calculateDistance": "Calcular distancia real",
+    "routeCalculating": "Calculando la ruta…",
     "distanceRouteResult": "Distancia por ruta",
     "distanceManualHint": "No se pudo calcular — introduce la distancia manualmente en el siguiente paso.",
     "km": "km",

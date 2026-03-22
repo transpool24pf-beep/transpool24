@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
+import { OrderRouteLottie } from "@/components/OrderRouteLottie";
 import { calculatePriceCents, formatPrice, type ServiceType } from "@/lib/pricing";
 import { volumeM3, suggestCargoSize, suggestVehicleLabel, getLoadUnloadMinutes, CARGO_CATEGORIES, type CargoType, type CargoCategoryId } from "@/lib/cargo";
 
@@ -617,6 +618,11 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
                 >
                   {distanceLoading ? "…" : t("calculateDistance")}
                 </button>
+                {distanceLoading && (
+                  <div className="mt-4 border-t border-[#0d2137]/10 pt-4">
+                    <OrderRouteLottie label={t("routeCalculating")} size="md" />
+                  </div>
+                )}
                 {distanceFromRoute && (
                   <p className="mt-2 text-sm font-medium text-green-700">
                     {t("distanceRouteResult")}: {data.distanceKm} km
@@ -879,11 +885,20 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
       )}
 
       {step === 4 && !orderConfirmed && (
-        <div className="space-y-4">
+        <div className="relative space-y-4">
+          {loading && (
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 rounded-xl bg-[var(--background)]/85 p-6 backdrop-blur-sm">
+              <OrderRouteLottie label={t("loading")} size="md" />
+            </div>
+          )}
           <h2 className="text-lg font-semibold text-[var(--primary)]">
             {t("step4")}
           </h2>
-          <div className="space-y-2 rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/5 p-4 text-sm">
+          <div className="flex flex-col gap-4 rounded-xl border border-[#0d2137]/10 bg-[#0d2137]/5 p-4 sm:flex-row sm:items-start">
+            <div className="flex shrink-0 justify-center sm:w-[7.5rem] sm:pt-1">
+              <OrderRouteLottie size="sm" className="opacity-95" />
+            </div>
+            <div className="min-w-0 flex-1 space-y-2 text-sm">
             <p><strong>{t("companyName")}:</strong> {data.companyName}</p>
             <p><strong>{t("email")}:</strong> {data.email}</p>
             <p><strong>{t("whatsapp")}:</strong> {data.phone.trim() ? normalizePhone(data.phone) : data.phone}</p>
@@ -904,6 +919,7 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
             <p className="pt-2 text-lg font-bold text-[var(--accent)]">
               {t("total")}: {formatPrice(priceCents)}
             </p>
+            </div>
           </div>
           <div className="rounded-lg border border-[#0d2137]/15 bg-[#0d2137]/5 p-4">
             <p className="text-sm text-[var(--foreground)] leading-relaxed">

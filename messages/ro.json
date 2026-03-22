@@ -143,6 +143,7 @@
     "distanceRoute": "Distanța traseului",
     "distanceFromRouteLabel": "Calculat din traseul real",
     "calculateDistance": "Calculați distanța reală",
+    "routeCalculating": "Se calculează traseul…",
     "distanceRouteResult": "Distanța traseului",
     "distanceManualHint": "Nu s-a putut calcula automat — introduceți manual distanța în pasul următor.",
     "km": "km",

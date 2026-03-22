@@ -143,6 +143,7 @@
     "distanceRoute": "Streckenentfernung",
     "distanceFromRouteLabel": "Berechnet nach echter Strecke",
     "calculateDistance": "Echte Strecke berechnen",
+    "routeCalculating": "Route wird berechnet…",
     "distanceRouteResult": "Strecke",
     "distanceManualHint": "Berechnung nicht möglich — Entfernung in der nächsten Schritt eingeben.",
     "km": "km",

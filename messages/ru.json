@@ -143,6 +143,7 @@
     "distanceRoute": "Расстояние маршрута",
     "distanceFromRouteLabel": "Рассчитано по фактическому маршруту",
     "calculateDistance": "Рассчитать реальное расстояние",
+    "routeCalculating": "Расчёт маршрута…",
     "distanceRouteResult": "Расстояние маршрута",
     "distanceManualHint": "Не удалось рассчитать автоматически — введите расстояние вручную на следующем шаге.",
     "km": "км",

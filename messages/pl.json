@@ -143,6 +143,7 @@
     "distanceRoute": "Odległość trasy",
     "distanceFromRouteLabel": "Obliczone na podstawie rzeczywistej trasy",
     "calculateDistance": "Oblicz rzeczywistą odległość",
+    "routeCalculating": "Obliczanie trasy…",
     "distanceRouteResult": "Odległość trasy",
     "distanceManualHint": "Nie można obliczyć automatycznie — w następnym kroku wprowadź odległość ręcznie.",
     "km": "km",
