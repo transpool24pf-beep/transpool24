@@ -5,6 +5,35 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
+/** Safe URL for HTML img src + Leaflet divIcon */
+function sanitizeMarkerPhotoUrl(raw: string | null | undefined): string | null {
+  if (!raw || typeof raw !== "string") return null;
+  const t = raw.trim();
+  if (!t) return null;
+  try {
+    const u = new URL(t);
+    if (u.protocol !== "https:" && u.protocol !== "http:") return null;
+    return u.href;
+  } catch {
+    return null;
+  }
+}
+
+function escapeAttr(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/</g, "&lt;");
+}
+
+function createDriverPhotoDivIcon(href: string): L.DivIcon {
+  const safe = escapeAttr(href);
+  return L.divIcon({
+    className: "leaflet-driver-photo-marker",
+    html: `<div class="leaflet-driver-photo-marker__inner"><img src="${safe}" alt="" /></div>`,
+    iconSize: [54, 54],
+    iconAnchor: [27, 54],
+    popupAnchor: [0, -48],
+  });
+}
+
 if (typeof window !== "undefined") {
   const DefaultIcon = L.icon({
     iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -41,6 +70,7 @@ export function OrderTrackMap({
   delivery,
   routeLine,
   livePosition,
+  liveMarkerPhotoUrl,
   trail = [],
   pickupLabel,
   deliveryLabel,
@@ -50,6 +80,7 @@ export function OrderTrackMap({
   delivery?: LatLng | null;
   routeLine?: GeoJSON.LineString | null;
   livePosition?: LatLng | null;
+  liveMarkerPhotoUrl?: string | null;
   trail?: TrailPointMap[];
   pickupLabel?: string;
   deliveryLabel?: string;
@@ -85,6 +116,12 @@ export function OrderTrackMap({
     return [s.lat / boundsPoints.length, s.lng / boundsPoints.length];
   }, [boundsPoints]);
 
+  const liveIcon = useMemo(() => {
+    const href = sanitizeMarkerPhotoUrl(liveMarkerPhotoUrl);
+    if (!href || typeof window === "undefined") return undefined;
+    return createDriverPhotoDivIcon(href);
+  }, [liveMarkerPhotoUrl]);
+
   if (boundsPoints.length === 0) return null;
 
   return (
@@ -115,7 +152,10 @@ export function OrderTrackMap({
           </Marker>
         )}
         {livePosition && (
-          <Marker position={[livePosition.lat, livePosition.lng]}>
+          <Marker
+            position={[livePosition.lat, livePosition.lng]}
+            {...(liveIcon ? { icon: liveIcon } : {})}
+          >
             <Popup>{liveLabel ?? "Live position"}</Popup>
           </Marker>
         )}

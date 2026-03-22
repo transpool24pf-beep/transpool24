@@ -315,6 +315,7 @@ export function OrderTrackClient({
             }
             routeLine={routePlan?.line ?? null}
             livePosition={hasLivePosition && lat != null && lng != null ? { lat, lng } : null}
+            liveMarkerPhotoUrl={driver?.personal_photo_url ?? null}
             trail={trailForMap}
             pickupLabel={t("trackPickup")}
             deliveryLabel={t("trackDelivery")}
