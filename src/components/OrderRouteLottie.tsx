@@ -10,6 +10,10 @@ type Props = {
   /** Shown under the animation (e.g. “Calculating route…”). */
   label?: string;
   size?: "md" | "sm" | "lg" | "xl";
+  /** When set, overrides `size` pixel width/height. */
+  dimension?: number;
+  /** Mirror horizontally (reliable for `dotlottie-wc` vs CSS on a distant ancestor). */
+  flipHorizontal?: boolean;
   className?: string;
 };
 
@@ -21,12 +25,15 @@ export function OrderRouteLottie({
   src = DOTLOTTIE_ROUTE_PIN,
   label,
   size = "md",
+  dimension: dimensionProp,
+  flipHorizontal = false,
   className = "",
 }: Props) {
   const [playerReady, setPlayerReady] = useState(false);
   const playerRef = useRef<HTMLDivElement>(null);
   const dim =
-    size === "sm" ? 88 : size === "lg" ? 132 : size === "xl" ? 220 : 120;
+    dimensionProp ??
+    (size === "sm" ? 88 : size === "lg" ? 132 : size === "xl" ? 220 : 120);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -73,7 +80,16 @@ export function OrderRouteLottie({
   return (
     <div className={`flex flex-col items-center justify-center gap-2 ${className}`}>
       <Script src={DOTLOTTIE_WC_SCRIPT} strategy="afterInteractive" type="module" />
-      <div className="relative" style={{ width: dim, height: dim }}>
+      <div
+        className="relative"
+        style={{
+          width: dim,
+          height: dim,
+          ...(flipHorizontal
+            ? { transform: "scaleX(-1)", transformOrigin: "center center" }
+            : {}),
+        }}
+      >
         {!playerReady && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
             <span
