@@ -68,7 +68,9 @@ export function WebsiteWhyTranspool24Client() {
       const data = await parseFetchJson<{ payload?: unknown; error?: string }>(res);
       if (!res.ok) throw new Error(data.error || "Zurücksetzen fehlgeschlagen");
       setJsonText(JSON.stringify(data.payload, null, 2));
-      setMessage("Auf Standard zurückgesetzt (nur Anzeige — bei Bedarf speichern).");
+      setMessage(
+        "Zurückgesetzt: DB-Eintrag gelöscht. Öffentliche /[locale]/why nutzt jetzt den Code-Standard — kein erneutes Speichern nötig.",
+      );
     } catch (e) {
       setMessage(e instanceof Error ? e.message : "Zurücksetzen fehlgeschlagen");
     } finally {
@@ -82,7 +84,12 @@ export function WebsiteWhyTranspool24Client() {
       <p className="mb-6 text-sm text-[#0d2137]/70">
         Inhalt der Seite{" "}
         <code className="rounded bg-[#0d2137]/5 px-1">/[locale]/why</code> — JSON bearbeiten und speichern.
-        Tabelle <code className="rounded bg-[#0d2137]/5 px-1">why_transpool24_locale</code> in Supabase ausführen.
+        Gespeicherte Zeilen in <code className="rounded bg-[#0d2137]/5 px-1">why_transpool24_locale</code>{" "}
+        <strong>überschreiben</strong> die Texte aus dem Code (
+        <code className="rounded bg-[#0d2137]/5 px-1">src/lib/why-defaults-*.ts</code>
+        ). Zeigt die Live-Seite noch alte Texte (z. B. Möbel / „zerbrechlich“)? Sprache wählen →{" "}
+        <strong>Code-Standard</strong> — dann ist der DB-Eintrag gelöscht und die Seite nutzt sofort die neuen
+        B2B-Standardtexte.
       </p>
       <p className="mb-6 rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/[0.03] px-4 py-3 text-sm text-[#0d2137]/75">
         <strong className="text-[#0d2137]">Abschlussbereich (orange CTA + dunkle Fußzeile):</strong> Wird am Ende aller öffentlichen Seiten mit{" "}
@@ -132,7 +139,11 @@ export function WebsiteWhyTranspool24Client() {
       </div>
 
       {message && (
-        <p className={`mb-3 text-sm ${message.startsWith("Gespeichert") ? "text-green-700" : "text-red-700"}`}>
+        <p
+          className={`mb-3 text-sm ${
+            message.startsWith("Gespeichert") || message.startsWith("Zurückgesetzt") ? "text-green-700" : "text-red-700"
+          }`}
+        >
           {message}
         </p>
       )}
