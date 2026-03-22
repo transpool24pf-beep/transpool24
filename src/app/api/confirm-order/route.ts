@@ -130,6 +130,8 @@ export async function POST(req: Request) {
         duration_minutes: durationMinutes ?? null,
         price_cents: priceCents,
         driver_price_cents: driverPriceCents,
+        assistant_price_cents:
+          st === "driver_car_assistant" ? pricing.assistant_fee_cents ?? null : null,
         payment_status: "pending",
         logistics_status: "confirmed",
         confirmation_token: confirmationToken,

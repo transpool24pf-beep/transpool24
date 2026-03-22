@@ -83,6 +83,8 @@ export async function POST(req: Request) {
           service_type: serviceType,
           distance_km: distanceKm,
           price_cents: priceCents,
+          assistant_price_cents:
+            serviceType === "driver_car_assistant" ? pricing.assistant_fee_cents ?? null : null,
           payment_status: "pending",
           logistics_status: "draft",
         })

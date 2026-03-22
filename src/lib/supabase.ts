@@ -45,6 +45,8 @@ export type Job = {
   duration_minutes: number | null;
   price_cents: number;
   driver_price_cents?: number | null;
+  /** Payout for assistant (Helfer), cents; service_type driver_car_assistant */
+  assistant_price_cents?: number | null;
   payment_status: "pending" | "paid" | "refunded" | "failed";
   logistics_status: string;
   confirmation_token: string | null;

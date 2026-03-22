@@ -138,8 +138,14 @@ export async function generateInvoicePdf(
   draw(`Distanz: ${job.distance_km ?? "-"} km`);
   y -= 12;
 
-  const assistantCents = 1630;
+  const defaultAssistantCents = 1630;
   const hasAssistant = job.service_type === "driver_car_assistant";
+  const assistantCents =
+    hasAssistant
+      ? (job.assistant_price_cents != null && job.assistant_price_cents >= 0
+          ? job.assistant_price_cents
+          : defaultAssistantCents)
+      : 0;
   if (type === "driver") {
     draw(`Fahrerpreis: € ${(amountCents / 100).toFixed(2)}`);
     if (hasAssistant) {

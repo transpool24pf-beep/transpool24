@@ -17,6 +17,7 @@ type Job = {
   distance_km: number | null;
   price_cents: number;
   driver_price_cents: number | null;
+  assistant_price_cents: number | null;
   payment_status: string;
   logistics_status: string;
   created_at: string;
@@ -90,7 +91,8 @@ const IC = {
 function buildWhatsAppMessage(o: Job): string {
   const orderRef = o.order_number != null ? String(o.order_number) : o.id;
   const driverEur = getDriverPriceEur(o);
-  const assistantEur = "16.30";
+  const assistantCents = o.assistant_price_cents ?? 1630;
+  const assistantEur = (assistantCents / 100).toFixed(2);
   const hasAssistant = o.service_type === "driver_car_assistant";
   const timeStr = o.preferred_pickup_at
     ? new Date(o.preferred_pickup_at).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })
@@ -131,7 +133,7 @@ function buildWhatsAppMessage(o: Job): string {
     o.delivery_address,
     "",
     `${IC.money} Fahrerpreis (Gruppe): ${driverEur} EUR`,
-    ...(hasAssistant ? [`${IC.worker} Helferpauschale: ${assistantEur} EUR`] : []),
+    ...(hasAssistant ? [`${IC.worker} Helfer (Gruppe): ${assistantEur} EUR`] : []),
   ];
   return blocks.join("\n");
 }
@@ -223,6 +225,27 @@ export default function AdminOrderDetailPage({
       })
       .catch(() => {})
       .finally(() => setUpdatingDriver(false));
+  };
+
+  const saveAssistantPriceEur = (eurValue: string) => {
+    if (!order || order.service_type !== "driver_car_assistant") return;
+    const trimmed = eurValue.trim();
+    const cents = trimmed === "" ? null : Math.round(parseFloat(trimmed.replace(",", ".")) * 100);
+    if (cents !== null && (Number.isNaN(cents) || cents < 0)) return;
+    fetch("/api/admin/orders", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: order.id, assistant_price_cents: cents }),
+    })
+      .then(async (r) => {
+        const data = (await r.json()) as Job & { error?: string };
+        if (!r.ok) throw new Error(typeof data.error === "string" ? data.error : "Speichern fehlgeschlagen.");
+        return data as Job;
+      })
+      .then((data) => {
+        setOrder((prev) => (prev ? { ...prev, assistant_price_cents: data.assistant_price_cents ?? cents } : null));
+      })
+      .catch((e) => alert(e instanceof Error ? e.message : "Fehler"));
   };
 
   const sendEmailToCustomer = () => {
@@ -671,6 +694,26 @@ export default function AdminOrderDetailPage({
               <dt className="text-[#0d2137]/60">Fahrerpreis (Gruppe)</dt>
               <dd className="font-semibold text-amber-700">€ {driverPriceEur}</dd>
             </div>
+            {order.service_type === "driver_car_assistant" && (
+              <div>
+                <dt className="text-[#0d2137]/60">Helferpreis (Gruppe)</dt>
+                <dd>
+                  <input
+                    type="text"
+                    key={`detail-asst-${order.assistant_price_cents ?? "null"}`}
+                    defaultValue={
+                      order.assistant_price_cents != null
+                        ? (order.assistant_price_cents / 100).toFixed(2).replace(".", ",")
+                        : "16,30"
+                    }
+                    onBlur={(e) => saveAssistantPriceEur(e.target.value)}
+                    className="w-28 rounded-lg border-2 border-violet-200 bg-violet-50/50 px-2 py-1.5 text-sm font-semibold text-violet-900"
+                    title="Betrag für den Helfer (Gruppe); auch in WhatsApp & Fahrer-PDF"
+                  />
+                  <span className="ml-2 text-xs text-[#0d2137]/50">€ — speichert bei Fokuswechsel</span>
+                </dd>
+              </div>
+            )}
             {(order.customer_driver_rating != null || order.customer_driver_comment) && (
               <div>
                 <dt className="text-[#0d2137]/60">Kundenbewertung Fahrer</dt>

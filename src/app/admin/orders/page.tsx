@@ -17,6 +17,7 @@ type Job = {
   distance_km: number | null;
   price_cents: number;
   driver_price_cents: number | null;
+  assistant_price_cents: number | null;
   payment_status: string;
   logistics_status: string;
   created_at: string;
@@ -65,6 +66,8 @@ function matchSearch(o: Job, q: string): boolean {
     str(statusLabelDe).includes(s) ||
     str((o.price_cents / 100).toFixed(2)).includes(s) ||
     (o.driver_price_cents != null && str((o.driver_price_cents / 100).toFixed(2)).includes(s)) ||
+    (o.assistant_price_cents != null &&
+      str((o.assistant_price_cents / 100).toFixed(2)).includes(s)) ||
     str(serviceTypeCompanyRequestLabel(o.service_type)).includes(s) ||
     str(serviceTypeLabelDe(o.service_type)).includes(s) ||
     str(o.service_type ?? "").includes(s)
@@ -123,6 +126,25 @@ export default function AdminOrdersPage() {
       });
   };
 
+  const updateAssistantPrice = (id: string, eurValue: string) => {
+    const trimmed = eurValue.trim();
+    const cents =
+      trimmed === "" ? null : Math.round(parseFloat(trimmed.replace(",", ".")) * 100);
+    if (trimmed !== "" && (cents === null || Number.isNaN(cents) || cents < 0)) return;
+    fetch("/api/admin/orders", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, assistant_price_cents: cents }),
+    })
+      .then((r) => {
+        if (r.ok) {
+          setOrders((prev) =>
+            prev.map((o) => (o.id === id ? { ...o, assistant_price_cents: cents } : o))
+          );
+        }
+      });
+  };
+
   const filtered = orders
     .filter((o) => (filter ? o.logistics_status === filter : true))
     .filter((o) => matchSearch(o, searchQuery));
@@ -170,8 +192,11 @@ export default function AdminOrdersPage() {
                   <th className="w-[12%] px-2 py-3 font-semibold text-[#0d2137]" dir="rtl">
                     طلب شركة
                   </th>
-                  <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">Kunde €</th>
-                  <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">Fahrer €</th>
+                  <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">Kunde €</th>
+                  <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">Fahrer €</th>
+                  <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]" dir="rtl">
+                    معاون €
+                  </th>
                   <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">Zahlung</th>
                   <th className="w-[10%] px-2 py-3 font-semibold text-[#0d2137]" dir="rtl">
                     إجراءات
@@ -241,6 +266,25 @@ export default function AdminOrdersPage() {
                           placeholder="—"
                           className="w-16 max-w-full rounded border border-[#0d2137]/20 px-1.5 py-1 text-xs"
                         />
+                      </td>
+                      <td className="min-w-0 px-2 py-2">
+                        {o.service_type === "driver_car_assistant" ? (
+                          <input
+                            type="text"
+                            key={`${o.id}-asst-${o.assistant_price_cents ?? "x"}`}
+                            defaultValue={
+                              o.assistant_price_cents != null
+                                ? (o.assistant_price_cents / 100).toFixed(2).replace(".", ",")
+                                : ""
+                            }
+                            onBlur={(e) => updateAssistantPrice(o.id, e.target.value)}
+                            placeholder="—"
+                            title="تسعير المعاون (لطلبات شوفير + معاون)"
+                            className="w-16 max-w-full rounded border border-violet-200 bg-violet-50/40 px-1.5 py-1 text-xs"
+                          />
+                        ) : (
+                          <span className="text-xs text-[#0d2137]/40">—</span>
+                        )}
                       </td>
                       <td className="min-w-0 px-2 py-2">
                         <span

@@ -8,7 +8,7 @@ export async function GET() {
   const supabase = createServerSupabase();
   const { data, error } = await supabase
     .from("jobs")
-    .select("id, order_number, company_name, phone, customer_email, pickup_address, delivery_address, cargo_size, cargo_details, service_type, distance_km, price_cents, driver_price_cents, payment_status, logistics_status, created_at, preferred_pickup_at, confirmation_token")
+    .select("id, order_number, company_name, phone, customer_email, pickup_address, delivery_address, cargo_size, cargo_details, service_type, distance_km, price_cents, driver_price_cents, assistant_price_cents, payment_status, logistics_status, created_at, preferred_pickup_at, confirmation_token")
     .order("created_at", { ascending: false });
   if (error) {
     console.error("[admin/orders]", error);
@@ -29,6 +29,10 @@ export async function PATCH(req: Request) {
   if (assigned_driver_id !== undefined) updates.assigned_driver_id = assigned_driver_id || null;
   if (assigned_driver_application_id !== undefined) updates.assigned_driver_application_id = assigned_driver_application_id || null;
   if (body.driver_price_cents !== undefined) updates.driver_price_cents = body.driver_price_cents == null ? null : Number(body.driver_price_cents);
+  if (body.assistant_price_cents !== undefined) {
+    updates.assistant_price_cents =
+      body.assistant_price_cents == null ? null : Number(body.assistant_price_cents);
+  }
   if (body.payment_status !== undefined) {
     const ps = String(body.payment_status);
     if (!["pending", "paid", "refunded", "failed"].includes(ps)) {

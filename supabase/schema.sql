@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS public.jobs (
   duration_minutes INTEGER,
   price_cents INTEGER NOT NULL,
   driver_price_cents INTEGER,
+  assistant_price_cents INTEGER,
   payment_status TEXT NOT NULL DEFAULT 'pending' CHECK (payment_status IN ('pending', 'paid', 'refunded', 'failed')),
   logistics_status TEXT NOT NULL DEFAULT 'draft' CHECK (logistics_status IN ('draft', 'confirmed', 'paid', 'assigned', 'in_transit', 'delivered', 'cancelled')),
   confirmation_token TEXT UNIQUE,
