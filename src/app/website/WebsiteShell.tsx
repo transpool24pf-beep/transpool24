@@ -95,9 +95,17 @@ export function WebsiteShell({ children }: { children: React.ReactNode }) {
           <span>
             Buchung (/order): Lottie Strecke/Zusammenfassung · seitliche Truck-Dekor (Desktop, gegenläufig) · Fahrer (/driver): Live-Tracking-Hinweis
           </span>
+          <span className="mx-2">·</span>
+          <span>
+            Startseite: DotLottie „Warehouse and delivery“ unter Fahrer-Team-Banner (volle Inhaltsbreite)
+          </span>
           <br />
           <span className="mt-1 inline-block" dir="rtl">
             صفحة الحجز (/order): Lottie المسار والملخص · شاحنتان جانبيتان (سطح المكتب، حركة متعاكسة) · السائق (/driver): تلميح التتبع المباشر
+          </span>
+          <br />
+          <span className="mt-1 inline-block" dir="rtl">
+            الصفحة الرئيسية: شريط DotLottie «مستودع وتوصيل» تحت بانر «انضم إلى فريق السائقين» بعرض المحتوى الكامل
           </span>
         </footer>
       </main>

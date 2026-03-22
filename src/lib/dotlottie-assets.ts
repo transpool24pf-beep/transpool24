@@ -9,3 +9,7 @@ export const DOTLOTTIE_ROUTE_PIN =
 /** Isometric truck — decorative on booking page sides (same asset; right column flipped). */
 export const DOTLOTTIE_ORDER_SIDE_TRUCK =
   "https://lottie.host/de43064f-e45c-40f9-b0b1-24e405aee1dc/iOVwxhnS4b.lottie";
+
+/** Warehouse & delivery — full-width band under homepage driver CTA. */
+export const DOTLOTTIE_HOME_DRIVER_LOGISTICS =
+  "https://lottie.host/12e3a6a9-ecbd-4f48-b04a-c216c19c912e/mFoZTfJhvo.lottie";

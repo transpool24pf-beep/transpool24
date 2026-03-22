@@ -6,6 +6,7 @@ import { Footer } from "@/components/Footer";
 import { DriversCarousel } from "@/components/DriversCarousel";
 import { HomeTransportOperations } from "@/components/HomeTransportOperations";
 import { GermanyConnectSection } from "@/components/GermanyConnectSection";
+import { HomepageDriverLogisticsLottie } from "@/components/HomepageDriverLogisticsLottie";
 import { getHomepageHero } from "@/lib/homepage-hero";
 
 const FALLBACK_IMAGE = "/images/5677.png";
@@ -215,6 +216,8 @@ export default async function HomePage({
             </div>
           </div>
         </section>
+
+        <HomepageDriverLogisticsLottie />
       </main>
       <Footer />
     </>
