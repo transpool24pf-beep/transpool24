@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 
 import type { TrailPointMap } from "@/components/OrderTrackMap";
+import { bcp47ForSiteLocale } from "@/lib/bcp47-locale";
 
 const OrderTrackMap = dynamic(
   () => import("@/components/OrderTrackMap").then((m) => m.OrderTrackMap),
@@ -255,7 +256,7 @@ export function OrderTrackClient({
             <div>
               <dt className="text-[var(--foreground)]/60">{t("trackEta")}</dt>
               <dd>
-                {new Date(job.estimated_arrival_at).toLocaleString(locale === "de" ? "de-DE" : locale === "en" ? "en-GB" : `${locale}-${locale.toUpperCase()}`, {
+                {new Date(job.estimated_arrival_at).toLocaleString(bcp47ForSiteLocale(locale), {
                   dateStyle: "medium",
                   timeStyle: "short",
                 })}
@@ -278,7 +279,7 @@ export function OrderTrackClient({
             <div className="sm:col-span-2">
               <dt className="text-[var(--foreground)]/60">{t("trackLastUpdate")}</dt>
               <dd>
-                {new Date(job.last_driver_location_at).toLocaleString(locale === "de" ? "de-DE" : locale === "en" ? "en-GB" : `${locale}-${locale.toUpperCase()}`, {
+                {new Date(job.last_driver_location_at).toLocaleString(bcp47ForSiteLocale(locale), {
                   dateStyle: "medium",
                   timeStyle: "short",
                 })}
@@ -382,7 +383,7 @@ export function OrderTrackClient({
             {trail.slice(0, 15).map((p, i) => (
               <li key={`${p.recorded_at}-${i}`}>
                 {Number(p.latitude).toFixed(5)}, {Number(p.longitude).toFixed(5)} —{" "}
-                {new Date(p.recorded_at).toLocaleTimeString(locale === "de" ? "de-DE" : locale === "en" ? "en-GB" : `${locale}-${locale.toUpperCase()}`, {
+                {new Date(p.recorded_at).toLocaleTimeString(bcp47ForSiteLocale(locale), {
                   hour: "2-digit",
                   minute: "2-digit",
                 })}

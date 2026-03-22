@@ -15,6 +15,12 @@ const localeLabels: Record<Locale, string> = {
   fr: "FR",
   es: "ES",
   ar: "AR",
+  ru: "RU",
+  pl: "PL",
+  ro: "RO",
+  ku: "KU",
+  it: "IT",
+  uk: "UK",
 };
 
 const FALLBACK_LINKEDIN = "https://www.linkedin.com/in/trans-pool-1235803b8";

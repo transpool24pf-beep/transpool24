@@ -1,7 +1,7 @@
 {
   "common": {
     "language": "Language",
-    "order": "Book order",
+    "order": "Book transport",
     "drivers": "Drivers",
     "contact": "Contact",
     "slogan": "Active in Pforzheim – Globally connected"
@@ -11,7 +11,7 @@
     "heroHeadline": "Your logistics partner in Pforzheim",
     "subtitle": "Fast, reliable, transparent. Book transport orders online.",
     "quote": "Together we bring your transports safely to their destination.",
-    "cta": "Book order now",
+    "cta": "Book transport now",
     "applyAsDriver": "Apply as a driver",
     "driverSignup": "Become a driver",
     "features": {
@@ -456,7 +456,13 @@
       "ar": "Arabic",
       "tr": "Turkish",
       "fr": "French",
-      "es": "Spanish"
+      "es": "Spanish",
+      "ru": "Russian",
+      "pl": "Polish",
+      "ro": "Romanian",
+      "ku": "Kurdish (Kurmanji)",
+      "it": "Italian",
+      "uk": "Ukrainian"
     }
   },
   "privacyPolicy": {

@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS homepage_hero (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- payload: { headline: { de, en, ar, fr, es, tr }, subtitle: {...}, cta: {...} }
+-- payload: { headline: { de, en, ar, fr, es, tr, ru, pl, ro, ku, it, uk }, subtitle: {...}, cta: {...} }
 
 CREATE TRIGGER update_homepage_hero_updated_at
   BEFORE UPDATE ON homepage_hero

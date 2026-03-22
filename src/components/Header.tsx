@@ -14,6 +14,12 @@ const localeFlags: Record<Locale, string> = {
   fr: "🇫🇷",
   es: "🇪🇸",
   ar: "🇸🇦",
+  ru: "🇷🇺",
+  pl: "🇵🇱",
+  ro: "🇷🇴",
+  ku: "🌐",
+  it: "🇮🇹",
+  uk: "🇺🇦",
 };
 
 const localeLabels: Record<Locale, string> = {
@@ -23,6 +29,12 @@ const localeLabels: Record<Locale, string> = {
   fr: "FR",
   es: "ES",
   ar: "AR",
+  ru: "RU",
+  pl: "PL",
+  ro: "RO",
+  ku: "KU",
+  it: "IT",
+  uk: "UK",
 };
 
 type HeaderProps = { hideLogo?: boolean };
@@ -90,7 +102,7 @@ export function Header({ hideLogo }: HeaderProps) {
               {localeLabels[locale]} ▾
             </button>
             {langOpen && (
-              <div className="absolute right-0 top-full mt-1 w-44 rounded-lg border border-[#0d2137]/10 bg-[var(--background)] py-1 shadow-lg">
+              <div className="absolute right-0 top-full z-[60] mt-1 max-h-[min(70vh,22rem)] w-48 overflow-y-auto rounded-lg border border-[#0d2137]/10 bg-[var(--background)] py-1 shadow-lg">
                 {locales.map((loc) => (
                   <Link
                     key={loc}

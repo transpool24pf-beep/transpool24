@@ -2,15 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-
-const LOCALES = [
-  { code: "de", label: "Deutsch" },
-  { code: "en", label: "English" },
-  { code: "ar", label: "العربية" },
-  { code: "fr", label: "Français" },
-  { code: "es", label: "Español" },
-  { code: "tr", label: "Türkçe" },
-] as const;
+import { WEBSITE_CMS_LOCALE_OPTIONS } from "@/lib/website-cms-locales";
 
 type HeroData = {
   imageUrl: string | null;
@@ -181,7 +173,7 @@ export function WebsiteHeroClient() {
             Nur ausfüllen, wenn Sie die Standard-Texte überschreiben möchten.
           </p>
           <div className="space-y-6">
-            {LOCALES.map(({ code, label }) => (
+            {WEBSITE_CMS_LOCALE_OPTIONS.map(({ code, label }) => (
               <div
                 key={code}
                 className="rounded-lg border border-[#0d2137]/10 bg-[#f8fafc] p-4"

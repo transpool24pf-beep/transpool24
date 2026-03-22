@@ -12,6 +12,12 @@ export const WHY_PAGE_DEFAULTS: Record<Locale, WhyPagePayload> = {
   tr: whyPageEn,
   fr: whyPageEn,
   es: whyPageEn,
+  ru: whyPageEn,
+  pl: whyPageEn,
+  ro: whyPageEn,
+  ku: whyPageEn,
+  it: whyPageEn,
+  uk: whyPageEn,
 };
 
 export function defaultWhyPayloadForLocale(locale: string): WhyPagePayload {

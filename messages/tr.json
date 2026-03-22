@@ -456,7 +456,13 @@
       "ar": "Arabic",
       "tr": "Turkish",
       "fr": "French",
-      "es": "Spanish"
+      "es": "Spanish",
+      "ru": "Rusça",
+      "pl": "Lehçe",
+      "ro": "Romence",
+      "ku": "Kürtçe (Kurmanci)",
+      "it": "İtalyanca",
+      "uk": "Ukraynaca"
     }
   },
   "privacyPolicy": {

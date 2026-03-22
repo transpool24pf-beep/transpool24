@@ -7,7 +7,7 @@ import { useState } from "react";
 import { DIAL_CODES, buildPhoneE164 } from "@/lib/country-dial-codes";
 
 const INQUIRY_KEYS = ["booking", "driver", "press", "partnership", "other"] as const;
-const COMM_KEYS = ["de", "en", "ar", "tr", "fr", "es"] as const;
+const COMM_KEYS = ["de", "en", "ar", "tr", "fr", "es", "ru", "pl", "ro", "ku", "it", "uk"] as const;
 const COUNTRY_ISOS = [...new Set(DIAL_CODES.map((d) => d.iso))].sort();
 
 export function SupportContactPage() {

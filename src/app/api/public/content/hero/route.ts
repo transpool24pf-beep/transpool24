@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
-
-const LOCALES = ["de", "en", "ar", "fr", "es", "tr"] as const;
+import { locales } from "@/i18n/routing";
 
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const locale = searchParams.get("locale") ?? "de";
-    const safeLocale = LOCALES.includes(locale as (typeof LOCALES)[number]) ? locale : "de";
+    const safeLocale = locales.includes(locale as (typeof locales)[number]) ? locale : "de";
 
     const supabase = createServerSupabase();
     const { data, error } = await supabase

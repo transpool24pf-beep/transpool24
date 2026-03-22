@@ -1,6 +1,5 @@
 import { createServerSupabase } from "./supabase";
-
-const LOCALES = ["de", "en", "ar", "fr", "es", "tr"] as const;
+import { locales } from "@/i18n/routing";
 
 const FALLBACK = { imageUrl: null, headline: null, subtitle: null, cta: null } as const;
 
@@ -9,7 +8,7 @@ export async function getHomepageHero(locale: string) {
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
       return FALLBACK;
     }
-    const safeLocale = LOCALES.includes(locale as (typeof LOCALES)[number]) ? locale : "de";
+    const safeLocale = locales.includes(locale as (typeof locales)[number]) ? locale : "de";
 
     const supabase = createServerSupabase();
     const { data, error } = await supabase

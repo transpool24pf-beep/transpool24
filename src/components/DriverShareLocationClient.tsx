@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState, type ChangeEvent } from "reac
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { mapsNavigateToDestination, mapsRoutePickupToDelivery } from "@/lib/google-maps-links";
+import { bcp47ForSiteLocale } from "@/lib/bcp47-locale";
 
 type ValidateResponse = {
   ok?: boolean;
@@ -341,9 +342,7 @@ export function DriverShareLocationClient({
         {lastSent && (
           <p className="mt-2 text-xs text-[var(--foreground)]/65">
             {t("lastSent")}:{" "}
-            {new Date(lastSent).toLocaleString(
-              locale === "de" ? "de-DE" : locale === "en" ? "en-GB" : `${locale}-${locale.toUpperCase()}`
-            )}
+            {new Date(lastSent).toLocaleString(bcp47ForSiteLocale(locale))}
           </p>
         )}
         <p className="mt-2 text-xs text-[#450a0a]/80">{t("keepOpen")}</p>
