@@ -34,94 +34,17 @@ const STATUS_CONFIG: Record<string, { labelDe: string; color: string; bg: string
   cancelled: { labelDe: "Storniert", color: "text-red-700", bg: "bg-red-500" },
 };
 
-/** Fahrerpreis: gespeichert oder 18 × Hin- und Rückfahrt (Cent) */
-function getDriverPriceEur(o: Job): string {
-  if (o.driver_price_cents != null) return (o.driver_price_cents / 100).toFixed(2);
-  if (o.distance_km != null && o.distance_km > 0) return ((18 * o.distance_km * 2) / 100).toFixed(2);
-  return "18.00";
+/** عمود «طلب شركة» — يطابق نوع الخدمة المستخدم في التسعير عند الدفع */
+function serviceTypeCompanyRequestLabel(st: string | undefined): string {
+  if (st === "driver_only") return "شوفير من دون سيارة";
+  if (st === "driver_car_assistant") return "شوفير مع سيارة ومعاون";
+  return "شوفير مع سيارة";
 }
 
 function serviceTypeLabelDe(st: string | undefined): string {
   if (st === "driver_only") return "Nur Fahrer";
   if (st === "driver_car_assistant") return "Fahrer mit Fahrzeug + Helfer";
   return "Fahrer mit Fahrzeug";
-}
-
-/** Ladungsabmessungen aus cargo_details */
-function cargoVolumeStr(cd: Record<string, unknown> | null): string | null {
-  if (!cd) return null;
-  const l = cd.cargoLengthCm ?? cd.lengthCm;
-  const w = cd.cargoWidthCm ?? cd.widthCm;
-  const h = cd.cargoHeightCm ?? cd.heightCm;
-  if (l != null && w != null && h != null) return `${l} × ${w} × ${h} cm`;
-  return null;
-}
-
-const IC = {
-  megaphone: "\u{1F4E2}",
-  clipboard: "\u{1F4CB}",
-  phone: "\u{1F4DE}",
-  clock: "\u{1F556}",
-  calendar: "\u{1F4C5}",
-  ruler: "\u{1F4CF}",
-  truck: "\u{1F69A}",
-  package: "\u{1F4E6}",
-  scale: "\u2696\uFE0F",
-  lorry: "\u{1F69B}",
-  building: "\u{1F3E2}",
-  pin: "\u{1F4CD}",
-  money: "\u{1F4B0}",
-  worker: "\u{1F477}",
-};
-
-/** WhatsApp-Text für die Fahrergruppe (Deutsch) */
-function buildWhatsAppMessage(o: Job): string {
-  const orderRef = o.order_number != null ? String(o.order_number) : o.id;
-  const driverEur = getDriverPriceEur(o);
-  const assistantEur = "16.30";
-  const hasAssistant = o.service_type === "driver_car_assistant";
-  const timeStr = o.preferred_pickup_at
-    ? new Date(o.preferred_pickup_at).toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" })
-    : null;
-  const dateStr = o.preferred_pickup_at
-    ? new Date(o.preferred_pickup_at).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "2-digit" })
-    : null;
-  const weightKg = o.cargo_details && typeof o.cargo_details.weightKg === "number"
-    ? o.cargo_details.weightKg
-    : o.cargo_details && typeof (o.cargo_details as { cargoWeightKg?: number }).cargoWeightKg === "number"
-      ? (o.cargo_details as { cargoWeightKg: number }).cargoWeightKg
-      : null;
-  const distanceStr = o.distance_km != null ? `${o.distance_km} km` : "—";
-  const volumeStr = cargoVolumeStr(o.cargo_details);
-  const serviceLabel = serviceTypeLabelDe(o.service_type);
-  const blocks: string[] = [
-    `${IC.megaphone} TransPool24 – Transportauftrag`,
-    "",
-    `${IC.clipboard} Auftragsnr.: ${orderRef}`,
-    "",
-    `${IC.phone} Telefon: ${o.phone}`,
-    "",
-    ...(timeStr ? [`${IC.clock} Zeit (Ankunft): ${timeStr}`] : []),
-    ...(dateStr ? [`${IC.calendar} Datum: ${dateStr}`] : []),
-    ...(timeStr || dateStr ? [""] : []),
-    `${IC.ruler} Distanz: ${distanceStr}`,
-    "",
-    `${IC.truck} Ladung: ${o.cargo_size}`,
-    ...(volumeStr ? [`${IC.package} Ladungsmaße: ${volumeStr}`] : []),
-    ...(weightKg != null ? [`${IC.scale} Gewicht: ${weightKg} kg`] : []),
-    `${IC.lorry} Service: ${serviceLabel}`,
-    `${IC.building} Firma: ${o.company_name}`,
-    "",
-    `${IC.pin} Abholung:`,
-    o.pickup_address,
-    "",
-    `${IC.pin} Zustellung:`,
-    o.delivery_address,
-    "",
-    `${IC.money} Fahrerpreis: ${driverEur} EUR`,
-    ...(hasAssistant ? [`${IC.worker} Helfer: ${assistantEur} EUR`] : []),
-  ];
-  return blocks.join("\n");
 }
 
 function matchSearch(o: Job, q: string): boolean {
@@ -141,7 +64,10 @@ function matchSearch(o: Job, q: string): boolean {
     str(o.logistics_status).includes(s) ||
     str(statusLabelDe).includes(s) ||
     str((o.price_cents / 100).toFixed(2)).includes(s) ||
-    (o.driver_price_cents != null && str((o.driver_price_cents / 100).toFixed(2)).includes(s))
+    (o.driver_price_cents != null && str((o.driver_price_cents / 100).toFixed(2)).includes(s)) ||
+    str(serviceTypeCompanyRequestLabel(o.service_type)).includes(s) ||
+    str(serviceTypeLabelDe(o.service_type)).includes(s) ||
+    str(o.service_type ?? "").includes(s)
   );
 }
 
@@ -150,7 +76,6 @@ export default function AdminOrdersPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [sending, setSending] = useState<string | null>(null);
   const [updating, setUpdating] = useState<string | null>(null);
 
   useEffect(() => {
@@ -198,45 +123,6 @@ export default function AdminOrdersPage() {
       });
   };
 
-  const sendEmail = (id: string) => {
-    setSending(id);
-    fetch("/api/admin/send-order-email", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ job_id: id }),
-    })
-      .then((r) => {
-        if (r.ok) alert("E-Mail wurde gesendet.");
-        else
-          r.json().then((d) => {
-            const errMsg =
-              typeof d?.error === "string"
-                ? d.error
-                : (d?.error && typeof d.error === "object" && "message" in d.error)
-                  ? String((d.error as { message: unknown }).message)
-                  : "Versand fehlgeschlagen.";
-            alert(errMsg);
-          });
-      })
-      .catch(() => alert("Anfrage fehlgeschlagen"))
-      .finally(() => setSending(null));
-  };
-
-  const openWhatsApp = (o: Job) => {
-    const text = buildWhatsAppMessage(o);
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank", "noopener");
-  };
-
-  const openWhatsAppCustomer = (phone: string) => {
-    const digits = phone.replace(/\D/g, "");
-    if (!digits) return;
-    window.open(`https://wa.me/${digits}`, "_blank", "noopener");
-  };
-
-  const downloadInvoice = (jobId: string, type: "customer" | "driver") => {
-    window.open(`/api/admin/invoice?job_id=${encodeURIComponent(jobId)}&type=${type}`, "_blank");
-  };
-
   const filtered = orders
     .filter((o) => (filter ? o.logistics_status === filter : true))
     .filter((o) => matchSearch(o, searchQuery));
@@ -281,10 +167,15 @@ export default function AdminOrdersPage() {
                   <th className="w-[10%] px-2 py-3 font-semibold text-[#0d2137]">Status</th>
                   <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">Datum</th>
                   <th className="w-[9%] px-2 py-3 font-semibold text-[#0d2137]">Firma</th>
+                  <th className="w-[12%] px-2 py-3 font-semibold text-[#0d2137]" dir="rtl">
+                    طلب شركة
+                  </th>
                   <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">Kunde €</th>
                   <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">Fahrer €</th>
                   <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">Zahlung</th>
-                  <th className="w-[29%] px-2 py-3 font-semibold text-[#0d2137]">Aktionen</th>
+                  <th className="w-[10%] px-2 py-3 font-semibold text-[#0d2137]" dir="rtl">
+                    إجراءات
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -326,7 +217,17 @@ export default function AdminOrdersPage() {
                       <td className="min-w-0 truncate px-2 py-2 font-medium text-[#0d2137] text-xs" title={o.company_name}>
                         {o.company_name}
                       </td>
-                      <td className="min-w-0 px-2 py-2 font-semibold text-[#0d2137] text-xs whitespace-nowrap">
+                      <td
+                        className="min-w-0 px-2 py-2 text-xs font-medium text-[#0d2137] leading-snug"
+                        dir="rtl"
+                        title={serviceTypeLabelDe(o.service_type)}
+                      >
+                        {serviceTypeCompanyRequestLabel(o.service_type)}
+                      </td>
+                      <td
+                        className="min-w-0 px-2 py-2 font-semibold text-[#0d2137] text-xs whitespace-nowrap"
+                        title="Kundenpreis (bei Zahlung nach Service-Typ berechnet)"
+                      >
                         € {(o.price_cents / 100).toFixed(2)}
                       </td>
                       <td className="min-w-0 px-2 py-2">
@@ -352,53 +253,13 @@ export default function AdminOrdersPage() {
                           {o.payment_status === "paid" ? "Bezahlt" : "Ausstehend"}
                         </span>
                       </td>
-                      <td className="min-w-0 px-2 py-2">
-                        <div className="flex flex-row flex-wrap items-center gap-1.5">
-                          <Link
-                            href={`/admin/orders/${o.id}`}
-                            className="inline-flex items-center justify-center rounded-lg bg-[#0d2137] px-2 py-1.5 text-[10px] font-medium text-white hover:bg-[#0d2137]/90"
-                          >
-                            Öffnen
-                          </Link>
-                          <button
-                            type="button"
-                            onClick={() => openWhatsApp(o)}
-                            className="inline-flex items-center justify-center rounded-lg bg-[#25D366] px-2 py-1.5 text-[10px] font-medium text-white hover:bg-[#20bd5a]"
-                          >
-                            WA Gruppe
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => openWhatsAppCustomer(o.phone)}
-                            className="inline-flex items-center justify-center rounded-lg border border-[#25D366] bg-[#25D366]/10 px-2 py-1.5 text-[10px] font-medium text-[#25D366] hover:bg-[#25D366]/20"
-                          >
-                            WA Kunde
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => downloadInvoice(o.id, "driver")}
-                            className="rounded-lg border border-amber-200 bg-amber-50 px-2 py-1 text-[10px] font-medium text-amber-800 hover:bg-amber-100"
-                          >
-                            Rechn. Fahrer
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => downloadInvoice(o.id, "customer")}
-                            className="rounded-lg border border-blue-200 bg-blue-50 px-2 py-1 text-[10px] font-medium text-blue-800 hover:bg-blue-100"
-                          >
-                            Rechn. Kunde
-                          </button>
-                          {o.customer_email && (
-                            <button
-                              type="button"
-                              onClick={() => sendEmail(o.id)}
-                              disabled={sending === o.id}
-                              className="rounded-lg bg-[var(--accent)] px-2 py-1 text-[10px] font-medium text-white hover:opacity-90 disabled:opacity-60"
-                            >
-                              {sending === o.id ? "…" : "E-Mail"}
-                            </button>
-                          )}
-                        </div>
+                      <td className="min-w-0 px-2 py-2" dir="rtl">
+                        <Link
+                          href={`/admin/orders/${o.id}`}
+                          className="inline-flex items-center justify-center rounded-lg bg-[#0d2137] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#0d2137]/90"
+                        >
+                          فتح ملف
+                        </Link>
                       </td>
                     </tr>
                   );
