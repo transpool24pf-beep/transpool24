@@ -13,3 +13,7 @@ export const DOTLOTTIE_ORDER_SIDE_TRUCK =
 /** Warehouse & delivery — full-width band under homepage driver CTA. */
 export const DOTLOTTIE_HOME_DRIVER_LOGISTICS =
   "https://lottie.host/12e3a6a9-ecbd-4f48-b04a-c216c19c912e/mFoZTfJhvo.lottie";
+
+/** Blue smile loading — global overlay when navigation or first paint is slow. */
+export const DOTLOTTIE_PAGE_LOADING_BLUE =
+  "https://lottie.host/67f13904-b750-42a2-bb1d-75c357e3ace1/Q8ZXiEU1wi.lottie";

@@ -99,6 +99,10 @@ export function WebsiteShell({ children }: { children: React.ReactNode }) {
           <span>
             Startseite: DotLottie „Warehouse and delivery“ unter Fahrer-Team-Banner (volle Inhaltsbreite)
           </span>
+          <span className="mx-2">·</span>
+          <span>
+            Globales Lade-Overlay: DotLottie „Loading blue“ bei langsamer Navigation / erstem Seitenaufbau
+          </span>
           <br />
           <span className="mt-1 inline-block" dir="rtl">
             صفحة الحجز (/order): Lottie المسار والملخص · شاحنتان جانبيتان (سطح المكتب، حركة متعاكسة) · السائق (/driver): تلميح التتبع المباشر
@@ -106,6 +110,10 @@ export function WebsiteShell({ children }: { children: React.ReactNode }) {
           <br />
           <span className="mt-1 inline-block" dir="rtl">
             الصفحة الرئيسية: شريط DotLottie «مستودع وتوصيل» تحت بانر «انضم إلى فريق السائقين» بعرض المحتوى الكامل
+          </span>
+          <br />
+          <span className="mt-1 inline-block" dir="rtl">
+            تحميل عام: طبقة DotLottie «Loading blue» عند بطء التنقل أو التحميل الأول للصفحة
           </span>
         </footer>
       </main>
