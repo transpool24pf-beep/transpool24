@@ -67,8 +67,8 @@ export function WebsiteHeroClient() {
       alert("Bitte ein Bild wählen (JPEG, PNG oder WebP).");
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      alert("Datei zu groß (max. 5 MB).");
+    if (file.size > 12 * 1024 * 1024) {
+      alert("Datei zu groß (max. 12 MB).");
       return;
     }
     setImageUploading(true);
@@ -180,7 +180,11 @@ export function WebsiteHeroClient() {
                 className="block w-full text-sm text-[#0d2137] file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--accent)] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:opacity-95 disabled:opacity-50"
               />
               <p className="text-xs text-[#0d2137]/60">
-                JPEG/PNG/WebP, max. 5 MB. Nach Upload unbedingt „Speichern“ klicken.
+                JPEG/PNG/WebP, max. 12 MB — lieber hohe Auflösung (z. B. 2400px+ Breite), minimal komprimiert. Nach
+                Upload „Speichern“.
+              </p>
+              <p className="text-xs text-[#0d2137]/55" dir="rtl">
+                يُفضَّل صورة عريضة عالية الدقة (مثلاً 2400 بكسل فأكثر) وبأقل ضغط ممكن؛ الحد الأقصى 12 ميجابايت.
               </p>
               <input
                 type="url"

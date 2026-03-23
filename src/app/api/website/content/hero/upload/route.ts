@@ -4,7 +4,8 @@ import { requireWebsiteAdmin } from "@/lib/website-admin-api";
 import { createServerSupabase } from "@/lib/supabase";
 
 const BUCKET = "driver-documents";
-const MAX_SIZE = 5 * 1024 * 1024;
+/** Hero banners need room for sharp 2K+ JPEGs; still bounded for abuse. */
+const MAX_SIZE = 12 * 1024 * 1024;
 const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp", "image/jpg"]);
 
 export async function POST(req: Request) {

@@ -38,6 +38,7 @@ export default async function HomePage({
               fill
               className="object-cover object-center"
               priority
+              quality={100}
               sizes="100vw"
               unoptimized={heroImage.startsWith("http")}
             />
