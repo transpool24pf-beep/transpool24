@@ -162,6 +162,8 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
   const [distanceLoading, setDistanceLoading] = useState(false);
   const [distanceFromRoute, setDistanceFromRoute] = useState(false);
   const [distanceError, setDistanceError] = useState<string | null>(null);
+  /** Server hint (e.g. Google API key / Directions setup) shown under the generic manual-distance message */
+  const [distanceHint, setDistanceHint] = useState<string | null>(null);
   const [routeGeo, setRouteGeo] = useState<RouteGeo | null>(null);
   const [routeDurationMinutes, setRouteDurationMinutes] = useState<number | null>(null);
   const [pricingOpts, setPricingOpts] = useState<PricingOptions | null>(null);
@@ -282,6 +284,7 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
     if (!data.pickupAddress.trim() || !data.deliveryAddress.trim()) return;
     setDistanceLoading(true);
     setDistanceError(null);
+    setDistanceHint(null);
     const departureParam =
       data.pickupDate && data.pickupTime
         ? `&departure_time=${encodeURIComponent(`${data.pickupDate}T${data.pickupTime}`)}`
@@ -295,6 +298,7 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
         update({ distanceKm: Math.round(json.distanceKm * 10) / 10 });
         setDistanceFromRoute(true);
         setRouteDurationMinutes(typeof json.durationMinutes === "number" ? json.durationMinutes : null);
+        setDistanceHint(null);
         if (json.from && json.to) {
           setRouteGeo({
             from: json.from,
@@ -309,12 +313,14 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
         setRouteGeo(null);
         setRouteDurationMinutes(null);
         setDistanceError(json.error || "Could not calculate route");
+        setDistanceHint(typeof json.hint === "string" ? json.hint : null);
       }
     } catch {
       setDistanceFromRoute(false);
       setRouteGeo(null);
       setRouteDurationMinutes(null);
       setDistanceError("Network error");
+      setDistanceHint(null);
     } finally {
       setDistanceLoading(false);
     }
@@ -737,7 +743,12 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
                   </p>
                 )}
                 {distanceError && !distanceLoading && (
-                  <p className="mt-2 text-sm text-amber-700">{t("distanceManualHint")}</p>
+                  <div className="mt-2 space-y-1">
+                    <p className="text-sm text-amber-700">{t("distanceManualHint")}</p>
+                    {distanceHint && (
+                      <p className="text-xs text-amber-800/90 whitespace-pre-wrap">{distanceHint}</p>
+                    )}
+                  </div>
                 )}
               </div>
               {routeGeo && (

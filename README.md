@@ -46,8 +46,9 @@ If the `jobs` table already existed before adding this feature, run `supabase/ad
 
 ### 6. Distance & traffic-aware pricing (optional)
 
-- **Google Maps**: Set `GOOGLE_MAPS_API_KEY` to use the Directions API. When the customer chooses a pickup date/time, the server uses it as `departure_time` for traffic-aware distance and duration. Price then includes a duration-based component (driver hourly rate).
-- **Address autocomplete (Germany)**: With the same `GOOGLE_MAPS_API_KEY`, enable **Places API** in Google Cloud. The order form then uses Places Autocomplete + Place Details so customers get full street + house number suggestions; without the key, OpenStreetMap/Nominatim is used (less precise for house numbers).
+- **Google Maps**: Set `GOOGLE_MAPS_API_KEY` and enable **Directions API** (and **Geocoding API** for fallbacks). Route distance and map geometry use Directions on the full address strings (including Places-formatted lines that Nominatim often misses). When the customer sets a pickup date/time, the server sends `departure_time` for traffic-aware duration. Price can then include a duration-based component (driver hourly rate).
+- **API key restrictions**: Distance runs on **Vercel’s server**, not in the browser. If the key uses **HTTP referrers (websites)** only, Directions/Geocoding from the server will fail (`REQUEST_DENIED`). Prefer **Application restrictions → None** (dev) or **API restrictions** listing Directions, Geocoding, Places (without referrer-only app restriction), or use a **second key** reserved for server routes.
+- **Address autocomplete (Germany)**: With the same key, enable **Places API**. The order form uses Places Autocomplete + Place Details for street + house number; without the key, OpenStreetMap/Nominatim is used (less precise for house numbers).
 - **Driver hourly rate**: Set `DRIVER_HOURLY_RATE_CENTS` (e.g. `2500` for 25 EUR/hour). Default is 2500. Used only when duration from Google is available.
 - If `GOOGLE_MAPS_API_KEY` is not set, the app uses OSRM for distance only (no duration, no traffic).
 
