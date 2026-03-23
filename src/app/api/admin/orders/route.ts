@@ -8,7 +8,9 @@ export async function GET() {
   const supabase = createServerSupabase();
   const { data, error } = await supabase
     .from("jobs")
-    .select("id, order_number, company_name, phone, customer_email, pickup_address, delivery_address, cargo_size, cargo_details, service_type, distance_km, price_cents, driver_price_cents, assistant_price_cents, payment_status, logistics_status, created_at, preferred_pickup_at, confirmation_token")
+    .select(
+      "id, order_number, company_name, phone, customer_email, pickup_address, delivery_address, cargo_size, cargo_details, service_type, distance_km, duration_minutes, price_cents, driver_price_cents, assistant_price_cents, payment_status, logistics_status, created_at, preferred_pickup_at, confirmation_token, assigned_driver_application_id, estimated_arrival_at, eta_minutes_remaining, last_driver_location_at, pod_photo_url, pod_completed_at"
+    )
     .order("created_at", { ascending: false });
   if (error) {
     console.error("[admin/orders]", error);
