@@ -11,6 +11,8 @@ export function WebsiteWhyTranspool24Client() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  /** Same full JSON written to every locale row (text will be identical everywhere — use only if intended) */
+  const [applyToAllLocales, setApplyToAllLocales] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -40,16 +42,33 @@ export function WebsiteWhyTranspool24Client() {
       setMessage("Ungültiges JSON — bitte Syntax prüfen.");
       return;
     }
+    if (
+      applyToAllLocales &&
+      !confirm(
+        "Alle Sprachen erhalten genau dieses JSON — Überschriften/FAQ-Texte sind dann überall gleich (z. B. nur Deutsch auf /ar/why).\n\n" +
+          "Für Bilder/Video lieber „Homepage – Medien (Why)“ mit „Alle Sprachen“ nutzen.\n\nTrotzdem speichern?"
+      )
+    ) {
+      return;
+    }
     setSaving(true);
     try {
       const res = await fetch("/api/website/content/why-transpool24", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ locale, payload }),
+        body: JSON.stringify({ locale, payload, applyToAllLocales }),
       });
-      const data = await parseFetchJson<{ error?: string }>(res);
+      const data = await parseFetchJson<{
+        error?: string;
+        applyToAllLocales?: boolean;
+        localesUpdated?: string[];
+      }>(res);
       if (!res.ok) throw new Error(data.error || "Speichern fehlgeschlagen");
-      setMessage("Gespeichert.");
+      if (data.applyToAllLocales && Array.isArray(data.localesUpdated)) {
+        setMessage(`Gespeichert für alle ${data.localesUpdated.length} Sprachen.`);
+      } else {
+        setMessage("Gespeichert.");
+      }
     } catch (e) {
       setMessage(e instanceof Error ? e.message : "Speichern fehlgeschlagen");
     } finally {
@@ -93,6 +112,45 @@ export function WebsiteWhyTranspool24Client() {
         <code className="rounded bg-[#0d2137]/5 px-1">contentRevision</code> ≥ aktuellem Stand im Code werden
         automatisch ignoriert — die Live-Seite zeigt dann die Standardtexte aus dem Repository.
       </p>
+      <div
+        className="mb-6 rounded-lg border border-[var(--accent)]/20 bg-[var(--accent)]/5 px-4 py-3 text-sm text-[#0d2137]"
+        dir="rtl"
+      >
+        <p className="mb-2 font-semibold text-[#0d2137]">لماذا قائمة «اللغة»؟</p>
+        <p className="mb-2 text-[#0d2137]/85">
+          محتوى JSON يحتوي عناوين ونصوصاً <strong>مترجمة لكل لغة</strong> (عربي، ألماني، …). تختار اللغة لتحميل وتحرير{" "}
+          <strong>نسخة تلك اللغة</strong> ثم تحفظ عادةً <strong>لهذه اللغة فقط</strong>.
+        </p>
+        <p className="text-[#0d2137]/85">
+          لتغيير <strong>الصور والفيديو</strong> لجميع اللغات دفعة واحدة بدون تكرار النصوص: استخدم صفحة{" "}
+          <strong>Homepage – Medien (Why)</strong> مع خيار <strong>«Alle Sprachen / تطبيق على كل اللغات»</strong>.
+        </p>
+      </div>
+      <p className="mb-4 rounded-lg border border-[#0d2137]/10 bg-white px-4 py-3 text-sm text-[#0d2137]/80">
+        <strong className="text-[#0d2137]">Warum „Sprache“-Auswahl?</strong> Das JSON enthält Überschriften und Texte pro
+        Sprache. Sie wählen die Sprache, um <strong>deren Version</strong> zu laden und zu bearbeiten — Speichern gilt
+        standardmäßig nur für diese Sprache. Bilder/Video für <strong>alle</strong> Sprachen: Seite{" "}
+        <strong>Homepage – Medien (Why)</strong> mit Checkbox „Alle Sprachen“.
+      </p>
+
+      <div className="mb-4 rounded-xl border border-amber-200/80 bg-amber-50/60 px-4 py-3">
+        <label className="flex cursor-pointer items-start gap-3">
+          <input
+            type="checkbox"
+            checked={applyToAllLocales}
+            onChange={(e) => setApplyToAllLocales(e.target.checked)}
+            className="mt-1 h-4 w-4 rounded border-[#0d2137]/30 text-[var(--accent)] focus:ring-[var(--accent)]"
+          />
+          <span className="text-sm text-[#0d2137]">
+            <strong className="font-semibold">Dieses JSON für alle {locales.length} Sprachen speichern</strong>
+            <span className="mt-1 block text-[#0d2137]/75">
+              Nur sinnvoll, wenn die Texte absichtlich überall gleich sein sollen. Sonst pro Sprache einzeln speichern
+              oder Medien-Seite nutzen.
+            </span>
+          </span>
+        </label>
+      </div>
+
       <p className="mb-6 rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/[0.03] px-4 py-3 text-sm text-[#0d2137]/75">
         <strong className="text-[#0d2137]">Abschlussbereich (orange CTA + dunkle Fußzeile):</strong> Wird am Ende aller öffentlichen Seiten mit{" "}
         <code className="rounded bg-[#0d2137]/5 px-1">Footer</code> angezeigt (Startseite, Why, Support, Auftrag, Fahrer, …). Texte pflegen Sie in{" "}
@@ -102,7 +160,7 @@ export function WebsiteWhyTranspool24Client() {
       </p>
 
       <div className="mb-4 flex flex-wrap items-center gap-3">
-        <label className="text-sm font-medium text-[#0d2137]">Sprache</label>
+        <label className="text-sm font-medium text-[#0d2137]">Sprache (laden / bearbeiten)</label>
         <select
           value={locale}
           onChange={(e) => setLocale(e.target.value as Locale)}

@@ -39,24 +39,43 @@ export async function PUT(request: Request) {
     if (!locales.includes(locale as (typeof locales)[number])) {
       return NextResponse.json({ error: "Invalid locale" }, { status: 400 });
     }
-    const base = defaultWhyPayloadForLocale(locale);
-    const merged = { ...base, ...(body.payload as object) } as WhyPagePayload;
-    if (!isValidWhyPayload(merged)) {
-      return NextResponse.json({ error: "Invalid payload shape" }, { status: 400 });
-    }
+
+    const applyToAllLocales = body.applyToAllLocales === true;
+    const targetLocales = applyToAllLocales ? [...locales] : [locale as (typeof locales)[number]];
 
     const supabase = createServerSupabase();
-    const { error } = await supabase.from("why_transpool24_locale").upsert(
-      {
-        locale,
-        payload: merged,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "locale" },
-    );
 
-    if (error) throw error;
-    return NextResponse.json({ success: true });
+    for (const loc of targetLocales) {
+      const base = defaultWhyPayloadForLocale(loc);
+      const merged = {
+        ...base,
+        ...(body.payload as object),
+        contentRevision: WHY_PAGE_CONTENT_REVISION,
+      } as WhyPagePayload;
+      if (!isValidWhyPayload(merged)) {
+        return NextResponse.json(
+          { error: `Invalid payload shape (locale ${loc})` },
+          { status: 400 },
+        );
+      }
+
+      const { error } = await supabase.from("why_transpool24_locale").upsert(
+        {
+          locale: loc,
+          payload: merged,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "locale" },
+      );
+
+      if (error) throw error;
+    }
+
+    return NextResponse.json({
+      success: true,
+      applyToAllLocales,
+      localesUpdated: targetLocales,
+    });
   } catch (e) {
     console.error("[website/why-transpool24 PUT]", e);
     return NextResponse.json({ error: "Save failed" }, { status: 500 });
