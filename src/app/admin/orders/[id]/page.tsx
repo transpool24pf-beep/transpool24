@@ -162,6 +162,7 @@ export default function AdminOrderDetailPage({
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [sendingTrackOnly, setSendingTrackOnly] = useState(false);
+  const [sendingDeliveryConfirm, setSendingDeliveryConfirm] = useState(false);
   const [ensuringDriverLink, setEnsuringDriverLink] = useState(false);
   const [id, setId] = useState<string | null>(null);
   const [drivers, setDrivers] = useState<DriverOption[]>([]);
@@ -1005,6 +1006,47 @@ export default function AdminOrderDetailPage({
             POD jetzt abschließen
           </button>
         </div>
+        {(order.logistics_status === "delivered" || order.pod_completed_at) && (
+          <div className="mt-4 rounded-xl border-2 border-sky-200 bg-sky-50/60 p-4">
+            <p className="text-sm font-semibold text-[#0d2137]">Zustellbestätigung an Kunden-E-Mail</p>
+            <p className="mt-1 text-xs text-[#0d2137]/70">
+              Sendet eine deutschsprachige E-Mail (Resend): Zustellung bestätigt, Lieferadresse, Link zum Lieferfoto (falls
+              vorhanden), Tracking- und Bewertungslink.
+            </p>
+            <button
+              type="button"
+              disabled={sendingDeliveryConfirm || !order.customer_email?.trim()}
+              onClick={async () => {
+                if (!order.customer_email?.trim()) {
+                  alert("Keine Kunden-E-Mail hinterlegt.");
+                  return;
+                }
+                setSendingDeliveryConfirm(true);
+                try {
+                  const res = await fetch(`/api/admin/orders/${order.id}/send-delivery-confirmation-email`, {
+                    method: "POST",
+                  });
+                  const data = (await res.json()) as { error?: string; sentTo?: string };
+                  if (!res.ok) {
+                    alert(data?.error ?? "Versand fehlgeschlagen");
+                    return;
+                  }
+                  alert(`Zustellbestätigung gesendet an: ${data.sentTo ?? order.customer_email}`);
+                } catch {
+                  alert("Netzwerkfehler");
+                } finally {
+                  setSendingDeliveryConfirm(false);
+                }
+              }}
+              className="mt-3 rounded-xl bg-sky-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {sendingDeliveryConfirm ? "Wird gesendet…" : "Zustellbestätigung per E-Mail senden"}
+            </button>
+            {!order.customer_email?.trim() && (
+              <p className="mt-2 text-xs text-amber-800">Bitte Kunden-E-Mail im Auftrag ergänzen.</p>
+            )}
+          </div>
+        )}
         <div className="mt-6 border-t border-[#0d2137]/10 pt-4">
           <p className="mb-2 text-sm font-medium text-[#0d2137]">Fahrerposition manuell (Trail + letzte Position)</p>
           <div className="flex max-w-xl flex-wrap gap-2">

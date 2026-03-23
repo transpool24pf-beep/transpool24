@@ -291,6 +291,117 @@ export function buildEmailHeaderBannerHtml(): string {
   return emailHeaderBannerHtml();
 }
 
+/** Customer: delivery completed + optional POD photo link (German only, no PDF). */
+function buildDeliveryConfirmationHtml(
+  job: Job,
+  options: {
+    trackOrderUrl: string | null;
+    rateDriverUrl: string | null;
+    podPhotoUrl: string | null;
+    deliveredAtDe: string;
+  }
+): string {
+  const orderRef = job.order_number != null ? String(job.order_number) : job.id.slice(0, 8);
+  const companyName = (job.company_name || "").trim() || "Kunde";
+  const podSafe = options.podPhotoUrl ? escapeHtml(options.podPhotoUrl) : "";
+  const trackSafe = options.trackOrderUrl ? escapeHtml(options.trackOrderUrl) : "";
+  const rateSafe = options.rateDriverUrl ? escapeHtml(options.rateDriverUrl) : "";
+  const podBlock = options.podPhotoUrl
+    ? `
+        <p style="margin:18px 0 8px 0; font-size:15px; font-weight:bold; color:#0d2137;">Liefernachweis (Foto vom Fahrer)</p>
+        <p style="margin:0 0 12px 0; font-size:14px;"><a href="${podSafe}" style="color:#0369a1; font-weight:600;">Lieferfoto im Browser öffnen</a></p>
+        <p style="margin:0;"><img src="${podSafe}" alt="Liefernachweis" width="560" style="max-width:100%; height:auto; border-radius:10px; border:1px solid #e2e8f0;" /></p>`
+    : `
+        <p style="margin:18px 0 0 0; font-size:14px; color:#64748b;">Im System liegt aktuell kein Lieferfoto vor. Sie können den Auftrag trotzdem über den Link unten einsehen.</p>`;
+  const trackBlock = options.trackOrderUrl
+    ? `<p style="margin:20px 0 0 0;"><a href="${trackSafe}" style="display:inline-block;padding:12px 22px;background:#0d2137;color:#fff!important;text-decoration:none;border-radius:10px;font-weight:600;font-size:15px;">Auftrag &amp; Status ansehen</a></p>`
+    : "";
+  const rateBlock = options.rateDriverUrl
+    ? `<p style="margin:14px 0 0 0; font-size:14px;"><a href="${rateSafe}" style="color:#0d2137; text-decoration:underline;">Fahrer bewerten (optional)</a></p>`
+    : "";
+
+  return `
+<!DOCTYPE html>
+<html dir="ltr" lang="de">
+<head><meta charset="utf-8" />${emailDeHeadMeta()}<title>Zustellung bestätigt – TransPool24</title></head>
+<body style="margin:0; font-family:'Segoe UI',Tahoma,sans-serif; background:#f1f5f9; direction:ltr; text-align:left;">
+  ${emailHeaderBannerHtml()}
+  <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px; margin:0 auto; padding:28px 18px 40px;">
+    <tr><td>
+      <div style="background:#fff; border-radius:14px; padding:26px; border:1px solid #e2e8f0; box-shadow:0 2px 10px rgba(0,0,0,0.06);">
+        <p style="margin:0 0 6px 0; font-size:20px; font-weight:bold; color:#0d2137;">Zustellung bestätigt</p>
+        <p style="margin:0 0 4px 0; font-size:15px; color:#334155;">Auftrag <strong>#${escapeHtml(orderRef)}</strong></p>
+        <p style="margin:0 0 16px 0; font-size:14px; color:#64748b;">${escapeHtml(companyName)}</p>
+        <p style="margin:0 0 12px 0; font-size:15px; line-height:1.55; color:#334155;">
+          Die Zustellung Ihrer Sendung wurde abgeschlossen. Zeitpunkt (laut System): <strong>${escapeHtml(options.deliveredAtDe)}</strong>.
+        </p>
+        <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse:collapse; font-size:14px; border:1px solid #e2e8f0; border-radius:8px;">
+          <tr style="background:#f8fafc;"><td style="color:#64748b; width:32%;">Lieferadresse</td><td>${escapeHtml(job.delivery_address)}${job.delivery_city ? `, ${escapeHtml(job.delivery_city)}` : ""}</td></tr>
+          <tr><td style="color:#64748b;">Abholung</td><td>${escapeHtml(job.pickup_address)}</td></tr>
+        </table>
+        ${podBlock}
+        ${trackBlock}
+        ${rateBlock}
+        <p style="margin:28px 0 0 0; font-size:13px; color:#94a3b8;">— TransPool24</p>
+      </div>
+    </td></tr>
+  </table>
+</body>
+</html>`.trim();
+}
+
+export async function sendDeliveryConfirmationEmail(
+  to: string,
+  job: Job,
+  options: { trackOrderUrl: string | null; rateDriverUrl: string | null; podPhotoUrl: string | null }
+): Promise<{ success: boolean; error?: string }> {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.error("[TransPool24] RESEND_API_KEY not set");
+    return { success: false, error: "RESEND_API_KEY not set" };
+  }
+  const orderRef = job.order_number != null ? String(job.order_number) : job.id.slice(0, 8);
+  const deliveredAtDe =
+    job.pod_completed_at != null
+      ? new Date(job.pod_completed_at).toLocaleString("de-DE", {
+          dateStyle: "medium",
+          timeStyle: "short",
+        })
+      : new Date().toLocaleString("de-DE", { dateStyle: "medium", timeStyle: "short" });
+  const resend = new Resend(apiKey);
+  try {
+    const { error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: [to],
+      subject: `TransPool24 – Zustellung bestätigt #${orderRef}`,
+      html: buildDeliveryConfirmationHtml(job, {
+        trackOrderUrl: options.trackOrderUrl,
+        rateDriverUrl: options.rateDriverUrl,
+        podPhotoUrl: options.podPhotoUrl,
+        deliveredAtDe,
+      }),
+    });
+    if (error) {
+      const raw =
+        typeof error === "string"
+          ? error
+          : error && typeof error === "object" && "message" in error
+            ? String((error as { message: unknown }).message)
+            : JSON.stringify(error);
+      const errMsg =
+        /only send testing emails|verify a domain|resend\.com\/domains/i.test(raw)
+          ? "Resend-Konto befindet sich im Testmodus oder die Domain ist nicht verifiziert. Verifizieren Sie die Domain auf resend.com/domains."
+          : raw;
+      return { success: false, error: errMsg };
+    }
+    return { success: true };
+  } catch (e) {
+    console.error("[TransPool24] sendDeliveryConfirmationEmail", e);
+    const msg = e instanceof Error ? e.message : "Unknown error";
+    return { success: false, error: msg };
+  }
+}
+
 /** Dedicated tracking email: German only, driver card, no PDF (Resend). */
 function buildTrackingUpdateHtml(
   job: Job,

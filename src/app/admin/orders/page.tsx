@@ -92,6 +92,7 @@ export default function AdminOrdersPage() {
   const [filter, setFilter] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [updating, setUpdating] = useState<string | null>(null);
+  const [sendingDeliveryEmailFor, setSendingDeliveryEmailFor] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/admin/orders")
@@ -491,9 +492,14 @@ export default function AdminOrdersPage() {
               الطلبات بحالة «تم التوصيل» مع صورة Liefernachweis التي يرفعها السائق من رابط GPS.
             </p>
             {deliveredOrders.length === 0 ? (
-              <p className="mt-4 rounded-xl border border-dashed border-emerald-200 bg-emerald-50/40 p-6 text-center text-sm text-[#0d2137]/60">
-                لا توجد طلبات مُسلَّمة بعد.
-              </p>
+              <div className="mt-4 space-y-2 rounded-xl border border-dashed border-emerald-200 bg-emerald-50/40 p-6 text-center text-sm text-[#0d2137]/70">
+                <p className="font-medium">لا توجد طلبات بحالة «تم التوصيل» بعد.</p>
+                <p className="text-xs leading-relaxed text-[#0d2137]/60">
+                  عندما يرفع السائق صورة التسليم من رابط GPS، أو عندما تضعون الحالة «تم التوصيل» يدوياً، يظهر الطلب هنا مع
+                  <strong className="text-[#0d2137]"> معاينة الصورة</strong>. استخدموا زر «إيميل تأكيد التسليم» لإرسال تأكيد
+                  للعميل (بالألمانية) مع رابط الصورة إن وُجدت.
+                </p>
+              </div>
             ) : (
               <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {deliveredOrders.map((o) => {
@@ -575,6 +581,51 @@ export default function AdminOrdersPage() {
                             <p className="rounded-lg border border-dashed border-amber-300 bg-amber-50/60 px-3 py-4 text-center text-xs text-amber-900">
                               لا توجد صورة مرفوعة — يمكن إضافة رابط يدوياً من ملف الطلب.
                             </p>
+                          )}
+                        </div>
+                        <div className="mt-3 border-t border-emerald-100 pt-3">
+                          <button
+                            type="button"
+                            disabled={
+                              sendingDeliveryEmailFor === o.id ||
+                              !o.customer_email?.trim()
+                            }
+                            title={
+                              !o.customer_email?.trim()
+                                ? "لا يوجد بريد للعميل على هذا الطلب"
+                                : "إرسال إيميل للعميل (ألماني): تأكيد التسليم + صورة إن وُجدت"
+                            }
+                            onClick={async () => {
+                              if (!o.customer_email?.trim()) {
+                                alert("لا يوجد بريد إلكتروني للعميل على هذا الطلب.");
+                                return;
+                              }
+                              setSendingDeliveryEmailFor(o.id);
+                              try {
+                                const res = await fetch(
+                                  `/api/admin/orders/${o.id}/send-delivery-confirmation-email`,
+                                  { method: "POST" }
+                                );
+                                const data = (await res.json()) as { error?: string; sentTo?: string };
+                                if (!res.ok) {
+                                  alert(data?.error ?? "فشل الإرسال");
+                                  return;
+                                }
+                                alert(`تم إرسال تأكيد التسليم إلى: ${data.sentTo ?? o.customer_email}`);
+                              } catch {
+                                alert("خطأ في الشبكة");
+                              } finally {
+                                setSendingDeliveryEmailFor(null);
+                              }
+                            }}
+                            className="w-full rounded-lg bg-sky-600 px-3 py-2 text-xs font-semibold text-white hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-50"
+                          >
+                            {sendingDeliveryEmailFor === o.id
+                              ? "جاري الإرسال…"
+                              : "إيميل تأكيد التسليم للعميل"}
+                          </button>
+                          {!o.customer_email?.trim() && (
+                            <p className="mt-1 text-center text-[10px] text-amber-800">أضف بريد العميل من ملف الطلب</p>
                           )}
                         </div>
                       </div>
