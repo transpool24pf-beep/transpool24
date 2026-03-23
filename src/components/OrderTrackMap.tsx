@@ -23,16 +23,19 @@ function escapeAttr(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/</g, "&lt;");
 }
 
-/** Larger on-map avatar so the driver is easy to recognize (see globals.css sizes). */
+/** Live driver avatar on track map — size matches `.leaflet-driver-photo-marker__inner` in globals.css */
+const DRIVER_PHOTO_MARKER_PX = 64;
+
 function createDriverPhotoDivIcon(href: string): L.DivIcon {
   const safe = escapeAttr(href);
+  const s = DRIVER_PHOTO_MARKER_PX;
+  const half = s / 2;
   return L.divIcon({
     className: "leaflet-driver-photo-marker",
     html: `<div class="leaflet-driver-photo-marker__inner"><img src="${safe}" alt="" decoding="async" fetchpriority="high" /></div>`,
-    /* Must match .leaflet-driver-photo-marker__inner outer size (88×88) so Leaflet does not offset the graphic */
-    iconSize: [88, 88],
-    iconAnchor: [44, 88],
-    popupAnchor: [0, -80],
+    iconSize: [s, s],
+    iconAnchor: [half, s],
+    popupAnchor: [0, -(s - 8)],
   });
 }
 
