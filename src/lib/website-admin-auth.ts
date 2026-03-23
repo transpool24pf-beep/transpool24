@@ -17,8 +17,8 @@ export function createWebsiteAdminSession(): string {
 }
 
 /**
- * Cookie flags for login/logout. Set WEBSITE_ADMIN_COOKIE_DOMAIN=.transpool24.com in production
- * so the same session works on www and apex.
+ * Cookie flags for login/logout. On Vercel set WEBSITE_ADMIN_COOKIE_DOMAIN=transpool24.com (no www)
+ * so the session cookie is sent on both www.transpool24.com and transpool24.com.
  */
 export function websiteAdminSessionCookieOptions(maxAgeSeconds: number) {
   const opts: {
