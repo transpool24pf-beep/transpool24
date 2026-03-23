@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { WebsiteHeroImageEditor } from "@/components/WebsiteHeroImageEditor";
 import { WEBSITE_CMS_LOCALE_OPTIONS } from "@/lib/website-cms-locales";
 
 type HeroData = {
@@ -14,6 +15,7 @@ type HeroData = {
 type EnglishFields = { headline: string; subtitle: string; cta: string };
 
 const UPLOAD_URL = "/api/website/content/hero/upload";
+const PROXY_URL = "/api/website/content/hero/proxy-image";
 const API_BASE = "/api/website/content/hero";
 
 function pickEnglishSource(d: HeroData): EnglishFields {
@@ -188,12 +190,26 @@ export function WebsiteHeroClient() {
               </p>
               <input
                 type="url"
-                placeholder="Oder URL einfügen"
+                placeholder="Oder URL einfügen (direkt speichern, ohne Editor)"
                 value={data.imageUrl ?? ""}
                 onChange={(e) => setData((prev) => ({ ...prev, imageUrl: e.target.value.trim() || null }))}
                 className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 text-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
               />
             </div>
+          </div>
+
+          <div className="mt-6">
+            <WebsiteHeroImageEditor
+              uploadEndpoint={UPLOAD_URL}
+              proxyEndpoint={PROXY_URL}
+              initialUrl={data.imageUrl}
+              disabled={imageUploading}
+              onBusyChange={setImageUploading}
+              onUploaded={(url) => setData((prev) => ({ ...prev, imageUrl: url }))}
+            />
+            <p className="mt-2 text-xs text-[#0d2137]/55" dir="rtl">
+              المحرّر: رابط أو ملف، ثم مقياس ودوران وقلب، ثم «Export &amp; Upload»، ثم احفظ الصفحة.
+            </p>
           </div>
         </div>
 

@@ -106,7 +106,8 @@ export function WebsiteShell({ children }: { children: React.ReactNode }) {
           <span className="mx-2">·</span>
           <span>
             Hero (/website/hero): Live aus DB (ISR/revalidate), Bild nach Speichern; Texte nur EN → Auto-Übersetzung
-            (DEEPL_AUTH_KEY oder GOOGLE_TRANSLATE_API_KEY, sonst MyMemory)
+            (DEEPL_AUTH_KEY oder GOOGLE_TRANSLATE_API_KEY, sonst MyMemory); Bild-Editor: URL-Proxy, Skalierung, Rotation,
+            Spiegeln, Export-Upload
           </span>
           <br />
           <span className="mt-1 inline-block" dir="rtl">
@@ -123,7 +124,7 @@ export function WebsiteShell({ children }: { children: React.ReactNode }) {
           <br />
           <span className="mt-1 inline-block" dir="rtl">
             البطل (Hero): يُحمَّل مباشرة من قاعدة البيانات؛ الصورة تظهر بعد «حفظ»؛ النصوص بالإنجليزية فقط ثم ترجمة
-            تلقائية (يفضّل DEEPL أو Google API)
+            تلقائية (يفضّل DEEPL أو Google API). محرّر الصورة: رابط عبر وكيل آمن، تحويل (مقياس/دوران/قلب)، رفع.
           </span>
         </footer>
       </main>
