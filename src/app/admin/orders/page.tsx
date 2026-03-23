@@ -171,7 +171,19 @@ export default function AdminOrdersPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-[#0d2137]">Aufträge</h1>
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
+        <h1 className="text-2xl font-bold text-[#0d2137]">Aufträge / طلبات</h1>
+        {!loading && (
+          <a
+            href="#admin-order-ops"
+            className="inline-flex w-fit items-center gap-2 rounded-xl border-2 border-[var(--accent)] bg-[var(--accent)]/10 px-4 py-2 text-sm font-semibold text-[#0d2137] hover:bg-[var(--accent)]/20"
+            dir="rtl"
+          >
+            <span aria-hidden>↓</span>
+            قيد التنفيذ وتم التوصيل (صور) — انتقل للأسفل
+          </a>
+        )}
+      </div>
 
       <div className="flex flex-wrap items-center gap-3">
         <input
@@ -334,12 +346,21 @@ export default function AdminOrdersPage() {
         </div>
       )}
 
-      {!loading && orders.length > 0 && (
+      {!loading && (
         <div
-          className="space-y-8 rounded-2xl border-2 border-[#0d2137]/10 bg-gradient-to-b from-white to-[#0d2137]/[0.02] p-6 shadow-lg"
+          id="admin-order-ops"
+          className="scroll-mt-24 space-y-8 rounded-2xl border-2 border-[#0d2137]/10 bg-gradient-to-b from-white to-[#0d2137]/[0.02] p-6 shadow-lg ring-2 ring-[var(--accent)]/20"
           dir="rtl"
         >
-          <div>
+          <p className="border-b border-[#0d2137]/10 pb-3 text-sm font-medium text-[#0d2137]/80">
+            لوحة التشغيل — تظهر دائماً تحت الجدول: الطلبات النشطة ثم المُسلَّمة مع صور الإثبات.
+          </p>
+          {orders.length === 0 ? (
+            <p className="rounded-xl border border-dashed border-[#0d2137]/25 bg-white p-8 text-center text-sm text-[#0d2137]/65">
+              لا توجد طلبات في النظام (تحقق من الاتصال أو صلاحيات API).
+            </p>
+          ) : (
+            <>
             <h2 className="text-xl font-bold text-[#0d2137]">تنفيذ الطلبات — قيد التنفيذ</h2>
             <p className="mt-1 text-sm text-[#0d2137]/65">
               طلبات مؤكدة أو مسار التوصيل (مؤكد، مدفوع، مُعيَّن، في الطريق). تفاصيل التتبع ووقت الوصول المتوقع هنا فقط.
@@ -463,9 +484,8 @@ export default function AdminOrdersPage() {
                 })}
               </div>
             )}
-          </div>
 
-          <div>
+          <div className="pt-2">
             <h2 className="text-xl font-bold text-[#0d2137]">تم التوصيل — إثبات التسليم (صورة)</h2>
             <p className="mt-1 text-sm text-[#0d2137]/65">
               الطلبات بحالة «تم التوصيل» مع صورة Liefernachweis التي يرفعها السائق من رابط GPS.
@@ -564,6 +584,8 @@ export default function AdminOrdersPage() {
               </div>
             )}
           </div>
+            </>
+          )}
         </div>
       )}
 
