@@ -106,6 +106,10 @@ export function WebsiteShell({ children }: { children: React.ReactNode }) {
           </span>
           <span className="mx-2">·</span>
           <span>
+            Homepage-Fahrer (/website): optional Foto per Fahrernummer aus genehmigter driver_applications (personal_photo_url)
+          </span>
+          <span className="mx-2">·</span>
+          <span>
             Hero (/website/hero): Live aus DB (ISR/revalidate), Bild nach Speichern; Texte nur EN → Auto-Übersetzung
             (DEEPL_AUTH_KEY oder GOOGLE_TRANSLATE_API_KEY, sonst MyMemory); Bild-Editor: URL-Proxy, Skalierung, Rotation,
             Spiegeln, Export-Upload. CMS-Session: WEBSITE_ADMIN_COOKIE_DOMAIN=transpool24.com (ohne www) auf Vercel, wenn
@@ -122,6 +126,10 @@ export function WebsiteShell({ children }: { children: React.ReactNode }) {
           <br />
           <span className="mt-1 inline-block" dir="rtl">
             تحميل عام: طبقة DotLottie «Loading blue» عند بطء التنقل أو التحميل الأول للصفحة
+          </span>
+          <br />
+          <span className="mt-1 inline-block" dir="rtl">
+            تقييمات السائقين: يمكن جلب صورة السائق برقمه من طلب معتمد (personal_photo_url).
           </span>
           <br />
           <span className="mt-1 inline-block" dir="rtl">

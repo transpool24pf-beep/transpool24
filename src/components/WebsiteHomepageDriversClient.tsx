@@ -17,12 +17,15 @@ interface Driver {
 type Props = { apiBase: string };
 
 const PHOTO_UPLOAD_URL = "/api/website/content/drivers/upload";
+const LOOKUP_BY_NUMBER_URL = "/api/website/content/drivers/lookup-by-number";
 
 export function WebsiteHomepageDriversClient({ apiBase }: Props) {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [photoUploading, setPhotoUploading] = useState(false);
+  const [driverNumberQuery, setDriverNumberQuery] = useState("");
+  const [lookupLoading, setLookupLoading] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   const [formData, setFormData] = useState<Driver>({
@@ -49,6 +52,7 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
   const handleAdd = () => {
     setEditingId(null);
     setIsAdding(true);
+    setDriverNumberQuery("");
     setFormData({
       name: "",
       photo: "",
@@ -103,6 +107,7 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
         }
         setEditingId(null);
         setIsAdding(false);
+        setDriverNumberQuery("");
         setFormData({
           name: "",
           photo: "",
@@ -124,6 +129,40 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
       alert("Anfrage fehlgeschlagen.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleLookupByDriverNumber = async () => {
+    const num = parseInt(driverNumberQuery.trim(), 10);
+    if (!Number.isFinite(num) || num < 1) {
+      alert("Bitte eine gültige Fahrernummer eingeben (positive Zahl). / أدخل رقماً صحيحاً.");
+      return;
+    }
+    setLookupLoading(true);
+    try {
+      const res = await cmsFetch(LOOKUP_BY_NUMBER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ driverNumber: num }),
+      });
+      const data = (await res.json()) as { photoUrl?: string; fullName?: string; error?: string };
+      if (res.status === 401) {
+        alert("Nicht angemeldet — bitte /website/login. / أعد تسجيل الدخول.");
+        return;
+      }
+      if (!res.ok) {
+        throw new Error(data.error || "Lookup fehlgeschlagen.");
+      }
+      if (!data.photoUrl) throw new Error("Keine Bild-URL.");
+      setFormData((prev) => ({
+        ...prev,
+        photo: data.photoUrl!,
+        name: prev.name.trim() ? prev.name : data.fullName?.trim() || prev.name,
+      }));
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Lookup fehlgeschlagen.");
+    } finally {
+      setLookupLoading(false);
     }
   };
 
@@ -223,8 +262,39 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
                 className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
               />
             </div>
+            <div className="sm:col-span-2 rounded-xl border border-[var(--accent)]/20 bg-[var(--accent)]/5 p-4">
+              <label className="mb-2 block text-sm font-medium text-[#0d2137]/85">
+                Fahrernummer · رقم السائق
+              </label>
+              <p className="mb-2 text-xs text-[#0d2137]/65">
+                Zugelassene Fahrer: Foto aus der Datenbank (Persönliches Foto im Antrag) übernehmen — keine Datei nötig.
+              </p>
+              <div className="flex flex-wrap items-center gap-2">
+                <input
+                  type="number"
+                  min={1}
+                  inputMode="numeric"
+                  value={driverNumberQuery}
+                  onChange={(e) => setDriverNumberQuery(e.target.value)}
+                  placeholder="z. B. 12"
+                  disabled={lookupLoading || photoUploading}
+                  className="w-36 rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] disabled:opacity-50"
+                />
+                <button
+                  type="button"
+                  onClick={() => void handleLookupByDriverNumber()}
+                  disabled={lookupLoading || photoUploading}
+                  className="rounded-lg bg-[#0d2137] px-4 py-2 text-sm font-medium text-white hover:opacity-95 disabled:opacity-50"
+                >
+                  {lookupLoading ? "…" : "Foto laden · تحميل الصورة"}
+                </button>
+              </div>
+              <p className="mt-2 text-xs text-[#0d2137]/55" dir="rtl">
+                فقط سائق معتمد (approved) ولديه صورة شخصية في طلب التسجيل.
+              </p>
+            </div>
             <div className="sm:col-span-2">
-              <label className="mb-1 block text-sm font-medium text-[#0d2137]/80">Foto</label>
+              <label className="mb-1 block text-sm font-medium text-[#0d2137]/80">Foto (manuell)</label>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
                 <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border-2 border-[var(--accent)]/30 bg-gray-100">
                   {formData.photo ? (
@@ -319,6 +389,7 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
               onClick={() => {
                 setEditingId(null);
                 setIsAdding(false);
+                setDriverNumberQuery("");
                 setFormData({
                   name: "",
                   photo: "",
