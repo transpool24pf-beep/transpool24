@@ -1,23 +1,13 @@
 import { NextResponse } from "next/server";
 import { getRouteDistanceAndDuration } from "@/lib/route-distance-server";
+import { geocodeGermanyOne } from "@/lib/nominatim-germany";
 
-const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
 const OSRM_URL = "https://router.project-osrm.org/route/v1/driving";
 
 async function geocode(address: string): Promise<{ lat: number; lon: number } | null> {
-  const res = await fetch(
-    `${NOMINATIM_URL}?format=json&q=${encodeURIComponent(address)}&limit=1&countrycodes=de`,
-    {
-      headers: {
-        "User-Agent": "TransPool24/1.0 (contact@transpool24.com)",
-        Accept: "application/json",
-      },
-    }
-  );
-  const data = await res.json();
-  if (!Array.isArray(data) || data.length === 0) return null;
-  const first = data[0];
-  return { lat: parseFloat(first.lat), lon: parseFloat(first.lon) };
+  const hit = await geocodeGermanyOne(address);
+  if (!hit || !Number.isFinite(hit.lat) || !Number.isFinite(hit.lon)) return null;
+  return { lat: hit.lat, lon: hit.lon };
 }
 
 export async function GET(req: Request) {

@@ -1,22 +1,13 @@
-const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
+import { geocodeGermanyOne } from "./nominatim-germany";
+
 const OSRM_URL = "https://router.project-osrm.org/route/v1/driving";
 const GOOGLE_DIRECTIONS_URL = "https://maps.googleapis.com/maps/api/directions/json";
 
-/** Nominatim (server-only). Use sparingly; respect OSM usage policy. */
+/** Nominatim (server-only). PLZ + free-text Germany; respect OSM usage policy. */
 export async function geocodeAddressForMap(address: string): Promise<{ lat: number; lon: number } | null> {
-  const res = await fetch(
-    `${NOMINATIM_URL}?format=json&q=${encodeURIComponent(address)}&limit=1&countrycodes=de`,
-    {
-      headers: {
-        "User-Agent": "TransPool24/1.0 (contact@transpool24.com)",
-        Accept: "application/json",
-      },
-    }
-  );
-  const data = await res.json();
-  if (!Array.isArray(data) || data.length === 0) return null;
-  const first = data[0];
-  return { lat: parseFloat(first.lat), lon: parseFloat(first.lon) };
+  const hit = await geocodeGermanyOne(address);
+  if (!hit || !Number.isFinite(hit.lat) || !Number.isFinite(hit.lon)) return null;
+  return { lat: hit.lat, lon: hit.lon };
 }
 
 export type RouteResult = { distanceKm: number; durationMinutes: number | null };

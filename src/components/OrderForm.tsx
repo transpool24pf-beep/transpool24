@@ -219,11 +219,17 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
   const priceCents = priceBreakdown.totalCents;
 
   const fetchSuggestions = useCallback((query: string, setter: (s: Suggestion[]) => void) => {
-    if (query.length < 3) {
+    const trimmed = query.trim();
+    if (trimmed.length < 3) {
       setter([]);
       return;
     }
-    fetch(`/api/address-suggestions?q=${encodeURIComponent(query)}`)
+    // German PLZ is 5 digits: avoid noisy partial results until complete
+    if (/^\d+$/.test(trimmed) && trimmed.length < 5) {
+      setter([]);
+      return;
+    }
+    fetch(`/api/address-suggestions?q=${encodeURIComponent(trimmed)}`)
       .then((r) => r.json())
       .then(setter)
       .catch(() => setter([]));
