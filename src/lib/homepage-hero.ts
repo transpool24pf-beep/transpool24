@@ -1,9 +1,11 @@
+import { unstable_noStore as noStore } from "next/cache";
 import { createServerSupabase } from "./supabase";
 import { locales } from "@/i18n/routing";
 
 const FALLBACK = { imageUrl: null, headline: null, subtitle: null, cta: null } as const;
 
 export async function getHomepageHero(locale: string) {
+  noStore();
   try {
     if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
       return FALLBACK;

@@ -1,4 +1,7 @@
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
+import { locales } from "@/i18n/routing";
+import { translateHeroFromEnglish } from "@/lib/hero-auto-translate";
 import { requireWebsiteAdmin } from "@/lib/website-admin-api";
 import { createServerSupabase } from "@/lib/supabase";
 
@@ -39,11 +42,24 @@ export async function PUT(req: Request) {
   try {
     const body = await req.json();
     const imageUrl = typeof body.imageUrl === "string" ? body.imageUrl.trim() || null : null;
-    const headline = body.headline && typeof body.headline === "object" ? body.headline : {};
-    const subtitle = body.subtitle && typeof body.subtitle === "object" ? body.subtitle : {};
-    const cta = body.cta && typeof body.cta === "object" ? body.cta : {};
 
-    const payload = { headline, subtitle, cta };
+    let payload: { headline: Record<string, string>; subtitle: Record<string, string>; cta: Record<string, string> };
+    let translationFallback = false;
+
+    const he = body.heroEnglish;
+    if (he && typeof he === "object") {
+      const headlineEn = typeof he.headline === "string" ? he.headline : "";
+      const subtitleEn = typeof he.subtitle === "string" ? he.subtitle : "";
+      const ctaEn = typeof he.cta === "string" ? he.cta : "";
+      payload = await translateHeroFromEnglish(headlineEn, subtitleEn, ctaEn);
+      translationFallback =
+        !process.env.DEEPL_AUTH_KEY && !process.env.GOOGLE_TRANSLATE_API_KEY;
+    } else {
+      const headline = body.headline && typeof body.headline === "object" ? body.headline : {};
+      const subtitle = body.subtitle && typeof body.subtitle === "object" ? body.subtitle : {};
+      const cta = body.cta && typeof body.cta === "object" ? body.cta : {};
+      payload = { headline, subtitle, cta };
+    }
 
     const supabase = createServerSupabase();
     const { error } = await supabase
@@ -55,7 +71,11 @@ export async function PUT(req: Request) {
 
     if (error) throw error;
 
-    return NextResponse.json({ ok: true });
+    for (const loc of locales) {
+      revalidatePath(`/${loc}`, "page");
+    }
+
+    return NextResponse.json({ ok: true, translationFallback });
   } catch (e) {
     console.error("[website/content/hero PUT]", e);
     return NextResponse.json({ error: "Update failed" }, { status: 500 });

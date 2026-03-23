@@ -23,12 +23,19 @@ export async function GET(req: Request) {
     const subtitle = payload.subtitle?.[safeLocale] ?? null;
     const cta = payload.cta?.[safeLocale] ?? null;
 
-    return NextResponse.json({
-      imageUrl: row?.image_url ?? null,
-      headline,
-      subtitle,
-      cta,
-    });
+    return NextResponse.json(
+      {
+        imageUrl: row?.image_url ?? null,
+        headline,
+        subtitle,
+        cta,
+      },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120",
+        },
+      },
+    );
   } catch (e) {
     console.error("[public/content/hero GET]", e);
     return NextResponse.json(

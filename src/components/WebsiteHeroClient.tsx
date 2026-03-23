@@ -11,8 +11,18 @@ type HeroData = {
   cta: Record<string, string>;
 };
 
+type EnglishFields = { headline: string; subtitle: string; cta: string };
+
 const UPLOAD_URL = "/api/website/content/hero/upload";
 const API_BASE = "/api/website/content/hero";
+
+function pickEnglishSource(d: HeroData): EnglishFields {
+  return {
+    headline: d.headline.en?.trim() || "",
+    subtitle: d.subtitle.en?.trim() || "",
+    cta: d.cta.en?.trim() || "",
+  };
+}
 
 export function WebsiteHeroClient() {
   const [data, setData] = useState<HeroData>({
@@ -21,23 +31,32 @@ export function WebsiteHeroClient() {
     subtitle: {},
     cta: {},
   });
+  const [english, setEnglish] = useState<EnglishFields>({
+    headline: "",
+    subtitle: "",
+    cta: "",
+  });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
 
-  useEffect(() => {
+  const load = () =>
     fetch(API_BASE)
       .then((r) => r.json())
-      .then((res) =>
-        setData({
+      .then((res) => {
+        const next: HeroData = {
           imageUrl: res.imageUrl ?? null,
           headline: res.headline ?? {},
           subtitle: res.subtitle ?? {},
           cta: res.cta ?? {},
-        }),
-      )
-      .catch(() => {})
-      .finally(() => setLoading(false));
+        };
+        setData(next);
+        setEnglish(pickEnglishSource(next));
+      })
+      .catch(() => {});
+
+  useEffect(() => {
+    load().finally(() => setLoading(false));
   }, []);
 
   const handleImageFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,30 +101,32 @@ export function WebsiteHeroClient() {
       const res = await fetch(API_BASE, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          imageUrl: data.imageUrl,
+          heroEnglish: english,
+        }),
       });
+      const body = (await res.json().catch(() => ({}))) as {
+        error?: string;
+        translationFallback?: boolean;
+      };
       if (res.ok) {
-        alert("Gespeichert. Änderungen sind auf der Startseite sichtbar.");
+        await load();
+        let msg =
+          "Gespeichert. Startseite lädt Hero jetzt live aus der Datenbank (kein Build nötig).";
+        if (body.translationFallback) {
+          msg +=
+            "\n\nHinweis: Ohne DEEPL_AUTH_KEY oder GOOGLE_TRANSLATE_API_KEY wird MyMemory genutzt (begrenzt). Für stabile Übersetzungen DeepL empfohlen.";
+        }
+        alert(msg);
       } else {
-        const body = await res.json().catch(() => ({}));
-        alert((body as { error?: string }).error || "Speichern fehlgeschlagen.");
+        alert(body.error || "Speichern fehlgeschlagen.");
       }
     } catch {
       alert("Anfrage fehlgeschlagen.");
     } finally {
       setSaving(false);
     }
-  };
-
-  const updateField = (
-    group: "headline" | "subtitle" | "cta",
-    locale: string,
-    value: string,
-  ) => {
-    setData((prev) => ({
-      ...prev,
-      [group]: { ...prev[group], [locale]: value },
-    }));
   };
 
   if (loading) {
@@ -121,7 +142,11 @@ export function WebsiteHeroClient() {
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-[#0d2137]">Homepage – Hero</h1>
         <p className="mt-1 text-sm text-[#0d2137]/70">
-          Hintergrundbild und Texte (Überschrift, Untertitel, Button) für den Hero-Bereich. Leere Felder nutzen die Standard-Texte aus den Übersetzungen.
+          Hintergrundbild und Texte für den Hero. Texte nur auf Englisch eingeben — beim Speichern werden alle
+          Sprachen automatisch übersetzt (DeepL, sonst Google, sonst MyMemory).
+        </p>
+        <p className="mt-1 text-sm text-[#0d2137]/70" dir="rtl">
+          صورة الخلفية والنصوص. أدخل النصوص بالإنجليزية فقط؛ عند الحفظ تُترجم تلقائياً لكل اللغات.
         </p>
       </div>
 
@@ -132,6 +157,7 @@ export function WebsiteHeroClient() {
             <div className="relative h-48 w-full max-w-sm shrink-0 overflow-hidden rounded-xl border-2 border-[#0d2137]/10 bg-gray-100">
               {data.imageUrl ? (
                 <Image
+                  key={data.imageUrl}
                   src={data.imageUrl}
                   alt=""
                   fill
@@ -154,7 +180,7 @@ export function WebsiteHeroClient() {
                 className="block w-full text-sm text-[#0d2137] file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--accent)] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:opacity-95 disabled:opacity-50"
               />
               <p className="text-xs text-[#0d2137]/60">
-                JPEG/PNG/WebP, max. 5 MB. Querformat empfohlen.
+                JPEG/PNG/WebP, max. 5 MB. Nach Upload unbedingt „Speichern“ klicken.
               </p>
               <input
                 type="url"
@@ -168,52 +194,72 @@ export function WebsiteHeroClient() {
         </div>
 
         <div className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-lg font-medium text-[#0d2137]">Texte pro Sprache</h2>
-          <p className="mb-6 text-sm text-[#0d2137]/70">
-            Nur ausfüllen, wenn Sie die Standard-Texte überschreiben möchten.
+          <h2 className="mb-2 text-lg font-medium text-[#0d2137]">Hero-Texte (nur Englisch)</h2>
+          <p className="mb-6 text-sm text-[#0d2137]/65">
+            Leer lassen = keine CMS-Texte, die Website nutzt dann die Standard-Übersetzungen aus den Sprachdateien.
           </p>
-          <div className="space-y-6">
-            {WEBSITE_CMS_LOCALE_OPTIONS.map(({ code, label }) => (
-              <div
-                key={code}
-                className="rounded-lg border border-[#0d2137]/10 bg-[#f8fafc] p-4"
-              >
-                <h3 className="mb-3 text-sm font-semibold text-[#0d2137]">{label} ({code})</h3>
-                <div className="grid gap-3 sm:grid-cols-3">
-                  <div>
-                    <label className="mb-1 block text-xs font-medium text-[#0d2137]/70">Überschrift</label>
-                    <input
-                      type="text"
-                      value={data.headline[code] ?? ""}
-                      onChange={(e) => updateField("headline", code, e.target.value)}
-                      placeholder="z. B. Ihr Logistikpartner in Pforzheim"
-                      className="w-full rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-xs font-medium text-[#0d2137]/70">Untertitel</label>
-                    <input
-                      type="text"
-                      value={data.subtitle[code] ?? ""}
-                      onChange={(e) => updateField("subtitle", code, e.target.value)}
-                      placeholder="z. B. Schnell, zuverlässig, transparent."
-                      className="w-full rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-xs font-medium text-[#0d2137]/70">Button-Text</label>
-                    <input
-                      type="text"
-                      value={data.cta[code] ?? ""}
-                      onChange={(e) => updateField("cta", code, e.target.value)}
-                      placeholder="z. B. Jetzt Auftrag buchen"
-                      className="w-full rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div>
+              <label className="mb-1 block text-xs font-medium text-[#0d2137]/70">Headline (EN)</label>
+              <input
+                type="text"
+                value={english.headline}
+                onChange={(e) => setEnglish((p) => ({ ...p, headline: e.target.value }))}
+                placeholder="e.g. Your logistics partner in Pforzheim"
+                className="w-full rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-[#0d2137]/70">Subtitle (EN)</label>
+              <input
+                type="text"
+                value={english.subtitle}
+                onChange={(e) => setEnglish((p) => ({ ...p, subtitle: e.target.value }))}
+                placeholder="e.g. Fast, reliable, transparent."
+                className="w-full rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-xs font-medium text-[#0d2137]/70">Button (EN)</label>
+              <input
+                type="text"
+                value={english.cta}
+                onChange={(e) => setEnglish((p) => ({ ...p, cta: e.target.value }))}
+                placeholder="e.g. Book now"
+                className="w-full rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+              />
+            </div>
           </div>
+
+          <details className="mt-8 rounded-lg border border-[#0d2137]/10 bg-[#f8fafc] p-4">
+            <summary className="cursor-pointer text-sm font-semibold text-[#0d2137]">
+              Alle Sprachen (Vorschau nach Speichern)
+            </summary>
+            <p className="mt-2 text-xs text-[#0d2137]/60" dir="rtl">
+              معاينة لكل اللغة بعد الحفظ
+            </p>
+            <div className="mt-4 space-y-4">
+              {WEBSITE_CMS_LOCALE_OPTIONS.map(({ code, label }) => (
+                <div key={code} className="rounded-md border border-[#0d2137]/8 bg-white p-3 text-xs">
+                  <p className="mb-2 font-semibold text-[#0d2137]">
+                    {label} ({code})
+                  </p>
+                  <p>
+                    <span className="text-[#0d2137]/55">Titel: </span>
+                    {data.headline[code] || "—"}
+                  </p>
+                  <p className="mt-1">
+                    <span className="text-[#0d2137]/55">Untertitel: </span>
+                    {data.subtitle[code] || "—"}
+                  </p>
+                  <p className="mt-1">
+                    <span className="text-[#0d2137]/55">Button: </span>
+                    {data.cta[code] || "—"}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </details>
         </div>
 
         <button
@@ -221,7 +267,7 @@ export function WebsiteHeroClient() {
           disabled={saving}
           className="rounded-xl bg-[var(--accent)] px-8 py-3 font-semibold text-white shadow-lg transition hover:opacity-95 disabled:opacity-60"
         >
-          {saving ? "Speichern…" : "Speichern & Veröffentlichen"}
+          {saving ? "Speichern & übersetzen…" : "Speichern & alle Sprachen übersetzen"}
         </button>
       </form>
     </div>

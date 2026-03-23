@@ -103,6 +103,11 @@ export function WebsiteShell({ children }: { children: React.ReactNode }) {
           <span>
             Globales Lade-Overlay: DotLottie „Loading blue“ bei langsamer Navigation / erstem Seitenaufbau
           </span>
+          <span className="mx-2">·</span>
+          <span>
+            Hero (/website/hero): Live aus DB (ISR/revalidate), Bild nach Speichern; Texte nur EN → Auto-Übersetzung
+            (DEEPL_AUTH_KEY oder GOOGLE_TRANSLATE_API_KEY, sonst MyMemory)
+          </span>
           <br />
           <span className="mt-1 inline-block" dir="rtl">
             صفحة الحجز (/order): Lottie المسار والملخص · شاحنتان جانبيتان (سطح المكتب، حركة متعاكسة) · السائق (/driver): تلميح التتبع المباشر
@@ -114,6 +119,11 @@ export function WebsiteShell({ children }: { children: React.ReactNode }) {
           <br />
           <span className="mt-1 inline-block" dir="rtl">
             تحميل عام: طبقة DotLottie «Loading blue» عند بطء التنقل أو التحميل الأول للصفحة
+          </span>
+          <br />
+          <span className="mt-1 inline-block" dir="rtl">
+            البطل (Hero): يُحمَّل مباشرة من قاعدة البيانات؛ الصورة تظهر بعد «حفظ»؛ النصوص بالإنجليزية فقط ثم ترجمة
+            تلقائية (يفضّل DEEPL أو Google API)
           </span>
         </footer>
       </main>
