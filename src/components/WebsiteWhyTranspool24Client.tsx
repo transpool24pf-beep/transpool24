@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { locales, type Locale } from "@/i18n/routing";
 import { localeCmsSelectLabel } from "@/lib/locale-display";
@@ -100,6 +101,33 @@ export function WebsiteWhyTranspool24Client() {
   return (
     <div>
       <h1 className="mb-2 text-2xl font-semibold text-[#0d2137]">Homepage – Warum TransPool24?</h1>
+
+      <div className="mb-6 flex flex-col gap-3 rounded-xl border-2 border-[var(--accent)] bg-gradient-to-br from-[var(--accent)]/12 to-white p-4 shadow-sm sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+        <div className="text-sm text-[#0d2137]" dir="rtl">
+          <p className="font-bold text-[#0d2137]">صور وفيديو صفحة «لماذا»؟</p>
+          <p className="mt-1 text-[#0d2137]/85">
+            ليست هنا — افتح صفحة <strong>الوسائط</strong> من القائمة الجانبية أو الزر أدناه. هناك: صورة البانوراما، صورة
+            المشهد، ورفع الفيديو + خيار <strong>تطبيق على كل اللغات</strong>.
+          </p>
+        </div>
+        <div className="text-sm text-[#0d2137]/90">
+          <p className="font-semibold text-[#0d2137]">Bilder &amp; Video für /why?</p>
+          <p className="mt-1">
+            Nicht auf dieser Seite — öffnen Sie{" "}
+            <strong>Homepage – Medien (Why)</strong> (Sidebar oder Button). Pfad:{" "}
+            <code className="rounded bg-[#0d2137]/10 px-1 text-xs">/website/why-media</code>
+          </p>
+        </div>
+        <Link
+          href="/website/why-media"
+          className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[var(--accent)] px-5 py-3 text-center text-sm font-bold text-white shadow-md transition hover:opacity-95"
+        >
+          <span dir="rtl">→ صور وفيديو</span>
+          <span className="opacity-90">·</span>
+          <span>Medien (Why) →</span>
+        </Link>
+      </div>
+
       <p className="mb-6 text-sm text-[#0d2137]/70">
         Inhalt der Seite{" "}
         <code className="rounded bg-[#0d2137]/5 px-1">/[locale]/why</code> — JSON bearbeiten und speichern.
@@ -122,8 +150,12 @@ export function WebsiteWhyTranspool24Client() {
           <strong>نسخة تلك اللغة</strong> ثم تحفظ عادةً <strong>لهذه اللغة فقط</strong>.
         </p>
         <p className="text-[#0d2137]/85">
-          لتغيير <strong>الصور والفيديو</strong> لجميع اللغات دفعة واحدة بدون تكرار النصوص: استخدم صفحة{" "}
-          <strong>Homepage – Medien (Why)</strong> مع خيار <strong>«Alle Sprachen / تطبيق على كل اللغات»</strong>.
+          لتغيير <strong>الصور والفيديو</strong>:{" "}
+          <Link href="/website/why-media" className="font-bold text-[var(--accent)] underline underline-offset-2">
+            اضغط للانتقال إلى صفحة الوسائط
+          </Link>{" "}
+          (أو من القائمة: <strong>Homepage – Medien (Why)</strong>) وفعّل{" "}
+          <strong>«تطبيق على كل اللغات»</strong> عند الحفظ.
         </p>
       </div>
       <p className="mb-4 rounded-lg border border-[#0d2137]/10 bg-white px-4 py-3 text-sm text-[#0d2137]/80">

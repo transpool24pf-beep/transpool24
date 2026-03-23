@@ -10,7 +10,7 @@ const NAV = [
   { href: "/website/hero", label: "Homepage – Hero (Bild & Texte)" },
   { href: "/website/transport", label: "Homepage – Transport-Kacheln" },
   { href: "/website/why", label: "Homepage – Warum TransPool24?" },
-  { href: "/website/why-media", label: "Homepage – Medien (Why)" },
+  { href: "/website/why-media", label: "Homepage – Medien (Why) — Bilder/Video" },
   { href: "/website/social", label: "Footer – Social Media URLs" },
 ];
 
