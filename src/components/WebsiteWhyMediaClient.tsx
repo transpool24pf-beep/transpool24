@@ -152,6 +152,11 @@ export function WebsiteWhyMediaClient() {
               Wenn aktiviert: Beim Speichern erhalten <strong>alle {locales.length} Sprachen</strong> dieselben Bild- und
               Video-URLs (Vorschau &amp; Bearbeitung hier weiter nach Sprache — „Medien speichern“ schreibt überall).
             </span>
+            <span className="mt-2 block text-xs text-amber-900/90" dir="rtl">
+              إذا ظهر خطأ عند الحفظ: قد تحتاج قاعدة البيانات إلى توسيع قائمة اللغات — نفّذ ملف SQL{" "}
+              <code className="rounded bg-white/80 px-1">supabase/FIX_why_save_all_languages.sql</code> في Supabase →
+              SQL Editor.
+            </span>
           </span>
         </label>
       </div>

@@ -1,6 +1,9 @@
 -- Editable "Why TransPool24?" long-form page (per locale), managed in /website
+-- Must match src/i18n/routing.ts `locales`. Older DBs: run why_transpool24_locale_extend.sql
 CREATE TABLE IF NOT EXISTS why_transpool24_locale (
-  locale TEXT PRIMARY KEY CHECK (locale IN ('de', 'en', 'tr', 'fr', 'es', 'ar')),
+  locale TEXT PRIMARY KEY CHECK (
+    locale IN ('de', 'en', 'tr', 'fr', 'es', 'ar', 'ru', 'pl', 'ro', 'ku', 'it', 'uk')
+  ),
   payload JSONB NOT NULL DEFAULT '{}'::jsonb,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

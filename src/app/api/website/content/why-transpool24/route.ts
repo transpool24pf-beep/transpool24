@@ -11,6 +11,21 @@ import {
 import { normalizeWhyAssetUrl } from "@/lib/why-asset-url";
 import { locales } from "@/i18n/routing";
 
+const CONSTRAINT_HINT =
+  'If this mentions "check constraint" or locale: run supabase/FIX_why_save_all_languages.sql (or why_transpool24_locale_extend.sql) in Supabase SQL Editor.';
+
+function upsertErrorResponse(locale: string, err: { message?: string; code?: string; hint?: string }) {
+  const msg = err.message || "Upsert failed";
+  return NextResponse.json(
+    {
+      error: `Save failed for locale "${locale}": ${msg}. ${CONSTRAINT_HINT}`,
+      code: err.code,
+      failedLocale: locale,
+    },
+    { status: 500 },
+  );
+}
+
 export async function GET(request: Request) {
   const err = await requireWebsiteAdmin();
   if (err) return err;
@@ -68,7 +83,10 @@ export async function PUT(request: Request) {
         { onConflict: "locale" },
       );
 
-      if (error) throw error;
+      if (error) {
+        console.error("[website/why-transpool24 PUT] upsert", loc, error);
+        return upsertErrorResponse(loc, error);
+      }
     }
 
     return NextResponse.json({
@@ -78,7 +96,8 @@ export async function PUT(request: Request) {
     });
   } catch (e) {
     console.error("[website/why-transpool24 PUT]", e);
-    return NextResponse.json({ error: "Save failed" }, { status: 500 });
+    const msg = e instanceof Error ? e.message : "Save failed";
+    return NextResponse.json({ error: `${msg} ${CONSTRAINT_HINT}` }, { status: 500 });
   }
 }
 
@@ -132,7 +151,10 @@ export async function PATCH(request: Request) {
         { onConflict: "locale" },
       );
 
-      if (error) throw error;
+      if (error) {
+        console.error("[website/why-transpool24 PATCH] upsert", loc, error);
+        return upsertErrorResponse(loc, error);
+      }
     }
 
     return NextResponse.json({
@@ -142,7 +164,8 @@ export async function PATCH(request: Request) {
     });
   } catch (e) {
     console.error("[website/why-transpool24 PATCH]", e);
-    return NextResponse.json({ error: "Save failed" }, { status: 500 });
+    const msg = e instanceof Error ? e.message : "Save failed";
+    return NextResponse.json({ error: `${msg} ${CONSTRAINT_HINT}` }, { status: 500 });
   }
 }
 
