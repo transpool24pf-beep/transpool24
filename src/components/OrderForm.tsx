@@ -25,7 +25,12 @@ const RouteMap = dynamic(
   }
 );
 
-type Suggestion = { display_name: string; lat: number; lon: number };
+type Suggestion = {
+  display_name: string;
+  lat?: number;
+  lon?: number;
+  place_id?: string;
+};
 type RouteGeo = {
   from: { lat: number; lon: number };
   to: { lat: number; lon: number };
@@ -166,6 +171,12 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
   const [countryCodeOpen, setCountryCodeOpen] = useState(false);
   const countryCodeRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Links Google Autocomplete + Place Details billing sessions */
+  const placesSessionRef = useRef(
+    typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+      ? crypto.randomUUID()
+      : `tp24-${Date.now()}`
+  );
 
   useEffect(() => {
     const close = (e: MouseEvent) => {
@@ -229,9 +240,25 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
       setter([]);
       return;
     }
-    fetch(`/api/address-suggestions?q=${encodeURIComponent(trimmed)}`)
+    const session = encodeURIComponent(placesSessionRef.current);
+    fetch(`/api/address-suggestions?q=${encodeURIComponent(trimmed)}&session=${session}`)
       .then((r) => r.json())
-      .then(setter)
+      .then((raw: unknown) => {
+        if (!Array.isArray(raw)) {
+          setter([]);
+          return;
+        }
+        setter(
+          raw.map((x: unknown) => {
+            const o = x as Record<string, unknown>;
+            const display_name = typeof o.display_name === "string" ? o.display_name : "";
+            const place_id = typeof o.place_id === "string" ? o.place_id : undefined;
+            const lat = typeof o.lat === "number" ? o.lat : undefined;
+            const lon = typeof o.lon === "number" ? o.lon : undefined;
+            return { display_name, place_id, lat, lon };
+          })
+        );
+      })
       .catch(() => setter([]));
   }, []);
 
@@ -568,10 +595,33 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
                     <button
                       type="button"
                       className="w-full px-4 py-2 text-left text-sm hover:bg-[#0d2137]/5"
-                      onMouseDown={() => {
-                        update({ pickupAddress: s.display_name });
-                        setPickupSuggestions([]);
-                        setSuggestionsOpen(null);
+                      onMouseDown={(ev) => {
+                        ev.preventDefault();
+                        void (async () => {
+                          try {
+                            if (s.place_id) {
+                              const res = await fetch(
+                                `/api/place-details?place_id=${encodeURIComponent(s.place_id)}&session=${encodeURIComponent(placesSessionRef.current)}`
+                              );
+                              const j = (await res.json()) as { formatted_address?: string };
+                              if (j.formatted_address?.trim()) {
+                                update({ pickupAddress: j.formatted_address.trim() });
+                                placesSessionRef.current =
+                                  typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+                                    ? crypto.randomUUID()
+                                    : `tp24-${Date.now()}`;
+                              } else {
+                                update({ pickupAddress: s.display_name });
+                              }
+                            } else {
+                              update({ pickupAddress: s.display_name });
+                            }
+                          } catch {
+                            update({ pickupAddress: s.display_name });
+                          }
+                          setPickupSuggestions([]);
+                          setSuggestionsOpen(null);
+                        })();
                       }}
                     >
                       {s.display_name}
@@ -604,10 +654,33 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
                     <button
                       type="button"
                       className="w-full px-4 py-2 text-left text-sm hover:bg-[#0d2137]/5"
-                      onMouseDown={() => {
-                        update({ deliveryAddress: s.display_name });
-                        setDeliverySuggestions([]);
-                        setSuggestionsOpen(null);
+                      onMouseDown={(ev) => {
+                        ev.preventDefault();
+                        void (async () => {
+                          try {
+                            if (s.place_id) {
+                              const res = await fetch(
+                                `/api/place-details?place_id=${encodeURIComponent(s.place_id)}&session=${encodeURIComponent(placesSessionRef.current)}`
+                              );
+                              const j = (await res.json()) as { formatted_address?: string };
+                              if (j.formatted_address?.trim()) {
+                                update({ deliveryAddress: j.formatted_address.trim() });
+                                placesSessionRef.current =
+                                  typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+                                    ? crypto.randomUUID()
+                                    : `tp24-${Date.now()}`;
+                              } else {
+                                update({ deliveryAddress: s.display_name });
+                              }
+                            } else {
+                              update({ deliveryAddress: s.display_name });
+                            }
+                          } catch {
+                            update({ deliveryAddress: s.display_name });
+                          }
+                          setDeliverySuggestions([]);
+                          setSuggestionsOpen(null);
+                        })();
                       }}
                     >
                       {s.display_name}
