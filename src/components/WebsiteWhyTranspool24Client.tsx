@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from "react";
 import { locales, type Locale } from "@/i18n/routing";
 import { localeCmsSelectLabel } from "@/lib/locale-display";
 import { parseFetchJson } from "@/lib/parse-fetch-json";
+import { cmsFetch } from "@/lib/website-cms-fetch";
 
 export function WebsiteWhyTranspool24Client() {
   const [locale, setLocale] = useState<Locale>("de");
@@ -19,7 +20,7 @@ export function WebsiteWhyTranspool24Client() {
     setLoading(true);
     setMessage(null);
     try {
-      const res = await fetch(`/api/website/content/why-transpool24?locale=${locale}`);
+      const res = await cmsFetch(`/api/website/content/why-transpool24?locale=${locale}`);
       const data = await parseFetchJson<{ payload?: unknown; error?: string }>(res);
       if (!res.ok) throw new Error(data.error || "Laden fehlgeschlagen");
       setJsonText(JSON.stringify(data.payload, null, 2));
@@ -54,7 +55,7 @@ export function WebsiteWhyTranspool24Client() {
     }
     setSaving(true);
     try {
-      const res = await fetch("/api/website/content/why-transpool24", {
+      const res = await cmsFetch("/api/website/content/why-transpool24", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ locale, payload, applyToAllLocales }),
@@ -82,7 +83,7 @@ export function WebsiteWhyTranspool24Client() {
     setMessage(null);
     setSaving(true);
     try {
-      const res = await fetch(`/api/website/content/why-transpool24?locale=${locale}`, {
+      const res = await cmsFetch(`/api/website/content/why-transpool24?locale=${locale}`, {
         method: "DELETE",
       });
       const data = await parseFetchJson<{ payload?: unknown; error?: string }>(res);

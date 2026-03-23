@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { createWebsiteAdminSession, WEBSITE_ADMIN_COOKIE_NAME } from "@/lib/website-admin-auth";
+import {
+  createWebsiteAdminSession,
+  WEBSITE_ADMIN_COOKIE_NAME,
+  websiteAdminSessionCookieOptions,
+} from "@/lib/website-admin-auth";
 
 export async function POST(req: Request) {
   try {
@@ -17,13 +21,7 @@ export async function POST(req: Request) {
     }
     const token = createWebsiteAdminSession();
     const res = NextResponse.json({ ok: true });
-    res.cookies.set(WEBSITE_ADMIN_COOKIE_NAME, token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 24 * 60 * 60,
-      path: "/",
-    });
+    res.cookies.set(WEBSITE_ADMIN_COOKIE_NAME, token, websiteAdminSessionCookieOptions(24 * 60 * 60));
     return res;
   } catch (e) {
     console.error("[website/login]", e);

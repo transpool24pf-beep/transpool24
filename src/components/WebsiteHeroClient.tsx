@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { WebsiteHeroImageEditor } from "@/components/WebsiteHeroImageEditor";
+import { cmsFetch } from "@/lib/website-cms-fetch";
 import { WEBSITE_CMS_LOCALE_OPTIONS } from "@/lib/website-cms-locales";
 
 type HeroData = {
@@ -43,7 +44,7 @@ export function WebsiteHeroClient() {
   const [imageUploading, setImageUploading] = useState(false);
 
   const load = () =>
-    fetch(API_BASE)
+    cmsFetch(API_BASE)
       .then((r) => r.json())
       .then((res) => {
         const next: HeroData = {
@@ -81,12 +82,17 @@ export function WebsiteHeroClient() {
         reader.onerror = () => reject(new Error("read failed"));
         reader.readAsDataURL(file);
       });
-      const res = await fetch(UPLOAD_URL, {
+      const res = await cmsFetch(UPLOAD_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ base64: dataUrl, filename: file.name }),
       });
       const body = (await res.json()) as { url?: string; error?: string };
+      if (res.status === 401) {
+        throw new Error(
+          "Nicht angemeldet — bitte /website/login öffnen und erneut anmelden. / الجلسة غير صالحة — سجّل الدخول من جديد.",
+        );
+      }
       if (!res.ok) throw new Error(body.error || "Upload fehlgeschlagen.");
       if (body.url) setData((prev) => ({ ...prev, imageUrl: body.url! }));
     } catch (err) {
@@ -100,7 +106,7 @@ export function WebsiteHeroClient() {
     e.preventDefault();
     setSaving(true);
     try {
-      const res = await fetch(API_BASE, {
+      const res = await cmsFetch(API_BASE, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -121,6 +127,10 @@ export function WebsiteHeroClient() {
             "\n\nHinweis: Ohne DEEPL_AUTH_KEY oder GOOGLE_TRANSLATE_API_KEY wird MyMemory genutzt (begrenzt). Für stabile Übersetzungen DeepL empfohlen.";
         }
         alert(msg);
+      } else if (res.status === 401) {
+        alert(
+          "Sitzung abgelaufen oder nicht angemeldet. Bitte erneut unter /website/login anmelden.\n\nانتهت الجلسة — سجّل الدخول من جديد من /website/login",
+        );
       } else {
         alert(body.error || "Speichern fehlgeschlagen.");
       }

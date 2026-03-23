@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { cmsFetch } from "@/lib/website-cms-fetch";
 import { parseFetchJson } from "@/lib/parse-fetch-json";
 import type { SiteSocialMediaPayload } from "@/lib/site-social-media";
 
@@ -22,7 +23,7 @@ export function WebsiteSocialLinksClient() {
     setLoading(true);
     setMessage(null);
     try {
-      const res = await fetch("/api/website/content/social-media");
+      const res = await cmsFetch("/api/website/content/social-media");
       const data = await parseFetchJson<{ social?: SiteSocialMediaPayload; error?: string }>(res);
       if (!res.ok) throw new Error(data.error || "Laden fehlgeschlagen");
       setSocial(data.social ?? empty);
@@ -41,7 +42,7 @@ export function WebsiteSocialLinksClient() {
     setMessage(null);
     setSaving(true);
     try {
-      const res = await fetch("/api/website/content/social-media", {
+      const res = await cmsFetch("/api/website/content/social-media", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(social),

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { locales, type Locale } from "@/i18n/routing";
 import { localeCmsSelectLabel } from "@/lib/locale-display";
 import { parseFetchJson } from "@/lib/parse-fetch-json";
+import { cmsFetch } from "@/lib/website-cms-fetch";
 import { putFileToSupabaseSignedUrl } from "@/lib/upload-supabase-signed-url";
 import { normalizeWhyAssetUrl } from "@/lib/why-asset-url";
 import { WhyCmsImage } from "@/components/why-transpool24/WhyCmsImage";
@@ -29,7 +30,7 @@ export function WebsiteWhyMediaClient() {
     setLoading(true);
     setMessage(null);
     try {
-      const res = await fetch(`/api/website/content/why-transpool24?locale=${locale}`);
+      const res = await cmsFetch(`/api/website/content/why-transpool24?locale=${locale}`);
       const data = await parseFetchJson<{ payload?: { heroImageUrl?: string; sceneImageUrl?: string; howVideoUrl?: string }; error?: string }>(res);
       if (!res.ok) throw new Error(data.error || "Laden fehlgeschlagen");
       setHeroImageUrl(normalizeWhyAssetUrl(data.payload?.heroImageUrl || ""));
@@ -59,7 +60,7 @@ export function WebsiteWhyMediaClient() {
     setUploading(slot);
     setMessage(null);
     try {
-      const pres = await fetch("/api/website/content/why-transpool24/presign-upload", {
+      const pres = await cmsFetch("/api/website/content/why-transpool24/presign-upload", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -90,7 +91,7 @@ export function WebsiteWhyMediaClient() {
     setSaving(true);
     setMessage(null);
     try {
-      const res = await fetch("/api/website/content/why-transpool24", {
+      const res = await cmsFetch("/api/website/content/why-transpool24", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { cmsFetch } from "@/lib/website-cms-fetch";
 
 interface Driver {
   id?: number;
@@ -34,7 +35,7 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
   });
 
   useEffect(() => {
-    fetch(`${apiBase}`)
+    cmsFetch(`${apiBase}`)
       .then((r) => r.json())
       .then((data) => {
         setDrivers(data.drivers || []);
@@ -67,7 +68,7 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
     if (!confirm("Möchten Sie diesen Fahrer wirklich löschen?")) return;
     setSaving(true);
     try {
-      const res = await fetch(`${apiBase}/${id}`, {
+      const res = await cmsFetch(`${apiBase}/${id}`, {
         method: "DELETE",
       });
       if (res.ok) {
@@ -88,7 +89,7 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
     try {
       const method = editingId ? "PUT" : "POST";
       const url = editingId ? `${apiBase}/${editingId}` : apiBase;
-      const res = await fetch(url, {
+      const res = await cmsFetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -146,7 +147,7 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
         reader.onerror = () => reject(new Error("read failed"));
         reader.readAsDataURL(file);
       });
-      const res = await fetch(PHOTO_UPLOAD_URL, {
+      const res = await cmsFetch(PHOTO_UPLOAD_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ base64: dataUrl, filename: file.name }),
@@ -175,7 +176,7 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
     setDrivers(newDrivers);
 
     try {
-      await fetch(`${apiBase}/reorder`, {
+      await cmsFetch(`${apiBase}/reorder`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ drivers: newDrivers.map((d) => ({ id: d.id, order: d.order })) }),

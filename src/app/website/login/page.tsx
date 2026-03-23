@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { cmsFetch } from "@/lib/website-cms-fetch";
 
 export default function WebsiteLoginPage() {
   const [password, setPassword] = useState("");
@@ -14,7 +15,7 @@ export default function WebsiteLoginPage() {
     setError("");
     setLoading(true);
     try {
-      const res = await fetch("/api/website/login", {
+      const res = await cmsFetch("/api/website/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ password }),

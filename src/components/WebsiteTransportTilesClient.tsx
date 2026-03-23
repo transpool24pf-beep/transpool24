@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { cmsFetch } from "@/lib/website-cms-fetch";
 
 interface Tile {
   id?: number;
@@ -28,7 +29,7 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
   });
 
   useEffect(() => {
-    fetch(`${apiBase}`)
+    cmsFetch(`${apiBase}`)
       .then((r) => r.json())
       .then((data) => setTiles(data.tiles || []))
       .catch(() => setTiles([]))
@@ -50,7 +51,7 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
     if (!confirm("Diese Kachel wirklich löschen?")) return;
     setSaving(true);
     try {
-      const res = await fetch(`${apiBase}/${id}`, { method: "DELETE" });
+      const res = await cmsFetch(`${apiBase}/${id}`, { method: "DELETE" });
       if (res.ok) setTiles(tiles.filter((t) => t.id !== id));
       else alert("Löschen fehlgeschlagen.");
     } catch {
@@ -70,7 +71,7 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
     try {
       const method = editingId ? "PUT" : "POST";
       const url = editingId ? `${apiBase}/${editingId}` : apiBase;
-      const res = await fetch(url, {
+      const res = await cmsFetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -121,7 +122,7 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
         reader.onerror = () => reject(new Error("read failed"));
         reader.readAsDataURL(file);
       });
-      const res = await fetch(UPLOAD_URL, {
+      const res = await cmsFetch(UPLOAD_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ base64: dataUrl, filename: file.name }),
@@ -151,7 +152,7 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
     setTiles(next);
 
     try {
-      await fetch(`${apiBase}/reorder`, {
+      await cmsFetch(`${apiBase}/reorder`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ tiles: next.map((t) => ({ id: t.id, order: t.order })) }),

@@ -16,6 +16,33 @@ export function createWebsiteAdminSession(): string {
   return Buffer.from(JSON.stringify({ t, h })).toString("base64url");
 }
 
+/**
+ * Cookie flags for login/logout. Set WEBSITE_ADMIN_COOKIE_DOMAIN=.transpool24.com in production
+ * so the same session works on www and apex.
+ */
+export function websiteAdminSessionCookieOptions(maxAgeSeconds: number) {
+  const opts: {
+    httpOnly: boolean;
+    secure: boolean;
+    sameSite: "lax";
+    path: string;
+    maxAge: number;
+    domain?: string;
+  } = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: maxAgeSeconds,
+  };
+  const raw = process.env.WEBSITE_ADMIN_COOKIE_DOMAIN?.trim();
+  if (raw && process.env.NODE_ENV === "production") {
+    const host = raw.replace(/^\.+/, "").replace(/\.+$/, "");
+    if (host) opts.domain = `.${host}`;
+  }
+  return opts;
+}
+
 export function verifyWebsiteAdminSession(token: string): boolean {
   try {
     const secret = getWebsiteAdminSecret();

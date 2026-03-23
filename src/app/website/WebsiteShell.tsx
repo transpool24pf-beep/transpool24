@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { cmsFetch } from "@/lib/website-cms-fetch";
 
 const NAV = [
   { href: "/website", label: "Homepage – Bewertungen" },
@@ -26,7 +27,7 @@ export function WebsiteShell({ children }: { children: React.ReactNode }) {
       setAuthenticated(false);
       return;
     }
-    fetch("/api/website/me")
+    cmsFetch("/api/website/me")
       .then((r) => {
         if (r.ok) setAuthenticated(true);
         else setAuthenticated(false);
@@ -36,7 +37,7 @@ export function WebsiteShell({ children }: { children: React.ReactNode }) {
   }, [pathname]);
 
   const handleLogout = () => {
-    fetch("/api/website/logout", { method: "POST" }).then(() => router.push("/website/login"));
+    cmsFetch("/api/website/logout", { method: "POST" }).then(() => router.push("/website/login"));
   };
 
   if (!checked) {
@@ -107,7 +108,8 @@ export function WebsiteShell({ children }: { children: React.ReactNode }) {
           <span>
             Hero (/website/hero): Live aus DB (ISR/revalidate), Bild nach Speichern; Texte nur EN → Auto-Übersetzung
             (DEEPL_AUTH_KEY oder GOOGLE_TRANSLATE_API_KEY, sonst MyMemory); Bild-Editor: URL-Proxy, Skalierung, Rotation,
-            Spiegeln, Export-Upload
+            Spiegeln, Export-Upload. CMS-Session: WEBSITE_ADMIN_COOKIE_DOMAIN=transpool24.com (ohne www) auf Vercel, wenn
+            www und Apex gemischt — sonst 401 nach Upload.
           </span>
           <br />
           <span className="mt-1 inline-block" dir="rtl">
@@ -124,7 +126,8 @@ export function WebsiteShell({ children }: { children: React.ReactNode }) {
           <br />
           <span className="mt-1 inline-block" dir="rtl">
             البطل (Hero): يُحمَّل مباشرة من قاعدة البيانات؛ الصورة تظهر بعد «حفظ»؛ النصوص بالإنجليزية فقط ثم ترجمة
-            تلقائية (يفضّل DEEPL أو Google API). محرّر الصورة: رابط عبر وكيل آمن، تحويل (مقياس/دوران/قلب)، رفع.
+            تلقائية (يفضّل DEEPL أو Google API). محرّر الصورة: رابط عبر وكيل آمن، تحويل (مقياس/دوران/قلب)، رفع. لتفادي
+            401: عرّف WEBSITE_ADMIN_COOKIE_DOMAIN=transpool24.com على Vercel إذا خلطت www مع النطاق بدون www.
           </span>
         </footer>
       </main>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { cmsFetch } from "@/lib/website-cms-fetch";
 
 type Props = {
   uploadEndpoint: string;
@@ -117,12 +118,15 @@ export function WebsiteHeroImageEditor({
     setBusy(true);
     setStatus(null);
     try {
-      const res = await fetch(proxyEndpoint, {
+      const res = await cmsFetch(proxyEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: u }),
       });
       const j = (await res.json()) as { mime?: string; base64?: string; error?: string };
+      if (res.status === 401) {
+        throw new Error("Unauthorized — bitte unter /website/login neu anmelden. / أعد تسجيل الدخول");
+      }
       if (!res.ok) throw new Error(j.error || "Proxy fehlgeschlagen");
       if (!j.mime || !j.base64) throw new Error("Ungültige Antwort");
       const dataUrl = `data:${j.mime};base64,${j.base64}`;
@@ -154,12 +158,15 @@ export function WebsiteHeroImageEditor({
     setBusy(true);
     setStatus(null);
     try {
-      const res = await fetch(proxyEndpoint, {
+      const res = await cmsFetch(proxyEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: u }),
       });
       const j = (await res.json()) as { mime?: string; base64?: string; error?: string };
+      if (res.status === 401) {
+        throw new Error("Unauthorized — bitte unter /website/login neu anmelden. / أعد تسجيل الدخول");
+      }
       if (!res.ok) throw new Error(j.error || "Proxy fehlgeschlagen");
       if (!j.mime || !j.base64) throw new Error("Ungültige Antwort");
       loadImageFromDataUrl(`data:${j.mime};base64,${j.base64}`);
@@ -196,12 +203,15 @@ export function WebsiteHeroImageEditor({
     try {
       const out = renderTransformed(loaded, scalePct, rotationDeg, flipH, flipV, maxExportWidth);
       const dataUrl = out.toDataURL("image/jpeg", 0.92);
-      const res = await fetch(uploadEndpoint, {
+      const res = await cmsFetch(uploadEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ base64: dataUrl, filename: "hero-edited.jpg" }),
       });
       const body = (await res.json()) as { url?: string; error?: string };
+      if (res.status === 401) {
+        throw new Error("Unauthorized — bitte unter /website/login neu anmelden. / أعد تسجيل الدخول");
+      }
       if (!res.ok) throw new Error(body.error || "Upload fehlgeschlagen.");
       if (!body.url) throw new Error("Keine URL");
       onUploaded(body.url);
