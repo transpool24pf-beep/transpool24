@@ -13,7 +13,9 @@ export async function GET(
   const supabase = createServerSupabase();
   const { data, error } = await supabase
     .from("driver_applications")
-    .select("full_name, email, phone, city, vehicle_plate, languages_spoken, approved_at, status, driver_number")
+    .select(
+      "full_name, email, phone, city, vehicle_plate, languages_spoken, approved_at, status, driver_number, created_at, service_policy_accepted, work_policy_accepted"
+    )
     .eq("id", id)
     .single();
   if (error || !data) {
@@ -38,6 +40,14 @@ export async function GET(
       languages_spoken: data.languages_spoken != null ? String(data.languages_spoken) : null,
       approved_at: approvedAt,
       driver_number: data.driver_number != null ? Number(data.driver_number) : null,
+      application_submitted_at:
+        data.created_at != null
+          ? typeof data.created_at === "string"
+            ? data.created_at
+            : new Date(data.created_at).toISOString()
+          : null,
+      service_policy_accepted: Boolean(data.service_policy_accepted),
+      work_policy_accepted: Boolean(data.work_policy_accepted),
     });
     return new NextResponse(Buffer.from(pdf), {
       status: 200,

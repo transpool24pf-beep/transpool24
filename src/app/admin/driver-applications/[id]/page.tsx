@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import { DRIVER_POLICY_LEGAL_REF } from "@/lib/driver-policy";
 
 type DriverApp = {
   id: string;
@@ -265,6 +266,35 @@ export default function AdminDriverApplicationDetailPage({
           <p><strong>Steuer-/Handelsnr.:</strong> {app.tax_or_commercial_number || "—"}</p>
           <p><strong>Sprachen:</strong> {app.languages_spoken || "—"}</p>
           <p><strong>Kennzeichen:</strong> {app.vehicle_plate || "—"}</p>
+        </div>
+
+        <div className="mt-6 rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/[0.03] p-4">
+          <p className="mb-2 text-sm font-semibold text-[#0d2137]/80">Zustimmungen bei Bewerbung</p>
+          <p className="mb-2 text-xs text-[#0d2137]/60">
+            Stand der Richtlinien-Referenz (PDF/Archiv):{" "}
+            <code className="rounded bg-[#0d2137]/10 px-1.5 py-0.5 font-mono text-[11px]">{DRIVER_POLICY_LEGAL_REF}</code>
+          </p>
+          <ul className="space-y-1.5 text-sm text-[#0d2137]/85">
+            <li>
+              <strong>WhatsApp-Kontakt (Schritt 1):</strong>{" "}
+              {app.service_policy_accepted ? (
+                <span className="text-emerald-700">Ja</span>
+              ) : (
+                <span className="text-amber-700">Nein / nicht erfasst</span>
+              )}
+            </li>
+            <li>
+              <strong>Arbeits-/Firmenrichtlinie (Schritt 4):</strong>{" "}
+              {app.work_policy_accepted ? (
+                <span className="text-emerald-700">Ja</span>
+              ) : (
+                <span className="text-amber-700">Nein / nicht erfasst</span>
+              )}
+            </li>
+            <li>
+              <strong>Einreichung (Zeitstempel):</strong> {new Date(app.created_at).toLocaleString("de-DE")}
+            </li>
+          </ul>
         </div>
 
         {app.status === "approved" && app.stats && (

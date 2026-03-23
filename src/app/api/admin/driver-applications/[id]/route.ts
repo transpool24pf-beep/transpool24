@@ -187,7 +187,9 @@ export async function PATCH(
     const driverNumber = updated?.driver_number ?? nextNumber;
     const { data: appRow } = await supabase
       .from("driver_applications")
-      .select("full_name, email, approved_at, vehicle_plate, personal_photo_url")
+      .select(
+        "full_name, email, phone, city, approved_at, vehicle_plate, personal_photo_url, languages_spoken, created_at, service_policy_accepted, work_policy_accepted"
+      )
       .eq("id", id)
       .single();
     if (appRow?.email?.trim()) {
@@ -197,12 +199,20 @@ export async function PATCH(
         pdfBuffer = await generateDriverApprovalPdf({
           full_name: String(appRow.full_name ?? ""),
           email: String(appRow.email ?? ""),
-          phone: "",
-          city: "",
+          phone: String(appRow.phone ?? ""),
+          city: String(appRow.city ?? ""),
           vehicle_plate: appRow.vehicle_plate ?? null,
-          languages_spoken: null,
+          languages_spoken: appRow.languages_spoken ?? null,
           approved_at: appRow.approved_at ?? now,
           driver_number: driverNumber,
+          application_submitted_at:
+            appRow.created_at != null
+              ? typeof appRow.created_at === "string"
+                ? appRow.created_at
+                : new Date(appRow.created_at).toISOString()
+              : null,
+          service_policy_accepted: Boolean(appRow.service_policy_accepted),
+          work_policy_accepted: Boolean(appRow.work_policy_accepted),
         });
       } catch (e) {
         console.warn("[approve] PDF skip", e);

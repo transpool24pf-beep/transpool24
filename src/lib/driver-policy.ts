@@ -1,3 +1,9 @@
+/**
+ * Legal reference for PDFs and admin UI. Bump when `WORK_POLICY_TEXT` changes materially.
+ * Not a substitute for lawyer-reviewed contracts.
+ */
+export const DRIVER_POLICY_LEGAL_REF = "TP24-DRIVER-POLICY-2025-03";
+
 /** Country codes for driver form (WhatsApp): Germany first */
 export const DRIVER_COUNTRY_CODES: { code: string; flag: string }[] = [
   { code: "+49", flag: "🇩🇪" },

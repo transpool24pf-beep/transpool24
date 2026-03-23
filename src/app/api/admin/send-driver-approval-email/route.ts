@@ -15,7 +15,9 @@ export async function POST(req: Request) {
   const supabase = createServerSupabase();
   const { data, error } = await supabase
     .from("driver_applications")
-    .select("full_name, email, phone, approved_at, status, driver_number, vehicle_plate, personal_photo_url")
+    .select(
+      "full_name, email, phone, city, languages_spoken, approved_at, status, driver_number, vehicle_plate, personal_photo_url, created_at, service_policy_accepted, work_policy_accepted"
+    )
     .eq("id", id)
     .single();
   if (error || !data) {
@@ -40,11 +42,19 @@ export async function POST(req: Request) {
       full_name: String(data.full_name ?? ""),
       email: String(data.email ?? ""),
       phone: String(data.phone ?? ""),
-      city: "",
+      city: String(data.city ?? ""),
       vehicle_plate: data.vehicle_plate != null ? String(data.vehicle_plate) : null,
-      languages_spoken: null,
+      languages_spoken: data.languages_spoken != null ? String(data.languages_spoken) : null,
       approved_at: approvedAt,
       driver_number: data.driver_number != null ? Number(data.driver_number) : null,
+      application_submitted_at:
+        data.created_at != null
+          ? typeof data.created_at === "string"
+            ? data.created_at
+            : new Date(data.created_at).toISOString()
+          : null,
+      service_policy_accepted: Boolean(data.service_policy_accepted),
+      work_policy_accepted: Boolean(data.work_policy_accepted),
     });
   } catch (e) {
     console.warn("[send-driver-approval-email] PDF skip", e);

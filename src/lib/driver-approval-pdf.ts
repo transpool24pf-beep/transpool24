@@ -1,4 +1,5 @@
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import { DRIVER_POLICY_LEGAL_REF } from "./driver-policy";
 import { PDF_COMPANY, getPdfLogoBytes } from "./pdf-company";
 
 /** Helvetica uses WinAnsi; strip non-ASCII to avoid "WinAnsi cannot encode" */
@@ -16,6 +17,10 @@ export type DriverAppForPdf = {
   languages_spoken: string | null;
   approved_at: string;
   driver_number?: number | null;
+  /** Recorded at application submit (consent timestamp) */
+  application_submitted_at?: string | null;
+  service_policy_accepted?: boolean;
+  work_policy_accepted?: boolean;
 };
 
 function drawText(
@@ -142,7 +147,59 @@ export async function generateDriverApprovalPdf(app: DriverAppForPdf): Promise<U
       ? new Date(app.approved_at).toLocaleDateString("de-DE")
       : new Date().toLocaleDateString("de-DE");
   y = drawText(page, font, fontBold, `Zulassungsdatum: ${approvedDateStr}`, { y, size: 10, x: margin });
-  y -= 20;
+  y -= 16;
+
+  // --- Legal consents (online application) — ASCII-safe for Helvetica WinAnsi ---
+  y = drawText(page, font, fontBold, "Consents at application (online form)", {
+    y,
+    size: 10,
+    bold: true,
+    x: margin,
+  });
+  y = drawText(page, font, fontBold, `Policy reference: ${DRIVER_POLICY_LEGAL_REF}`, { y, size: 9, x: margin });
+  const submitted =
+    app.application_submitted_at && String(app.application_submitted_at).trim()
+      ? new Date(app.application_submitted_at).toLocaleString("de-DE")
+      : "—";
+  y = drawText(page, font, fontBold, `Application submitted: ${toWinAnsiSafe(submitted)}`, { y, size: 9, x: margin });
+  y = drawText(
+    page,
+    font,
+    fontBold,
+    `WhatsApp contact for recruitment (step 1): ${app.service_policy_accepted ? "Accepted YES" : "Not recorded"}`,
+    { y, size: 9, x: margin }
+  );
+  y = drawText(
+    page,
+    font,
+    fontBold,
+    `Work / company policy (ArbZG, EU 561/2006, GDPR, docs, insurance): ${
+      app.work_policy_accepted ? "Accepted YES" : "Not recorded"
+    }`,
+    { y, size: 9, x: margin }
+  );
+  y -= 6;
+  const wrapW = width - margin * 2;
+  const approxChars = Math.max(40, Math.floor(wrapW / 4.8));
+  const summaryParts = [
+    "The applicant confirmed the German-language policies in the driver portal before submit.",
+    "Full text was shown in the form; this PDF documents that both checkboxes were accepted.",
+  ];
+  for (const part of summaryParts) {
+    const words = part.split(/\s+/);
+    let line = "";
+    for (const w of words) {
+      const next = line ? `${line} ${w}` : w;
+      if (next.length > approxChars && line) {
+        y = drawText(page, font, fontBold, toWinAnsiSafe(line), { y, size: 8, x: margin });
+        line = w;
+      } else {
+        line = next;
+      }
+    }
+    if (line) y = drawText(page, font, fontBold, toWinAnsiSafe(line), { y, size: 8, x: margin });
+  }
+  y -= 14;
 
   // Willkommenstext
   y = drawText(page, font, fontBold, "Willkommen bei TransPool24.", { y, size: 11, bold: true, x: margin });
