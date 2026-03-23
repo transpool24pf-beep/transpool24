@@ -95,8 +95,8 @@ export const whyPageAr: WhyPagePayload = {
   completingP3:
     "ملاحظاتك بعد التسليم تحافظ على الجودة وتساعد عملاء B2B آخرين على الاختيار.",
   closingLine: "نتطلع لنقلك التجاري القادم.",
-  heroImageUrl: "/images/van1.png",
-  sceneImageUrl: "/images/van2.png",
+  heroImageUrl: "/transpool24-email-banner.png",
+  sceneImageUrl: "/images/445.png",
   howVideoUrl: "",
   howTitle: "كيف يعمل TransPool24",
   howSteps: [

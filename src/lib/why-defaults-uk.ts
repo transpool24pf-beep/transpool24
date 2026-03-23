@@ -95,8 +95,8 @@ export const whyPageUk: WhyPagePayload = {
   completingP3:
     "Зворотний зв’язок після доставки допомагає якості — і іншим B2B-клієнтам обирати впевнено.",
   closingLine: "Чекаємо на ваш наступний комерційний рейс.",
-  heroImageUrl: "/images/van1.png",
-  sceneImageUrl: "/images/van2.png",
+  heroImageUrl: "/transpool24-email-banner.png",
+  sceneImageUrl: "/images/445.png",
   howVideoUrl: "",
   howTitle: "Як працює TransPool24",
   howSteps: [

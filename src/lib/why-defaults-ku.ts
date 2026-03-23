@@ -95,8 +95,8 @@ export const whyPageKu: WhyPagePayload = {
   completingP3:
     "Bersiva we piştî radestkirinê kalîteyê parastin dike — û xerîdarên B2B yên din alîkar dike ku bi bawerî hilbijêrin.",
   closingLine: "Em li benda veguhestina karsaziya we ya din in.",
-  heroImageUrl: "/images/van1.png",
-  sceneImageUrl: "/images/van2.png",
+  heroImageUrl: "/transpool24-email-banner.png",
+  sceneImageUrl: "/images/445.png",
   howVideoUrl: "",
   howTitle: "TransPool24 çawa dixebite",
   howSteps: [

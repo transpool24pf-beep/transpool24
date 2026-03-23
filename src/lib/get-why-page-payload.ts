@@ -13,13 +13,26 @@ function dbPayloadRevision(p: WhyPagePayload): number {
     : 0;
 }
 
+const DEFAULT_HERO_IMAGE = "/transpool24-email-banner.png";
+const DEFAULT_SCENE_IMAGE = "/images/445.png";
+
+/** Repo never shipped /images/van1.png or van2.png — replace legacy defaults & old CMS values */
+function fixLegacyWhyMediaUrls(p: WhyPagePayload): WhyPagePayload {
+  let hero = (p.heroImageUrl || "").trim();
+  let scene = (p.sceneImageUrl || "").trim();
+  if (!hero || hero.includes("/van1.png")) hero = DEFAULT_HERO_IMAGE;
+  if (!scene || scene.includes("/van2.png")) scene = DEFAULT_SCENE_IMAGE;
+  return { ...p, heroImageUrl: hero, sceneImageUrl: scene };
+}
+
 function normalizeWhyPayloadMedia(p: WhyPagePayload): WhyPagePayload {
-  return {
+  const n = {
     ...p,
     heroImageUrl: normalizeWhyAssetUrl(p.heroImageUrl),
     sceneImageUrl: normalizeWhyAssetUrl(p.sceneImageUrl),
     howVideoUrl: typeof p.howVideoUrl === "string" ? p.howVideoUrl.trim() : "",
   };
+  return fixLegacyWhyMediaUrls(n);
 }
 
 export async function getWhyPagePayload(locale: string): Promise<WhyPagePayload> {

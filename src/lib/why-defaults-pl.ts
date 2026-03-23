@@ -95,8 +95,8 @@ export const whyPagePl: WhyPagePayload = {
   completingP3:
     "Opinia po dostawie pomaga utrzymać jakość — i innym klientom B2B pewnie wybrać.",
   closingLine: "Czekamy na Twój następny transport biznesowy.",
-  heroImageUrl: "/images/van1.png",
-  sceneImageUrl: "/images/van2.png",
+  heroImageUrl: "/transpool24-email-banner.png",
+  sceneImageUrl: "/images/445.png",
   howVideoUrl: "",
   howTitle: "Jak działa TransPool24",
   howSteps: [

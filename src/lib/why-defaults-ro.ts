@@ -95,8 +95,8 @@ export const whyPageRo: WhyPagePayload = {
   completingP3:
     "Feedback-ul după livrare menține calitatea — și ajută alți clienți B2B să aleagă cu încredere.",
   closingLine: "Așteptăm următoarea dvs. expediere comercială.",
-  heroImageUrl: "/images/van1.png",
-  sceneImageUrl: "/images/van2.png",
+  heroImageUrl: "/transpool24-email-banner.png",
+  sceneImageUrl: "/images/445.png",
   howVideoUrl: "",
   howTitle: "Cum funcționează TransPool24",
   howSteps: [
