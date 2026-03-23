@@ -22,6 +22,8 @@ export function WebsiteWhyMediaClient() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState<"hero" | "scene" | "video" | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  /** Same hero/scene/video URLs for every locale (DE, EN, AR, …) */
+  const [applyToAllLocales, setApplyToAllLocales] = useState(true);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -93,14 +95,25 @@ export function WebsiteWhyMediaClient() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           locale,
+          applyToAllLocales,
           heroImageUrl: normalizeWhyAssetUrl(heroImageUrl),
           sceneImageUrl: normalizeWhyAssetUrl(sceneImageUrl),
           howVideoUrl: howVideoUrl.trim(),
         }),
       });
-      const data = await parseFetchJson<{ error?: string }>(res);
+      const data = await parseFetchJson<{
+        error?: string;
+        applyToAllLocales?: boolean;
+        localesUpdated?: string[];
+      }>(res);
       if (!res.ok) throw new Error(data.error || "Speichern fehlgeschlagen");
-      setMessage(`Gespeichert. Seite /${locale}/why lädt Inhalte live aus der Datenbank (nicht aus dem Build-Cache).`);
+      if (data.applyToAllLocales && Array.isArray(data.localesUpdated)) {
+        setMessage(
+          `Gespeichert für alle ${data.localesUpdated.length} Sprachen (z. B. /de/why, /en/why, /ar/why …). Medien-URLs sind jetzt überall gleich.`
+        );
+      } else {
+        setMessage(`Gespeichert. Seite /${locale}/why lädt Inhalte live aus der Datenbank (nicht aus dem Build-Cache).`);
+      }
     } catch (e) {
       setMessage(e instanceof Error ? e.message : "Speichern fehlgeschlagen");
     } finally {
@@ -125,8 +138,26 @@ export function WebsiteWhyMediaClient() {
         <code className="rounded bg-[#0d2137]/5 px-1">driver-documents</code>.
       </p>
 
+      <div className="mb-4 rounded-xl border border-[var(--accent)]/25 bg-[var(--accent)]/5 px-4 py-3">
+        <label className="flex cursor-pointer items-start gap-3">
+          <input
+            type="checkbox"
+            checked={applyToAllLocales}
+            onChange={(e) => setApplyToAllLocales(e.target.checked)}
+            className="mt-1 h-4 w-4 rounded border-[#0d2137]/30 text-[var(--accent)] focus:ring-[var(--accent)]"
+          />
+          <span className="text-sm text-[#0d2137]">
+            <strong className="font-semibold">Alle Sprachen / تطبيق على كل اللغات</strong>
+            <span className="mt-1 block text-[#0d2137]/75">
+              Wenn aktiviert: Beim Speichern erhalten <strong>alle {locales.length} Sprachen</strong> dieselben Bild- und
+              Video-URLs (Vorschau &amp; Bearbeitung hier weiter nach Sprache — „Medien speichern“ schreibt überall).
+            </span>
+          </span>
+        </label>
+      </div>
+
       <div className="mb-6 flex flex-wrap items-center gap-3">
-        <label className="text-sm font-medium text-[#0d2137]">Sprache</label>
+        <label className="text-sm font-medium text-[#0d2137]">Sprache (Vorschau / Bearbeitung)</label>
         <select
           value={locale}
           onChange={(e) => setLocale(e.target.value as Locale)}

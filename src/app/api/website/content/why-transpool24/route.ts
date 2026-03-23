@@ -75,28 +75,52 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: "Invalid locale" }, { status: 400 });
     }
 
-    const current = await getWhyPagePayload(locale);
-    const next = { ...current, contentRevision: WHY_PAGE_CONTENT_REVISION };
-    if (typeof body.heroImageUrl === "string") next.heroImageUrl = normalizeWhyAssetUrl(body.heroImageUrl);
-    if (typeof body.sceneImageUrl === "string") next.sceneImageUrl = normalizeWhyAssetUrl(body.sceneImageUrl);
-    if (typeof body.howVideoUrl === "string") next.howVideoUrl = body.howVideoUrl.trim();
+    const applyToAllLocales = body.applyToAllLocales === true;
+    const targetLocales = applyToAllLocales ? [...locales] : [locale as (typeof locales)[number]];
 
-    if (!isValidWhyPayload(next)) {
-      return NextResponse.json({ error: "Invalid payload after merge" }, { status: 400 });
+    const patchHero = typeof body.heroImageUrl === "string";
+    const patchScene = typeof body.sceneImageUrl === "string";
+    const patchVideo = typeof body.howVideoUrl === "string";
+    if (!patchHero && !patchScene && !patchVideo) {
+      return NextResponse.json(
+        { error: "Provide at least one of heroImageUrl, sceneImageUrl, howVideoUrl" },
+        { status: 400 },
+      );
     }
 
     const supabase = createServerSupabase();
-    const { error } = await supabase.from("why_transpool24_locale").upsert(
-      {
-        locale,
-        payload: next,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "locale" },
-    );
 
-    if (error) throw error;
-    return NextResponse.json({ success: true });
+    for (const loc of targetLocales) {
+      const current = await getWhyPagePayload(loc);
+      const next = { ...current, contentRevision: WHY_PAGE_CONTENT_REVISION };
+      if (patchHero) next.heroImageUrl = normalizeWhyAssetUrl(body.heroImageUrl);
+      if (patchScene) next.sceneImageUrl = normalizeWhyAssetUrl(body.sceneImageUrl);
+      if (patchVideo) next.howVideoUrl = body.howVideoUrl.trim();
+
+      if (!isValidWhyPayload(next)) {
+        return NextResponse.json(
+          { error: `Invalid payload after merge for locale ${loc}` },
+          { status: 400 },
+        );
+      }
+
+      const { error } = await supabase.from("why_transpool24_locale").upsert(
+        {
+          locale: loc,
+          payload: next,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "locale" },
+      );
+
+      if (error) throw error;
+    }
+
+    return NextResponse.json({
+      success: true,
+      applyToAllLocales,
+      localesUpdated: targetLocales,
+    });
   } catch (e) {
     console.error("[website/why-transpool24 PATCH]", e);
     return NextResponse.json({ error: "Save failed" }, { status: 500 });
