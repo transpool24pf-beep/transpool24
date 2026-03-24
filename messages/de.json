@@ -95,6 +95,8 @@
     "deliveryPlaceholder": "Straße, PLZ, Ort",
     "addressPostcodePlaceholder": "75172",
     "addressPostcodeHint": "Postleitzahl (5 Ziffern), Straße und Hausnummer selbst eintragen. Vorschläge erscheinen beim Tippen im Straßenfeld.",
+    "addressOneLineHint": "Straße, Hausnummer und deutsche Postleitzahl (5 Ziffern) in einer Zeile eintragen. Vorschläge erscheinen beim Tippen.",
+    "addressOneLinePlaceholder": "z. B. Musterstraße 12, 75172 Pforzheim",
     "addressStreet": "Straße",
     "addressStreetPlaceholder": "z. B. Musterstraße",
     "addressHouseNumber": "Hausnummer",

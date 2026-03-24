@@ -95,6 +95,8 @@
     "deliveryPlaceholder": "Ulica, kod pocztowy, miasto",
     "addressPostcodePlaceholder": "75172",
     "addressPostcodeHint": "Wpisz samodzielnie niemiecki kod (5 cyfr), ulicę i numer. Podpowiedzi pojawiają się podczas pisania w polu ulicy.",
+    "addressOneLineHint": "Wpisz ulicę, numer i niemiecki kod pocztowy (5 cyfr) w jednej linii. Podpowiedzi podczas pisania.",
+    "addressOneLinePlaceholder": "np. Musterstraße 12, 75172 Pforzheim",
     "addressStreet": "Ulica",
     "addressStreetPlaceholder": "np. Hauptstraße",
     "addressHouseNumber": "Numer domu",

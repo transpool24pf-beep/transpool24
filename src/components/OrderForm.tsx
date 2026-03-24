@@ -55,17 +55,31 @@ const SERVICE_OPTIONS: { value: ServiceType; key: "serviceDriverOnly" | "service
 
 const DEFAULT_KM = 50;
 
-function normalizeGermanPostcode(value: string): string {
-  return value.replace(/\D/g, "").slice(0, 5);
+/** Append country for geocoding when the customer omits it */
+function addressLineForGeocode(raw: string): string {
+  const t = raw.trim();
+  if (!t) return "";
+  if (/deutschland|germany/gi.test(t)) return t;
+  return `${t}, Deutschland`;
 }
 
-/** German line for geocoding: "Straße Hausnr, PLZ, Deutschland" */
-function buildGermanAddressLine(street: string, houseNumber: string, postcode: string): string {
-  const p = normalizeGermanPostcode(postcode);
-  const st = street.trim();
-  const h = houseNumber.trim();
-  if (!/^\d{5}$/.test(p) || !st || !h) return "";
-  return `${st} ${h}, ${p}, Deutschland`;
+function lineFromPlaceDetails(j: PlaceDetailsJson, displayFallback: string): string {
+  const street = j.street?.trim() || "";
+  const hn = j.houseNumber?.trim() || "";
+  const pc = j.postcode?.trim().replace(/\D/g, "").slice(0, 5) || "";
+  if (street && hn && /^\d{5}$/.test(pc)) {
+    return `${street} ${hn}, ${pc}, Deutschland`;
+  }
+  const fa = j.formatted_address?.trim();
+  if (fa) return fa;
+  return displayFallback;
+}
+
+/** Street + number + German PLZ in one line (minimum bar before continuing) */
+function addressCompleteEnoughForOrder(value: string): boolean {
+  const t = value.trim();
+  if (t.length < 10) return false;
+  return /\b\d{5}\b/.test(t);
 }
 
 type OrderPricePreview = {
@@ -150,12 +164,9 @@ export type OrderFormData = {
   companyName: string;
   email: string;
   phone: string;
-  pickupPostcode: string;
-  pickupStreet: string;
-  pickupHouseNumber: string;
-  deliveryPostcode: string;
-  deliveryStreet: string;
-  deliveryHouseNumber: string;
+  /** Full pickup line: street, house no., postcode (and city) — one field */
+  pickupAddressLine: string;
+  deliveryAddressLine: string;
   pickupDate: string;
   pickupTime: string;
   cargoSize: CargoSize;
@@ -170,12 +181,8 @@ const initial: OrderFormData = {
   companyName: "",
   email: "",
   phone: "",
-  pickupPostcode: "",
-  pickupStreet: "",
-  pickupHouseNumber: "",
-  deliveryPostcode: "",
-  deliveryStreet: "",
-  deliveryHouseNumber: "",
+  pickupAddressLine: "",
+  deliveryAddressLine: "",
   pickupDate: "",
   pickupTime: "",
   cargoSize: "M",
@@ -221,26 +228,18 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
       ? crypto.randomUUID()
       : `tp24-${Date.now()}`
   );
-  /** Stable random `name`s so Chrome autofill does not replace server PLZ street hints */
-  const streetAutofillShieldRef = useRef({
+  const pickupAddress = useMemo(() => addressLineForGeocode(data.pickupAddressLine), [data.pickupAddressLine]);
+  const deliveryAddress = useMemo(() => addressLineForGeocode(data.deliveryAddressLine), [data.deliveryAddressLine]);
+  const addressLineInputNamesRef = useRef({
     pickup:
       typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-        ? `tp24-pu-st-${crypto.randomUUID().slice(0, 10)}`
-        : `tp24-pu-st-${Date.now()}`,
+        ? `tp24-addr-pu-${crypto.randomUUID().slice(0, 10)}`
+        : `tp24-addr-pu-${Date.now()}`,
     delivery:
       typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-        ? `tp24-de-st-${crypto.randomUUID().slice(0, 10)}`
-        : `tp24-de-st-${Date.now()}`,
+        ? `tp24-addr-de-${crypto.randomUUID().slice(0, 10)}`
+        : `tp24-addr-de-${Date.now()}`,
   });
-
-  const pickupAddress = useMemo(
-    () => buildGermanAddressLine(data.pickupStreet, data.pickupHouseNumber, data.pickupPostcode),
-    [data.pickupStreet, data.pickupHouseNumber, data.pickupPostcode]
-  );
-  const deliveryAddress = useMemo(
-    () => buildGermanAddressLine(data.deliveryStreet, data.deliveryHouseNumber, data.deliveryPostcode),
-    [data.deliveryStreet, data.deliveryHouseNumber, data.deliveryPostcode]
-  );
 
   useEffect(() => {
     const close = (e: MouseEvent) => {
@@ -264,7 +263,8 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
   };
 
   const step1Complete = data.companyName.trim() !== "" && data.email.trim() !== "" && data.phone.trim() !== "";
-  const step2Complete = pickupAddress !== "" && deliveryAddress !== "";
+  const step2Complete =
+    addressCompleteEnoughForOrder(data.pickupAddressLine) && addressCompleteEnoughForOrder(data.deliveryAddressLine);
   const step3Complete =
     data.serviceType !== "" &&
     distanceFromRoute &&
@@ -386,38 +386,29 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
     if (debounceRef.current) clearTimeout(debounceRef.current);
     if (suggestionsOpen === "pickup") {
       debounceRef.current = setTimeout(() => {
-        const pc = normalizeGermanPostcode(data.pickupPostcode);
-        const st = data.pickupStreet.trim();
-        if (st.length < 3) {
+        const raw = data.pickupAddressLine.trim();
+        if (raw.length < 3) {
           setPickupSuggestions([]);
           return;
         }
-        const q = /^\d{5}$/.test(pc) ? `${st}, ${pc}, Deutschland` : `${st}, Deutschland`;
+        const q = /deutschland|germany/gi.test(raw) ? raw : `${raw}, Deutschland`;
         fetchSuggestions(q, setPickupSuggestions);
       }, 300);
     } else if (suggestionsOpen === "delivery") {
       debounceRef.current = setTimeout(() => {
-        const pc = normalizeGermanPostcode(data.deliveryPostcode);
-        const st = data.deliveryStreet.trim();
-        if (st.length < 3) {
+        const raw = data.deliveryAddressLine.trim();
+        if (raw.length < 3) {
           setDeliverySuggestions([]);
           return;
         }
-        const q = /^\d{5}$/.test(pc) ? `${st}, ${pc}, Deutschland` : `${st}, Deutschland`;
+        const q = /deutschland|germany/gi.test(raw) ? raw : `${raw}, Deutschland`;
         fetchSuggestions(q, setDeliverySuggestions);
       }, 300);
     }
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [
-    data.pickupPostcode,
-    data.pickupStreet,
-    data.deliveryPostcode,
-    data.deliveryStreet,
-    suggestionsOpen,
-    fetchSuggestions,
-  ]);
+  }, [data.pickupAddressLine, data.deliveryAddressLine, suggestionsOpen, fetchSuggestions]);
 
   const fetchRealDistance = useCallback(async () => {
     if (!pickupAddress.trim() || !deliveryAddress.trim()) return;
@@ -532,7 +523,7 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
 
   const next = () => {
     if (step < 4) {
-      if (step === 2 && pickupAddress.trim() && deliveryAddress.trim()) {
+      if (step === 2 && step2Complete) {
         setDistanceLoading(true);
         fetchRealDistance().finally(() => {
           setDistanceLoading(false);
@@ -721,235 +712,151 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
               {t("pickup")}
             </label>
-            <input
-              type="text"
-              inputMode="numeric"
-              autoComplete="off"
-              name="tp24-pickup-plz"
-              maxLength={5}
-              value={data.pickupPostcode}
-              onChange={(e) => {
-                update({ pickupPostcode: normalizeGermanPostcode(e.target.value) });
-                setError(null);
-              }}
-              placeholder={t("addressPostcodePlaceholder")}
-              className="w-full max-w-[10rem] rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-            />
-            <p className="text-xs text-[var(--foreground)]/60">{t("addressPostcodeHint")}</p>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_7rem]">
-                <div className="relative sm:col-span-1">
-                  <label className="mb-1 block text-xs font-medium text-[var(--foreground)]/80">
-                    {t("addressStreet")}
-                  </label>
-                  <input
-                    type="text"
-                    autoComplete="off"
-                    name={streetAutofillShieldRef.current.pickup}
-                    value={data.pickupStreet}
-                    onChange={(e) => {
-                      update({ pickupStreet: e.target.value });
-                      setSuggestionsOpen("pickup");
-                    }}
-                    onFocus={() => setSuggestionsOpen("pickup")}
-                    onBlur={() => setTimeout(() => setSuggestionsOpen(null), 200)}
-                    placeholder={t("addressStreetPlaceholder")}
-                    className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-                  />
-                  {suggestionsOpen === "pickup" && pickupSuggestions.length > 0 && (
-                    <ul className="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-lg border border-[#0d2137]/20 bg-white py-1 shadow-lg">
-                      {pickupSuggestions.map((s, i) => (
-                        <li key={i}>
-                          <button
-                            type="button"
-                            className="w-full px-4 py-2 text-left text-sm hover:bg-[#0d2137]/5"
-                            onMouseDown={(ev) => {
-                              ev.preventDefault();
-                              void (async () => {
-                                const rotateSession = () => {
-                                  placesSessionRef.current =
-                                    typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-                                      ? crypto.randomUUID()
-                                      : `tp24-${Date.now()}`;
-                                };
-                                try {
-                                  if (s.place_id) {
-                                    const res = await fetch(
-                                      `/api/place-details?place_id=${encodeURIComponent(s.place_id)}&session=${encodeURIComponent(placesSessionRef.current)}`
-                                    );
-                                    const j = (await res.json()) as PlaceDetailsJson;
-                                    rotateSession();
-                                    setData((prev) => ({
-                                      ...prev,
-                                      pickupPostcode:
-                                        j.postcode != null && String(j.postcode).trim() !== ""
-                                          ? normalizeGermanPostcode(String(j.postcode))
-                                          : prev.pickupPostcode,
-                                      pickupStreet:
-                                        j.street?.trim() ||
-                                        j.formatted_address?.trim() ||
-                                        s.display_name ||
-                                        prev.pickupStreet,
-                                      pickupHouseNumber: j.houseNumber?.trim() || prev.pickupHouseNumber,
-                                    }));
-                                    setError(null);
-                                  } else {
-                                    setData((prev) => ({
-                                      ...prev,
-                                      pickupStreet: s.display_name || prev.pickupStreet,
-                                    }));
-                                    setError(null);
-                                  }
-                                } catch {
-                                  setData((prev) => ({
-                                    ...prev,
-                                    pickupStreet: s.display_name || prev.pickupStreet,
-                                  }));
-                                  setError(null);
-                                }
-                                setPickupSuggestions([]);
-                                setSuggestionsOpen(null);
-                              })();
-                            }}
-                          >
-                            {s.display_name}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-[var(--foreground)]/80">
-                    {t("addressHouseNumber")}
-                  </label>
-                  <input
-                    type="text"
-                    autoComplete="off"
-                    name="tp24-pickup-house"
-                    value={data.pickupHouseNumber}
-                    onChange={(e) => update({ pickupHouseNumber: e.target.value })}
-                    placeholder={t("addressHouseNumberPlaceholder")}
-                    className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-                  />
-                </div>
-              </div>
+            <div className="relative">
+              <input
+                type="text"
+                autoComplete="off"
+                name={addressLineInputNamesRef.current.pickup}
+                value={data.pickupAddressLine}
+                onChange={(e) => {
+                  update({ pickupAddressLine: e.target.value });
+                  setSuggestionsOpen("pickup");
+                }}
+                onFocus={() => setSuggestionsOpen("pickup")}
+                onBlur={() => setTimeout(() => setSuggestionsOpen(null), 200)}
+                placeholder={t("addressOneLinePlaceholder")}
+                className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+              />
+              {suggestionsOpen === "pickup" && pickupSuggestions.length > 0 && (
+                <ul className="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-lg border border-[#0d2137]/20 bg-white py-1 shadow-lg">
+                  {pickupSuggestions.map((s, i) => (
+                    <li key={i}>
+                      <button
+                        type="button"
+                        className="w-full px-4 py-2 text-left text-sm hover:bg-[#0d2137]/5"
+                        onMouseDown={(ev) => {
+                          ev.preventDefault();
+                          void (async () => {
+                            const rotateSession = () => {
+                              placesSessionRef.current =
+                                typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+                                  ? crypto.randomUUID()
+                                  : `tp24-${Date.now()}`;
+                            };
+                            try {
+                              if (s.place_id) {
+                                const res = await fetch(
+                                  `/api/place-details?place_id=${encodeURIComponent(s.place_id)}&session=${encodeURIComponent(placesSessionRef.current)}`
+                                );
+                                const j = (await res.json()) as PlaceDetailsJson;
+                                rotateSession();
+                                setData((prev) => ({
+                                  ...prev,
+                                  pickupAddressLine: lineFromPlaceDetails(j, s.display_name || prev.pickupAddressLine),
+                                }));
+                                setError(null);
+                              } else {
+                                setData((prev) => ({
+                                  ...prev,
+                                  pickupAddressLine: s.display_name || prev.pickupAddressLine,
+                                }));
+                                setError(null);
+                              }
+                            } catch {
+                              setData((prev) => ({
+                                ...prev,
+                                pickupAddressLine: s.display_name || prev.pickupAddressLine,
+                              }));
+                              setError(null);
+                            }
+                            setPickupSuggestions([]);
+                            setSuggestionsOpen(null);
+                          })();
+                        }}
+                      >
+                        {s.display_name}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <p className="text-xs text-[var(--foreground)]/60">{t("addressOneLineHint")}</p>
           </div>
           <div className="space-y-2">
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
               {t("delivery")}
             </label>
-            <input
-              type="text"
-              inputMode="numeric"
-              autoComplete="off"
-              name="tp24-delivery-plz"
-              maxLength={5}
-              value={data.deliveryPostcode}
-              onChange={(e) => {
-                update({ deliveryPostcode: normalizeGermanPostcode(e.target.value) });
-                setError(null);
-              }}
-              placeholder={t("addressPostcodePlaceholder")}
-              className="w-full max-w-[10rem] rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-            />
-            <p className="text-xs text-[var(--foreground)]/60">{t("addressPostcodeHint")}</p>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_7rem]">
-                <div className="relative sm:col-span-1">
-                  <label className="mb-1 block text-xs font-medium text-[var(--foreground)]/80">
-                    {t("addressStreet")}
-                  </label>
-                  <input
-                    type="text"
-                    autoComplete="off"
-                    name={streetAutofillShieldRef.current.delivery}
-                    value={data.deliveryStreet}
-                    onChange={(e) => {
-                      update({ deliveryStreet: e.target.value });
-                      setSuggestionsOpen("delivery");
-                    }}
-                    onFocus={() => setSuggestionsOpen("delivery")}
-                    onBlur={() => setTimeout(() => setSuggestionsOpen(null), 200)}
-                    placeholder={t("addressStreetPlaceholder")}
-                    className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-                  />
-                  {suggestionsOpen === "delivery" && deliverySuggestions.length > 0 && (
-                    <ul className="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-lg border border-[#0d2137]/20 bg-white py-1 shadow-lg">
-                      {deliverySuggestions.map((s, i) => (
-                        <li key={i}>
-                          <button
-                            type="button"
-                            className="w-full px-4 py-2 text-left text-sm hover:bg-[#0d2137]/5"
-                            onMouseDown={(ev) => {
-                              ev.preventDefault();
-                              void (async () => {
-                                const rotateSession = () => {
-                                  placesSessionRef.current =
-                                    typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-                                      ? crypto.randomUUID()
-                                      : `tp24-${Date.now()}`;
-                                };
-                                try {
-                                  if (s.place_id) {
-                                    const res = await fetch(
-                                      `/api/place-details?place_id=${encodeURIComponent(s.place_id)}&session=${encodeURIComponent(placesSessionRef.current)}`
-                                    );
-                                    const j = (await res.json()) as PlaceDetailsJson;
-                                    rotateSession();
-                                    setData((prev) => ({
-                                      ...prev,
-                                      deliveryPostcode:
-                                        j.postcode != null && String(j.postcode).trim() !== ""
-                                          ? normalizeGermanPostcode(String(j.postcode))
-                                          : prev.deliveryPostcode,
-                                      deliveryStreet:
-                                        j.street?.trim() ||
-                                        j.formatted_address?.trim() ||
-                                        s.display_name ||
-                                        prev.deliveryStreet,
-                                      deliveryHouseNumber: j.houseNumber?.trim() || prev.deliveryHouseNumber,
-                                    }));
-                                    setError(null);
-                                  } else {
-                                    setData((prev) => ({
-                                      ...prev,
-                                      deliveryStreet: s.display_name || prev.deliveryStreet,
-                                    }));
-                                    setError(null);
-                                  }
-                                } catch {
-                                  setData((prev) => ({
-                                    ...prev,
-                                    deliveryStreet: s.display_name || prev.deliveryStreet,
-                                  }));
-                                  setError(null);
-                                }
-                                setDeliverySuggestions([]);
-                                setSuggestionsOpen(null);
-                              })();
-                            }}
-                          >
-                            {s.display_name}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs font-medium text-[var(--foreground)]/80">
-                    {t("addressHouseNumber")}
-                  </label>
-                  <input
-                    type="text"
-                    autoComplete="off"
-                    name="tp24-delivery-house"
-                    value={data.deliveryHouseNumber}
-                    onChange={(e) => update({ deliveryHouseNumber: e.target.value })}
-                    placeholder={t("addressHouseNumberPlaceholder")}
-                    className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-                  />
-                </div>
-              </div>
+            <div className="relative">
+              <input
+                type="text"
+                autoComplete="off"
+                name={addressLineInputNamesRef.current.delivery}
+                value={data.deliveryAddressLine}
+                onChange={(e) => {
+                  update({ deliveryAddressLine: e.target.value });
+                  setSuggestionsOpen("delivery");
+                }}
+                onFocus={() => setSuggestionsOpen("delivery")}
+                onBlur={() => setTimeout(() => setSuggestionsOpen(null), 200)}
+                placeholder={t("addressOneLinePlaceholder")}
+                className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+              />
+              {suggestionsOpen === "delivery" && deliverySuggestions.length > 0 && (
+                <ul className="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-lg border border-[#0d2137]/20 bg-white py-1 shadow-lg">
+                  {deliverySuggestions.map((s, i) => (
+                    <li key={i}>
+                      <button
+                        type="button"
+                        className="w-full px-4 py-2 text-left text-sm hover:bg-[#0d2137]/5"
+                        onMouseDown={(ev) => {
+                          ev.preventDefault();
+                          void (async () => {
+                            const rotateSession = () => {
+                              placesSessionRef.current =
+                                typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+                                  ? crypto.randomUUID()
+                                  : `tp24-${Date.now()}`;
+                            };
+                            try {
+                              if (s.place_id) {
+                                const res = await fetch(
+                                  `/api/place-details?place_id=${encodeURIComponent(s.place_id)}&session=${encodeURIComponent(placesSessionRef.current)}`
+                                );
+                                const j = (await res.json()) as PlaceDetailsJson;
+                                rotateSession();
+                                setData((prev) => ({
+                                  ...prev,
+                                  deliveryAddressLine: lineFromPlaceDetails(j, s.display_name || prev.deliveryAddressLine),
+                                }));
+                                setError(null);
+                              } else {
+                                setData((prev) => ({
+                                  ...prev,
+                                  deliveryAddressLine: s.display_name || prev.deliveryAddressLine,
+                                }));
+                                setError(null);
+                              }
+                            } catch {
+                              setData((prev) => ({
+                                ...prev,
+                                deliveryAddressLine: s.display_name || prev.deliveryAddressLine,
+                              }));
+                              setError(null);
+                            }
+                            setDeliverySuggestions([]);
+                            setSuggestionsOpen(null);
+                          })();
+                        }}
+                      >
+                        {s.display_name}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <p className="text-xs text-[var(--foreground)]/60">{t("addressOneLineHint")}</p>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
@@ -976,7 +883,7 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
               />
             </div>
           </div>
-          {pickupAddress.trim() && deliveryAddress.trim() && (
+          {step2Complete && (
             <>
               <div className="rounded-lg border border-[#0d2137]/15 bg-[#0d2137]/5 p-4">
                 <button
