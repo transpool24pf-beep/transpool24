@@ -1,12 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { CARGO_CATEGORIES, CARGO_CATEGORY_LABEL_DE } from "@/lib/cargo";
+import { PRICING_DEFAULTS } from "@/lib/settings";
 
 type Pricing = {
   price_per_km_cents?: Record<string, number>;
   driver_hourly_rate_cents?: number;
   driver_only_hourly_cents?: number;
   assistant_fee_cents?: number;
+  weight_surcharge_cents_per_10kg?: number;
+  cargo_category_adjustment_cents?: Record<string, number>;
 };
 
 const SIZE_LABELS: Record<string, string> = {
@@ -33,10 +37,16 @@ export default function AdminSettingsPage() {
     driver_hourly_rate_cents: 2500,
     driver_only_hourly_cents: 4500,
     assistant_fee_cents: 1630,
+    weight_surcharge_cents_per_10kg: 50,
+    cargo_category_adjustment_cents: { ...PRICING_DEFAULTS.cargo_category_adjustment_cents },
   });
   const [driverRateEur, setDriverRateEur] = useState("25,00");
   const [driverOnlyEur, setDriverOnlyEur] = useState("45,00");
   const [assistantFeeEur, setAssistantFeeEur] = useState("16,30");
+  const [weightPer10Eur, setWeightPer10Eur] = useState("0,50");
+  const [categoryEur, setCategoryEur] = useState<Record<string, string>>(() =>
+    Object.fromEntries(CARGO_CATEGORIES.map((c) => [c.id, "0,00"]))
+  );
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -47,15 +57,28 @@ export default function AdminSettingsPage() {
         const withCar = data.driver_hourly_rate_cents ?? 2500;
         const onlyDriver = data.driver_only_hourly_cents ?? 4500;
         const assistant = data.assistant_fee_cents ?? 1630;
+        const w10 = data.weight_surcharge_cents_per_10kg ?? 50;
+        const cats = {
+          ...PRICING_DEFAULTS.cargo_category_adjustment_cents,
+          ...(data.cargo_category_adjustment_cents as Record<string, number> | undefined),
+        };
         setPricing({
           price_per_km_cents: data.price_per_km_cents ?? { XS: 80, M: 120, L: 200 },
           driver_hourly_rate_cents: withCar,
           driver_only_hourly_cents: onlyDriver,
           assistant_fee_cents: assistant,
+          weight_surcharge_cents_per_10kg: w10,
+          cargo_category_adjustment_cents: cats,
         });
         setDriverRateEur(formatEur(withCar));
         setDriverOnlyEur(formatEur(onlyDriver));
         setAssistantFeeEur(formatEur(assistant));
+        setWeightPer10Eur(formatEur(w10));
+        setCategoryEur(
+          Object.fromEntries(
+            CARGO_CATEGORIES.map((c) => [c.id, formatEur(cats[c.id] ?? 0)])
+          )
+        );
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -64,11 +87,17 @@ export default function AdminSettingsPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    const categoryAdjust: Record<string, number> = {};
+    for (const c of CARGO_CATEGORIES) {
+      categoryAdjust[c.id] = Math.max(0, parseEur(categoryEur[c.id] ?? "0"));
+    }
     const toSave = {
       ...pricing,
       driver_hourly_rate_cents: parseEur(driverRateEur) || 2500,
       driver_only_hourly_cents: parseEur(driverOnlyEur) || 4500,
       assistant_fee_cents: parseEur(assistantFeeEur) || 1630,
+      weight_surcharge_cents_per_10kg: Math.max(0, parseEur(weightPer10Eur) || 50),
+      cargo_category_adjustment_cents: categoryAdjust,
     };
     fetch("/api/admin/settings", {
       method: "PUT",
@@ -160,6 +189,53 @@ export default function AdminSettingsPage() {
               className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2.5 text-lg focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
             />
             <p className="mt-1 text-xs text-[#0d2137]/50">Euro pro Stunde</p>
+          </div>
+        </section>
+
+        <section className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
+          <h2 className="mb-1 text-lg font-medium text-[#0d2137]">Gewicht: Aufschlag je 10 kg</h2>
+          <p className="mb-4 text-sm text-[#0d2137]/60">
+            Wird pro angefangener 10 kg der angegebenen Ladungsmasse berechnet (z. B. 0,50 € = 50 Cent
+            pro 10 kg). Gilt sofort für neue Preisberechnungen nach Speichern.
+          </p>
+          <div className="max-w-xs">
+            <input
+              type="text"
+              inputMode="decimal"
+              value={weightPer10Eur}
+              onChange={(e) => setWeightPer10Eur(e.target.value)}
+              placeholder="0,50"
+              className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2.5 text-lg focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+            />
+            <p className="mt-1 text-xs text-[#0d2137]/50">Euro je 10 kg (Standard 0,50)</p>
+          </div>
+        </section>
+
+        <section className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
+          <h2 className="mb-1 text-lg font-medium text-[#0d2137]">Warenkategorie: Aufschlag pro Auftrag</h2>
+          <p className="mb-4 text-sm text-[#0d2137]/60">
+            Einmaliger Betrag pro Bestellung je Kategorie („Was transportieren Sie?“). Mit 0,00 € überall
+            erhalten alle Kategorien denselben Basispreis; kleine Differenzen sind optional.
+          </p>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {CARGO_CATEGORIES.map((c) => (
+              <div key={c.id}>
+                <label className="mb-2 block text-sm font-medium text-[#0d2137]/80">
+                  {CARGO_CATEGORY_LABEL_DE[c.id]}
+                </label>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={categoryEur[c.id] ?? "0,00"}
+                  onChange={(e) =>
+                    setCategoryEur((prev) => ({ ...prev, [c.id]: e.target.value }))
+                  }
+                  placeholder="0,00"
+                  className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2.5 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                />
+                <p className="mt-1 text-xs text-[#0d2137]/50">Einmalig pro Auftrag (€)</p>
+              </div>
+            ))}
           </div>
         </section>
 

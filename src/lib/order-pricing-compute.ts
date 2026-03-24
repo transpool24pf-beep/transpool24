@@ -1,12 +1,13 @@
-import { calculatePriceBreakdown, type PriceBreakdown, type PricingOptions, type ServiceType } from "@/lib/pricing";
+import {
+  calculatePriceBreakdown,
+  weightSurchargeCentsFromKg,
+  type PriceBreakdown,
+  type PricingOptions,
+  type ServiceType,
+} from "@/lib/pricing";
 import { getRouteDistanceAndDuration, geocodeAddressForMap } from "@/lib/route-distance-server";
 import { getLoadUnloadMinutes } from "@/lib/cargo";
-import {
-  routeDriveTimeMultiplier,
-  weightSurchargeCentsFromKg,
-  type RouteTerrainId,
-  type RouteWeatherId,
-} from "@/lib/route-pricing-factors";
+import { routeDriveTimeMultiplier, type RouteTerrainId, type RouteWeatherId } from "@/lib/route-pricing-factors";
 import { resolveWeatherForMidpoint, terrainFromGoogleElevation } from "@/lib/auto-route-factors";
 
 export type OrderPricingComputeOk = {
@@ -21,16 +22,25 @@ export type OrderPricingComputeOk = {
   loadingMinutes: number;
   unloadingMinutes: number;
   totalDriverMinutes: number;
-  weightSurchargeCents: number;
   breakdown: PriceBreakdown;
 };
+
+function categorySurchargeCentsFromMap(
+  categoryId: string | null | undefined,
+  map: Record<string, number> | undefined
+): number {
+  if (categoryId == null || categoryId === "" || !map) return 0;
+  const raw = map[categoryId];
+  if (typeof raw !== "number" || !Number.isFinite(raw)) return 0;
+  return Math.max(0, Math.round(raw));
+}
 
 export async function computeOrderPricingFromAddresses(input: {
   pickupAddress: string;
   deliveryAddress: string;
   departureTime: Date | null;
-  cargoCategory: string | null;
   weightKg: number;
+  cargoCategory: string | null;
   cargoSize: "XS" | "M" | "L";
   serviceType: ServiceType;
   pricingOpts: PricingOptions;
@@ -49,7 +59,6 @@ export async function computeOrderPricingFromAddresses(input: {
 
   const { distanceKm, durationMinutes } = route;
   const oneWayBase = durationMinutes ?? Math.round((distanceKm / 50) * 60);
-  const weightKg = Math.max(0, Number(input.weightKg) || 0);
 
   const [from, to] = await Promise.all([
     geocodeAddressForMap(input.pickupAddress.trim()),
@@ -71,13 +80,22 @@ export async function computeOrderPricingFromAddresses(input: {
     key ?? undefined
   );
 
-  const driveMult = routeDriveTimeMultiplier(routeTerrain, routeWeather, weightKg);
+  const driveMult = routeDriveTimeMultiplier(routeTerrain, routeWeather);
   const oneWayAdjusted = Math.round(oneWayBase * driveMult);
   const roundTripMinutes = oneWayAdjusted * 2;
 
-  const { loadingMinutes, unloadingMinutes } = getLoadUnloadMinutes(input.cargoCategory, weightKg);
+  const { loadingMinutes, unloadingMinutes } = getLoadUnloadMinutes();
   const totalDriverMinutes = Math.round(roundTripMinutes + loadingMinutes + unloadingMinutes);
-  const weightSurchargeCents = weightSurchargeCentsFromKg(weightKg);
+  const weightKg = Math.max(0, Number(input.weightKg) || 0);
+  const centsPer10 =
+    input.pricingOpts.weight_surcharge_cents_per_10kg != null
+      ? Math.max(0, Math.round(Number(input.pricingOpts.weight_surcharge_cents_per_10kg)))
+      : 50;
+  const weightSurchargeCents = weightSurchargeCentsFromKg(weightKg, centsPer10);
+  const cargoCategorySurchargeCents = categorySurchargeCentsFromMap(
+    input.cargoCategory,
+    input.pricingOpts.cargo_category_adjustment_cents
+  );
 
   const breakdown = calculatePriceBreakdown(
     distanceKm,
@@ -86,7 +104,8 @@ export async function computeOrderPricingFromAddresses(input: {
     input.pricingOpts,
     input.serviceType,
     totalDriverMinutes,
-    weightSurchargeCents
+    weightSurchargeCents,
+    cargoCategorySurchargeCents
   );
 
   return {
@@ -103,7 +122,6 @@ export async function computeOrderPricingFromAddresses(input: {
       loadingMinutes,
       unloadingMinutes,
       totalDriverMinutes,
-      weightSurchargeCents,
       breakdown,
     },
   };

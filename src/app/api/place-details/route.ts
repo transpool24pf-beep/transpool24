@@ -23,5 +23,8 @@ export async function GET(req: Request) {
     formatted_address: details.formatted_address,
     lat: details.lat,
     lng: details.lng,
+    street: details.street,
+    houseNumber: details.houseNumber,
+    postcode: details.postcode,
   });
 }

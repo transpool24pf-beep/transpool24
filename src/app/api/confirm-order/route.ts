@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
-import { calculatePriceBreakdown } from "@/lib/pricing";
 import { getPricingSettings } from "@/lib/settings";
-import { getLoadUnloadMinutes, isCargoCategoryId } from "@/lib/cargo";
+import { isCargoCategoryId } from "@/lib/cargo";
 import { computeOrderPricingFromAddresses } from "@/lib/order-pricing-compute";
 import { randomBytes, randomInt } from "crypto";
 
@@ -81,6 +80,8 @@ export async function POST(req: Request) {
       driver_hourly_rate_cents: pricing.driver_hourly_rate_cents,
       driver_only_hourly_cents: pricing.driver_only_hourly_cents,
       assistant_fee_cents: pricing.assistant_fee_cents,
+      weight_surcharge_cents_per_10kg: pricing.weight_surcharge_cents_per_10kg,
+      cargo_category_adjustment_cents: pricing.cargo_category_adjustment_cents,
     };
 
     const weightKg = weightKgRaw;
@@ -88,8 +89,8 @@ export async function POST(req: Request) {
       pickupAddress,
       deliveryAddress,
       departureTime,
-      cargoCategory: typeof cargoCat === "string" ? cargoCat : null,
       weightKg,
+      cargoCategory: typeof cargoCat === "string" ? cargoCat : null,
       cargoSize,
       serviceType: st,
       pricingOpts,
@@ -107,11 +108,12 @@ export async function POST(req: Request) {
     const durationMinutes = p.durationMinutes;
     const breakdown = p.breakdown;
     const priceCents = breakdown.totalCents;
+    const weightSurchargeCents = breakdown.weightSurchargeCents;
+    const cargoCategorySurchargeCents = breakdown.cargoCategorySurchargeCents;
     const roundTripMinutes = p.roundTripMinutes;
     const loadingMinutes = p.loadingMinutes;
     const unloadingMinutes = p.unloadingMinutes;
     const totalDriverMinutes = p.totalDriverMinutes;
-    const weightSurchargeCents = p.weightSurchargeCents;
 
     /** Fahrerpreis = 18 × Hin- und Rückfahrt (Cent) — 18 Cent pro km Hin+Rück */
     const roundTripKm = distanceKm * 2;
@@ -153,6 +155,7 @@ export async function POST(req: Request) {
                 terrainSource: p.terrainSource,
                 weatherSource: p.weatherSource,
                 weightSurchargeCents,
+                cargoCategorySurchargeCents,
                 roundTripMinutes,
                 loadingMinutes,
                 unloadingMinutes,

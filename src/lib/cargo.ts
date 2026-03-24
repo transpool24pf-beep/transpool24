@@ -94,22 +94,15 @@ export function getCargoCategory(id: CargoCategoryId | string | null) {
   return CARGO_CATEGORIES.find((c) => c.id === id) ?? null;
 }
 
-/** Load/unload minutes for pricing. Heavy weight adds extra time. */
+/**
+ * Load/unload minutes for pricing: fixed for all categories and weights so
+ * “what you transport” and shipment weight do not change this part of the price.
+ */
 export function getLoadUnloadMinutes(
-  categoryId: CargoCategoryId | string | null,
-  weightKg: number = 0
+  _categoryId?: CargoCategoryId | string | null,
+  _weightKg?: number
 ): { loadingMinutes: number; unloadingMinutes: number } {
-  const cat = getCargoCategory(categoryId);
-  let loading = cat?.loadingMinutes ?? 30;
-  let unloading = cat?.unloadingMinutes ?? 30;
-  if (weightKg > 300) {
-    loading += 15;
-    unloading += 15;
-  } else if (weightKg > 150) {
-    loading += 5;
-    unloading += 5;
-  }
-  return { loadingMinutes: loading, unloadingMinutes: unloading };
+  return { loadingMinutes: 30, unloadingMinutes: 30 };
 }
 
 export function volumeM3(lengthCm: number, widthCm: number, heightCm: number): number {

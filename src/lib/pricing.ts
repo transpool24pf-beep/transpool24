@@ -15,6 +15,10 @@ export type PricingOptions = {
   driver_only_hourly_cents?: number;
   /** Helfer: Stundensatz in Cent (z. B. 1630 = 16,30 €/h), wird × Fahrer-Gesamtstunden berechnet */
   assistant_fee_cents?: number;
+  /** Cents per full 10 kg block; default 50 (= 0,50 €). */
+  weight_surcharge_cents_per_10kg?: number;
+  /** Flat cents added once per order by cargo category id. */
+  cargo_category_adjustment_cents?: Record<string, number>;
 };
 
 export type ServiceType = "driver_only" | "driver_car" | "driver_car_assistant";
@@ -27,12 +31,20 @@ export type PriceBreakdown = {
   driverTimeCents: number;
   /** Only for driver_car_assistant: assistant hourly × (total driver minutes / 60), rounded */
   assistantCents: number;
-  /** Extra for heavy cargo: €0.20 per 10 kg (slows vehicle / longer effective time on road) */
   weightSurchargeCents: number;
+  /** Optional flat surcharge from “what you transport” category (cents). */
+  cargoCategorySurchargeCents: number;
   totalCents: number;
   /** Minutes used for time-based charges (round-trip + load/unload) */
   billingMinutesUsed: number;
 };
+
+/** Cents for weight: `floor(kg / 10) * centsPer10Kg` (default 50 = 0,50 € per 10 kg). */
+export function weightSurchargeCentsFromKg(weightKg: number, centsPer10Kg?: number | null): number {
+  const w = Math.max(0, Math.floor(Number(weightKg) || 0));
+  const unit = Math.max(0, Math.round(Number(centsPer10Kg ?? 50) || 0));
+  return Math.floor(w / 10) * unit;
+}
 
 function resolveBillingMinutes(
   distanceKm: number,
@@ -69,22 +81,26 @@ export function calculatePriceBreakdown(
   options?: PricingOptions | null,
   serviceType: ServiceType = "driver_car",
   totalDriverMinutes?: number | null,
-  weightSurchargeCents?: number | null
+  weightSurchargeCents?: number | null,
+  cargoCategorySurchargeCents?: number | null
 ): PriceBreakdown {
   const driverOnlyHourly = options?.driver_only_hourly_cents ?? DEFAULT_DRIVER_ONLY_HOURLY_CENTS;
   const assistantHourlyCents = options?.assistant_fee_cents ?? DEFAULT_ASSISTANT_HOURLY_CENTS;
   const rawMinutes = resolveBillingMinutes(distanceKm, durationMinutes, totalDriverMinutes);
   const timeMinutes = Math.max(0, Math.round(rawMinutes));
   const weightExtra = Math.max(0, Math.round(Number(weightSurchargeCents) || 0));
+  const categoryExtra = Math.max(0, Math.round(Number(cargoCategorySurchargeCents) || 0));
+  const extras = weightExtra + categoryExtra;
 
   if (serviceType === "driver_only") {
     const total = Math.round((timeMinutes / 60) * driverOnlyHourly);
-    const totalCents = Math.max(total + weightExtra, 1000);
+    const totalCents = Math.max(total + extras, 1000);
     return {
       distanceCents: 0,
       driverTimeCents: total,
       assistantCents: 0,
       weightSurchargeCents: weightExtra,
+      cargoCategorySurchargeCents: categoryExtra,
       totalCents,
       billingMinutesUsed: timeMinutes,
     };
@@ -99,12 +115,13 @@ export function calculatePriceBreakdown(
     serviceType === "driver_car_assistant"
       ? assistantChargeCentsFromMinutes(timeMinutes, assistantHourlyCents)
       : 0;
-  const totalCents = Math.max(distanceCents + driverTimeCents + assistantCents + weightExtra, 1000);
+  const totalCents = Math.max(distanceCents + driverTimeCents + assistantCents + extras, 1000);
   return {
     distanceCents,
     driverTimeCents,
     assistantCents,
     weightSurchargeCents: weightExtra,
+    cargoCategorySurchargeCents: categoryExtra,
     totalCents,
     billingMinutesUsed: timeMinutes,
   };
@@ -117,7 +134,8 @@ export function calculatePriceCents(
   options?: PricingOptions | null,
   serviceType: ServiceType = "driver_car",
   totalDriverMinutes?: number | null,
-  weightSurchargeCents?: number | null
+  weightSurchargeCents?: number | null,
+  cargoCategorySurchargeCents?: number | null
 ): number {
   return calculatePriceBreakdown(
     distanceKm,
@@ -126,7 +144,8 @@ export function calculatePriceCents(
     options,
     serviceType,
     totalDriverMinutes,
-    weightSurchargeCents
+    weightSurchargeCents,
+    cargoCategorySurchargeCents
   ).totalCents;
 }
 

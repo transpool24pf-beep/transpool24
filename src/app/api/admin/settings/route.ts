@@ -12,6 +12,10 @@ function mergePricing(
   const s = stored ?? {};
   const perKmPatch = patch.price_per_km_cents as Record<string, number> | undefined;
   const perKmStored = s.price_per_km_cents as Record<string, number> | undefined;
+  const catPatch = patch.cargo_category_adjustment_cents as Record<string, number> | undefined;
+  const catStored = s.cargo_category_adjustment_cents as Record<string, number> | undefined;
+  const weightPatch = patch.weight_surcharge_cents_per_10kg;
+  const weightStored = s.weight_surcharge_cents_per_10kg;
   return {
     ...PRICING_DEFAULTS,
     ...(s as PricingSettings),
@@ -21,6 +25,17 @@ function mergePricing(
       ...perKmStored,
       ...perKmPatch,
     },
+    cargo_category_adjustment_cents: {
+      ...PRICING_DEFAULTS.cargo_category_adjustment_cents,
+      ...catStored,
+      ...catPatch,
+    },
+    weight_surcharge_cents_per_10kg:
+      weightPatch != null
+        ? Math.max(0, Math.round(Number(weightPatch)))
+        : typeof weightStored === "number"
+          ? Math.max(0, Math.round(weightStored))
+          : PRICING_DEFAULTS.weight_surcharge_cents_per_10kg,
   };
 }
 

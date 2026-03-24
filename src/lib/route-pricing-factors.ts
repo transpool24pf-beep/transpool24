@@ -1,5 +1,5 @@
 /**
- * Terrain & weather ids map to drive-time multipliers; weight slows the vehicle (capped).
+ * Terrain & weather ids map to drive-time multipliers.
  * Terrain/weather are chosen automatically on the server (Google Elevation + Google/Open-Meteo weather).
  */
 
@@ -22,12 +22,6 @@ const WEATHER_MULT: Record<RouteWeatherId, number> = {
   snow_ice: 1.2,
 };
 
-/** Heavier loads → lower effective speed on the road segment (capped). */
-export function weightSlowdownFactor(weightKg: number): number {
-  const w = Math.max(0, Number(weightKg) || 0);
-  return 1 + Math.min(0.35, w / 450);
-}
-
 export function isRouteTerrainId(s: string): s is RouteTerrainId {
   return (ROUTE_TERRAINS as readonly string[]).includes(s);
 }
@@ -39,14 +33,8 @@ export function isRouteWeatherId(s: string): s is RouteWeatherId {
 /**
  * Multiplier applied to one-way route minutes (before doubling for round trip).
  */
-export function routeDriveTimeMultiplier(terrain: string, weather: string, weightKg: number): number {
+export function routeDriveTimeMultiplier(terrain: string, weather: string): number {
   const t = isRouteTerrainId(terrain) ? terrain : "flat";
   const w = isRouteWeatherId(weather) ? weather : "clear";
-  return TERRAIN_MULT[t] * WEATHER_MULT[w] * weightSlowdownFactor(weightKg);
-}
-
-/** €0.20 per full 10 kg (20 cents / 10 kg). */
-export function weightSurchargeCentsFromKg(weightKg: number): number {
-  const w = Math.max(0, Math.floor(Number(weightKg) || 0));
-  return Math.floor(w / 10) * 20;
+  return TERRAIN_MULT[t] * WEATHER_MULT[w];
 }

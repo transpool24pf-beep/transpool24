@@ -12,6 +12,34 @@ export type GooglePlacePrediction = {
   place_id: string;
 };
 
+export type GooglePlaceDetailsResult = {
+  formatted_address: string;
+  lat: number;
+  lng: number;
+  street: string | null;
+  houseNumber: string | null;
+  postcode: string | null;
+};
+
+function parseAddressComponents(
+  components: { long_name: string; types: string[] }[] | undefined
+): { street: string | null; houseNumber: string | null; postcode: string | null } {
+  if (!components?.length) return { street: null, houseNumber: null, postcode: null };
+  let street = "";
+  let houseNumber = "";
+  let postcode = "";
+  for (const c of components) {
+    if (c.types.includes("street_number")) houseNumber = c.long_name;
+    if (c.types.includes("route")) street = c.long_name;
+    if (c.types.includes("postal_code")) postcode = c.long_name;
+  }
+  return {
+    street: street || null,
+    houseNumber: houseNumber || null,
+    postcode: postcode || null,
+  };
+}
+
 export async function googlePlacesAutocompleteGermany(
   input: string,
   sessionToken: string,
@@ -52,10 +80,10 @@ export async function googlePlaceDetailsGermany(
   placeId: string,
   sessionToken: string,
   apiKey: string
-): Promise<{ formatted_address: string; lat: number; lng: number } | null> {
+): Promise<GooglePlaceDetailsResult | null> {
   const params = new URLSearchParams({
     place_id: placeId,
-    fields: "formatted_address,geometry/location",
+    fields: "formatted_address,geometry/location,address_components",
     language: "de",
     key: apiKey,
     sessiontoken: sessionToken,
@@ -67,6 +95,7 @@ export async function googlePlaceDetailsGermany(
     result?: {
       formatted_address: string;
       geometry?: { location: { lat: number; lng: number } };
+      address_components?: { long_name: string; types: string[] }[];
     };
     error_message?: string;
   };
@@ -77,13 +106,24 @@ export async function googlePlaceDetailsGermany(
   }
 
   const loc = data.result.geometry?.location;
+  const parsed = parseAddressComponents(data.result.address_components);
   if (loc == null || typeof loc.lat !== "number" || typeof loc.lng !== "number") {
-    return { formatted_address: data.result.formatted_address, lat: 0, lng: 0 };
+    return {
+      formatted_address: data.result.formatted_address,
+      lat: 0,
+      lng: 0,
+      street: parsed.street,
+      houseNumber: parsed.houseNumber,
+      postcode: parsed.postcode,
+    };
   }
 
   return {
     formatted_address: data.result.formatted_address,
     lat: loc.lat,
     lng: loc.lng,
+    street: parsed.street,
+    houseNumber: parsed.houseNumber,
+    postcode: parsed.postcode,
   };
 }

@@ -43,14 +43,16 @@ export async function POST(req: Request) {
       driver_hourly_rate_cents: pricing.driver_hourly_rate_cents,
       driver_only_hourly_cents: pricing.driver_only_hourly_cents,
       assistant_fee_cents: pricing.assistant_fee_cents,
+      weight_surcharge_cents_per_10kg: pricing.weight_surcharge_cents_per_10kg,
+      cargo_category_adjustment_cents: pricing.cargo_category_adjustment_cents,
     };
 
     const result = await computeOrderPricingFromAddresses({
       pickupAddress,
       deliveryAddress,
       departureTime: pickupTime,
-      cargoCategory,
       weightKg,
+      cargoCategory: cargoCategory || null,
       cargoSize,
       serviceType,
       pricingOpts,
@@ -73,7 +75,6 @@ export async function POST(req: Request) {
       loadingMinutes: d.loadingMinutes,
       unloadingMinutes: d.unloadingMinutes,
       totalDriverMinutes: d.totalDriverMinutes,
-      weightSurchargeCents: d.weightSurchargeCents,
       breakdown: d.breakdown,
     });
   } catch (e) {
