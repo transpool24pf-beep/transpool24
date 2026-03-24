@@ -12,6 +12,14 @@ import {
   type PricingOptions,
 } from "@/lib/pricing";
 import { getLoadUnloadMinutes, CARGO_CATEGORIES, type CargoCategoryId } from "@/lib/cargo";
+import {
+  ROUTE_TERRAINS,
+  ROUTE_WEATHERS,
+  routeDriveTimeMultiplier,
+  weightSurchargeCentsFromKg,
+  type RouteTerrainId,
+  type RouteWeatherId,
+} from "@/lib/route-pricing-factors";
 
 const RouteMap = dynamic(
   () => import("@/components/RouteMapInner").then((m) => m.RouteMapInner),
@@ -47,6 +55,19 @@ const SERVICE_OPTIONS: { value: ServiceType; key: "serviceDriverOnly" | "service
 ];
 
 const DEFAULT_KM = 50;
+
+const TERRAIN_OPTION_KEYS: Record<RouteTerrainId, "routeTerrainFlat" | "routeTerrainRolling" | "routeTerrainHilly" | "routeTerrainMountain"> = {
+  flat: "routeTerrainFlat",
+  rolling: "routeTerrainRolling",
+  hilly: "routeTerrainHilly",
+  mountain: "routeTerrainMountain",
+};
+
+const WEATHER_OPTION_KEYS: Record<RouteWeatherId, "routeWeatherClear" | "routeWeatherRain" | "routeWeatherSnowIce"> = {
+  clear: "routeWeatherClear",
+  rain: "routeWeatherRain",
+  snow_ice: "routeWeatherSnowIce",
+};
 
 /** Country codes for WhatsApp: Germany first, then others. */
 const COUNTRY_CODES: { code: string; flag: string }[] = [
@@ -129,6 +150,10 @@ export type OrderFormData = {
   distanceKm: number;
   cargoWeightKg: number;
   packageCount: number;
+  /** Area terrain — affects effective driving time */
+  routeTerrain: RouteTerrainId | "";
+  /** Weather — affects effective driving time */
+  routeWeather: RouteWeatherId | "";
 };
 
 const initial: OrderFormData = {
@@ -145,6 +170,8 @@ const initial: OrderFormData = {
   distanceKm: DEFAULT_KM,
   cargoWeightKg: 0,
   packageCount: 0,
+  routeTerrain: "",
+  routeWeather: "",
 };
 
 export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrderConfirmed?: () => void }) {
@@ -209,10 +236,20 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
     data.cargoCategory !== "" &&
     data.cargoWeightKg > 0 &&
     data.packageCount >= 1 &&
-    cargoPhotoUrls.length >= 1;
+    cargoPhotoUrls.length >= 1 &&
+    data.routeTerrain !== "" &&
+    data.routeWeather !== "";
 
-  const oneWayMinutes = Math.round(routeDurationMinutes ?? (data.distanceKm / 50) * 60);
-  const roundTripMinutes = oneWayMinutes * 2;
+  /** Price only after category, service, shipment, cargo size, terrain & weather */
+  const showStep3Price = step3Complete;
+
+  const oneWayBaseMinutes = Math.round(routeDurationMinutes ?? (data.distanceKm / 50) * 60);
+  const routeCondMult =
+    data.routeTerrain !== "" && data.routeWeather !== ""
+      ? routeDriveTimeMultiplier(data.routeTerrain, data.routeWeather, data.cargoWeightKg || 0)
+      : 1;
+  const oneWayAdjustedMinutes = Math.round(oneWayBaseMinutes * routeCondMult);
+  const roundTripMinutes = oneWayAdjustedMinutes * 2;
   const { loadingMinutes, unloadingMinutes } = getLoadUnloadMinutes(
     data.cargoCategory || null,
     data.cargoWeightKg || 0
@@ -221,13 +258,15 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
   const estimatedDurationMinutes = routeDurationMinutes ?? Math.round((data.distanceKm / 50) * 60);
   const roundTripParts = splitHoursMinutesParts(roundTripMinutes);
   const totalTimeParts = splitHoursMinutesParts(totalDriverMinutesRounded);
+  const weightSurchargeCents = weightSurchargeCentsFromKg(data.cargoWeightKg || 0);
   const priceBreakdown = calculatePriceBreakdown(
     data.distanceKm,
     data.cargoSize,
     estimatedDurationMinutes,
     pricingOpts,
     data.serviceType || "driver_car",
-    totalDriverMinutesRounded
+    totalDriverMinutesRounded,
+    weightSurchargeCents
   );
   const priceCents = priceBreakdown.totalCents;
 
@@ -432,6 +471,8 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
             packageCount: data.packageCount,
             photoUrls: cargoPhotoUrls,
             cargoCategory: data.cargoCategory || null,
+            routeTerrain: data.routeTerrain || null,
+            routeWeather: data.routeWeather || null,
           },
         }),
       });
@@ -442,6 +483,7 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
         if (err === "CARGO_WEIGHT_REQUIRED") throw new Error(t("cargoWeightRequired"));
         if (err === "CARGO_PACKAGES_REQUIRED") throw new Error(t("cargoPackagesRequired"));
         if (err === "CARGO_PHOTOS_REQUIRED") throw new Error(t("cargoPhotosRequired"));
+        if (err === "ROUTE_FACTORS_REQUIRED") throw new Error(t("routeFactorsRequired"));
         throw new Error(err || "Failed to confirm order");
       }
       if (json.jobId && json.confirmationToken && json.whatsappLink) {
@@ -918,6 +960,50 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
               ))}
             </div>
           </div>
+          <div className="space-y-3 rounded-lg border border-[#0d2137]/15 bg-white p-4">
+            <p className="text-sm font-medium text-[var(--foreground)]">{t("routeConditionsTitle")}</p>
+            <p className="text-xs text-[var(--foreground)]/70">{t("routeConditionsHint")}</p>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <div>
+                <label className="mb-1 block text-xs font-medium text-[var(--foreground)]/80">
+                  {t("routeTerrainLabel")} *
+                </label>
+                <select
+                  value={data.routeTerrain}
+                  onChange={(e) =>
+                    update({ routeTerrain: e.target.value as RouteTerrainId | "" })
+                  }
+                  className="w-full rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm text-[var(--foreground)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                >
+                  <option value="">— {t("routeTerrainPlaceholder")}</option>
+                  {ROUTE_TERRAINS.map((id) => (
+                    <option key={id} value={id}>
+                      {t(`routeTerrain_${id}` as "routeTerrain_flat")}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-[var(--foreground)]/80">
+                  {t("routeWeatherLabel")} *
+                </label>
+                <select
+                  value={data.routeWeather}
+                  onChange={(e) =>
+                    update({ routeWeather: e.target.value as RouteWeatherId | "" })
+                  }
+                  className="w-full rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm text-[var(--foreground)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                >
+                  <option value="">— {t("routeWeatherPlaceholder")}</option>
+                  {ROUTE_WEATHERS.map((id) => (
+                    <option key={id} value={id}>
+                      {t(WEATHER_OPTION_KEYS[id])}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
           <div className="rounded-lg border border-[#0d2137]/15 bg-[#0d2137]/5 p-4">
             <p className="mb-2 text-sm font-medium text-[var(--foreground)]">{t("driverTimeSummary")}</p>
             {!distanceFromRoute ? (
@@ -932,6 +1018,11 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
                   {routeDurationMinutes != null && (
                     <span className="ml-1 text-green-700">({t("fromRoute")})</span>
                   )}
+                  {data.routeTerrain !== "" && data.routeWeather !== "" && (
+                    <span className="ml-1 text-[var(--foreground)]/60">
+                      ({t("routeTimeAdjustedForConditions")})
+                    </span>
+                  )}
                 </p>
                 <p className="text-sm text-[var(--foreground)]/90">
                   {t("loadingUnloadingTime")}: {loadingMinutes} + {unloadingMinutes} {t("minutes")}
@@ -939,14 +1030,6 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
                 <p className="mt-2 text-sm font-semibold text-[var(--accent)]">
                   {t("totalDriverTime")}: {totalTimeParts.hours} {t("hours")} {totalTimeParts.minutes} {t("minutes")}
                 </p>
-                {data.serviceType === "driver_car_assistant" && (
-                  <p className="mt-2 text-sm text-[var(--foreground)]/90">
-                    <span className="font-medium text-[var(--accent)]">{t("assistantRatePerHour")}: </span>
-                    {formatPrice(pricingOpts?.assistant_fee_cents ?? 1630)}
-                    <span className="mx-1">·</span>
-                    {t("assistantChargeForTrip")}: {formatPrice(priceBreakdown.assistantCents)}
-                  </p>
-                )}
               </>
             )}
           </div>
@@ -973,21 +1056,27 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
               />
             )}
           </div>
-          <div className="rounded-lg bg-[#0d2137]/5 p-4 space-y-1">
-            <p className="text-sm text-[var(--foreground)]/80">{t("price")}</p>
-            {data.serviceType !== "driver_only" && (
-              <p className="text-xs text-[var(--foreground)]/65">
-                {t("priceBreakdownDistance")}: {formatPrice(priceBreakdown.distanceCents)} · {t("priceBreakdownDriverTime")}:{" "}
-                {formatPrice(priceBreakdown.driverTimeCents)}
-                {data.serviceType === "driver_car_assistant" && priceBreakdown.assistantCents > 0
-                  ? ` · ${t("priceBreakdownAssistant")}: ${formatPrice(priceBreakdown.assistantCents)}`
-                  : ""}
+          {showStep3Price ? (
+            <div className="rounded-lg bg-[#0d2137]/5 p-4 space-y-1">
+              <p className="text-sm text-[var(--foreground)]/80">{t("price")}</p>
+              {data.serviceType !== "driver_only" && (
+                <p className="text-xs text-[var(--foreground)]/65">
+                  {t("priceBreakdownDistance")}: {formatPrice(priceBreakdown.distanceCents)} · {t("priceBreakdownDriverTime")}:{" "}
+                  {formatPrice(priceBreakdown.driverTimeCents)}
+                  {priceBreakdown.weightSurchargeCents > 0
+                    ? ` · ${t("priceBreakdownWeight")}: ${formatPrice(priceBreakdown.weightSurchargeCents)}`
+                    : ""}
+                </p>
+              )}
+              <p className="text-2xl font-bold text-[var(--accent)]">
+                {formatPrice(priceCents)}
               </p>
-            )}
-            <p className="text-2xl font-bold text-[var(--accent)]">
-              {formatPrice(priceCents)}
-            </p>
-          </div>
+            </div>
+          ) : (
+            <div className="rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/5 p-4">
+              <p className="text-sm text-[var(--foreground)]/75">{t("priceCompleteAllFieldsHint")}</p>
+            </div>
+          )}
         </div>
       )}
 

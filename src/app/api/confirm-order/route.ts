@@ -4,6 +4,12 @@ import { calculatePriceBreakdown } from "@/lib/pricing";
 import { getPricingSettings } from "@/lib/settings";
 import { getRouteDistanceAndDuration } from "@/lib/route-distance-server";
 import { getLoadUnloadMinutes, isCargoCategoryId } from "@/lib/cargo";
+import {
+  isRouteTerrainId,
+  isRouteWeatherId,
+  routeDriveTimeMultiplier,
+  weightSurchargeCentsFromKg,
+} from "@/lib/route-pricing-factors";
 import { randomBytes, randomInt } from "crypto";
 
 const VALID_CARGO = ["XS", "M", "L"] as const;
@@ -69,6 +75,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "CARGO_PHOTOS_REQUIRED" }, { status: 400 });
     }
 
+    const routeTerrain =
+      cd?.routeTerrain != null && typeof cd.routeTerrain === "string" ? cd.routeTerrain.trim() : "";
+    const routeWeather =
+      cd?.routeWeather != null && typeof cd.routeWeather === "string" ? cd.routeWeather.trim() : "";
+    if (!isRouteTerrainId(routeTerrain) || !isRouteWeatherId(routeWeather)) {
+      return NextResponse.json({ error: "ROUTE_FACTORS_REQUIRED" }, { status: 400 });
+    }
+
     const departureTime =
       pickupTime && !Number.isNaN(Date.parse(pickupTime)) ? new Date(pickupTime) : null;
     const route = await getRouteDistanceAndDuration(
@@ -83,14 +97,17 @@ export async function POST(req: Request) {
       );
     }
     const { distanceKm, durationMinutes } = route;
-    const oneWayMinutes = durationMinutes ?? Math.round((distanceKm / 50) * 60);
-    const roundTripMinutes = oneWayMinutes * 2;
+    const oneWayBase = durationMinutes ?? Math.round((distanceKm / 50) * 60);
     const weightKg = weightKgRaw;
+    const driveMult = routeDriveTimeMultiplier(routeTerrain, routeWeather, weightKg);
+    const oneWayAdjusted = Math.round(oneWayBase * driveMult);
+    const roundTripMinutes = oneWayAdjusted * 2;
     const { loadingMinutes, unloadingMinutes } = getLoadUnloadMinutes(
       cargoDetails?.cargoCategory ?? null,
       weightKg
     );
     const totalDriverMinutes = Math.round(roundTripMinutes + loadingMinutes + unloadingMinutes);
+    const weightSurchargeCents = weightSurchargeCentsFromKg(weightKg);
 
     const st = VALID_SERVICE_TYPES.includes(serviceType as (typeof VALID_SERVICE_TYPES)[number])
       ? (serviceType as (typeof VALID_SERVICE_TYPES)[number])
@@ -108,7 +125,8 @@ export async function POST(req: Request) {
       durationMinutes ?? null,
       pricingOpts,
       st,
-      totalDriverMinutes
+      totalDriverMinutes,
+      weightSurchargeCents
     );
     const priceCents = breakdown.totalCents;
 
@@ -146,6 +164,10 @@ export async function POST(req: Request) {
                 weightKg,
                 packageCount: Math.round(packageCountRaw),
                 photoUrls,
+                routeTerrain,
+                routeWeather,
+                routeDriveTimeMultiplier: driveMult,
+                weightSurchargeCents,
                 roundTripMinutes,
                 loadingMinutes,
                 unloadingMinutes,

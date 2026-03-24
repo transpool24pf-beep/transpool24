@@ -713,6 +713,28 @@ export default function AdminOrderDetailPage({
               </div>
             )}
             {order.cargo_details &&
+              typeof (order.cargo_details as { routeTerrain?: unknown }).routeTerrain === "string" &&
+              String((order.cargo_details as { routeTerrain: string }).routeTerrain).length > 0 && (
+                <div>
+                  <dt className="text-[#0d2137]/60">Gelände / Wetter (Preis)</dt>
+                  <dd>
+                    {(order.cargo_details as { routeTerrain: string }).routeTerrain}
+                    {typeof (order.cargo_details as { routeWeather?: string }).routeWeather === "string" &&
+                    (order.cargo_details as { routeWeather: string }).routeWeather
+                      ? ` · ${(order.cargo_details as { routeWeather: string }).routeWeather}`
+                      : ""}
+                    {typeof (order.cargo_details as { routeDriveTimeMultiplier?: number }).routeDriveTimeMultiplier ===
+                    "number"
+                      ? ` · Faktor ${(order.cargo_details as { routeDriveTimeMultiplier: number }).routeDriveTimeMultiplier.toFixed(2)}`
+                      : ""}
+                    {typeof (order.cargo_details as { weightSurchargeCents?: number }).weightSurchargeCents ===
+                      "number" && (order.cargo_details as { weightSurchargeCents: number }).weightSurchargeCents > 0
+                      ? ` · Gewicht +${((order.cargo_details as { weightSurchargeCents: number }).weightSurchargeCents / 100).toFixed(2)} €`
+                      : ""}
+                  </dd>
+                </div>
+              )}
+            {order.cargo_details &&
               Array.isArray((order.cargo_details as { photoUrls?: unknown }).photoUrls) &&
               (order.cargo_details as { photoUrls: string[] }).photoUrls.length > 0 && (
                 <div className="sm:col-span-2">

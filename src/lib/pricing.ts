@@ -27,6 +27,8 @@ export type PriceBreakdown = {
   driverTimeCents: number;
   /** Only for driver_car_assistant: assistant hourly × (total driver minutes / 60), rounded */
   assistantCents: number;
+  /** Extra for heavy cargo: €0.20 per 10 kg (slows vehicle / longer effective time on road) */
+  weightSurchargeCents: number;
   totalCents: number;
   /** Minutes used for time-based charges (round-trip + load/unload) */
   billingMinutesUsed: number;
@@ -66,20 +68,23 @@ export function calculatePriceBreakdown(
   durationMinutes?: number | null,
   options?: PricingOptions | null,
   serviceType: ServiceType = "driver_car",
-  totalDriverMinutes?: number | null
+  totalDriverMinutes?: number | null,
+  weightSurchargeCents?: number | null
 ): PriceBreakdown {
   const driverOnlyHourly = options?.driver_only_hourly_cents ?? DEFAULT_DRIVER_ONLY_HOURLY_CENTS;
   const assistantHourlyCents = options?.assistant_fee_cents ?? DEFAULT_ASSISTANT_HOURLY_CENTS;
   const rawMinutes = resolveBillingMinutes(distanceKm, durationMinutes, totalDriverMinutes);
   const timeMinutes = Math.max(0, Math.round(rawMinutes));
+  const weightExtra = Math.max(0, Math.round(Number(weightSurchargeCents) || 0));
 
   if (serviceType === "driver_only") {
     const total = Math.round((timeMinutes / 60) * driverOnlyHourly);
-    const totalCents = Math.max(total, 1000);
+    const totalCents = Math.max(total + weightExtra, 1000);
     return {
       distanceCents: 0,
-      driverTimeCents: totalCents,
+      driverTimeCents: total,
       assistantCents: 0,
+      weightSurchargeCents: weightExtra,
       totalCents,
       billingMinutesUsed: timeMinutes,
     };
@@ -94,11 +99,12 @@ export function calculatePriceBreakdown(
     serviceType === "driver_car_assistant"
       ? assistantChargeCentsFromMinutes(timeMinutes, assistantHourlyCents)
       : 0;
-  const totalCents = Math.max(distanceCents + driverTimeCents + assistantCents, 1000);
+  const totalCents = Math.max(distanceCents + driverTimeCents + assistantCents + weightExtra, 1000);
   return {
     distanceCents,
     driverTimeCents,
     assistantCents,
+    weightSurchargeCents: weightExtra,
     totalCents,
     billingMinutesUsed: timeMinutes,
   };
@@ -110,7 +116,8 @@ export function calculatePriceCents(
   durationMinutes?: number | null,
   options?: PricingOptions | null,
   serviceType: ServiceType = "driver_car",
-  totalDriverMinutes?: number | null
+  totalDriverMinutes?: number | null,
+  weightSurchargeCents?: number | null
 ): number {
   return calculatePriceBreakdown(
     distanceKm,
@@ -118,7 +125,8 @@ export function calculatePriceCents(
     durationMinutes,
     options,
     serviceType,
-    totalDriverMinutes
+    totalDriverMinutes,
+    weightSurchargeCents
   ).totalCents;
 }
 
