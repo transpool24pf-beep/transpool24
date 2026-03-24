@@ -245,6 +245,17 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
       ? crypto.randomUUID()
       : `tp24-${Date.now()}`
   );
+  /** Stable random `name`s so Chrome autofill does not replace server PLZ street hints */
+  const streetAutofillShieldRef = useRef({
+    pickup:
+      typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+        ? `tp24-pu-st-${crypto.randomUUID().slice(0, 10)}`
+        : `tp24-pu-st-${Date.now()}`,
+    delivery:
+      typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+        ? `tp24-de-st-${crypto.randomUUID().slice(0, 10)}`
+        : `tp24-de-st-${Date.now()}`,
+  });
 
   const pickupAddress = useMemo(
     () => buildGermanAddressLine(data.pickupStreet, data.pickupHouseNumber, data.pickupPostcode),
@@ -817,7 +828,7 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
                   <input
                     type="text"
                     autoComplete="off"
-                    name="tp24-pickup-street"
+                    name={streetAutofillShieldRef.current.pickup}
                     value={data.pickupStreet}
                     onChange={(e) => {
                       update({ pickupStreet: e.target.value });
@@ -936,7 +947,7 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
                   <input
                     type="text"
                     autoComplete="off"
-                    name="tp24-delivery-street"
+                    name={streetAutofillShieldRef.current.delivery}
                     value={data.deliveryStreet}
                     onChange={(e) => {
                       update({ deliveryStreet: e.target.value });

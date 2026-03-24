@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { NOMINATIM_HEADERS } from "@/lib/nominatim-germany";
+import { isUnreliablePlzAutoStreet } from "@/lib/plz-street-hint-filters";
 import { googleStreetHintFromPostcodeGermany } from "@/lib/places-germany";
 
 const NOMINATIM_URL = "https://nominatim.openstreetmap.org/search";
@@ -12,6 +13,7 @@ type NominatimRow = {
     road?: string;
     pedestrian?: string;
     residential?: string;
+    postcode?: string;
     city?: string;
     town?: string;
     village?: string;
@@ -20,10 +22,24 @@ type NominatimRow = {
   };
 };
 
+function rowPostcode(row: NominatimRow): string | null {
+  const p = row.address?.postcode?.trim();
+  if (p && /^\d{5}$/.test(p)) return p;
+  return null;
+}
+
+function rowPostcodeMatchesOrUnknown(row: NominatimRow, pc: string): boolean {
+  const rp = rowPostcode(row);
+  return rp == null || rp === pc;
+}
+
 function roadFromRow(row: NominatimRow): string | null {
   const a = row.address;
   const road = a?.road || a?.pedestrian || a?.residential;
-  return road?.trim() && road.trim().length >= 2 ? road.trim() : null;
+  const r = road?.trim();
+  if (!r || r.length < 2) return null;
+  if (isUnreliablePlzAutoStreet(r)) return null;
+  return r;
 }
 
 function localityFromRow(row: NominatimRow): string | null {
@@ -69,14 +85,26 @@ async function nominatimHints(pc: string): Promise<NominatimRow[]> {
   return dedupeRows([...a, ...b]);
 }
 
-function bestHintFromNominatim(rows: NominatimRow[]): string | null {
-  for (const row of rows) {
+function bestHintFromNominatim(rows: NominatimRow[], pc: string): string | null {
+  const matchesPc = rows.filter((row) => rowPostcode(row) === pc);
+
+  for (const row of matchesPc) {
     const r = roadFromRow(row);
     if (r) return r;
   }
   for (const row of rows) {
+    if (!rowPostcodeMatchesOrUnknown(row, pc)) continue;
+    const r = roadFromRow(row);
+    if (r) return r;
+  }
+  for (const row of matchesPc) {
     const loc = localityFromRow(row);
-    if (loc) return loc;
+    if (loc && !isUnreliablePlzAutoStreet(loc)) return loc;
+  }
+  for (const row of rows) {
+    if (!rowPostcodeMatchesOrUnknown(row, pc)) continue;
+    const loc = localityFromRow(row);
+    if (loc && !isUnreliablePlzAutoStreet(loc)) return loc;
   }
   return null;
 }
@@ -101,7 +129,7 @@ export async function GET(req: Request) {
 
     const rows = await nominatimHints(pc);
     if (rows.length === 0) return NextResponse.json({ hint: null });
-    const hint = bestHintFromNominatim(rows);
+    const hint = bestHintFromNominatim(rows, pc);
     return NextResponse.json({ hint, source: hint ? ("nominatim" as const) : null });
   } catch (e) {
     console.error("[postcode-street-hint]", e);

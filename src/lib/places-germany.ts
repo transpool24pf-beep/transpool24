@@ -4,6 +4,11 @@
  * Session token links Autocomplete + Place Details for billing.
  */
 
+import {
+  formattedAddressContainsPostcode,
+  isUnreliablePlzAutoStreet,
+} from "@/lib/plz-street-hint-filters";
+
 const AUTOCOMPLETE_URL = "https://maps.googleapis.com/maps/api/place/autocomplete/json";
 const DETAILS_URL = "https://maps.googleapis.com/maps/api/place/details/json";
 
@@ -151,7 +156,10 @@ export async function googleStreetHintFromPostcodeGermany(
   const preds = await googlePlacesAutocompleteGermany(`${pc}, Deutschland`, session, apiKey);
   if (preds.length === 0) return null;
 
-  const ordered = [...preds].sort((a, b) => {
+  const prefersPlzInText = preds.filter((p) => p.description.includes(pc));
+  const pool = prefersPlzInText.length > 0 ? prefersPlzInText : preds;
+
+  const ordered = [...pool].sort((a, b) => {
     const sa = descriptionLooksLikeStreet(a.description) ? 1 : 0;
     const sb = descriptionLooksLikeStreet(b.description) ? 1 : 0;
     return sb - sa;
@@ -161,11 +169,12 @@ export async function googleStreetHintFromPostcodeGermany(
     const d = await googlePlaceDetailsGermany(p.place_id, session, apiKey);
     if (!d?.street?.trim()) continue;
     const street = d.street.trim();
-    const pcMatch =
+    if (isUnreliablePlzAutoStreet(street)) continue;
+    const pcOk =
       d.postcode === pc ||
-      (d.formatted_address && d.formatted_address.includes(pc)) ||
-      descriptionLooksLikeStreet(p.description);
-    if (pcMatch) return street;
+      (d.formatted_address != null && formattedAddressContainsPostcode(d.formatted_address, pc));
+    if (!pcOk) continue;
+    return street;
   }
   return null;
 }
