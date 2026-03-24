@@ -127,3 +127,45 @@ export async function googlePlaceDetailsGermany(
     postcode: parsed.postcode,
   };
 }
+
+const STREETISH = /\b(Straße|Str\.|Weg|Platz|Ring|Allee|Gasse|Damm|Chaussee)\b/i;
+
+function descriptionLooksLikeStreet(desc: string): boolean {
+  return STREETISH.test(desc);
+}
+
+/**
+ * Try to resolve a real street (route) for a German PLZ using Autocomplete + Place Details.
+ */
+export async function googleStreetHintFromPostcodeGermany(
+  postcode5: string,
+  apiKey: string
+): Promise<string | null> {
+  const pc = postcode5.replace(/\D/g, "").slice(0, 5);
+  if (!/^\d{5}$/.test(pc)) return null;
+  const session =
+    typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+      ? crypto.randomUUID()
+      : `pc-hint-${pc}-${Date.now()}`;
+
+  const preds = await googlePlacesAutocompleteGermany(`${pc}, Deutschland`, session, apiKey);
+  if (preds.length === 0) return null;
+
+  const ordered = [...preds].sort((a, b) => {
+    const sa = descriptionLooksLikeStreet(a.description) ? 1 : 0;
+    const sb = descriptionLooksLikeStreet(b.description) ? 1 : 0;
+    return sb - sa;
+  });
+
+  for (const p of ordered.slice(0, 8)) {
+    const d = await googlePlaceDetailsGermany(p.place_id, session, apiKey);
+    if (!d?.street?.trim()) continue;
+    const street = d.street.trim();
+    const pcMatch =
+      d.postcode === pc ||
+      (d.formatted_address && d.formatted_address.includes(pc)) ||
+      descriptionLooksLikeStreet(p.description);
+    if (pcMatch) return street;
+  }
+  return null;
+}

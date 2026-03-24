@@ -68,6 +68,30 @@ function buildGermanAddressLine(street: string, houseNumber: string, postcode: s
   return `${st} ${h}, ${p}, Deutschland`;
 }
 
+function nextStateAfterPostcodeEdit(
+  prev: OrderFormData,
+  side: "pickup" | "delivery",
+  nextRaw: string
+): OrderFormData {
+  const next = normalizeGermanPostcode(nextRaw);
+  if (side === "pickup") {
+    const o = prev.pickupPostcode;
+    const o5 = /^\d{5}$/.test(o);
+    const n5 = /^\d{5}$/.test(next);
+    const clearStreet = (o5 && n5 && o !== next) || (o5 && !n5);
+    return clearStreet
+      ? { ...prev, pickupPostcode: next, pickupStreet: "", pickupHouseNumber: "" }
+      : { ...prev, pickupPostcode: next };
+  }
+  const o = prev.deliveryPostcode;
+  const o5 = /^\d{5}$/.test(o);
+  const n5 = /^\d{5}$/.test(next);
+  const clearStreet = (o5 && n5 && o !== next) || (o5 && !n5);
+  return clearStreet
+    ? { ...prev, deliveryPostcode: next, deliveryStreet: "", deliveryHouseNumber: "" }
+    : { ...prev, deliveryPostcode: next };
+}
+
 type OrderPricePreview = {
   breakdown: PriceBreakdown;
   roundTripMinutes: number;
@@ -772,10 +796,14 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
             <input
               type="text"
               inputMode="numeric"
-              autoComplete="postal-code"
+              autoComplete="off"
+              name="tp24-pickup-plz"
               maxLength={5}
               value={data.pickupPostcode}
-              onChange={(e) => update({ pickupPostcode: normalizeGermanPostcode(e.target.value) })}
+              onChange={(e) => {
+                setData((prev) => nextStateAfterPostcodeEdit(prev, "pickup", e.target.value));
+                setError(null);
+              }}
               placeholder={t("addressPostcodePlaceholder")}
               className="w-full max-w-[10rem] rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
             />
@@ -788,7 +816,8 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
                   </label>
                   <input
                     type="text"
-                    autoComplete="street-address"
+                    autoComplete="off"
+                    name="tp24-pickup-street"
                     value={data.pickupStreet}
                     onChange={(e) => {
                       update({ pickupStreet: e.target.value });
@@ -868,7 +897,8 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
                   </label>
                   <input
                     type="text"
-                    autoComplete="address-line2"
+                    autoComplete="off"
+                    name="tp24-pickup-house"
                     value={data.pickupHouseNumber}
                     onChange={(e) => update({ pickupHouseNumber: e.target.value })}
                     placeholder={t("addressHouseNumberPlaceholder")}
@@ -885,10 +915,14 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
             <input
               type="text"
               inputMode="numeric"
-              autoComplete="postal-code"
+              autoComplete="off"
+              name="tp24-delivery-plz"
               maxLength={5}
               value={data.deliveryPostcode}
-              onChange={(e) => update({ deliveryPostcode: normalizeGermanPostcode(e.target.value) })}
+              onChange={(e) => {
+                setData((prev) => nextStateAfterPostcodeEdit(prev, "delivery", e.target.value));
+                setError(null);
+              }}
               placeholder={t("addressPostcodePlaceholder")}
               className="w-full max-w-[10rem] rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
             />
@@ -901,7 +935,8 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
                   </label>
                   <input
                     type="text"
-                    autoComplete="street-address"
+                    autoComplete="off"
+                    name="tp24-delivery-street"
                     value={data.deliveryStreet}
                     onChange={(e) => {
                       update({ deliveryStreet: e.target.value });
@@ -981,7 +1016,8 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
                   </label>
                   <input
                     type="text"
-                    autoComplete="address-line2"
+                    autoComplete="off"
+                    name="tp24-delivery-house"
                     value={data.deliveryHouseNumber}
                     onChange={(e) => update({ deliveryHouseNumber: e.target.value })}
                     placeholder={t("addressHouseNumberPlaceholder")}
