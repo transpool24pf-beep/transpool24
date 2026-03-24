@@ -94,7 +94,7 @@
     "delivery": "Delivery address",
     "deliveryPlaceholder": "Street, postal code, city",
     "addressPostcodePlaceholder": "75172",
-    "addressPostcodeHint": "German postal code (5 digits). Street and house number appear after you enter it.",
+    "addressPostcodeHint": "Enter the German postcode (5 digits), street, and house number yourself. Suggestions appear as you type in the street field.",
     "addressStreet": "Street",
     "addressStreetPlaceholder": "e.g. Musterstraße",
     "addressHouseNumber": "House number",

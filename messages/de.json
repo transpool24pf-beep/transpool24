@@ -94,7 +94,7 @@
     "delivery": "Lieferadresse",
     "deliveryPlaceholder": "Straße, PLZ, Ort",
     "addressPostcodePlaceholder": "75172",
-    "addressPostcodeHint": "Deutsche Postleitzahl (5 Ziffern). Danach Straße und Hausnummer eingeben.",
+    "addressPostcodeHint": "Postleitzahl (5 Ziffern), Straße und Hausnummer selbst eintragen. Vorschläge erscheinen beim Tippen im Straßenfeld.",
     "addressStreet": "Straße",
     "addressStreetPlaceholder": "z. B. Musterstraße",
     "addressHouseNumber": "Hausnummer",

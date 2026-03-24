@@ -94,7 +94,7 @@
     "delivery": "Адрес доставки",
     "deliveryPlaceholder": "Улица, почтовый индекс, город",
     "addressPostcodePlaceholder": "75172",
-    "addressPostcodeHint": "Немецкий почтовый индекс (5 цифр). Затем улица и номер дома.",
+    "addressPostcodeHint": "Введите вручную индекс (5 цифр), улицу и номер дома. Подсказки появляются при вводе в поле улицы.",
     "addressStreet": "Улица",
     "addressStreetPlaceholder": "напр. Hauptstraße",
     "addressHouseNumber": "Номер дома",

@@ -68,30 +68,6 @@ function buildGermanAddressLine(street: string, houseNumber: string, postcode: s
   return `${st} ${h}, ${p}, Deutschland`;
 }
 
-function nextStateAfterPostcodeEdit(
-  prev: OrderFormData,
-  side: "pickup" | "delivery",
-  nextRaw: string
-): OrderFormData {
-  const next = normalizeGermanPostcode(nextRaw);
-  if (side === "pickup") {
-    const o = prev.pickupPostcode;
-    const o5 = /^\d{5}$/.test(o);
-    const n5 = /^\d{5}$/.test(next);
-    const clearStreet = (o5 && n5 && o !== next) || (o5 && !n5);
-    return clearStreet
-      ? { ...prev, pickupPostcode: next, pickupStreet: "", pickupHouseNumber: "" }
-      : { ...prev, pickupPostcode: next };
-  }
-  const o = prev.deliveryPostcode;
-  const o5 = /^\d{5}$/.test(o);
-  const n5 = /^\d{5}$/.test(next);
-  const clearStreet = (o5 && n5 && o !== next) || (o5 && !n5);
-  return clearStreet
-    ? { ...prev, deliveryPostcode: next, deliveryStreet: "", deliveryHouseNumber: "" }
-    : { ...prev, deliveryPostcode: next };
-}
-
 type OrderPricePreview = {
   breakdown: PriceBreakdown;
   roundTripMinutes: number;
@@ -410,23 +386,25 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
     if (debounceRef.current) clearTimeout(debounceRef.current);
     if (suggestionsOpen === "pickup") {
       debounceRef.current = setTimeout(() => {
-        const pc = data.pickupPostcode.trim();
+        const pc = normalizeGermanPostcode(data.pickupPostcode);
         const st = data.pickupStreet.trim();
-        if (!/^\d{5}$/.test(pc) || st.length < 3) {
+        if (st.length < 3) {
           setPickupSuggestions([]);
           return;
         }
-        fetchSuggestions(`${st}, ${pc}, Deutschland`, setPickupSuggestions);
+        const q = /^\d{5}$/.test(pc) ? `${st}, ${pc}, Deutschland` : `${st}, Deutschland`;
+        fetchSuggestions(q, setPickupSuggestions);
       }, 300);
     } else if (suggestionsOpen === "delivery") {
       debounceRef.current = setTimeout(() => {
-        const pc = data.deliveryPostcode.trim();
+        const pc = normalizeGermanPostcode(data.deliveryPostcode);
         const st = data.deliveryStreet.trim();
-        if (!/^\d{5}$/.test(pc) || st.length < 3) {
+        if (st.length < 3) {
           setDeliverySuggestions([]);
           return;
         }
-        fetchSuggestions(`${st}, ${pc}, Deutschland`, setDeliverySuggestions);
+        const q = /^\d{5}$/.test(pc) ? `${st}, ${pc}, Deutschland` : `${st}, Deutschland`;
+        fetchSuggestions(q, setDeliverySuggestions);
       }, 300);
     }
     return () => {
@@ -440,67 +418,6 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
     suggestionsOpen,
     fetchSuggestions,
   ]);
-
-  /** When PLZ is complete and Straße is empty: suggest Ort/Straße via OSM (server). */
-  useEffect(() => {
-    if (step !== 2) return;
-    const pc = data.pickupPostcode.trim();
-    if (!/^\d{5}$/.test(pc) || data.pickupStreet.trim() !== "") return;
-    const ctrl = new AbortController();
-    const tid = setTimeout(() => {
-      void (async () => {
-        try {
-          const r = await fetch(`/api/postcode-street-hint?postcode=${encodeURIComponent(pc)}`, {
-            signal: ctrl.signal,
-          });
-          if (!r.ok) return;
-          const j = (await r.json()) as { hint?: string | null };
-          const hint = typeof j.hint === "string" ? j.hint.trim() : "";
-          if (!hint || ctrl.signal.aborted) return;
-          setData((prev) => {
-            if (prev.pickupPostcode.trim() !== pc || prev.pickupStreet.trim() !== "") return prev;
-            return { ...prev, pickupStreet: hint };
-          });
-        } catch {
-          /* aborted */
-        }
-      })();
-    }, 500);
-    return () => {
-      clearTimeout(tid);
-      ctrl.abort();
-    };
-  }, [step, data.pickupPostcode, data.pickupStreet]);
-
-  useEffect(() => {
-    if (step !== 2) return;
-    const pc = data.deliveryPostcode.trim();
-    if (!/^\d{5}$/.test(pc) || data.deliveryStreet.trim() !== "") return;
-    const ctrl = new AbortController();
-    const tid = setTimeout(() => {
-      void (async () => {
-        try {
-          const r = await fetch(`/api/postcode-street-hint?postcode=${encodeURIComponent(pc)}`, {
-            signal: ctrl.signal,
-          });
-          if (!r.ok) return;
-          const j = (await r.json()) as { hint?: string | null };
-          const hint = typeof j.hint === "string" ? j.hint.trim() : "";
-          if (!hint || ctrl.signal.aborted) return;
-          setData((prev) => {
-            if (prev.deliveryPostcode.trim() !== pc || prev.deliveryStreet.trim() !== "") return prev;
-            return { ...prev, deliveryStreet: hint };
-          });
-        } catch {
-          /* aborted */
-        }
-      })();
-    }, 500);
-    return () => {
-      clearTimeout(tid);
-      ctrl.abort();
-    };
-  }, [step, data.deliveryPostcode, data.deliveryStreet]);
 
   const fetchRealDistance = useCallback(async () => {
     if (!pickupAddress.trim() || !deliveryAddress.trim()) return;
@@ -812,15 +729,14 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
               maxLength={5}
               value={data.pickupPostcode}
               onChange={(e) => {
-                setData((prev) => nextStateAfterPostcodeEdit(prev, "pickup", e.target.value));
+                update({ pickupPostcode: normalizeGermanPostcode(e.target.value) });
                 setError(null);
               }}
               placeholder={t("addressPostcodePlaceholder")}
               className="w-full max-w-[10rem] rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
             />
             <p className="text-xs text-[var(--foreground)]/60">{t("addressPostcodeHint")}</p>
-            {/^\d{5}$/.test(data.pickupPostcode) && (
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_7rem]">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_7rem]">
                 <div className="relative sm:col-span-1">
                   <label className="mb-1 block text-xs font-medium text-[var(--foreground)]/80">
                     {t("addressStreet")}
@@ -917,7 +833,6 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
                   />
                 </div>
               </div>
-            )}
           </div>
           <div className="space-y-2">
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
@@ -931,15 +846,14 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
               maxLength={5}
               value={data.deliveryPostcode}
               onChange={(e) => {
-                setData((prev) => nextStateAfterPostcodeEdit(prev, "delivery", e.target.value));
+                update({ deliveryPostcode: normalizeGermanPostcode(e.target.value) });
                 setError(null);
               }}
               placeholder={t("addressPostcodePlaceholder")}
               className="w-full max-w-[10rem] rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
             />
             <p className="text-xs text-[var(--foreground)]/60">{t("addressPostcodeHint")}</p>
-            {/^\d{5}$/.test(data.deliveryPostcode) && (
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_7rem]">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_7rem]">
                 <div className="relative sm:col-span-1">
                   <label className="mb-1 block text-xs font-medium text-[var(--foreground)]/80">
                     {t("addressStreet")}
@@ -1036,7 +950,6 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
                   />
                 </div>
               </div>
-            )}
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>

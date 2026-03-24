@@ -94,7 +94,7 @@
     "delivery": "عنوان التسليم",
     "deliveryPlaceholder": "الشارع، الرمز البريدي، المدينة",
     "addressPostcodePlaceholder": "75172",
-    "addressPostcodeHint": "الرمز البريدي الألماني (5 أرقام). بعد إدخاله تظهر حقول اسم الشارع ورقم المنزل.",
+    "addressPostcodeHint": "أدخل الرمز البريدي الألماني (5 أرقام) واسم الشارع ورقم المنزل يدوياً. تظهر اقتراحات أثناء الكتابة في حقل اسم الشارع.",
     "addressStreet": "اسم الشارع",
     "addressStreetPlaceholder": "مثال: Hauptstraße",
     "addressHouseNumber": "رقم المنزل",

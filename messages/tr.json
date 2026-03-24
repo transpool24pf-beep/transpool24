@@ -94,7 +94,7 @@
     "delivery": "Teslimat adresi",
     "deliveryPlaceholder": "Sokak, posta kodu, şehir",
     "addressPostcodePlaceholder": "75172",
-    "addressPostcodeHint": "Almanya posta kodu (5 rakam). Ardından sokak ve kapı numarasını girin.",
+    "addressPostcodeHint": "Almanya posta kodunu (5 rakam), sokak ve kapı numarasını kendiniz yazın. Sokak alanına yazarken öneriler görünür.",
     "addressStreet": "Sokak",
     "addressStreetPlaceholder": "örn. Hauptstraße",
     "addressHouseNumber": "Kapı numarası",

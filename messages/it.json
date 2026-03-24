@@ -94,7 +94,7 @@
     "delivery": "Indirizzo di consegna",
     "deliveryPlaceholder": "Via, codice postale, città",
     "addressPostcodePlaceholder": "75172",
-    "addressPostcodeHint": "CAP tedesco (5 cifre). Poi inserisci via e numero civico.",
+    "addressPostcodeHint": "Inserisci tu CAP tedesco (5 cifre), via e numero civico. Suggerimenti mentre digiti nel campo via.",
     "addressStreet": "Via",
     "addressStreetPlaceholder": "es. Hauptstraße",
     "addressHouseNumber": "Numero civico",

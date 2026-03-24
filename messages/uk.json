@@ -94,7 +94,7 @@
     "delivery": "Адреса доставки",
     "deliveryPlaceholder": "Вулиця, поштовий індекс, місто",
     "addressPostcodePlaceholder": "75172",
-    "addressPostcodeHint": "Німецький поштовий індекс (5 цифр). Далі вулиця та номер будинку.",
+    "addressPostcodeHint": "Введіть вручну німецький індекс (5 цифр), вулицю та номер будинку. Підказки з’являються під час введення у полі вулиці.",
     "addressStreet": "Вулиця",
     "addressStreetPlaceholder": "напр. Hauptstraße",
     "addressHouseNumber": "Номер будинку",

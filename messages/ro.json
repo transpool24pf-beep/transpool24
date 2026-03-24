@@ -94,7 +94,7 @@
     "delivery": "Adresa de livrare",
     "deliveryPlaceholder": "Stradă, cod poștal, oraș",
     "addressPostcodePlaceholder": "75172",
-    "addressPostcodeHint": "Cod poștal german (5 cifre). Apoi introduceți strada și numărul.",
+    "addressPostcodeHint": "Introduceți manual codul poștal german (5 cifre), strada și numărul. Sugestiile apar în timp ce scrieți în câmpul stradă.",
     "addressStreet": "Stradă",
     "addressStreetPlaceholder": "ex. Hauptstraße",
     "addressHouseNumber": "Număr",

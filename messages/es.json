@@ -94,7 +94,7 @@
     "delivery": "Dirección de entrega",
     "deliveryPlaceholder": "Calle, código postal, ciudad",
     "addressPostcodePlaceholder": "75172",
-    "addressPostcodeHint": "Código postal alemán (5 dígitos). Después indique calle y número.",
+    "addressPostcodeHint": "Escriba usted mismo el código postal alemán (5 dígitos), la calle y el número. Aparecen sugerencias al escribir en el campo de calle.",
     "addressStreet": "Calle",
     "addressStreetPlaceholder": "p. ej. Hauptstraße",
     "addressHouseNumber": "Número",
