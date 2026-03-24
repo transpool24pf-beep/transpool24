@@ -5,21 +5,13 @@ import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { OrderRouteLottie } from "@/components/OrderRouteLottie";
 import {
-  calculatePriceBreakdown,
   formatPrice,
   splitHoursMinutesParts,
   type ServiceType,
   type PricingOptions,
+  type PriceBreakdown,
 } from "@/lib/pricing";
 import { getLoadUnloadMinutes, CARGO_CATEGORIES, type CargoCategoryId } from "@/lib/cargo";
-import {
-  ROUTE_TERRAINS,
-  ROUTE_WEATHERS,
-  routeDriveTimeMultiplier,
-  weightSurchargeCentsFromKg,
-  type RouteTerrainId,
-  type RouteWeatherId,
-} from "@/lib/route-pricing-factors";
 
 const RouteMap = dynamic(
   () => import("@/components/RouteMapInner").then((m) => m.RouteMapInner),
@@ -56,17 +48,15 @@ const SERVICE_OPTIONS: { value: ServiceType; key: "serviceDriverOnly" | "service
 
 const DEFAULT_KM = 50;
 
-const TERRAIN_OPTION_KEYS: Record<RouteTerrainId, "routeTerrainFlat" | "routeTerrainRolling" | "routeTerrainHilly" | "routeTerrainMountain"> = {
-  flat: "routeTerrainFlat",
-  rolling: "routeTerrainRolling",
-  hilly: "routeTerrainHilly",
-  mountain: "routeTerrainMountain",
-};
-
-const WEATHER_OPTION_KEYS: Record<RouteWeatherId, "routeWeatherClear" | "routeWeatherRain" | "routeWeatherSnowIce"> = {
-  clear: "routeWeatherClear",
-  rain: "routeWeatherRain",
-  snow_ice: "routeWeatherSnowIce",
+type OrderPricePreview = {
+  breakdown: PriceBreakdown;
+  roundTripMinutes: number;
+  totalDriverMinutes: number;
+  routeTerrain: string;
+  routeWeather: string;
+  routeDriveTimeMultiplier: number;
+  terrainSource: string;
+  weatherSource: string;
 };
 
 /** Country codes for WhatsApp: Germany first, then others. */
@@ -150,10 +140,6 @@ export type OrderFormData = {
   distanceKm: number;
   cargoWeightKg: number;
   packageCount: number;
-  /** Area terrain — affects effective driving time */
-  routeTerrain: RouteTerrainId | "";
-  /** Weather — affects effective driving time */
-  routeWeather: RouteWeatherId | "";
 };
 
 const initial: OrderFormData = {
@@ -170,8 +156,6 @@ const initial: OrderFormData = {
   distanceKm: DEFAULT_KM,
   cargoWeightKg: 0,
   packageCount: 0,
-  routeTerrain: "",
-  routeWeather: "",
 };
 
 export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrderConfirmed?: () => void }) {
@@ -196,6 +180,9 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
   const [pricingOpts, setPricingOpts] = useState<PricingOptions | null>(null);
   const [cargoPhotoUrls, setCargoPhotoUrls] = useState<string[]>([]);
   const [photoUploading, setPhotoUploading] = useState(false);
+  const [pricePreview, setPricePreview] = useState<OrderPricePreview | null>(null);
+  const [pricePreviewLoading, setPricePreviewLoading] = useState(false);
+  const [pricePreviewError, setPricePreviewError] = useState<string | null>(null);
   const [phoneCountryCode, setPhoneCountryCode] = useState("+49");
   const [countryCodeOpen, setCountryCodeOpen] = useState(false);
   const countryCodeRef = useRef<HTMLDivElement>(null);
@@ -236,39 +223,86 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
     data.cargoCategory !== "" &&
     data.cargoWeightKg > 0 &&
     data.packageCount >= 1 &&
-    cargoPhotoUrls.length >= 1 &&
-    data.routeTerrain !== "" &&
-    data.routeWeather !== "";
+    cargoPhotoUrls.length >= 1;
 
-  /** Price only after category, service, shipment, cargo size, terrain & weather */
-  const showStep3Price = step3Complete;
+  const showStep3Price = step3Complete && !!pricePreview && !pricePreviewLoading && !pricePreviewError;
 
   const oneWayBaseMinutes = Math.round(routeDurationMinutes ?? (data.distanceKm / 50) * 60);
-  const routeCondMult =
-    data.routeTerrain !== "" && data.routeWeather !== ""
-      ? routeDriveTimeMultiplier(data.routeTerrain, data.routeWeather, data.cargoWeightKg || 0)
-      : 1;
-  const oneWayAdjustedMinutes = Math.round(oneWayBaseMinutes * routeCondMult);
-  const roundTripMinutes = oneWayAdjustedMinutes * 2;
+  const baseRoundTripMinutes = oneWayBaseMinutes * 2;
   const { loadingMinutes, unloadingMinutes } = getLoadUnloadMinutes(
     data.cargoCategory || null,
     data.cargoWeightKg || 0
   );
-  const totalDriverMinutesRounded = Math.round(roundTripMinutes + loadingMinutes + unloadingMinutes);
-  const estimatedDurationMinutes = routeDurationMinutes ?? Math.round((data.distanceKm / 50) * 60);
-  const roundTripParts = splitHoursMinutesParts(roundTripMinutes);
-  const totalTimeParts = splitHoursMinutesParts(totalDriverMinutesRounded);
-  const weightSurchargeCents = weightSurchargeCentsFromKg(data.cargoWeightKg || 0);
-  const priceBreakdown = calculatePriceBreakdown(
-    data.distanceKm,
+  const roundTripMinutesDisplay = pricePreview?.roundTripMinutes ?? baseRoundTripMinutes;
+  const totalDriverMinutesDisplay =
+    pricePreview?.totalDriverMinutes ??
+    Math.round(baseRoundTripMinutes + loadingMinutes + unloadingMinutes);
+  const roundTripParts = splitHoursMinutesParts(roundTripMinutesDisplay);
+  const totalTimeParts = splitHoursMinutesParts(totalDriverMinutesDisplay);
+  const priceBreakdown = pricePreview?.breakdown ?? null;
+  const priceCents = pricePreview?.breakdown?.totalCents ?? 0;
+
+  useEffect(() => {
+    if (step !== 3 || !step3Complete) {
+      setPricePreview(null);
+      setPricePreviewError(null);
+      setPricePreviewLoading(false);
+      return;
+    }
+    const ctrl = new AbortController();
+    setPricePreviewLoading(true);
+    setPricePreviewError(null);
+    const tid = setTimeout(() => {
+      void (async () => {
+        try {
+          const res = await fetch("/api/order-price-preview", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            signal: ctrl.signal,
+            body: JSON.stringify({
+              pickupAddress: data.pickupAddress,
+              deliveryAddress: data.deliveryAddress,
+              pickupTime:
+                data.pickupDate && data.pickupTime ? `${data.pickupDate}T${data.pickupTime}` : null,
+              cargoSize: data.cargoSize,
+              serviceType: data.serviceType || "driver_car",
+              weightKg: data.cargoWeightKg,
+              cargoCategory: data.cargoCategory,
+            }),
+          });
+          const json = (await res.json()) as { error?: string } & Partial<OrderPricePreview>;
+          if (!res.ok) {
+            throw new Error(json.error || "preview failed");
+          }
+          if (!json.breakdown || typeof json.roundTripMinutes !== "number") {
+            throw new Error("Invalid preview");
+          }
+          setPricePreview(json as OrderPricePreview);
+        } catch (e) {
+          if (e instanceof Error && e.name === "AbortError") return;
+          setPricePreview(null);
+          setPricePreviewError(e instanceof Error ? e.message : "preview failed");
+        } finally {
+          if (!ctrl.signal.aborted) setPricePreviewLoading(false);
+        }
+      })();
+    }, 400);
+    return () => {
+      clearTimeout(tid);
+      ctrl.abort();
+    };
+  }, [
+    step,
+    step3Complete,
+    data.pickupAddress,
+    data.deliveryAddress,
+    data.pickupDate,
+    data.pickupTime,
     data.cargoSize,
-    estimatedDurationMinutes,
-    pricingOpts,
-    data.serviceType || "driver_car",
-    totalDriverMinutesRounded,
-    weightSurchargeCents
-  );
-  const priceCents = priceBreakdown.totalCents;
+    data.serviceType,
+    data.cargoWeightKg,
+    data.cargoCategory,
+  ]);
 
   const fetchSuggestions = useCallback((query: string, setter: (s: Suggestion[]) => void) => {
     const trimmed = query.trim();
@@ -471,8 +505,6 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
             packageCount: data.packageCount,
             photoUrls: cargoPhotoUrls,
             cargoCategory: data.cargoCategory || null,
-            routeTerrain: data.routeTerrain || null,
-            routeWeather: data.routeWeather || null,
           },
         }),
       });
@@ -483,7 +515,6 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
         if (err === "CARGO_WEIGHT_REQUIRED") throw new Error(t("cargoWeightRequired"));
         if (err === "CARGO_PACKAGES_REQUIRED") throw new Error(t("cargoPackagesRequired"));
         if (err === "CARGO_PHOTOS_REQUIRED") throw new Error(t("cargoPhotosRequired"));
-        if (err === "ROUTE_FACTORS_REQUIRED") throw new Error(t("routeFactorsRequired"));
         throw new Error(err || "Failed to confirm order");
       }
       if (json.jobId && json.confirmationToken && json.whatsappLink) {
@@ -960,56 +991,14 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
               ))}
             </div>
           </div>
-          <div className="space-y-3 rounded-lg border border-[#0d2137]/15 bg-white p-4">
-            <p className="text-sm font-medium text-[var(--foreground)]">{t("routeConditionsTitle")}</p>
-            <p className="text-xs text-[var(--foreground)]/70">{t("routeConditionsHint")}</p>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div>
-                <label className="mb-1 block text-xs font-medium text-[var(--foreground)]/80">
-                  {t("routeTerrainLabel")} *
-                </label>
-                <select
-                  value={data.routeTerrain}
-                  onChange={(e) =>
-                    update({ routeTerrain: e.target.value as RouteTerrainId | "" })
-                  }
-                  className="w-full rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm text-[var(--foreground)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-                >
-                  <option value="">— {t("routeTerrainPlaceholder")}</option>
-                  {ROUTE_TERRAINS.map((id) => (
-                    <option key={id} value={id}>
-                      {t(`routeTerrain_${id}` as "routeTerrain_flat")}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-medium text-[var(--foreground)]/80">
-                  {t("routeWeatherLabel")} *
-                </label>
-                <select
-                  value={data.routeWeather}
-                  onChange={(e) =>
-                    update({ routeWeather: e.target.value as RouteWeatherId | "" })
-                  }
-                  className="w-full rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm text-[var(--foreground)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-                >
-                  <option value="">— {t("routeWeatherPlaceholder")}</option>
-                  {ROUTE_WEATHERS.map((id) => (
-                    <option key={id} value={id}>
-                      {t(WEATHER_OPTION_KEYS[id])}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
           <div className="rounded-lg border border-[#0d2137]/15 bg-[#0d2137]/5 p-4">
             <p className="mb-2 text-sm font-medium text-[var(--foreground)]">{t("driverTimeSummary")}</p>
             {!distanceFromRoute ? (
               <p className="text-sm text-amber-700">
                 {t("driverTimeRequiresAddress")}
               </p>
+            ) : step3Complete && pricePreviewLoading ? (
+              <p className="text-sm text-[var(--foreground)]/75">{t("pricePreviewLoading")}</p>
             ) : (
               <>
                 <p className="text-sm text-[var(--foreground)]/90">
@@ -1018,9 +1007,9 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
                   {routeDurationMinutes != null && (
                     <span className="ml-1 text-green-700">({t("fromRoute")})</span>
                   )}
-                  {data.routeTerrain !== "" && data.routeWeather !== "" && (
-                    <span className="ml-1 text-[var(--foreground)]/60">
-                      ({t("routeTimeAdjustedForConditions")})
+                  {pricePreview && (
+                    <span className="ml-1 block text-xs text-[var(--foreground)]/60 sm:ml-1 sm:inline">
+                      {t("routePricingAutoHint")}
                     </span>
                   )}
                 </p>
@@ -1056,7 +1045,7 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
               />
             )}
           </div>
-          {showStep3Price ? (
+          {showStep3Price && priceBreakdown ? (
             <div className="rounded-lg bg-[#0d2137]/5 p-4 space-y-1">
               <p className="text-sm text-[var(--foreground)]/80">{t("price")}</p>
               {data.serviceType !== "driver_only" && (
@@ -1073,8 +1062,16 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
               </p>
             </div>
           ) : (
-            <div className="rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/5 p-4">
-              <p className="text-sm text-[var(--foreground)]/75">{t("priceCompleteAllFieldsHint")}</p>
+            <div className="rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/5 p-4 space-y-2">
+              {step3Complete && pricePreviewError && (
+                <p className="text-sm text-red-700">{t("pricePreviewFailed")}</p>
+              )}
+              {step3Complete && pricePreviewLoading && (
+                <p className="text-sm text-[var(--foreground)]/75">{t("pricePreviewLoading")}</p>
+              )}
+              {!step3Complete && (
+                <p className="text-sm text-[var(--foreground)]/75">{t("priceCompleteAllFieldsHint")}</p>
+              )}
             </div>
           )}
         </div>
@@ -1179,7 +1176,11 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
                 distanceLoading ||
                 (step === 1 && !step1Complete) ||
                 (step === 2 && !step2Complete) ||
-                (step === 3 && !step3Complete)
+                (step === 3 &&
+                  (!step3Complete ||
+                    !pricePreview ||
+                    pricePreviewLoading ||
+                    !!pricePreviewError))
               }
               className="rounded-lg bg-[var(--accent)] px-6 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-70 disabled:cursor-not-allowed"
             >

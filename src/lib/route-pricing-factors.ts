@@ -1,6 +1,6 @@
 /**
- * Customer-chosen route conditions (weight, terrain, weather) adjust effective drive time
- * and add a small weight surcharge (€0.20 per 10 kg). Used client + server (confirm-order).
+ * Terrain & weather ids map to drive-time multipliers; weight slows the vehicle (capped).
+ * Terrain/weather are chosen automatically on the server (Google Elevation + Google/Open-Meteo weather).
  */
 
 export const ROUTE_TERRAINS = ["flat", "rolling", "hilly", "mountain"] as const;

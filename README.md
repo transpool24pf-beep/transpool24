@@ -50,6 +50,7 @@ If the `jobs` table already existed before adding this feature, run `supabase/ad
 - **API key restrictions**: Distance runs on **Vercel’s server**, not in the browser. If the key uses **HTTP referrers (websites)** only, Directions/Geocoding from the server will fail (`REQUEST_DENIED`). Prefer **Application restrictions → None** (dev) or **API restrictions** listing Directions, Geocoding, Places (without referrer-only app restriction), or use a **second key** reserved for server routes.
 - **Address autocomplete (Germany)**: With the same key, enable **Places API**. The order form uses Places Autocomplete + Place Details for street + house number; without the key, OpenStreetMap/Nominatim is used (less precise for house numbers).
 - **Driver hourly rate**: Set `DRIVER_HOURLY_RATE_CENTS` (e.g. `2500` for 25 EUR/hour). Default is 2500. Used only when duration from Google is available.
+- **Automatic route pricing factors** (no customer UI): Enable **Elevation API** on the same project so server-side pricing can classify terrain along pickup→delivery. Enable **Weather API** (Maps Platform) for current conditions at the route midpoint; if the Weather call fails, the server falls back to **Open-Meteo** (no extra key).
 - If `GOOGLE_MAPS_API_KEY` is not set, the app uses OSRM for distance only (no duration, no traffic).
 
 Run `supabase/add_duration_minutes.sql` once if your `jobs` table already exists, to add the `duration_minutes` column.

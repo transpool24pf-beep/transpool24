@@ -2,14 +2,8 @@ import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 import { calculatePriceBreakdown } from "@/lib/pricing";
 import { getPricingSettings } from "@/lib/settings";
-import { getRouteDistanceAndDuration } from "@/lib/route-distance-server";
 import { getLoadUnloadMinutes, isCargoCategoryId } from "@/lib/cargo";
-import {
-  isRouteTerrainId,
-  isRouteWeatherId,
-  routeDriveTimeMultiplier,
-  weightSurchargeCentsFromKg,
-} from "@/lib/route-pricing-factors";
+import { computeOrderPricingFromAddresses } from "@/lib/order-pricing-compute";
 import { randomBytes, randomInt } from "crypto";
 
 const VALID_CARGO = ["XS", "M", "L"] as const;
@@ -75,39 +69,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "CARGO_PHOTOS_REQUIRED" }, { status: 400 });
     }
 
-    const routeTerrain =
-      cd?.routeTerrain != null && typeof cd.routeTerrain === "string" ? cd.routeTerrain.trim() : "";
-    const routeWeather =
-      cd?.routeWeather != null && typeof cd.routeWeather === "string" ? cd.routeWeather.trim() : "";
-    if (!isRouteTerrainId(routeTerrain) || !isRouteWeatherId(routeWeather)) {
-      return NextResponse.json({ error: "ROUTE_FACTORS_REQUIRED" }, { status: 400 });
-    }
-
     const departureTime =
       pickupTime && !Number.isNaN(Date.parse(pickupTime)) ? new Date(pickupTime) : null;
-    const route = await getRouteDistanceAndDuration(
-      pickupAddress,
-      deliveryAddress,
-      departureTime
-    );
-    if (!route || route.distanceKm <= 0) {
-      return NextResponse.json(
-        { error: "Could not calculate route distance for the given addresses" },
-        { status: 400 }
-      );
-    }
-    const { distanceKm, durationMinutes } = route;
-    const oneWayBase = durationMinutes ?? Math.round((distanceKm / 50) * 60);
-    const weightKg = weightKgRaw;
-    const driveMult = routeDriveTimeMultiplier(routeTerrain, routeWeather, weightKg);
-    const oneWayAdjusted = Math.round(oneWayBase * driveMult);
-    const roundTripMinutes = oneWayAdjusted * 2;
-    const { loadingMinutes, unloadingMinutes } = getLoadUnloadMinutes(
-      cargoDetails?.cargoCategory ?? null,
-      weightKg
-    );
-    const totalDriverMinutes = Math.round(roundTripMinutes + loadingMinutes + unloadingMinutes);
-    const weightSurchargeCents = weightSurchargeCentsFromKg(weightKg);
 
     const st = VALID_SERVICE_TYPES.includes(serviceType as (typeof VALID_SERVICE_TYPES)[number])
       ? (serviceType as (typeof VALID_SERVICE_TYPES)[number])
@@ -119,16 +82,36 @@ export async function POST(req: Request) {
       driver_only_hourly_cents: pricing.driver_only_hourly_cents,
       assistant_fee_cents: pricing.assistant_fee_cents,
     };
-    const breakdown = calculatePriceBreakdown(
-      distanceKm,
+
+    const weightKg = weightKgRaw;
+    const priced = await computeOrderPricingFromAddresses({
+      pickupAddress,
+      deliveryAddress,
+      departureTime,
+      cargoCategory: typeof cargoCat === "string" ? cargoCat : null,
+      weightKg,
       cargoSize,
-      durationMinutes ?? null,
+      serviceType: st,
       pricingOpts,
-      st,
-      totalDriverMinutes,
-      weightSurchargeCents
-    );
+    });
+
+    if (!priced.ok) {
+      return NextResponse.json(
+        { error: "Could not calculate route distance for the given addresses" },
+        { status: 400 }
+      );
+    }
+
+    const p = priced.data;
+    const distanceKm = p.distanceKm;
+    const durationMinutes = p.durationMinutes;
+    const breakdown = p.breakdown;
     const priceCents = breakdown.totalCents;
+    const roundTripMinutes = p.roundTripMinutes;
+    const loadingMinutes = p.loadingMinutes;
+    const unloadingMinutes = p.unloadingMinutes;
+    const totalDriverMinutes = p.totalDriverMinutes;
+    const weightSurchargeCents = p.weightSurchargeCents;
 
     /** Fahrerpreis = 18 × Hin- und Rückfahrt (Cent) — 18 Cent pro km Hin+Rück */
     const roundTripKm = distanceKm * 2;
@@ -164,9 +147,11 @@ export async function POST(req: Request) {
                 weightKg,
                 packageCount: Math.round(packageCountRaw),
                 photoUrls,
-                routeTerrain,
-                routeWeather,
-                routeDriveTimeMultiplier: driveMult,
+                routeTerrain: p.routeTerrain,
+                routeWeather: p.routeWeather,
+                routeDriveTimeMultiplier: p.routeDriveTimeMultiplier,
+                terrainSource: p.terrainSource,
+                weatherSource: p.weatherSource,
                 weightSurchargeCents,
                 roundTripMinutes,
                 loadingMinutes,

@@ -731,6 +731,14 @@ export default function AdminOrderDetailPage({
                       "number" && (order.cargo_details as { weightSurchargeCents: number }).weightSurchargeCents > 0
                       ? ` · Gewicht +${((order.cargo_details as { weightSurchargeCents: number }).weightSurchargeCents / 100).toFixed(2)} €`
                       : ""}
+                    {typeof (order.cargo_details as { terrainSource?: string }).terrainSource === "string" &&
+                    (order.cargo_details as { terrainSource: string }).terrainSource
+                      ? ` · Terrain: ${(order.cargo_details as { terrainSource: string }).terrainSource}`
+                      : ""}
+                    {typeof (order.cargo_details as { weatherSource?: string }).weatherSource === "string" &&
+                    (order.cargo_details as { weatherSource: string }).weatherSource
+                      ? ` · Wetter-Quelle: ${(order.cargo_details as { weatherSource: string }).weatherSource}`
+                      : ""}
                   </dd>
                 </div>
               )}
