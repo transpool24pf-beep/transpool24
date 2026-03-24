@@ -406,6 +406,67 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
     fetchSuggestions,
   ]);
 
+  /** When PLZ is complete and Straße is empty: suggest Ort/Straße via OSM (server). */
+  useEffect(() => {
+    if (step !== 2) return;
+    const pc = data.pickupPostcode.trim();
+    if (!/^\d{5}$/.test(pc) || data.pickupStreet.trim() !== "") return;
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => {
+      void (async () => {
+        try {
+          const r = await fetch(`/api/postcode-street-hint?postcode=${encodeURIComponent(pc)}`, {
+            signal: ctrl.signal,
+          });
+          if (!r.ok) return;
+          const j = (await r.json()) as { hint?: string | null };
+          const hint = typeof j.hint === "string" ? j.hint.trim() : "";
+          if (!hint || ctrl.signal.aborted) return;
+          setData((prev) => {
+            if (prev.pickupPostcode.trim() !== pc || prev.pickupStreet.trim() !== "") return prev;
+            return { ...prev, pickupStreet: hint };
+          });
+        } catch {
+          /* aborted */
+        }
+      })();
+    }, 500);
+    return () => {
+      clearTimeout(tid);
+      ctrl.abort();
+    };
+  }, [step, data.pickupPostcode, data.pickupStreet]);
+
+  useEffect(() => {
+    if (step !== 2) return;
+    const pc = data.deliveryPostcode.trim();
+    if (!/^\d{5}$/.test(pc) || data.deliveryStreet.trim() !== "") return;
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => {
+      void (async () => {
+        try {
+          const r = await fetch(`/api/postcode-street-hint?postcode=${encodeURIComponent(pc)}`, {
+            signal: ctrl.signal,
+          });
+          if (!r.ok) return;
+          const j = (await r.json()) as { hint?: string | null };
+          const hint = typeof j.hint === "string" ? j.hint.trim() : "";
+          if (!hint || ctrl.signal.aborted) return;
+          setData((prev) => {
+            if (prev.deliveryPostcode.trim() !== pc || prev.deliveryStreet.trim() !== "") return prev;
+            return { ...prev, deliveryStreet: hint };
+          });
+        } catch {
+          /* aborted */
+        }
+      })();
+    }, 500);
+    return () => {
+      clearTimeout(tid);
+      ctrl.abort();
+    };
+  }, [step, data.deliveryPostcode, data.deliveryStreet]);
+
   const fetchRealDistance = useCallback(async () => {
     if (!pickupAddress.trim() || !deliveryAddress.trim()) return;
     setDistanceLoading(true);
