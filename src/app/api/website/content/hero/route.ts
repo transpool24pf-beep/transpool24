@@ -93,6 +93,7 @@ export async function PUT(req: Request) {
 
     for (const loc of locales) {
       revalidatePath(`/${loc}`, "page");
+      revalidatePath(`/${loc}/blog`, "page");
     }
 
     return NextResponse.json({ ok: true, translationFallback });

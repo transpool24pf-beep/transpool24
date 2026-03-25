@@ -166,7 +166,7 @@ export function WebsiteHeroClient() {
       if (res.ok) {
         await load();
         let msg =
-          "Gespeichert. Startseite lädt Hero jetzt live aus der Datenbank (kein Build nötig).";
+          "Gespeichert. Startseite und Magazin (/blog) laden Hero-Daten live aus der Datenbank (kein Build nötig).";
         if (body.translationFallback) {
           msg +=
             "\n\nHinweis: Ohne DEEPL_AUTH_KEY oder GOOGLE_TRANSLATE_API_KEY wird MyMemory genutzt (begrenzt). Für stabile Übersetzungen DeepL empfohlen.";
@@ -197,28 +197,30 @@ export function WebsiteHeroClient() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-[#0d2137]">Homepage – Hero</h1>
+        <h1 className="text-2xl font-semibold text-[#0d2137]">Hero – Startseite &amp; Magazin</h1>
         <p className="mt-1 text-sm text-[#0d2137]/70">
-          Hintergrundbild und Texte für den Hero. Texte nur auf Englisch eingeben — beim Speichern werden alle
-          Sprachen automatisch übersetzt (DeepL, sonst Google, sonst MyMemory).
+          <strong className="text-[#0d2137]">Startseite:</strong> klassischer Hero mit Rahmen (dieses Bild + Texte).
+          <strong className="ms-1 text-[#0d2137]">Magazin (/blog):</strong> großer Logistik-Cover inkl. LKW-Vordergrund
+          nutzt dieselben Daten. Texte nur auf Englisch — beim Speichern werden alle Sprachen übersetzt.
         </p>
         <p className="mt-1 text-sm text-[#0d2137]/70" dir="rtl">
-          صورة الخلفية والنصوص. أدخل النصوص بالإنجليزية فقط؛ عند الحفظ تُترجم تلقائياً لكل اللغات.
+          <strong>الصفحة الرئيسية:</strong> الهيرو الكلاسيكي. <strong>المجلة (/blog):</strong> نفس صورة الخلفية والنصوص
+          + شاحمة الـHero. أدخل النصوص بالإنجليزية؛ تُترجم تلقائياً.
         </p>
         <p className="mt-2 text-sm font-medium text-[#0d2137]">
-          LKW / Transporter (Vordergrund): optional unter „Hero-LKW“ — PNG mit Transparenz empfohlen.
+          LKW erscheint nur auf der <strong>Magazin-Startseite</strong> — PNG mit Transparenz empfohlen.
         </p>
         <p className="text-sm text-[#0d2137]/70" dir="rtl">
-          صورة الشاحمة على الغلاف (اختياري) من قسم «Hero-LKW» — يُفضّل PNG بخلفية شفافة.
+          الشاحمة تظهر على <strong>صفحة المدونة فقط</strong> — يُفضّل PNG شفاف.
         </p>
       </div>
 
       <form onSubmit={handleSave} className="space-y-8">
         <div className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-lg font-medium text-[#0d2137]">Hero-LKW (überlappend)</h2>
+          <h2 className="mb-4 text-lg font-medium text-[#0d2137]">Magazin: Hero-LKW (überlappend)</h2>
           <p className="mb-4 text-sm text-[#0d2137]/65">
-            Erscheint auf der Startseite rechts unten über dem Übergang zum weißen Bereich. Ohne Bild: Standard-Foto
-            (Unsplash). Leer lassen und speichern = Standard; URL löschen und speichern = Standard.
+            Nur auf der <strong>Magazin-Startseite</strong> (z. B. /de/blog) sichtbar, unten rechts über dem Übergang.
+            Ohne Bild: Standard (Unsplash).
           </p>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
             <div className="relative h-40 w-full max-w-xs shrink-0 overflow-hidden rounded-xl border-2 border-[#0d2137]/10 bg-gray-100">
@@ -267,7 +269,7 @@ export function WebsiteHeroClient() {
         </div>
 
         <div className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-lg font-medium text-[#0d2137]">Hintergrundbild</h2>
+          <h2 className="mb-4 text-lg font-medium text-[#0d2137]">Hintergrundbild (Startseite + Magazin-Cover)</h2>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
             <div className="relative h-48 w-full max-w-sm shrink-0 overflow-hidden rounded-xl border-2 border-[#0d2137]/10 bg-gray-100">
               {data.imageUrl ? (
