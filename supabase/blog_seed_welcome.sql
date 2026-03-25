@@ -1,5 +1,6 @@
 -- Optional welcome posts so the magazine is not empty after go-live.
 -- Run after blog.sql. Safe to run once; delete rows manually if you prefer a blank slate.
+-- Arabic «أهلاً» row: after first seed, run blog_post_ar_ahlan_future_vision.sql for the full vision article + images.
 
 INSERT INTO public.blog_posts (
   locale, slug, title, excerpt, body, category, tags, status, published_at, author_name, meta_title, meta_description

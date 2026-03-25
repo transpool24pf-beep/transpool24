@@ -10,12 +10,12 @@ function ArticleFigureImg(props: ImgHTMLAttributes<HTMLImageElement>) {
   const { src, alt, className, ...rest } = props;
   if (!src || typeof src !== "string") return null;
   return (
-    <figure className="blog-md-figure my-10 overflow-hidden rounded-2xl shadow-[0_28px_64px_-32px_rgba(0,0,0,0.45)] ring-1 ring-black/[0.06] sm:rounded-3xl sm:[&:nth-of-type(3n+1)]:rotate-[-0.6deg] sm:[&:nth-of-type(3n+2)]:rotate-[0.5deg] sm:[&:nth-of-type(3n)]:rotate-[-0.35deg]">
+    <figure className="blog-md-figure group/fig my-10 overflow-hidden rounded-[1.35rem] bg-gradient-to-br from-[#eef0f3] via-white to-[#e85d04]/[0.09] p-1.5 shadow-[0_28px_64px_-32px_rgba(0,0,0,0.42)] ring-1 ring-black/[0.07] transition-shadow duration-300 hover:shadow-[0_32px_72px_-28px_rgba(232,93,4,0.18)] sm:rounded-[1.65rem] sm:p-2 sm:[&:nth-of-type(3n+1)]:rotate-[-0.6deg] sm:[&:nth-of-type(3n+2)]:rotate-[0.5deg] sm:[&:nth-of-type(3n)]:rotate-[-0.35deg]">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
         alt={alt ?? ""}
-        className={`h-auto w-full object-cover ${className ?? ""}`}
+        className={`h-auto w-full rounded-xl object-cover ring-1 ring-black/[0.05] sm:rounded-2xl ${className ?? ""}`}
         loading="lazy"
         {...rest}
       />
