@@ -2,9 +2,13 @@ import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { createServerSupabase } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/admin-api";
-import { slugifyInput } from "@/lib/blog";
+import { slugifyInput } from "@/lib/blog-slug";
 import { clampPublishedAtIfInFuture } from "@/lib/blog-publish";
 import { locales } from "@/i18n/routing";
+import { upsertTranslatedPostCopies } from "@/lib/blog-sync-translations";
+
+/** Match POST: auto-translate batches can exceed default Vercel limit. */
+export const maxDuration = 120;
 
 function revalidateBlogAll() {
   for (const locale of locales) {
@@ -126,13 +130,44 @@ export async function PATCH(req: Request, ctx: Ctx) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+  const autoTranslate =
+    body.auto_translate_all !== false && body.auto_translate_all !== "false";
+  const openaiKey = process.env.OPENAI_API_KEY?.trim();
+  const { translatedLocales, translationNote } = await upsertTranslatedPostCopies(
+    supabase,
+    {
+      locale: data.locale as string,
+      slug: data.slug as string,
+      title: data.title as string,
+      excerpt: (data.excerpt as string | null) ?? null,
+      body: (data.body as string) ?? "",
+      featured_image_url: (data.featured_image_url as string | null) ?? null,
+      category: (data.category as string | null) ?? null,
+      tags: (data.tags as string[]) ?? [],
+      status: data.status as string,
+      published_at: (data.published_at as string | null) ?? null,
+      meta_title: (data.meta_title as string | null) ?? null,
+      meta_description: (data.meta_description as string | null) ?? null,
+      author_name: (data.author_name as string) || "TransPool24",
+    },
+    autoTranslate,
+    openaiKey
+  );
+
   revalidateBlogAll();
   revalidatePath(`/${oldLocale}/blog/${oldSlug}`);
   const newLocale = (data.locale as string) || oldLocale;
   const newSlug = (data.slug as string) || oldSlug;
   revalidatePath(`/${newLocale}/blog/${newSlug}`);
+  for (const loc of translatedLocales) {
+    revalidatePath(`/${loc}/blog/${newSlug}`);
+  }
 
-  return NextResponse.json({ post: data });
+  return NextResponse.json({
+    post: data,
+    translatedLocales,
+    ...(translationNote ? { translationNote } : {}),
+  });
 }
 
 export async function DELETE(_req: Request, ctx: Ctx) {

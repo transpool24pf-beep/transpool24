@@ -8,7 +8,7 @@ export function BlogFooter() {
   const locale = useLocale();
 
   return (
-    <footer className="mt-auto border-t border-[#0d2137]/10 bg-[#0d2137] text-white">
+    <footer className="mt-auto border-t border-black/10 bg-[#1a1a1a] text-white">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         <div className="grid gap-10 sm:grid-cols-2">
           <div>

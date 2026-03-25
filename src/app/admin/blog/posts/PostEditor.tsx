@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { locales, type Locale } from "@/i18n/routing";
-import { slugifyInput } from "@/lib/blog";
+import { slugifyInput } from "@/lib/blog-slug";
+import { localeSelectLabel } from "@/lib/locale-labels";
 
 type PostRow = {
   id: string;
@@ -168,10 +169,22 @@ export function PostEditor({ postId }: { postId?: string }) {
             meta_title: metaTitle || null,
             meta_description: metaDescription || null,
             author_name: authorName || "TransPool24",
+            auto_translate_all: autoTranslateAll,
           }),
         });
-        const j = (await r.json()) as { error?: string };
+        const j = (await r.json()) as {
+          error?: string;
+          translatedLocales?: string[];
+          translationNote?: string;
+        };
         if (!r.ok) throw new Error(j.error || "Speichern fehlgeschlagen");
+        if (j.translatedLocales?.length || j.translationNote) {
+          if (j.translatedLocales?.length) {
+            setInfo(`Übersetzt in: ${j.translatedLocales.join(", ")}${j.translationNote ? ` — ${j.translationNote}` : ""}`);
+          } else if (j.translationNote) {
+            setInfo(j.translationNote);
+          }
+        }
       } else {
         const r = await fetch("/api/admin/blog/posts", {
           method: "POST",
@@ -288,32 +301,38 @@ export function PostEditor({ postId }: { postId?: string }) {
         </p>
       ) : null}
 
-      {!isEdit ? (
-        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-[#0d2137]/15 bg-white p-4 shadow-sm">
-          <input
-            type="checkbox"
-            className="mt-1 h-4 w-4 rounded border-[#0d2137]/30"
-            checked={autoTranslateAll}
-            onChange={(e) => setAutoTranslateAll(e.target.checked)}
-          />
-          <span className="text-sm text-[#0d2137]/85">
-            <span className="font-semibold text-[#0d2137]">In alle Sprachen übersetzen (KI)</span>
-            <span className="mt-1 block text-[#0d2137]/70">
-              Nach dem Speichern werden Kopien für alle anderen Website-Sprachen erzeugt (gleicher Slug). Erfordert{" "}
-              <code className="rounded bg-[#0d2137]/10 px-1">OPENAI_API_KEY</code> in Vercel. Ohne Key wird nur
-              dieser Artikel gespeichert.
-            </span>
+      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-[#0d2137]/15 bg-white p-4 shadow-sm">
+        <input
+          type="checkbox"
+          className="mt-1 h-4 w-4 rounded border-[#0d2137]/30"
+          checked={autoTranslateAll}
+          onChange={(e) => setAutoTranslateAll(e.target.checked)}
+        />
+        <span className="text-sm text-[#0d2137]/85">
+          <span className="font-semibold text-[#0d2137]">In alle Sprachen übersetzen (KI)</span>
+          <span className="mt-1 block text-[#0d2137]/70">
+            {isEdit
+              ? "Beim Speichern werden alle anderen Sprachversionen (gleicher Slug) aktualisiert."
+              : "Nach dem Speichern werden Kopien für alle anderen Website-Sprachen erzeugt (gleicher Slug)."}{" "}
+            Erfordert <code className="rounded bg-[#0d2137]/10 px-1">OPENAI_API_KEY</code> in Vercel. Ohne Key
+            bleiben andere Locales unverändert; die öffentliche Seite kann fehlende Sprachen per KI zur Anzeige
+            übersetzen (Cache 24h).
           </span>
-        </label>
-      ) : null}
+        </span>
+      </label>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div>
           <label className={labelClass}>Sprache</label>
-          <select className={inputClass} value={locale} onChange={(e) => setLocale(e.target.value as Locale)}>
+          <select
+            className={`${inputClass} font-mono text-sm`}
+            translate="no"
+            value={locale}
+            onChange={(e) => setLocale(e.target.value as Locale)}
+          >
             {locales.map((loc) => (
-              <option key={loc} value={loc}>
-                {loc}
+              <option key={loc} value={loc} translate="no">
+                {localeSelectLabel(loc)}
               </option>
             ))}
           </select>

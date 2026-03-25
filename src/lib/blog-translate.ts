@@ -134,3 +134,71 @@ Rules:
 export function otherLocalesThan(source: Locale): Locale[] {
   return locales.filter((l) => l !== source);
 }
+
+export type BlogCardSourceFields = {
+  title: string;
+  excerpt: string | null;
+  category: string | null;
+  tags: string[];
+};
+
+/**
+ * Lightweight translation for listing cards when no row exists for the URL locale.
+ */
+export async function translateBlogCardFields(
+  source: BlogCardSourceFields,
+  sourceLocale: Locale,
+  targetLocale: Locale,
+  apiKey: string
+): Promise<BlogCardSourceFields | null> {
+  if (sourceLocale === targetLocale) return source;
+
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: "gpt-4o-mini",
+      temperature: 0.25,
+      max_tokens: 2048,
+      response_format: { type: "json_object" },
+      messages: [
+        {
+          role: "system",
+          content: `You translate short blog listing fields for a logistics magazine. Return ONLY JSON:
+{ "title": string, "excerpt": string|null, "category": string|null, "tags": string[] }
+Translate from ${sourceLocale} to ${targetLocale}. Preserve meaning; keep TransPool24 and place names sensible.`,
+        },
+        {
+          role: "user",
+          content: JSON.stringify({ ...source, source_locale: sourceLocale, target_locale: targetLocale }),
+        },
+      ],
+    }),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    console.error("[blog-translate] card OpenAI error", res.status, errText.slice(0, 400));
+    return null;
+  }
+
+  const data = (await res.json()) as { choices?: { message?: { content?: string } }[] };
+  const raw = data.choices?.[0]?.message?.content;
+  if (!raw) return null;
+
+  try {
+    const parsed = JSON.parse(raw) as Partial<BlogCardSourceFields>;
+    return {
+      title: typeof parsed.title === "string" ? parsed.title : source.title,
+      excerpt: parsed.excerpt === undefined ? source.excerpt : parsed.excerpt,
+      category: parsed.category === undefined ? source.category : parsed.category,
+      tags: Array.isArray(parsed.tags) ? parsed.tags.map(String) : source.tags,
+    };
+  } catch (e) {
+    console.error("[blog-translate] card JSON", e);
+    return null;
+  }
+}

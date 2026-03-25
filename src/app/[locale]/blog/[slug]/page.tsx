@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { BlogMarkdown } from "@/components/BlogMarkdown";
 import { getPublishedPostBySlug } from "@/lib/blog";
+import { IconCalendar, IconUser } from "@/components/blog/BlogNewsIcons";
 import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
 
@@ -72,37 +73,49 @@ export default async function BlogPostPage({ params }: Props) {
   };
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+    <main className="bg-[#f5f6f8] px-4 py-12 sm:px-6 sm:py-16">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <nav className="mb-8 text-sm">
-        <Link href={`/${locale}/blog`} className="font-medium text-[var(--accent)] hover:underline">
-          ← {t("backToMagazine")}
-        </Link>
-      </nav>
+      <article className="mx-auto max-w-3xl rounded-2xl bg-white p-6 shadow-[0_20px_50px_-24px_rgba(0,0,0,0.12)] ring-1 ring-black/[0.05] sm:p-10">
+        <nav className="mb-8">
+          <Link
+            href={`/${locale}/blog`}
+            className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-[0.12em] text-[var(--accent)] transition hover:gap-3"
+          >
+            <span aria-hidden>←</span>
+            {t("backToMagazine")}
+          </Link>
+        </nav>
 
-      <article>
         <header className="mb-8">
           {post.category ? (
-            <span className="inline-block rounded-full bg-[var(--accent)]/12 px-3 py-1 text-xs font-semibold text-[var(--accent)]">
+            <span className="inline-block text-xs font-bold uppercase tracking-[0.15em] text-[var(--accent)]">
               {post.category}
             </span>
           ) : null}
-          <h1 className="mt-4 text-3xl font-bold tracking-tight text-[#0d2137] sm:text-4xl">
+          <h1 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight text-[#1a1a1a] sm:text-4xl">
             {post.title}
           </h1>
-          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[#0d2137]/60">
-            <time dateTime={post.published_at ?? undefined}>{formatDate(post.published_at, locale)}</time>
-            <span>{post.author_name}</span>
+          <div className="mt-5 flex flex-wrap items-center gap-x-8 gap-y-2 text-sm text-[#5c5c5c]">
+            <span className="inline-flex items-center gap-2">
+              <IconCalendar className="h-4 w-4 shrink-0 text-[var(--accent)]" />
+              <time className="font-medium" dateTime={post.published_at ?? undefined}>
+                {formatDate(post.published_at, locale)}
+              </time>
+            </span>
+            <span className="inline-flex items-center gap-2">
+              <IconUser className="h-4 w-4 shrink-0 text-[var(--accent)]" />
+              <span className="font-medium">{t("byAuthor", { author: post.author_name })}</span>
+            </span>
           </div>
           {post.tags?.length ? (
-            <ul className="mt-4 flex flex-wrap gap-2">
+            <ul className="mt-5 flex flex-wrap gap-2">
               {post.tags.map((tag) => (
                 <li
                   key={tag}
-                  className="rounded-md bg-[#0d2137]/[0.06] px-2 py-0.5 text-xs text-[#0d2137]/75"
+                  className="rounded-md bg-[#f5f6f8] px-2.5 py-1 text-xs font-medium text-[#5c5c5c]"
                 >
                   {tag}
                 </li>
@@ -112,7 +125,7 @@ export default async function BlogPostPage({ params }: Props) {
         </header>
 
         {post.featured_image_url ? (
-          <div className="relative mb-10 aspect-[16/9] overflow-hidden rounded-2xl bg-[#0d2137]/[0.06]">
+          <div className="relative mb-10 aspect-[16/9] overflow-hidden rounded-xl bg-[#e8eaed] shadow-inner ring-1 ring-black/[0.04]">
             <Image
               src={post.featured_image_url}
               alt=""
@@ -126,7 +139,7 @@ export default async function BlogPostPage({ params }: Props) {
         ) : null}
 
         {post.excerpt ? (
-          <p className="mb-8 text-lg font-medium leading-relaxed text-[#0d2137]/85">{post.excerpt}</p>
+          <p className="mb-8 text-lg font-medium leading-relaxed text-[#3d3d3d]">{post.excerpt}</p>
         ) : null}
 
         <BlogMarkdown markdown={post.body || ""} />

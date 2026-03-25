@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { createServerSupabase } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/admin-api";
-import { slugifyInput } from "@/lib/blog";
+import { slugifyInput } from "@/lib/blog-slug";
 import { locales, type Locale } from "@/i18n/routing";
-import { otherLocalesThan, translatePostIntoLocales } from "@/lib/blog-translate";
+import { upsertTranslatedPostCopies } from "@/lib/blog-sync-translations";
 import { clampPublishedAtIfInFuture } from "@/lib/blog-publish";
 
 /** Auto-translate can take a while (multiple OpenAI batches). Raise on Vercel if needed. */
@@ -110,59 +110,12 @@ export async function POST(req: Request) {
   const autoTranslate =
     body.auto_translate_all !== false && body.auto_translate_all !== "false";
   const openaiKey = process.env.OPENAI_API_KEY?.trim();
-  const translatedLocales: string[] = [];
-  let translationNote: string | undefined;
-
-  if (autoTranslate && openaiKey) {
-    const targets = otherLocalesThan(locale as Locale);
-    try {
-      const translations = await translatePostIntoLocales(
-        {
-          title: row.title,
-          excerpt: row.excerpt,
-          body: row.body,
-          meta_title: row.meta_title,
-          meta_description: row.meta_description,
-          category: row.category,
-          tags: row.tags,
-        },
-        locale as Locale,
-        targets,
-        openaiKey
-      );
-
-      for (const loc of targets) {
-        const tr = translations[loc];
-        if (!tr) continue;
-        const satellite = {
-          locale: loc,
-          slug,
-          title: tr.title,
-          excerpt: tr.excerpt,
-          body: tr.body,
-          featured_image_url: row.featured_image_url,
-          category: tr.category,
-          tags: tr.tags,
-          status: row.status,
-          published_at: row.published_at,
-          meta_title: tr.meta_title,
-          meta_description: tr.meta_description,
-          author_name: row.author_name,
-        };
-        const { error: upErr } = await supabase.from("blog_posts").upsert(satellite, {
-          onConflict: "locale,slug",
-        });
-        if (!upErr) translatedLocales.push(loc);
-        else console.error("[admin/blog/posts translate upsert]", loc, upErr);
-      }
-    } catch (e) {
-      console.error("[admin/blog/posts translate]", e);
-      translationNote = "Auto-translate failed; primary post was saved.";
-    }
-  } else if (autoTranslate && !openaiKey) {
-    translationNote =
-      "Auto-translate skipped: set OPENAI_API_KEY in Vercel (or .env) to publish in all languages at once.";
-  }
+  const { translatedLocales, translationNote } = await upsertTranslatedPostCopies(
+    supabase,
+    { ...row, slug },
+    autoTranslate,
+    openaiKey
+  );
 
   revalidateBlogAll();
   revalidatePath(`/${locale}/blog/${slug}`);

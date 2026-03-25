@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { locales, type Locale } from "@/i18n/routing";
-import { slugifyInput } from "@/lib/blog";
+import { slugifyInput } from "@/lib/blog-slug";
+import { localeSelectLabel } from "@/lib/locale-labels";
 
 type PageRow = {
   id: string;
@@ -227,10 +228,15 @@ export function PageEditor({ pageId }: { pageId?: string }) {
       <div className="grid gap-6 lg:grid-cols-2">
         <div>
           <label className={labelClass}>Sprache</label>
-          <select className={inputClass} value={locale} onChange={(e) => setLocale(e.target.value as Locale)}>
+          <select
+            className={`${inputClass} font-mono text-sm`}
+            translate="no"
+            value={locale}
+            onChange={(e) => setLocale(e.target.value as Locale)}
+          >
             {locales.map((loc) => (
-              <option key={loc} value={loc}>
-                {loc}
+              <option key={loc} value={loc} translate="no">
+                {localeSelectLabel(loc)}
               </option>
             ))}
           </select>

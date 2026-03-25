@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { createServerSupabase } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/admin-api";
-import { slugifyInput } from "@/lib/blog";
+import { slugifyInput } from "@/lib/blog-slug";
 import { locales } from "@/i18n/routing";
 
 function revalidateBlogAll() {

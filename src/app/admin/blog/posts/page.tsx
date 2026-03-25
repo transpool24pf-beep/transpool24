@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { locales, type Locale } from "@/i18n/routing";
+import { localeSelectLabel } from "@/lib/locale-labels";
 
 type Post = {
   id: string;
@@ -55,14 +56,15 @@ export default function AdminBlogPostsPage() {
           <label className="text-sm text-[#0d2137]/80">
             Sprache
             <select
-              className="ms-2 rounded-lg border border-[#0d2137]/20 bg-white px-2 py-1.5 text-sm"
+              className="ms-2 rounded-lg border border-[#0d2137]/20 bg-white px-2 py-1.5 font-mono text-sm"
+              translate="no"
               value={filter}
               onChange={(e) => setFilter(e.target.value as Locale | "")}
             >
               <option value="">Alle</option>
               {locales.map((loc) => (
-                <option key={loc} value={loc}>
-                  {loc}
+                <option key={loc} value={loc} translate="no">
+                  {localeSelectLabel(loc)}
                 </option>
               ))}
             </select>

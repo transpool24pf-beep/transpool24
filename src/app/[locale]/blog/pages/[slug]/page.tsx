@@ -43,20 +43,24 @@ export default async function BlogStaticPage({ params }: Props) {
   const t = await getTranslations("blog");
 
   return (
-    <main className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
-      <nav className="mb-8 text-sm">
-        <Link href={`/${locale}/blog`} className="font-medium text-[var(--accent)] hover:underline">
-          ← {t("backToMagazine")}
-        </Link>
-      </nav>
+    <main className="bg-[#f5f6f8] px-4 py-12 sm:px-6 sm:py-16">
+      <article className="mx-auto max-w-3xl rounded-2xl bg-white p-6 shadow-[0_20px_50px_-24px_rgba(0,0,0,0.12)] ring-1 ring-black/[0.05] sm:p-10">
+        <nav className="mb-8">
+          <Link
+            href={`/${locale}/blog`}
+            className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-[0.12em] text-[var(--accent)] transition hover:gap-3"
+          >
+            <span aria-hidden>←</span>
+            {t("backToMagazine")}
+          </Link>
+        </nav>
 
-      <article>
         <header className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight text-[#0d2137] sm:text-4xl">{page.title}</h1>
+          <h1 className="text-3xl font-extrabold leading-tight tracking-tight text-[#1a1a1a] sm:text-4xl">{page.title}</h1>
         </header>
 
         {page.featured_image_url ? (
-          <div className="relative mb-10 aspect-[16/9] overflow-hidden rounded-2xl bg-[#0d2137]/[0.06]">
+          <div className="relative mb-10 aspect-[16/9] overflow-hidden rounded-xl bg-[#e8eaed] ring-1 ring-black/[0.04]">
             <Image
               src={page.featured_image_url}
               alt=""
