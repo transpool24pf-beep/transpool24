@@ -45,7 +45,7 @@ VALUES (
 
 نعلم أهمية الثقة المالية؛ لذلك نعتمد **الدفع الآمن عبر Stripe Checkout**. يتم تأمين طلبك ونشره للسائقين المعتمدين **فور تأكيد الدفع**، مما يضمن سرعة التنفيذ وموثوقية المعاملة.
 
-![توصيل طرد بأمان إلى العميلة](https://media.istockphoto.com/id/955864950/pt/foto/delivery-man-delivering-parcel-box-to-a-woman-customer.jpg?s=170667a&w=0&k=20&c=wg6tBHkV2GGzJUMKF0mwEJBy5OxJPpCDA7NyqtIAPCY=)
+![لوجستيات ومستودعات دعم النقل البري](https://linqo.de/wp-content/uploads/2023/08/AdobeStock_395396400-1618x1080.jpeg)
 
 ---
 
