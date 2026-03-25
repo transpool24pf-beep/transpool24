@@ -620,6 +620,13 @@
     "footerBlurb": "Independent editorial content from TransPool24. Booking and services remain on the main website.",
     "linkPrivacy": "Privacy",
     "linkContact": "Contact",
-    "footerDisclaimer": "Articles are for general information only, not legal or financial advice."
+    "footerDisclaimer": "Articles are for general information only, not legal or financial advice.",
+    "emptyTitle": "The magazine is live — your first story goes here",
+    "emptyHint": "Articles are not written on this public page. Sign in to the operations dashboard, open Blog / Magazin, create a post, set status to Published, and choose the same language as this page. You can also run the optional SQL seed in Supabase to insert welcome posts for DE and EN.",
+    "linkAdmin": "Open editor dashboard",
+    "footerEditorsTitle": "Editorial team",
+    "footerEditorsLine": "Manage articles and static pages:",
+    "emptyAdminSteps": "Admin login → Blog / Magazin → New article → Published",
+    "seedHint": "Optional welcome posts for DE & EN:"
   }
 }
