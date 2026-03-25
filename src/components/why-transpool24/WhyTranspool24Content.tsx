@@ -1,15 +1,21 @@
 import Link from "next/link";
 import type { WhyIconId } from "@/lib/why-transpool24-types";
 import type { WhyPagePayload } from "@/lib/why-transpool24-types";
+import { AboutUsArWhyNarrative } from "@/components/about/AboutUsArWhyNarrative";
 import { WhyTranspool24Icon } from "./WhyTranspool24Icon";
 import { WhyHowItWorksMedia } from "./WhyHowItWorksMedia";
 import { WhyCmsImage } from "./WhyCmsImage";
 
-type Props = { data: WhyPagePayload; locale: string };
+type Props = {
+  data: WhyPagePayload;
+  locale: string;
+  /** Arabic: show vision / brand narrative (من نحن) above operational B2B sections. */
+  arAboutNarrativeFirst?: boolean;
+};
 
 const SERVICE_CARD_ICONS: WhyIconId[] = ["package", "truck", "clipboard", "shield"];
 
-export function WhyTranspool24Content({ data, locale }: Props) {
+export function WhyTranspool24Content({ data, locale, arAboutNarrativeFirst = false }: Props) {
   const rtl = locale === "ar";
   const faqMid = Math.ceil(data.faqs.length / 2);
   const faqCol1 = data.faqs.slice(0, faqMid);
@@ -19,13 +25,30 @@ export function WhyTranspool24Content({ data, locale }: Props) {
     <div className="bg-[#f4f6f8] pb-0 pt-6 sm:pt-10" dir={rtl ? "rtl" : "ltr"}>
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <article className="overflow-hidden rounded-[1.25rem] border border-[#0d2137]/8 bg-white shadow-sm sm:rounded-[1.75rem]">
-          <div className="border-b border-[#0d2137]/6 bg-gradient-to-br from-[#f8fafc] to-white px-6 py-10 sm:px-10 sm:py-12">
-            <p className="text-sm font-semibold uppercase tracking-wide text-[var(--accent)]">{data.heroBadge}</p>
-            <h1 className="mt-3 text-3xl font-extrabold leading-tight text-[var(--primary)] sm:text-4xl md:text-[2.35rem]">
-              {data.headline}
-            </h1>
-            <p className="mt-5 max-w-3xl text-lg leading-relaxed text-[var(--foreground)]/75">{data.heroSub}</p>
-          </div>
+          {arAboutNarrativeFirst ? (
+            <AboutUsArWhyNarrative />
+          ) : null}
+          {arAboutNarrativeFirst ? (
+            <div className="border-b border-[#0d2137]/6 bg-white px-6 py-8 sm:px-10 sm:py-10">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--accent)]">
+                التشغيل اليومي للشركات والتجارة
+              </p>
+              <h1 className="mt-3 text-2xl font-extrabold leading-tight text-[var(--primary)] sm:text-3xl md:text-[2rem]">
+                {data.headline}
+              </h1>
+              <p className="mt-4 max-w-3xl text-base leading-relaxed text-[var(--foreground)]/75 sm:text-lg">
+                {data.heroSub}
+              </p>
+            </div>
+          ) : (
+            <div className="border-b border-[#0d2137]/6 bg-gradient-to-br from-[#f8fafc] to-white px-6 py-10 sm:px-10 sm:py-12">
+              <p className="text-sm font-semibold uppercase tracking-wide text-[var(--accent)]">{data.heroBadge}</p>
+              <h1 className="mt-3 text-3xl font-extrabold leading-tight text-[var(--primary)] sm:text-4xl md:text-[2.35rem]">
+                {data.headline}
+              </h1>
+              <p className="mt-5 max-w-3xl text-lg leading-relaxed text-[var(--foreground)]/75">{data.heroSub}</p>
+            </div>
+          )}
 
           <div className="grid gap-10 px-6 py-10 sm:gap-12 sm:px-10 sm:py-12 lg:grid-cols-12 lg:gap-14">
             <div className="lg:col-span-8">

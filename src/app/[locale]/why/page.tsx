@@ -14,10 +14,13 @@ export async function generateMetadata({
 }) {
   const { locale } = await params;
   const data = await getWhyPagePayload(locale);
-  return {
-    title: data.metaTitle,
-    description: data.heroSub.slice(0, 155),
-  };
+  const title =
+    locale === "ar" ? "من نحن | TransPool24 — رؤية رقمية من بفورتسهايم" : data.metaTitle;
+  const description =
+    locale === "ar"
+      ? "رؤية هندسية، لوجستيات مرنة، Minimalist Modern، وأهداف استراتيجية من ألمانيا — ثم تفاصيل التشغيل للشركات."
+      : data.heroSub.slice(0, 155);
+  return { title, description };
 }
 
 export default async function WhyTranspool24Page({
@@ -32,7 +35,11 @@ export default async function WhyTranspool24Page({
     <>
       <Header />
       <main>
-        <WhyTranspool24Content data={data} locale={locale} />
+        <WhyTranspool24Content
+          data={data}
+          locale={locale}
+          arAboutNarrativeFirst={locale === "ar"}
+        />
       </main>
       <Footer />
     </>
