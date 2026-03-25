@@ -4,7 +4,29 @@
     "order": "Book transport",
     "drivers": "Drivers",
     "contact": "Contact",
-    "slogan": "Active in Pforzheim – Globally connected"
+    "slogan": "Active in Pforzheim – Globally connected",
+    "blog": "Magazine"
+  },
+  "blog": {
+    "magazineBadge": "Insights",
+    "magazineTitle": "TransPool24 Magazine",
+    "navAria": "Magazine navigation",
+    "navArticles": "Articles",
+    "toCompanySite": "Company website",
+    "bookTransport": "Book transport",
+    "language": "Language",
+    "metaIndexTitle": "Magazine | TransPool24",
+    "metaIndexDescription": "Analysis and news on transport, logistics, fuel prices, and markets.",
+    "indexKicker": "Insights",
+    "indexTitle": "Transport & logistics insights",
+    "indexSubtitle": "Editorial articles on freight, Europe, pricing, and the industry — separate from our booking product.",
+    "empty": "No articles yet. Please check back soon.",
+    "backToMagazine": "Back to magazine",
+    "notFoundTitle": "Not found",
+    "footerBlurb": "Independent editorial content from TransPool24. Booking and services remain on the main website.",
+    "linkPrivacy": "Privacy",
+    "linkContact": "Contact",
+    "footerDisclaimer": "Articles are for general information only, not legal or financial advice."
   },
   "home": {
     "title": "TransPool24 – Your logistics partner in Pforzheim",
@@ -250,6 +272,7 @@
     "colSocial": "Social media",
     "linkHome": "Home",
     "linkWhy": "Why TransPool24?",
+    "linkBlog": "Magazine",
     "linkContact": "Contact",
     "linkPrivacy": "Privacy",
     "linkImprint": "Imprint",

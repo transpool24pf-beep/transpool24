@@ -19,6 +19,14 @@ export function getSupabase(): SupabaseClient {
   return _supabase;
 }
 
+/** Same client as getSupabase(), but returns null if env is missing (e.g. CI build without secrets). */
+export function tryGetSupabase(): SupabaseClient | null {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return null;
+  }
+  return getSupabase();
+}
+
 export function createServerSupabase(): SupabaseClient {
   const url = getSupabaseUrl();
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;

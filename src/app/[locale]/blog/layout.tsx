@@ -1,0 +1,14 @@
+import { BlogHeader } from "@/components/BlogHeader";
+import { BlogFooter } from "@/components/BlogFooter";
+
+export const revalidate = 60;
+
+export default function BlogLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex min-h-screen flex-col bg-[var(--background)]">
+      <BlogHeader />
+      <div className="flex-1">{children}</div>
+      <BlogFooter />
+    </div>
+  );
+}

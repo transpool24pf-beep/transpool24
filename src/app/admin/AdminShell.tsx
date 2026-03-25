@@ -10,6 +10,7 @@ const NAV = [
   { href: "/admin/reports", label: "Berichte" },
   { href: "/admin/driver-applications", label: "Fahrerbewerbungen" },
   { href: "/admin/drivers", label: "Fahrer" },
+  { href: "/admin/blog", label: "Blog / Magazin" },
   { href: "/admin/settings", label: "Einstellungen" },
   { href: "/admin/support", label: "Support-Nachrichten" },
 ];
@@ -85,7 +86,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           className={`mx-auto flex-1 px-4 py-8 ${
             pathname === "/admin/orders" ||
             pathname?.startsWith("/admin/driver-applications") ||
-            pathname === "/admin/reports"
+            pathname === "/admin/reports" ||
+            pathname?.startsWith("/admin/blog")
               ? "max-w-[98%] xl:max-w-7xl"
               : "max-w-4xl"
           }`}

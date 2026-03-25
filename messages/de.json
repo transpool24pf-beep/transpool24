@@ -4,7 +4,29 @@
     "order": "Auftrag buchen",
     "drivers": "Fahrer",
     "contact": "Kontakt",
-    "slogan": "Aktiv in Pforzheim – Weltweit verbunden"
+    "slogan": "Aktiv in Pforzheim – Weltweit verbunden",
+    "blog": "Magazin"
+  },
+  "blog": {
+    "magazineBadge": "Einordnung",
+    "magazineTitle": "TransPool24 Magazin",
+    "navAria": "Magazin-Navigation",
+    "navArticles": "Artikel",
+    "toCompanySite": "Zur Firmenwebsite",
+    "bookTransport": "Auftrag buchen",
+    "language": "Sprache",
+    "metaIndexTitle": "Magazin | TransPool24",
+    "metaIndexDescription": "Analysen und Hintergründe zu Transport, Logistik, Kraftstoffpreisen und Märkten.",
+    "indexKicker": "Einordnung",
+    "indexTitle": "Transport & Logistik",
+    "indexSubtitle": "Redaktionelle Artikel zu Fracht, Europa, Preisen und Branche — getrennt vom Buchungsangebot.",
+    "empty": "Noch keine Artikel. Schauen Sie bald wieder vorbei.",
+    "backToMagazine": "Zurück zum Magazin",
+    "notFoundTitle": "Nicht gefunden",
+    "footerBlurb": "Unabhängiger Redaktionsteil von TransPool24. Buchung und Leistungen bleiben auf der Hauptwebsite.",
+    "linkPrivacy": "Datenschutz",
+    "linkContact": "Kontakt",
+    "footerDisclaimer": "Die Beiträge dienen der allgemeinen Information und sind keine Rechts- oder Finanzberatung."
   },
   "home": {
     "title": "TransPool24\nIhr Logistikpartner in Pforzheim",
@@ -250,6 +272,7 @@
     "colSocial": "Social Media",
     "linkHome": "Startseite",
     "linkWhy": "Warum TransPool24?",
+    "linkBlog": "Magazin",
     "linkContact": "Kontakt",
     "linkPrivacy": "Datenschutz",
     "linkImprint": "Impressum",

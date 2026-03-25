@@ -4,7 +4,8 @@
     "order": "حجز طلب",
     "drivers": "السائقين",
     "contact": "اتصل",
-    "slogan": "نشطون في بفورتسهايم – متصلون عالمياً"
+    "slogan": "نشطون في بفورتسهايم – متصلون عالمياً",
+    "blog": "Magazine"
   },
   "home": {
     "title": "TransPool24 شريكك اللوجستي في بفورتسهايم",
@@ -260,7 +261,8 @@
     "languageLabel": "اللغة",
     "socialTiktok": "تيك توك",
     "socialFacebook": "فيسبوك",
-    "socialYoutube": "يوتيوب"
+    "socialYoutube": "يوتيوب",
+    "linkBlog": "Magazine"
   },
   "driver": {
     "step1Name": "البيانات الأساسية",
@@ -598,5 +600,26 @@
       "p1": "نحدّث السياسة عند تغيّر المعالجة أو المتطلبات القانونية. النسخة الحالية على هذه الصفحة مع تاريخ «آخر تحديث».",
       "p2": "يُرجى المراجعة عند استخدام ميزات جديدة."
     }
+  },
+  "blog": {
+    "magazineBadge": "Insights",
+    "magazineTitle": "TransPool24 Magazine",
+    "navAria": "Magazine navigation",
+    "navArticles": "Articles",
+    "toCompanySite": "Company website",
+    "bookTransport": "Book transport",
+    "language": "Language",
+    "metaIndexTitle": "Magazine | TransPool24",
+    "metaIndexDescription": "Analysis and news on transport, logistics, fuel prices, and markets.",
+    "indexKicker": "Insights",
+    "indexTitle": "Transport & logistics insights",
+    "indexSubtitle": "Editorial articles on freight, Europe, pricing, and the industry — separate from our booking product.",
+    "empty": "No articles yet. Please check back soon.",
+    "backToMagazine": "Back to magazine",
+    "notFoundTitle": "Not found",
+    "footerBlurb": "Independent editorial content from TransPool24. Booking and services remain on the main website.",
+    "linkPrivacy": "Privacy",
+    "linkContact": "Contact",
+    "footerDisclaimer": "Articles are for general information only, not legal or financial advice."
   }
 }

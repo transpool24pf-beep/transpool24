@@ -54,6 +54,12 @@ export function Header({ hideLogo }: HeaderProps) {
         )}
         <nav className="flex items-center gap-4">
           <Link
+            href={`/${locale}/blog`}
+            className="rounded-lg border border-[#0d2137]/15 px-3 py-2 text-sm font-medium text-[var(--foreground)] transition hover:bg-[#0d2137]/5 sm:px-4"
+          >
+            {t("blog")}
+          </Link>
+          <Link
             href={`/${locale}/driver`}
             className="rounded-lg border border-[#0d2137]/15 px-4 py-2 text-sm font-medium text-[var(--foreground)] transition hover:bg-[#0d2137]/5"
           >
