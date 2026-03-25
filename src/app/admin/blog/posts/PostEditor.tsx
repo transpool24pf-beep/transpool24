@@ -63,6 +63,8 @@ export function PostEditor({ postId }: { postId?: string }) {
   const [metaTitle, setMetaTitle] = useState("");
   const [metaDescription, setMetaDescription] = useState("");
   const [authorName, setAuthorName] = useState("TransPool24");
+  const [autoTranslateAll, setAutoTranslateAll] = useState(true);
+  const [info, setInfo] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     if (!postId) return;
@@ -89,6 +91,22 @@ export function PostEditor({ postId }: { postId?: string }) {
       setMetaTitle(p.meta_title ?? "");
       setMetaDescription(p.meta_description ?? "");
       setAuthorName(p.author_name ?? "TransPool24");
+      try {
+        const raw = sessionStorage.getItem("blog_last_translate");
+        if (raw && postId) {
+          const o = JSON.parse(raw) as { postId?: string; locales?: string[]; note?: string | null };
+          if (o.postId === postId) {
+            sessionStorage.removeItem("blog_last_translate");
+            if (o.locales?.length) {
+              setInfo(`Übersetzt in: ${o.locales.join(", ")}${o.note ? ` — ${o.note}` : ""}`);
+            } else if (o.note) {
+              setInfo(o.note);
+            }
+          }
+        }
+      } catch {
+        /* ignore */
+      }
     } catch {
       setError("Laden fehlgeschlagen");
     } finally {
@@ -124,6 +142,7 @@ export function PostEditor({ postId }: { postId?: string }) {
     e.preventDefault();
     setSaving(true);
     setError(null);
+    setInfo(null);
     const tags = tagsStr
       .split(",")
       .map((t) => t.trim())
@@ -171,10 +190,31 @@ export function PostEditor({ postId }: { postId?: string }) {
             meta_title: metaTitle || null,
             meta_description: metaDescription || null,
             author_name: authorName || "TransPool24",
+            auto_translate_all: autoTranslateAll,
           }),
         });
-        const j = (await r.json()) as { id?: string; error?: string; slug?: string };
+        const j = (await r.json()) as {
+          id?: string;
+          error?: string;
+          slug?: string;
+          translatedLocales?: string[];
+          translationNote?: string;
+        };
         if (!r.ok) throw new Error(j.error || "Anlegen fehlgeschlagen");
+        if (j.id && (j.translatedLocales?.length || j.translationNote)) {
+          try {
+            sessionStorage.setItem(
+              "blog_last_translate",
+              JSON.stringify({
+                postId: j.id,
+                locales: j.translatedLocales ?? [],
+                note: j.translationNote ?? null,
+              })
+            );
+          } catch {
+            /* ignore */
+          }
+        }
         if (j.id) {
           router.replace(`/admin/blog/posts/${j.id}`);
           return;
@@ -241,6 +281,30 @@ export function PostEditor({ postId }: { postId?: string }) {
         <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800" role="alert">
           {error}
         </p>
+      ) : null}
+      {info ? (
+        <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-900" role="status">
+          {info}
+        </p>
+      ) : null}
+
+      {!isEdit ? (
+        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-[#0d2137]/15 bg-white p-4 shadow-sm">
+          <input
+            type="checkbox"
+            className="mt-1 h-4 w-4 rounded border-[#0d2137]/30"
+            checked={autoTranslateAll}
+            onChange={(e) => setAutoTranslateAll(e.target.checked)}
+          />
+          <span className="text-sm text-[#0d2137]/85">
+            <span className="font-semibold text-[#0d2137]">In alle Sprachen übersetzen (KI)</span>
+            <span className="mt-1 block text-[#0d2137]/70">
+              Nach dem Speichern werden Kopien für alle anderen Website-Sprachen erzeugt (gleicher Slug). Erfordert{" "}
+              <code className="rounded bg-[#0d2137]/10 px-1">OPENAI_API_KEY</code> in Vercel. Ohne Key wird nur
+              dieser Artikel gespeichert.
+            </span>
+          </span>
+        </label>
       ) : null}
 
       <div className="grid gap-6 lg:grid-cols-2">

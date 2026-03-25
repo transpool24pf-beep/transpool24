@@ -71,23 +71,8 @@ export default async function BlogIndexPage({ params }: Props) {
               <h2 className="text-lg font-bold text-[#0d2137] sm:text-xl">{t("emptyTitle")}</h2>
               <p className="mt-2 text-sm leading-relaxed text-[#0d2137]/65">{t("empty")}</p>
             </div>
-            <div className="space-y-4 px-6 py-6 sm:px-8 sm:py-8">
-              <p className="text-sm leading-relaxed text-[#0d2137]/75">{t("emptyHint")}</p>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-                <Link
-                  href="/admin/blog"
-                  className="inline-flex items-center justify-center rounded-xl bg-[#0d2137] px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-[#0d2137]/90"
-                >
-                  {t("linkAdmin")}
-                </Link>
-                <code className="rounded-lg bg-[#0d2137]/[0.06] px-3 py-2 text-xs text-[#0d2137]/80">
-                  {t("emptyAdminSteps")}
-                </code>
-              </div>
-              <p className="text-xs text-[#0d2137]/45">
-                {t("seedHint")}{" "}
-                <code className="rounded bg-[#0d2137]/10 px-1">supabase/blog_seed_welcome.sql</code>
-              </p>
+            <div className="px-6 py-6 sm:px-8 sm:py-8">
+              <p className="text-sm leading-relaxed text-[#0d2137]/75">{t("emptyHintPublic")}</p>
             </div>
           </div>
         ) : (
