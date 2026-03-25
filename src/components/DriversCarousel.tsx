@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 
 interface Driver {
@@ -13,13 +13,13 @@ interface Driver {
   customerName: string;
 }
 
-function StarRating({ rating }: { rating: number }) {
+function StarRating({ rating, className }: { rating: number; className?: string }) {
   return (
-    <div className="flex shrink-0 items-center gap-0.5" aria-hidden>
+    <div className={`flex shrink-0 items-center gap-0.5 ${className ?? ""}`} aria-hidden>
       {[1, 2, 3, 4, 5].map((star) => (
         <svg
           key={star}
-          className={`h-4 w-4 sm:h-5 sm:w-5 ${star <= rating ? "text-amber-400" : "text-gray-200"}`}
+          className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${star <= rating ? "text-amber-400" : "text-gray-200"}`}
           fill="currentColor"
           viewBox="0 0 20 20"
         >
@@ -30,17 +30,142 @@ function StarRating({ rating }: { rating: number }) {
   );
 }
 
-function isMiddleOfTriple(index: number, total: number) {
-  if (total < 3) return false;
-  return index % 3 === 1;
+/** Deterministic star positions (no SSR/client mismatch). */
+function Starfield() {
+  const stars = useMemo(() => {
+    return Array.from({ length: 72 }, (_, i) => {
+      const x = ((i * 47 + 13) % 100) + (i % 7) * 0.35;
+      const y = ((i * 71 + 29) % 100) + (i % 5) * 0.2;
+      const r = 1 + (i % 4) * 0.35;
+      const o = 0.15 + (i % 6) * 0.12;
+      return { x, y, r, o };
+    });
+  }, []);
+
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+      {stars.map((s, i) => (
+        <span
+          key={i}
+          className="absolute rounded-full bg-white"
+          style={{
+            left: `${s.x}%`,
+            top: `${s.y}%`,
+            width: s.r,
+            height: s.r,
+            opacity: s.o,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
+
+function SideDriverCard({
+  driver,
+  onSelect,
+  isRtl,
+  ariaLabel,
+}: {
+  driver: Driver;
+  onSelect: () => void;
+  isRtl: boolean;
+  ariaLabel: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      aria-label={ariaLabel}
+      className="group relative z-0 w-[4.5rem] shrink-0 scale-[0.82] cursor-pointer overflow-hidden rounded-2xl border border-white/15 bg-white/95 p-2.5 shadow-lg transition hover:scale-[0.88] hover:border-white/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/80 sm:w-[5.75rem] md:w-32 md:p-3 opacity-[0.52] md:opacity-60"
+    >
+      <div
+        className="flex flex-col items-center gap-1.5 blur-[1.5px] transition group-hover:blur-[0.5px] group-focus-visible:blur-[0.5px]"
+        dir={isRtl ? "rtl" : "ltr"}
+      >
+        <div className="relative h-9 w-9 overflow-hidden rounded-full bg-gray-100 ring-2 ring-gray-100 md:h-11 md:w-11">
+          <Image
+            src={driver.photo}
+            alt=""
+            fill
+            className="object-cover"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(driver.name)}&background=e85d04&color=fff&size=128`;
+            }}
+            unoptimized
+          />
+        </div>
+        <StarRating rating={driver.rating} />
+      </div>
+    </button>
+  );
+}
+
+function MainDriverBubble({
+  driver,
+  isRtl,
+  reviewLead,
+}: {
+  driver: Driver;
+  isRtl: boolean;
+  reviewLead: string;
+}) {
+  return (
+    <article
+      dir={isRtl ? "rtl" : "ltr"}
+      className="relative z-10 mx-auto w-full max-w-[min(100%,22rem)] sm:max-w-md md:max-w-lg"
+    >
+      <div className="relative pb-3 sm:pb-4">
+        <div className="relative rounded-2xl border border-white/20 bg-white px-5 py-5 shadow-2xl shadow-black/25 sm:px-7 sm:py-6 md:px-8 md:py-7">
+          <p className="text-center text-[11px] font-medium leading-snug text-[var(--foreground)]/45 sm:text-xs">
+            {reviewLead}
+          </p>
+          <div className="mt-3 flex items-center justify-center gap-3 sm:mt-4 sm:gap-4">
+            <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-gray-100 ring-2 ring-[var(--accent)]/25 sm:h-14 sm:w-14">
+              <Image
+                src={driver.photo}
+                alt=""
+                fill
+                className="object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(driver.name)}&background=e85d04&color=fff&size=128`;
+                }}
+                unoptimized
+              />
+            </div>
+            <div className="min-w-0 flex-1 text-start">
+              <h3 className="truncate text-base font-bold text-[var(--primary)] sm:text-lg">{driver.name}</h3>
+              <StarRating rating={driver.rating} className="mt-1" />
+            </div>
+          </div>
+          <p className="mt-4 text-start text-sm leading-relaxed text-[var(--foreground)]/80 sm:mt-5 sm:text-[0.9375rem]">
+            &ldquo;{driver.comment}&rdquo;
+          </p>
+          <p className="mt-4 text-start text-xs font-semibold text-[var(--foreground)]/45 sm:text-sm">
+            {driver.customerName}
+          </p>
+        </div>
+        <div
+          className="pointer-events-none absolute left-1/2 top-full z-0 h-0 w-0 -translate-x-1/2 border-x-[10px] border-t-[12px] border-x-transparent border-t-white [filter:drop-shadow(0_4px_6px_rgba(0,0,0,0.12))] sm:border-x-[12px] sm:border-t-[14px]"
+          aria-hidden
+        />
+      </div>
+    </article>
+  );
 }
 
 export function DriversCarousel() {
   const t = useTranslations("home.drivers");
   const locale = useLocale();
-  const isRtl = locale === "ar";
+  const isRtl = locale === "ar" || locale === "ku";
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(true);
+  const [index, setIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const dragRef = useRef<{ x: number } | null>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetch("/api/public/content/drivers")
@@ -85,18 +210,61 @@ export function DriversCarousel() {
 
   const displayDrivers = drivers.length > 0 ? drivers : demoDrivers;
   const isDemo = drivers.length === 0;
-  const total = displayDrivers.length;
+  const n = displayDrivers.length;
+
+  const prevIdx = n > 0 ? (index - 1 + n) % n : 0;
+  const nextIdx = n > 0 ? (index + 1) % n : 0;
+
+  const goPrev = useCallback(() => {
+    if (n < 2) return;
+    setIndex((i) => (i - 1 + n) % n);
+  }, [n]);
+
+  const goNext = useCallback(() => {
+    if (n < 2) return;
+    setIndex((i) => (i + 1) % n);
+  }, [n]);
+
+  useEffect(() => {
+    if (n < 2 || paused) return;
+    const id = window.setInterval(goNext, 6000);
+    return () => window.clearInterval(id);
+  }, [n, paused, goNext]);
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    dragRef.current = { x: e.clientX };
+    const el = trackRef.current;
+    if (el && typeof el.setPointerCapture === "function") {
+      try {
+        el.setPointerCapture(e.pointerId);
+      } catch {
+        /* ignore */
+      }
+    }
+  };
+
+  const onPointerUp = (e: React.PointerEvent) => {
+    const start = dragRef.current;
+    dragRef.current = null;
+    if (!start || n < 2) return;
+    const dx = e.clientX - start.x;
+    const threshold = 50;
+    if (dx > threshold) goPrev();
+    else if (dx < -threshold) goNext();
+  };
+
+  const leftDriver = isRtl ? displayDrivers[nextIdx] : displayDrivers[prevIdx];
+  const rightDriver = isRtl ? displayDrivers[prevIdx] : displayDrivers[nextIdx];
+  const active = displayDrivers[index] ?? displayDrivers[0];
+
+  const shellClass =
+    "relative overflow-hidden rounded-tr-[2.75rem] sm:rounded-tr-[4.5rem] md:rounded-tr-[5.5rem]";
 
   if (loading) {
     return (
-      <section
-        className="relative overflow-hidden rounded-tr-[2.75rem] bg-gradient-to-br from-[#0f3536] via-[#164848] to-[#0a2324] sm:rounded-tr-[4.5rem] md:rounded-tr-[5.5rem]"
-        aria-busy="true"
-      >
-        <div
-          className="pointer-events-none absolute -right-24 -top-24 h-80 w-80 rounded-full bg-[var(--accent)]/10 blur-3xl"
-          aria-hidden
-        />
+      <section className={shellClass} aria-busy="true">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#061a1c] via-[#0f3536] to-[#0a2324]" />
+        <Starfield />
         <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
           <p className="text-center text-lg text-white/80">{t("loading")}</p>
         </div>
@@ -104,13 +272,24 @@ export function DriversCarousel() {
     );
   }
 
+  if (n === 0) {
+    return null;
+  }
+
+  const reviewLead = t("reviewLead", { customer: active.customerName });
+
   return (
     <section
-      className="relative overflow-hidden rounded-tr-[2.75rem] bg-gradient-to-br from-[#0f3536] via-[#164848] to-[#0a2324] sm:rounded-tr-[4.5rem] md:rounded-tr-[5.5rem]"
+      className={shellClass}
+      dir={isRtl ? "rtl" : "ltr"}
       aria-labelledby="drivers-section-title"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
     >
+      <div className="absolute inset-0 bg-gradient-to-br from-[#061a1c] via-[#0f3536] to-[#0a2324]" />
+      <Starfield />
       <div
-        className="pointer-events-none absolute -right-20 -top-28 h-96 w-96 rounded-full bg-[var(--accent)]/12 blur-3xl"
+        className="pointer-events-none absolute -right-20 -top-28 h-96 w-96 rounded-full bg-[var(--accent)]/10 blur-3xl"
         aria-hidden
       />
       <div
@@ -127,59 +306,82 @@ export function DriversCarousel() {
             {t("title")}
           </h2>
           <p className="mt-3 text-lg text-white/85 sm:text-xl">{t("subtitle")}</p>
-          {isDemo && (
-            <p className="mt-2 text-sm text-white/55">{t("demoNotice")}</p>
+          {isDemo && <p className="mt-2 text-sm text-white/55">{t("demoNotice")}</p>}
+        </div>
+
+        <div
+          ref={trackRef}
+          className="mt-12 flex touch-manipulation items-center justify-center gap-2 sm:mt-14 md:gap-4 lg:mt-16"
+          onPointerDown={onPointerDown}
+          onPointerUp={onPointerUp}
+          onPointerCancel={() => {
+            dragRef.current = null;
+          }}
+        >
+          {n > 1 && (
+            <button
+              type="button"
+              onClick={goPrev}
+              className="z-20 hidden h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white shadow-md backdrop-blur-sm transition hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 md:flex"
+              aria-label={t("carouselPrev")}
+            >
+              <span className="text-xl leading-none rtl:rotate-180" aria-hidden>
+                ‹
+              </span>
+            </button>
+          )}
+
+          <div className="flex min-w-0 flex-1 items-center justify-center gap-2 sm:gap-3 md:gap-6">
+            {n > 1 && (
+              <SideDriverCard
+                driver={leftDriver}
+                onSelect={goPrev}
+                isRtl={isRtl}
+                ariaLabel={t("carouselPrev")}
+              />
+            )}
+            <MainDriverBubble driver={active} isRtl={isRtl} reviewLead={reviewLead} />
+            {n > 1 && (
+              <SideDriverCard
+                driver={rightDriver}
+                onSelect={goNext}
+                isRtl={isRtl}
+                ariaLabel={t("carouselNext")}
+              />
+            )}
+          </div>
+
+          {n > 1 && (
+            <button
+              type="button"
+              onClick={goNext}
+              className="z-20 hidden h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white shadow-md backdrop-blur-sm transition hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 md:flex"
+              aria-label={t("carouselNext")}
+            >
+              <span className="text-xl leading-none rtl:rotate-180" aria-hidden>
+                ›
+              </span>
+            </button>
           )}
         </div>
 
-        <ul className="mt-12 grid list-none grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-7 lg:mt-14 lg:grid-cols-3 lg:gap-8">
-          {displayDrivers.map((driver, index) => {
-            const highlighted = isMiddleOfTriple(index, total);
-            return (
-              <li key={driver.id} className="relative">
-                {highlighted && (
-                  <div
-                    className="pointer-events-none absolute inset-0 -m-3 rounded-[1.35rem] bg-white/20 opacity-70 shadow-[0_0_60px_20px_rgba(255,255,255,0.12)] blur-xl sm:-m-4"
-                    aria-hidden
-                  />
-                )}
-                <article
-                  dir={isRtl ? "rtl" : "ltr"}
-                  className={`relative flex h-full flex-col rounded-2xl bg-white p-5 shadow-md ring-1 ring-black/[0.04] transition duration-300 sm:p-6 ${
-                    highlighted ? "shadow-xl shadow-black/10 ring-white/40 sm:scale-[1.02]" : "hover:shadow-lg"
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex min-w-0 flex-1 items-center gap-3">
-                      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-gray-100 ring-2 ring-gray-100 sm:h-14 sm:w-14">
-                        <Image
-                          src={driver.photo}
-                          alt=""
-                          fill
-                          className="object-cover"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(driver.name)}&background=e85d04&color=fff&size=128`;
-                          }}
-                          unoptimized
-                        />
-                      </div>
-                      <h3 className="truncate text-base font-bold text-[var(--primary)] sm:text-lg">{driver.name}</h3>
-                    </div>
-                    <StarRating rating={driver.rating} />
-                  </div>
-
-                  <p className="mt-4 flex-1 text-start text-sm leading-relaxed text-[var(--foreground)]/75 sm:text-[0.9375rem]">
-                    &ldquo;{driver.comment}&rdquo;
-                  </p>
-                  <p className="mt-4 text-start text-xs font-semibold uppercase tracking-wide text-[var(--foreground)]/50 sm:text-sm sm:normal-case sm:tracking-normal">
-                    {driver.customerName}
-                  </p>
-                </article>
-              </li>
-            );
-          })}
-        </ul>
+        {n > 1 && (
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-2 sm:mt-10" role="tablist" aria-label={t("carouselDotsAria")}>
+            {displayDrivers.map((d, i) => (
+              <button
+                key={d.id}
+                type="button"
+                role="tab"
+                aria-selected={i === index}
+                aria-label={t("carouselGoTo", { index: i + 1 })}
+                onClick={() => setIndex(i)}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  i === index ? "w-8 bg-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.45)]" : "w-5 bg-white/25 hover:bg-white/40"
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
