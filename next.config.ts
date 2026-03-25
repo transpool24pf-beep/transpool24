@@ -28,7 +28,10 @@ const nextConfig: NextConfig = {
         : []),
       { protocol: "https", hostname: "ui-avatars.com", pathname: "/api/**" },
       { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
+      { protocol: "https", hostname: "tse1.mm.bing.net", pathname: "/th/**" },
+      { protocol: "https", hostname: "tse2.mm.bing.net", pathname: "/th/**" },
       { protocol: "https", hostname: "tse3.mm.bing.net", pathname: "/th/**" },
+      { protocol: "https", hostname: "tse4.mm.bing.net", pathname: "/th/**" },
     ],
   },
   async headers() {

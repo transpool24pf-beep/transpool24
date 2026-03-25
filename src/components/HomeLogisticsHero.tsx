@@ -86,7 +86,7 @@ export async function HomeLogisticsHero({
             fill
             className="object-cover object-center"
             priority
-            quality={95}
+            quality={heroImage.startsWith("http") ? 100 : 95}
             sizes="100vw"
             unoptimized={heroImage.startsWith("http")}
           />

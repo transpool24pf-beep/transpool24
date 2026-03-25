@@ -12,9 +12,12 @@ import { routing } from "@/i18n/routing";
 
 export const revalidate = 60;
 
-/** Blog hero background (high-res Bing asset; CMS hero image is not used on magazine cover). */
+/**
+ * Blog hero background — Bing `th` URLs default to tiny WebP (~8KB). Appending large `w`/`h` requests a bigger JPEG from the CDN.
+ * @see curl -sI "…?w=3840&h=2160&rs=1&pid=ImgDetMain&o=7"
+ */
 const BLOG_HERO_BACKGROUND =
-  "https://tse3.mm.bing.net/th/id/OIP.Qyuy2JUxnIQHzGj6eMTUJgHaE8?rs=1&pid=ImgDetMain&o=7&rm=3";
+  "https://tse1.mm.bing.net/th/id/OIP.VlpzxeRVYbRXqO08zdATXAHaE8?w=3840&h=2160&rs=1&pid=ImgDetMain&o=7";
 /** Blog hero vehicle: `assets/pngegg.png` → public */
 const BLOG_HERO_VEHICLE = "/images/blog-hero-vehicle.png";
 
