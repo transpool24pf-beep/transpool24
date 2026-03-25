@@ -113,3 +113,83 @@ body {
   display: block;
   pointer-events: none;
 }
+
+/* Home — drivers section: floating Lottie backdrops */
+@keyframes drivers-lottie-drift-a {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(16px, -10px) scale(1.04);
+  }
+}
+
+@keyframes drivers-lottie-drift-b {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-12px, 14px) scale(0.96);
+  }
+}
+
+.drivers-lottie-drift-a {
+  animation: drivers-lottie-drift-a 10s ease-in-out infinite;
+  will-change: transform;
+}
+
+.drivers-lottie-drift-b {
+  animation: drivers-lottie-drift-b 9s ease-in-out infinite;
+  animation-delay: -3.5s;
+  will-change: transform;
+}
+
+/* Drivers CTA: animated border + soft pulse */
+@keyframes drivers-cta-border-flow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes drivers-cta-glow-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 0 rgba(232, 93, 4, 0.28),
+      0 12px 40px -12px rgba(0, 0, 0, 0.45);
+  }
+  50% {
+    box-shadow:
+      0 0 28px 6px rgba(232, 93, 4, 0.22),
+      0 16px 48px -8px rgba(0, 0, 0, 0.5);
+  }
+}
+
+.drivers-cta-shell {
+  border-radius: 1.25rem;
+  padding: 2px;
+  background: linear-gradient(
+    125deg,
+    rgba(232, 93, 4, 0.85),
+    rgba(52, 211, 153, 0.55),
+    rgba(251, 191, 36, 0.65),
+    rgba(232, 93, 4, 0.8)
+  );
+  background-size: 280% 280%;
+  animation: drivers-cta-border-flow 7s ease infinite;
+}
+
+.drivers-cta-inner {
+  border-radius: 1.15rem;
+  background: linear-gradient(160deg, rgba(8, 35, 38, 0.96) 0%, rgba(6, 22, 24, 0.98) 100%);
+  backdrop-filter: blur(14px);
+  animation: drivers-cta-glow-pulse 4s ease-in-out infinite;
+}

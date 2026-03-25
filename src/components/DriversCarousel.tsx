@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { DriversLottieBackdrop } from "@/components/DriversLottieBackdrop";
 
 interface Driver {
   id: number;
@@ -43,7 +44,7 @@ function Starfield() {
   }, []);
 
   return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+    <div className="pointer-events-none absolute inset-0 z-[2] overflow-hidden" aria-hidden>
       {stars.map((s, i) => (
         <span
           key={i}
@@ -227,7 +228,7 @@ export function DriversCarousel() {
 
   useEffect(() => {
     if (n < 2 || paused) return;
-    const id = window.setInterval(goNext, 6000);
+    const id = window.setInterval(goNext, 5000);
     return () => window.clearInterval(id);
   }, [n, paused, goNext]);
 
@@ -264,8 +265,13 @@ export function DriversCarousel() {
     return (
       <section className={shellClass} aria-busy="true">
         <div className="absolute inset-0 bg-gradient-to-br from-[#061a1c] via-[#0f3536] to-[#0a2324]" />
+        <DriversLottieBackdrop />
+        <div
+          className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-[#061a1c]/45 via-[#061a1c]/25 to-[#061a1c]/55"
+          aria-hidden
+        />
         <Starfield />
-        <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+        <div className="relative z-10 mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
           <p className="text-center text-lg text-white/80">{t("loading")}</p>
         </div>
       </section>
@@ -287,17 +293,22 @@ export function DriversCarousel() {
       onMouseLeave={() => setPaused(false)}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-[#061a1c] via-[#0f3536] to-[#0a2324]" />
+      <DriversLottieBackdrop />
+      <div
+        className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-b from-[#061a1c]/45 via-[#061a1c]/25 to-[#061a1c]/55"
+        aria-hidden
+      />
       <Starfield />
       <div
-        className="pointer-events-none absolute -right-20 -top-28 h-96 w-96 rounded-full bg-[var(--accent)]/10 blur-3xl"
+        className="pointer-events-none absolute -right-20 -top-28 z-[2] h-96 w-96 rounded-full bg-[var(--accent)]/10 blur-3xl"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute -bottom-32 left-0 h-72 w-72 rounded-full bg-teal-400/5 blur-3xl"
+        className="pointer-events-none absolute -bottom-32 left-0 z-[2] h-72 w-72 rounded-full bg-teal-400/5 blur-3xl"
         aria-hidden
       />
 
-      <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
         <div className="max-w-3xl">
           <h2
             id="drivers-section-title"
@@ -382,6 +393,17 @@ export function DriversCarousel() {
             ))}
           </div>
         )}
+
+        <div className="drivers-cta-shell mx-auto mt-14 max-w-3xl sm:mt-16 lg:mt-20">
+          <div className="drivers-cta-inner px-5 py-6 sm:px-8 sm:py-8">
+            <p className="text-center text-xl font-extrabold leading-tight text-white sm:text-2xl">
+              {t("ctaTitle")}
+            </p>
+            <p className="mt-4 text-center text-sm leading-relaxed text-white/88 sm:text-base">
+              {t("ctaBody")}
+            </p>
+          </div>
+        </div>
       </div>
     </section>
   );
