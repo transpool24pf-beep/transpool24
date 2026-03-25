@@ -35,6 +35,7 @@ const nextConfig: NextConfig = {
         hostname: "sk-bucket.sgp1.cdn.digitaloceanspaces.com",
         pathname: "/**",
       },
+      { protocol: "https", hostname: "tse1.explicit.bing.net", pathname: "/th/**" },
       { protocol: "https", hostname: "tse1.mm.bing.net", pathname: "/th/**" },
       { protocol: "https", hostname: "tse2.mm.bing.net", pathname: "/th/**" },
       { protocol: "https", hostname: "tse3.mm.bing.net", pathname: "/th/**" },
