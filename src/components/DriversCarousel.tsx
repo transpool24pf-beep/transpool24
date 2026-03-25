@@ -164,12 +164,11 @@ export function DriversCarousel() {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(true);
   const [index, setIndex] = useState(0);
-  const [paused, setPaused] = useState(false);
   const dragRef = useRef<{ x: number } | null>(null);
   const trackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetch("/api/public/content/drivers")
+    fetch("/api/public/content/drivers", { cache: "no-store" })
       .then((r) => r.json())
       .then((data) => setDrivers(data.drivers || []))
       .catch(() => setDrivers([]))
@@ -178,7 +177,7 @@ export function DriversCarousel() {
 
   const demoDrivers = useMemo((): Driver[] => {
     try {
-      return [
+      const triple: Driver[] = [
         {
           id: -1,
           name: t("f1_name"),
@@ -204,6 +203,14 @@ export function DriversCarousel() {
           customerName: t("f3_customerName"),
         },
       ];
+      return Array.from({ length: 6 }, (_, i) => {
+        const b = triple[i % 3];
+        return {
+          ...b,
+          id: -(i + 1),
+          name: i < 3 ? b.name : `${b.name}\u00A0·\u00A0${i + 1}`,
+        };
+      });
     } catch {
       return [];
     }
@@ -213,24 +220,67 @@ export function DriversCarousel() {
   const isDemo = drivers.length === 0;
   const n = displayDrivers.length;
 
+  const [slideDir, setSlideDir] = useState<"next" | "prev" | null>(null);
+  const [interactionPause, setInteractionPause] = useState(false);
+  const userPauseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const bumpUserPause = useCallback(() => {
+    if (userPauseTimerRef.current) clearTimeout(userPauseTimerRef.current);
+    setInteractionPause(true);
+    userPauseTimerRef.current = setTimeout(() => {
+      setInteractionPause(false);
+      userPauseTimerRef.current = null;
+    }, 8500);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (userPauseTimerRef.current) clearTimeout(userPauseTimerRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (n === 0) return;
+    setIndex((i) => Math.min(i, Math.max(0, n - 1)));
+  }, [n]);
+
   const prevIdx = n > 0 ? (index - 1 + n) % n : 0;
   const nextIdx = n > 0 ? (index + 1) % n : 0;
 
-  const goPrev = useCallback(() => {
+  const userPrev = useCallback(() => {
     if (n < 2) return;
+    bumpUserPause();
+    setSlideDir("prev");
     setIndex((i) => (i - 1 + n) % n);
-  }, [n]);
+  }, [n, bumpUserPause]);
 
-  const goNext = useCallback(() => {
+  const userNext = useCallback(() => {
     if (n < 2) return;
+    bumpUserPause();
+    setSlideDir("next");
     setIndex((i) => (i + 1) % n);
-  }, [n]);
+  }, [n, bumpUserPause]);
+
+  const goToIndex = useCallback(
+    (target: number) => {
+      if (n < 2 || target === index || target < 0 || target >= n) return;
+      bumpUserPause();
+      const forward = (target - index + n) % n;
+      const backward = (index - target + n) % n;
+      setSlideDir(forward <= backward ? "next" : "prev");
+      setIndex(target);
+    },
+    [n, index, bumpUserPause]
+  );
 
   useEffect(() => {
-    if (n < 2 || paused) return;
-    const id = window.setInterval(goNext, 5000);
+    if (n < 2 || interactionPause) return;
+    const id = window.setInterval(() => {
+      setSlideDir("next");
+      setIndex((i) => (i + 1) % n);
+    }, 4500);
     return () => window.clearInterval(id);
-  }, [n, paused, goNext]);
+  }, [n, interactionPause]);
 
   const onPointerDown = (e: React.PointerEvent) => {
     dragRef.current = { x: e.clientX };
@@ -249,9 +299,9 @@ export function DriversCarousel() {
     dragRef.current = null;
     if (!start || n < 2) return;
     const dx = e.clientX - start.x;
-    const threshold = 50;
-    if (dx > threshold) goPrev();
-    else if (dx < -threshold) goNext();
+    const threshold = 40;
+    if (dx > threshold) userPrev();
+    else if (dx < -threshold) userNext();
   };
 
   const leftDriver = isRtl ? displayDrivers[nextIdx] : displayDrivers[prevIdx];
@@ -284,13 +334,15 @@ export function DriversCarousel() {
 
   const reviewLead = t("reviewLead", { customer: active.customerName });
 
+  const enterClass =
+    slideDir === "next" ? "drivers-carousel-enter-next" : slideDir === "prev" ? "drivers-carousel-enter-prev" : "";
+
   return (
     <section
       className={shellClass}
       dir={isRtl ? "rtl" : "ltr"}
       aria-labelledby="drivers-section-title"
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
+      aria-roledescription="carousel"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-[#061a1c] via-[#0f3536] to-[#0a2324]" />
       <DriversLottieBackdrop />
@@ -332,11 +384,11 @@ export function DriversCarousel() {
           {n > 1 && (
             <button
               type="button"
-              onClick={goPrev}
-              className="z-20 hidden h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white shadow-md backdrop-blur-sm transition hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 md:flex"
+              onClick={userPrev}
+              className="z-20 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white shadow-md backdrop-blur-sm transition hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 sm:h-11 sm:w-11"
               aria-label={t("carouselPrev")}
             >
-              <span className="text-xl leading-none rtl:rotate-180" aria-hidden>
+              <span className="text-lg leading-none rtl:rotate-180 sm:text-xl" aria-hidden>
                 ‹
               </span>
             </button>
@@ -346,16 +398,18 @@ export function DriversCarousel() {
             {n > 1 && (
               <SideDriverCard
                 driver={leftDriver}
-                onSelect={goPrev}
+                onSelect={userPrev}
                 isRtl={isRtl}
                 ariaLabel={t("carouselPrev")}
               />
             )}
-            <MainDriverBubble driver={active} isRtl={isRtl} reviewLead={reviewLead} />
+            <div className={`min-w-0 max-w-full flex-1 ${enterClass}`} key={index}>
+              <MainDriverBubble driver={active} isRtl={isRtl} reviewLead={reviewLead} />
+            </div>
             {n > 1 && (
               <SideDriverCard
                 driver={rightDriver}
-                onSelect={goNext}
+                onSelect={userNext}
                 isRtl={isRtl}
                 ariaLabel={t("carouselNext")}
               />
@@ -365,11 +419,11 @@ export function DriversCarousel() {
           {n > 1 && (
             <button
               type="button"
-              onClick={goNext}
-              className="z-20 hidden h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white shadow-md backdrop-blur-sm transition hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 md:flex"
+              onClick={userNext}
+              className="z-20 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white shadow-md backdrop-blur-sm transition hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 sm:h-11 sm:w-11"
               aria-label={t("carouselNext")}
             >
-              <span className="text-xl leading-none rtl:rotate-180" aria-hidden>
+              <span className="text-lg leading-none rtl:rotate-180 sm:text-xl" aria-hidden>
                 ›
               </span>
             </button>
@@ -385,7 +439,7 @@ export function DriversCarousel() {
                 role="tab"
                 aria-selected={i === index}
                 aria-label={t("carouselGoTo", { index: i + 1 })}
-                onClick={() => setIndex(i)}
+                onClick={() => goToIndex(i)}
                 className={`h-1.5 rounded-full transition-all duration-300 ${
                   i === index ? "w-8 bg-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.45)]" : "w-5 bg-white/25 hover:bg-white/40"
                 }`}

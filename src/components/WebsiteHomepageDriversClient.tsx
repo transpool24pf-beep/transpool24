@@ -235,12 +235,23 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-[#0d2137]">Homepage – Fahrer-Bewertungen</h1>
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold text-[#0d2137]">Homepage – Fahrer-Bewertungen</h1>
+          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[#0d2137]/70">
+            Einträge werden in der Datenbank gespeichert und auf der Startseite im Karussell angezeigt — beliebig viele
+            Bewertungen, Reihenfolge mit ↑↓. Nach dem Speichern erscheinen neue Fahrer nach einem Seitenrefresh auf der
+            Website.
+          </p>
+          <p className="mt-1 max-w-3xl text-sm text-[#0d2137]/60" dir="rtl">
+            تُحفظ البطاقات في قاعدة البيانات وتظهر في الصفحة الرئيسية في شريط متحرك؛ يمكنك إضافة أي عدد وترتيبها. قد
+            تحتاج لتحديث الصفحة لرؤية التحديث فوراً.
+          </p>
+        </div>
         <button
           type="button"
           onClick={handleAdd}
-          className="rounded-lg bg-[var(--accent)] px-4 py-2 font-medium text-white hover:opacity-95"
+          className="shrink-0 rounded-lg bg-[var(--accent)] px-4 py-2 font-medium text-white hover:opacity-95 sm:self-start"
         >
           + Neuer Fahrer
         </button>

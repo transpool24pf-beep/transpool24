@@ -193,3 +193,64 @@ body {
   backdrop-filter: blur(14px);
   animation: drivers-cta-glow-pulse 4s ease-in-out infinite;
 }
+
+/* Drivers testimonial — slide in when changing (infinite loop carousel) */
+@keyframes drivers-carousel-next-in-ltr {
+  from {
+    opacity: 0;
+    transform: translateX(1.35rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes drivers-carousel-next-in-rtl {
+  from {
+    opacity: 0;
+    transform: translateX(-1.35rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes drivers-carousel-prev-in-ltr {
+  from {
+    opacity: 0;
+    transform: translateX(-1.35rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes drivers-carousel-prev-in-rtl {
+  from {
+    opacity: 0;
+    transform: translateX(1.35rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.drivers-carousel-enter-next {
+  animation: drivers-carousel-next-in-ltr 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+[dir="rtl"] .drivers-carousel-enter-next {
+  animation-name: drivers-carousel-next-in-rtl;
+}
+
+.drivers-carousel-enter-prev {
+  animation: drivers-carousel-prev-in-ltr 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+[dir="rtl"] .drivers-carousel-enter-prev {
+  animation-name: drivers-carousel-prev-in-rtl;
+}

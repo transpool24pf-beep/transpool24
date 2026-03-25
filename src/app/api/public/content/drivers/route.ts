@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 import { mapHomepageDriverRow, type HomepageDriverRow } from "@/lib/homepage-drivers-map";
 
+/** Always fresh list so CMS additions show after refresh without stale CDN cache. */
+export const dynamic = "force-dynamic";
+
 // Public API for fetching drivers (used by homepage)
 export async function GET() {
   try {
@@ -15,9 +18,15 @@ export async function GET() {
 
     const drivers = (data || []).map((d) => mapHomepageDriverRow(d as HomepageDriverRow));
 
-    return NextResponse.json({ drivers });
+    return NextResponse.json(
+      { drivers },
+      { headers: { "Cache-Control": "no-store, max-age=0" } }
+    );
   } catch (error) {
     console.error("[public/content/drivers GET]", error);
-    return NextResponse.json({ drivers: [] }, { status: 200 });
+    return NextResponse.json(
+      { drivers: [] },
+      { status: 200, headers: { "Cache-Control": "no-store, max-age=0" } }
+    );
   }
 }
