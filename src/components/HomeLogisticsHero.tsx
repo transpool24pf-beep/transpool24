@@ -138,7 +138,7 @@ export async function HomeLogisticsHero({
       </div>
 
       {/* Overlap: freight cards + floating truck (mockup-style) */}
-      <div className="relative z-20 mx-auto max-w-7xl px-4 sm:px-6">
+      <div className="relative z-30 mx-auto max-w-7xl px-4 sm:px-6">
         <div className="flex flex-col items-center gap-8 pb-4 pt-2 lg:flex-row lg:items-end lg:justify-between lg:gap-6 lg:pb-10 lg:pt-0">
           <div className="order-2 flex w-full flex-wrap justify-center gap-4 lg:order-1 lg:justify-start">
             <HeroOverlapCard
@@ -158,24 +158,25 @@ export async function HomeLogisticsHero({
           </div>
 
           <div className="order-1 flex w-full justify-center lg:order-2 lg:w-auto lg:justify-end lg:pe-4">
-            <div
-              className="relative -mt-6 w-[min(100%,420px)] max-w-lg lg:-mt-28 lg:w-[min(100%,480px)]"
-              style={{
-                filter:
-                  "drop-shadow(0 28px 40px rgba(0,0,0,0.34)) drop-shadow(0 0 22px rgba(232,93,4,0.2)) drop-shadow(0 0 52px rgba(255,107,0,0.06))",
-              }}
-            >
-              <div className="relative aspect-[4/3] w-full">
-                <Image
-                  src={truckSrc}
-                  alt=""
-                  fill
-                  className="object-contain object-bottom"
-                  sizes="(max-width: 1024px) 90vw, 480px"
-                  priority
-                  unoptimized={truckSrc.startsWith("http")}
-                />
-              </div>
+            <div className="relative isolate z-10 -mt-6 w-[min(100%,460px)] max-w-[min(100%,520px)] shrink-0 lg:-mt-28">
+              {/*
+                Explicit width/height (not fill) so the PNG always reserves space; fill + aspect box was collapsing
+                for some transparent PNGs in production. Local /public assets use unoptimized for reliable alpha.
+              */}
+              <Image
+                src={truckSrc}
+                alt=""
+                width={900}
+                height={600}
+                className="h-auto w-full max-h-[min(52vh,440px)] object-contain object-bottom"
+                sizes="(max-width: 1024px) 92vw, 520px"
+                priority
+                unoptimized={truckSrc.startsWith("/") || truckSrc.startsWith("http")}
+                style={{
+                  filter:
+                    "drop-shadow(0 28px 40px rgba(0,0,0,0.34)) drop-shadow(0 0 22px rgba(232,93,4,0.2)) drop-shadow(0 0 52px rgba(255,107,0,0.06))",
+                }}
+              />
             </div>
           </div>
         </div>

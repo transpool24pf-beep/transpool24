@@ -12,8 +12,9 @@ import { routing } from "@/i18n/routing";
 
 export const revalidate = 60;
 
-/** Blog cover: `assets/OIP (1).png` → public (CMS hero image is not used on magazine cover). */
-const BLOG_HERO_BACKGROUND = "/images/blog-hero-background.png";
+/** Blog hero background (high-res Bing asset; CMS hero image is not used on magazine cover). */
+const BLOG_HERO_BACKGROUND =
+  "https://tse3.mm.bing.net/th/id/OIP.Qyuy2JUxnIQHzGj6eMTUJgHaE8?rs=1&pid=ImgDetMain&o=7&rm=3";
 /** Blog hero vehicle: `assets/pngegg.png` → public */
 const BLOG_HERO_VEHICLE = "/images/blog-hero-vehicle.png";
 
