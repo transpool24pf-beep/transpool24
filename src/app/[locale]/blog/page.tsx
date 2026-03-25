@@ -12,7 +12,10 @@ import { routing } from "@/i18n/routing";
 
 export const revalidate = 60;
 
-const HERO_FALLBACK_IMAGE = "/images/5677.png";
+/** Blog cover: `assets/OIP (1).png` → public (CMS hero image is not used on magazine cover). */
+const BLOG_HERO_BACKGROUND = "/images/blog-hero-background.png";
+/** Blog hero vehicle: `assets/pngegg.png` → public */
+const BLOG_HERO_VEHICLE = "/images/blog-hero-vehicle.png";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -54,7 +57,7 @@ export default async function BlogIndexPage({ params }: Props) {
   const posts = await listPublishedPosts(locale);
   const hero = await getHomepageHero(locale);
 
-  const heroImage = hero.imageUrl || HERO_FALLBACK_IMAGE;
+  const heroImage = BLOG_HERO_BACKGROUND;
   const heroSubtitle = hero.subtitle?.trim() || t("template.heroSubtitleGermany");
   const primaryCta = (hero.cta && hero.cta.trim()) || t("template.heroPrimary");
   const secondaryCta = t("template.heroSecondary");
@@ -71,7 +74,7 @@ export default async function BlogIndexPage({ params }: Props) {
         heroSubtitle={heroSubtitle}
         primaryCta={primaryCta}
         secondaryCta={secondaryCta}
-        truckImageUrl={hero.truckImageUrl}
+        truckImageUrl={BLOG_HERO_VEHICLE}
       />
       <HomeAboutCollage locale={locale} />
       <BlogTemplateBeforePosts locale={locale} />

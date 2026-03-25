@@ -91,6 +91,15 @@ export async function HomeLogisticsHero({
             unoptimized={heroImage.startsWith("http")}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/62 to-black/40 rtl:bg-gradient-to-l" />
+          {/* Very subtle orange haze on the cover (edges + soft center wash) */}
+          <div
+            className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_95%_80%_at_50%_38%,transparent_40%,rgba(232,93,4,0.045)_72%,rgba(232,93,4,0.09)_100%)]"
+            aria-hidden
+          />
+          <div
+            className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[var(--accent)]/[0.035] via-transparent to-[var(--accent)]/[0.055]"
+            aria-hidden
+          />
         </div>
 
         <div className="relative z-10 mx-auto flex min-h-[min(88vh,46rem)] max-w-7xl flex-col justify-center px-4 py-20 sm:px-6 sm:py-24 lg:min-h-[38rem] lg:py-28">
@@ -151,7 +160,10 @@ export async function HomeLogisticsHero({
           <div className="order-1 flex w-full justify-center lg:order-2 lg:w-auto lg:justify-end lg:pe-4">
             <div
               className="relative -mt-6 w-[min(100%,420px)] max-w-lg lg:-mt-28 lg:w-[min(100%,480px)]"
-              style={{ filter: "drop-shadow(0 28px 40px rgba(0,0,0,0.35))" }}
+              style={{
+                filter:
+                  "drop-shadow(0 28px 40px rgba(0,0,0,0.34)) drop-shadow(0 0 22px rgba(232,93,4,0.2)) drop-shadow(0 0 52px rgba(255,107,0,0.06))",
+              }}
             >
               <div className="relative aspect-[4/3] w-full">
                 <Image
