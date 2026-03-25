@@ -311,6 +311,7 @@
     "socialLinkedin": "LinkedIn",
     "socialInstagram": "Instagrama",
     "copyright": "© {year} TransPool24. Wszelkie prawa zastrzeżone.",
+    "developerCredit": "Projekt i rozwój: wisam dandash",
     "languageLabel": "Język",
     "socialTiktok": "TikTok",
     "socialFacebook": "Facebooku",
@@ -785,7 +786,8 @@
       "footerQuick2": "About",
       "footerQuick3": "Blog",
       "footerQuick4": "Privacy",
-      "footerCopyright": "© {year} TransPool24. All rights reserved."
+      "footerCopyright": "© {year} TransPool24. All rights reserved.",
+      "footerDeveloperCredit": "Projekt i rozwój: wisam dandash"
     }
   }
 }

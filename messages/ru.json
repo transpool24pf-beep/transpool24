@@ -311,6 +311,7 @@
     "socialLinkedin": "LinkedIn",
     "socialInstagram": "Инстаграм",
     "copyright": "© {year} ТрансПул24. Все права защищены.",
+    "developerCredit": "Дизайн и разработка: wisam dandash",
     "languageLabel": "Язык",
     "socialTiktok": "ТикТок",
     "socialFacebook": "Фейсбук",
@@ -785,7 +786,8 @@
       "footerQuick2": "About",
       "footerQuick3": "Blog",
       "footerQuick4": "Privacy",
-      "footerCopyright": "© {year} TransPool24. All rights reserved."
+      "footerCopyright": "© {year} TransPool24. All rights reserved.",
+      "footerDeveloperCredit": "Дизайн и разработка: wisam dandash"
     }
   }
 }

@@ -311,6 +311,7 @@
     "socialLinkedin": "لينكد إن",
     "socialInstagram": "إنستغرام",
     "copyright": "© {year} TransPool24. جميع الحقوق محفوظة.",
+    "developerCredit": "تصميم وتطوير wisam dandash",
     "languageLabel": "اللغة",
     "socialTiktok": "تيك توك",
     "socialFacebook": "فيسبوك",
@@ -785,7 +786,8 @@
       "footerQuick2": "من نحن",
       "footerQuick3": "المدونة",
       "footerQuick4": "الخصوصية",
-      "footerCopyright": "© {year} TransPool24. جميع الحقوق محفوظة."
+      "footerCopyright": "© {year} TransPool24. جميع الحقوق محفوظة.",
+      "footerDeveloperCredit": "تصميم وتطوير wisam dandash"
     }
   }
 }

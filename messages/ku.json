@@ -311,6 +311,7 @@
     "socialLinkedin": "LinkedIn",
     "socialInstagram": "Instagram",
     "copyright": "©⁠<<0>> TransPool24. Hemû maf parastî ne.",
+    "developerCredit": "Sêwiranî û pêşvebirin: wisam dandash",
     "languageLabel": "Ziman",
     "socialTiktok": "TikTok",
     "socialFacebook": "Facebook",
@@ -785,7 +786,8 @@
       "footerQuick2": "About",
       "footerQuick3": "Blog",
       "footerQuick4": "Privacy",
-      "footerCopyright": "© {year} TransPool24. All rights reserved."
+      "footerCopyright": "© {year} TransPool24. All rights reserved.",
+      "footerDeveloperCredit": "Sêwiranî û pêşvebirin: wisam dandash"
     }
   }
 }

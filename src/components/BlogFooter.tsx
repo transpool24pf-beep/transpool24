@@ -34,9 +34,10 @@ export function BlogFooter() {
   const t = useTranslations("blog");
   const locale = useLocale();
   const year = new Date().getFullYear();
+  const rtl = locale === "ar" || locale === "ku";
 
   return (
-    <footer className="mt-auto bg-[#1a1a1a] text-white">
+    <footer className="mt-auto bg-[#1a1a1a] text-white" dir={rtl ? "rtl" : "ltr"}>
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:py-16">
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-10">
           <div>
@@ -117,10 +118,15 @@ export function BlogFooter() {
             </ul>
           </div>
         </div>
-        <p className="mt-12 border-t border-white/10 pt-8 text-center text-xs text-white/45">
-          {t("template.footerCopyright", { year })}
+        <p className="mt-12 border-t border-white/10 pt-8 text-center text-xs text-white/35">
+          {t("footerDisclaimer")}
         </p>
-        <p className="mt-4 text-center text-xs text-white/35">{t("footerDisclaimer")}</p>
+        <div className="mt-6 border-t border-black/50 bg-[#12151a]">
+          <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-3 text-center text-xs text-white/50 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:text-start">
+            <p>{t("template.footerCopyright", { year })}</p>
+            <p className="text-white/45">{t("template.footerDeveloperCredit")}</p>
+          </div>
+        </div>
       </div>
     </footer>
   );

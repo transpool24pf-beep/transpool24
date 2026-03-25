@@ -159,7 +159,8 @@
       "footerQuick2": "About",
       "footerQuick3": "Blog",
       "footerQuick4": "Privacy",
-      "footerCopyright": "© {year} TransPool24. All rights reserved."
+      "footerCopyright": "© {year} TransPool24. All rights reserved.",
+      "footerDeveloperCredit": "Design & development: wisam dandash"
     }
   },
   "home": {
@@ -446,6 +447,7 @@
     "socialLinkedin": "LinkedIn",
     "socialInstagram": "Instagram",
     "copyright": "© {year} TransPool24. All rights reserved.",
+    "developerCredit": "Design & development: wisam dandash",
     "languageLabel": "Language",
     "socialTiktok": "TikTok",
     "socialFacebook": "Facebook",

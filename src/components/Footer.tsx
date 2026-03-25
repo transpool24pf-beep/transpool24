@@ -189,36 +189,40 @@ export function Footer() {
 
         <div className="border-t border-white/10">
           <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-6 text-xs text-white/55 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-            <p>{t("copyright", { year: new Date().getFullYear() })}</p>
-            <div className="flex flex-wrap items-center gap-3 sm:gap-4">
-              <a
-                href="https://www.transpool24.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-white/70 hover:text-white hover:underline"
-              >
-                transpool24.com
-              </a>
-              <div className="flex flex-col gap-2 border-white/10 sm:border-s sm:ps-4">
-                <span className="text-white/50">{t("languageLabel")}</span>
-                <div className="grid max-w-[22rem] grid-cols-2 gap-x-3 gap-y-1">
-                  {locales.map((loc) => (
-                    <Link
-                      key={loc}
-                      href={`/${loc}${basePath === "/" ? "" : basePath}`}
-                      className={`flex min-w-0 items-center gap-2 rounded-md px-1 py-1 text-left text-[11px] sm:text-xs ${
-                        loc === locale
-                          ? "bg-white/15 font-semibold text-white"
-                          : "text-white/75 hover:bg-white/10 hover:text-white"
-                      }`}
-                    >
-                      <LocaleFlagIcon locale={loc} />
-                      <span className="min-w-0 truncate">{LOCALE_NATIVE_LABEL[loc]}</span>
-                    </Link>
-                  ))}
-                </div>
+            <a
+              href="https://www.transpool24.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white/70 hover:text-white hover:underline"
+            >
+              transpool24.com
+            </a>
+            <div className="flex flex-col gap-2 border-white/10 sm:border-s sm:ps-4">
+              <span className="text-white/50">{t("languageLabel")}</span>
+              <div className="grid max-w-[22rem] grid-cols-2 gap-x-3 gap-y-1">
+                {locales.map((loc) => (
+                  <Link
+                    key={loc}
+                    href={`/${loc}${basePath === "/" ? "" : basePath}`}
+                    className={`flex min-w-0 items-center gap-2 rounded-md px-1 py-1 text-left text-[11px] sm:text-xs ${
+                      loc === locale
+                        ? "bg-white/15 font-semibold text-white"
+                        : "text-white/75 hover:bg-white/10 hover:text-white"
+                    }`}
+                  >
+                    <LocaleFlagIcon locale={loc} />
+                    <span className="min-w-0 truncate">{LOCALE_NATIVE_LABEL[loc]}</span>
+                  </Link>
+                ))}
               </div>
             </div>
+          </div>
+        </div>
+
+        <div className="border-t border-black/50 bg-[#12151a]">
+          <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-3 text-center text-xs text-white/50 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:text-start">
+            <p>{t("copyright", { year: new Date().getFullYear() })}</p>
+            <p className="text-white/45">{t("developerCredit")}</p>
           </div>
         </div>
       </footer>
