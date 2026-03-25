@@ -19,19 +19,32 @@ type Props = {
   truckImageUrl: string | null;
 };
 
+/** `clear` = sharp photo, dark band at bottom only (no orange wash, no blur). */
 function HeroOverlapCard({
   title,
   description,
   readMore,
   href,
   imageUrl,
+  overlay = "brand",
 }: {
   title: string;
   description: string;
   readMore: string;
   href: string;
   imageUrl: string;
+  overlay?: "brand" | "clear";
 }) {
+  const overlayClass =
+    overlay === "clear"
+      ? "bg-gradient-to-t from-black/[0.92] via-black/25 via-[42%] to-transparent"
+      : "bg-gradient-to-t from-black/85 via-[var(--accent)]/55 to-[var(--accent)]/25";
+
+  const textShell =
+    overlay === "clear"
+      ? "[text-shadow:0_1px_14px_rgba(0,0,0,0.9),0_0_1px_rgba(0,0,0,0.8)]"
+      : "";
+
   return (
     <Link
       href={href}
@@ -45,8 +58,8 @@ function HeroOverlapCard({
         sizes="280px"
         unoptimized={imageUrl.startsWith("http")}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-[var(--accent)]/55 to-[var(--accent)]/25" />
-      <div className="relative z-10 p-5 text-white">
+      <div className={`absolute inset-0 ${overlayClass}`} />
+      <div className={`relative z-10 p-5 text-white ${textShell}`}>
         <h3 className="text-lg font-bold leading-snug text-[var(--accent)] drop-shadow-sm">{title}</h3>
         <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-white/90">{description}</p>
         <span className="mt-4 inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-white">
@@ -70,8 +83,9 @@ export async function HomeLogisticsHero({
   const t = await getTranslations({ locale, namespace: "home" });
 
   const truckSrc = truckImageUrl?.trim() || DEFAULT_TRUCK_UNSPLASH;
+  /** Land-freight overlap card — DO Spaces (sharp photo; `overlay="clear"` avoids orange wash). */
   const cardImgRoad =
-    "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80&auto=format&fit=crop";
+    "https://sk-bucket.sgp1.cdn.digitaloceanspaces.com/2022/04/24234214/shutterstock_637016899_censored.jpg";
   /** Second land-service card (no sea/air) — loading / last-mile visual */
   const cardImgLand2 =
     "https://images.unsplash.com/photo-1616432043562-7a89e2f4e936?w=600&q=80&auto=format&fit=crop";
@@ -139,6 +153,7 @@ export async function HomeLogisticsHero({
               readMore={t("logisticsHero.cardReadMore")}
               href={`/${locale}/order`}
               imageUrl={cardImgRoad}
+              overlay="clear"
             />
             <HeroOverlapCard
               title={t("logisticsHero.cardLand2Title")}
