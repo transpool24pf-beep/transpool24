@@ -12,12 +12,9 @@ import { routing } from "@/i18n/routing";
 
 export const revalidate = 60;
 
-/**
- * Blog hero background — Bing `th` URLs default to tiny WebP (~8KB). Appending large `w`/`h` requests a bigger JPEG from the CDN.
- * @see curl -sI "…?w=3840&h=2160&rs=1&pid=ImgDetMain&o=7"
- */
+/** Blog hero — iStock delivery scene (licensed use per your account; served crisp via next/image unoptimized). */
 const BLOG_HERO_BACKGROUND =
-  "https://tse1.mm.bing.net/th/id/OIP.VlpzxeRVYbRXqO08zdATXAHaE8?w=3840&h=2160&rs=1&pid=ImgDetMain&o=7";
+  "https://media.istockphoto.com/id/1795667445/photo/asian-woman-receiving-product-from-delivery-man-at-home-young-owner-woman-order-product-from.jpg?s=170667a&w=0&k=20&c=z4DKtsdWUvhJWsVvLB3OlZ1eVtib_ftEZj0a0fzHoR4=";
 /** Blog hero vehicle: `assets/pngegg.png` → public */
 const BLOG_HERO_VEHICLE = "/images/blog-hero-vehicle.png";
 
