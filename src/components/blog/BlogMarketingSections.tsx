@@ -92,12 +92,12 @@ export async function BlogTemplateBeforePosts({ locale }: { locale: Locale }) {
             </li>
             <li className="flex flex-col rounded-2xl border-2 border-[var(--accent)]/35 bg-white p-8 shadow-sm">
               <span className="text-3xl text-[var(--accent)]" aria-hidden>
-                🚢
+                🚚
               </span>
-              <h3 className="mt-6 text-xl font-extrabold text-[#1a1a1a]">{t("template.svcSeaTitle")}</h3>
-              <p className="mt-3 flex-1 text-sm leading-relaxed text-[#6b6b6b]">{t("template.svcSeaDesc")}</p>
+              <h3 className="mt-6 text-xl font-extrabold text-[#1a1a1a]">{t("template.svcLand2Title")}</h3>
+              <p className="mt-3 flex-1 text-sm leading-relaxed text-[#6b6b6b]">{t("template.svcLand2Desc")}</p>
               <Link
-                href={`/${locale}/why`}
+                href={`/${locale}/order`}
                 className="mt-8 inline-flex text-xs font-bold uppercase tracking-wider text-[var(--accent)] underline-offset-4 hover:underline"
               >
                 {t("template.svcReadMore")}
@@ -105,10 +105,10 @@ export async function BlogTemplateBeforePosts({ locale }: { locale: Locale }) {
             </li>
             <li className="flex flex-col rounded-2xl border-2 border-[var(--accent)]/35 bg-white p-8 shadow-sm">
               <span className="text-3xl text-[var(--accent)]" aria-hidden>
-                ✈️
+                📦
               </span>
-              <h3 className="mt-6 text-xl font-extrabold text-[#1a1a1a]">{t("template.svcAirTitle")}</h3>
-              <p className="mt-3 flex-1 text-sm leading-relaxed text-[#6b6b6b]">{t("template.svcAirDesc")}</p>
+              <h3 className="mt-6 text-xl font-extrabold text-[#1a1a1a]">{t("template.svcLand3Title")}</h3>
+              <p className="mt-3 flex-1 text-sm leading-relaxed text-[#6b6b6b]">{t("template.svcLand3Desc")}</p>
               <Link
                 href={`/${locale}/order`}
                 className="mt-8 inline-flex text-xs font-bold uppercase tracking-wider text-[var(--accent)] underline-offset-4 hover:underline"
@@ -131,9 +131,9 @@ export async function BlogTemplateBeforePosts({ locale }: { locale: Locale }) {
               })}
             </h2>
             <div className="mt-10 space-y-8">
-              <ProgressBar label={t("template.statsSea")} pct={t("template.statsSeaPct")} />
-              <ProgressBar label={t("template.statsRoad")} pct={t("template.statsRoadPct")} />
-              <ProgressBar label={t("template.statsAir")} pct={t("template.statsAirPct")} />
+              <ProgressBar label={t("template.statsLand1")} pct={t("template.statsLand1Pct")} />
+              <ProgressBar label={t("template.statsLand2")} pct={t("template.statsLand2Pct")} />
+              <ProgressBar label={t("template.statsLand3")} pct={t("template.statsLand3Pct")} />
             </div>
           </div>
           <div className="relative mx-auto w-full max-w-lg">
