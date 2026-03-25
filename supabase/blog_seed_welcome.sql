@@ -32,5 +32,19 @@ VALUES
   'TransPool24',
   'TransPool24 Magazine — logistics & transport',
   'Editorial insights on transport, markets, and logistics.'
+),
+(
+  'ar',
+  'ahlan-transpool24-magazine',
+  'مرحباً بكم في مجلة TransPool24',
+  'تحليلات ومقالات حول النقل واللوجستيات والأسواق — منفصلة عن صفحة الحجز.',
+  E'# أهلاً بكم\n\nننشر هنا **تحليلات وسياقاً** حول أسعار الوقود، المسارات، اتجاهات القطاع، وديناميكيات السوق.\n\n- التركيز: ألمانيا وأوروبا  \n- منفصل عن خدمة الحجز على [الموقع الرئيسي](/ar)\n\n> المقالات للمعلومات العامة فقط وليست استشارة قانونية أو مالية.\n',
+  'تحرير',
+  ARRAY['لوجستيات', 'نقل']::text[],
+  'published',
+  NOW(),
+  'TransPool24',
+  'مجلة TransPool24 — النقل واللوجستيات',
+  'مقالات تحريرية حول النقل واللوجستيات والأسواق.'
 )
 ON CONFLICT (locale, slug) DO NOTHING;

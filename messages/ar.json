@@ -5,7 +5,7 @@
     "drivers": "السائقين",
     "contact": "اتصل",
     "slogan": "نشطون في بفورتسهايم – متصلون عالمياً",
-    "blog": "Magazine"
+    "blog": "المجلة"
   },
   "home": {
     "title": "TransPool24 شريكك اللوجستي في بفورتسهايم",
@@ -262,7 +262,7 @@
     "socialTiktok": "تيك توك",
     "socialFacebook": "فيسبوك",
     "socialYoutube": "يوتيوب",
-    "linkBlog": "Magazine"
+    "linkBlog": "المجلة"
   },
   "driver": {
     "step1Name": "البيانات الأساسية",
@@ -602,31 +602,31 @@
     }
   },
   "blog": {
-    "magazineBadge": "Insights",
-    "magazineTitle": "TransPool24 Magazine",
-    "navAria": "Magazine navigation",
-    "navArticles": "Articles",
-    "toCompanySite": "Company website",
-    "bookTransport": "Book transport",
-    "language": "Language",
-    "metaIndexTitle": "Magazine | TransPool24",
-    "metaIndexDescription": "Analysis and news on transport, logistics, fuel prices, and markets.",
-    "indexKicker": "Insights",
-    "indexTitle": "Transport & logistics insights",
-    "indexSubtitle": "Editorial articles on freight, Europe, pricing, and the industry — separate from our booking product.",
-    "empty": "No articles yet. Please check back soon.",
-    "backToMagazine": "Back to magazine",
-    "notFoundTitle": "Not found",
-    "footerBlurb": "Independent editorial content from TransPool24. Booking and services remain on the main website.",
-    "linkPrivacy": "Privacy",
-    "linkContact": "Contact",
-    "footerDisclaimer": "Articles are for general information only, not legal or financial advice.",
-    "emptyTitle": "The magazine is live — your first story goes here",
-    "emptyHint": "Articles are not written on this public page. Sign in to the operations dashboard, open Blog / Magazin, create a post, set status to Published, and choose the same language as this page. You can also run the optional SQL seed in Supabase to insert welcome posts for DE and EN.",
-    "linkAdmin": "Open editor dashboard",
-    "footerEditorsTitle": "Editorial team",
-    "footerEditorsLine": "Manage articles and static pages:",
-    "emptyAdminSteps": "Admin login → Blog / Magazin → New article → Published",
-    "seedHint": "Optional welcome posts for DE & EN:"
+    "magazineBadge": "تحليلات",
+    "magazineTitle": "مجلة TransPool24",
+    "navAria": "تنقل المجلة",
+    "navArticles": "المقالات",
+    "toCompanySite": "الموقع الرئيسي للشركة",
+    "bookTransport": "احجز نقلًا",
+    "language": "اللغة",
+    "metaIndexTitle": "المجلة | TransPool24",
+    "metaIndexDescription": "تحليلات وأخبار حول النقل واللوجستيات وأسعار الوقود والأسواق.",
+    "indexKicker": "تحليلات",
+    "indexTitle": "رؤى النقل واللوجستيات",
+    "indexSubtitle": "مقالات تحريرية عن الشحن وأوروبا والأسعار والقطاع — منفصلة عن صفحة الحجز.",
+    "empty": "لا توجد مقالات بعد. يُرجى العودة لاحقًا.",
+    "backToMagazine": "العودة إلى المجلة",
+    "notFoundTitle": "غير موجود",
+    "footerBlurb": "محتوى تحريري من TransPool24. الحجز والخدمات يبقى على الموقع الرئيسي.",
+    "linkPrivacy": "الخصوصية",
+    "linkContact": "اتصل بنا",
+    "footerDisclaimer": "المقالات للمعلومات العامة فقط وليست استشارة قانونية أو مالية.",
+    "emptyTitle": "المجلة جاهزة — أضف أول مقال بالعربية هنا",
+    "emptyHint": "المقالات لا تُكتب على هذه الصفحة العامة. سجّل الدخول إلى لوحة التحكم، افتح «Blog / Magazin»، أنشئ مقالاً، اضبط الحالة على «منشور»، واختر اللغة نفسها لهذه الصفحة (مثلاً ar). مهم: صفحة /ar/blog تعرض فقط المقالات التي حقل لغتها ar. يمكنك أيضاً تشغيل ملف blog_seed_welcome.sql في Supabase لإضافة مقالات ترحيب (يشمل ar وde وen).",
+    "linkAdmin": "فتح لوحة التحرير",
+    "footerEditorsTitle": "فريق التحرير",
+    "footerEditorsLine": "إدارة المقالات والصفحات الثابتة:",
+    "emptyAdminSteps": "تسجيل الدخول → Blog / Magazin → مقال جديد → منشور",
+    "seedHint": "مقالات ترحيب اختيارية (ar, de, en):"
   }
 }
