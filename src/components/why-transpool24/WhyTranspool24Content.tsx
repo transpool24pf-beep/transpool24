@@ -198,6 +198,8 @@ export async function WhyTranspool24Content({ data, locale, aboutNarrativeFirst 
               </div>
             </div>
           </div>
+
+          <SiteQrSection url={qrTargetUrl} embedded />
         </article>
 
         <section className="relative mt-12 overflow-hidden rounded-tr-[2.5rem] bg-gradient-to-br from-[#0d2137] via-[#152a45] to-[#0d2137] px-6 py-12 text-white shadow-xl sm:mt-14 sm:rounded-tr-[4rem] sm:px-10 sm:py-16 lg:rounded-tr-[5rem]">
