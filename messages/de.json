@@ -242,7 +242,14 @@
     "siteQr": {
       "title": "TransPool24 auf dem Smartphone",
       "subtitle": "QR-Code scannen — unsere Website öffnet sich in Ihrer Sprache.",
-      "logoAlt": "TransPool24"
+      "logoAlt": "TransPool24",
+      "copyLink": "Link kopieren",
+      "downloadPng": "QR als PNG laden",
+      "share": "Teilen",
+      "copied": "Kopiert!",
+      "shareTitle": "TransPool24",
+      "shareText": "TransPool24 öffnen",
+      "actionError": "Aktion fehlgeschlagen. Bitte erneut versuchen oder den Link manuell kopieren."
     },
     "driverCta": {
       "eyebrow": "Für Berufsfahrer",

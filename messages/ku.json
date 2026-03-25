@@ -110,7 +110,14 @@
     "siteQr": {
       "title": "Malperê ji telefona xwe veke",
       "subtitle": "Koda QR bixwîne da ku TransPool24 bi zimanê xwe vebe.",
-      "logoAlt": "TransPool24"
+      "logoAlt": "TransPool24",
+      "copyLink": "Girêdanê kopî bike",
+      "downloadPng": "QR daxîne (PNG)",
+      "share": "Parve bike",
+      "copied": "Hat kopîkirin!",
+      "shareTitle": "TransPool24",
+      "shareText": "TransPool24 veke",
+      "actionError": "Ne hat. Dîsa biceribîne an girêdanê bi dest kopî bike."
     },
     "driverCta": {
       "eyebrow": "Ji bo ajokarên profesyonel",

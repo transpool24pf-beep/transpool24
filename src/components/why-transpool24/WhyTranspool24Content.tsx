@@ -1,45 +1,58 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import type { WhyIconId } from "@/lib/why-transpool24-types";
 import type { WhyPagePayload } from "@/lib/why-transpool24-types";
-import { AboutUsArWhyNarrative } from "@/components/about/AboutUsArWhyNarrative";
+import { AboutUsWhyNarrative } from "@/components/about/AboutUsWhyNarrative";
+import type { Locale } from "@/i18n/routing";
+import { routing } from "@/i18n/routing";
 import { WhyTranspool24Icon } from "./WhyTranspool24Icon";
 import { WhyHowItWorksMedia } from "./WhyHowItWorksMedia";
 import { WhyCmsImage } from "./WhyCmsImage";
+import { SiteQrSection } from "@/components/SiteQrSection";
 
 type Props = {
   data: WhyPagePayload;
   locale: string;
-  /** Arabic: show vision / brand narrative (من نحن) above operational B2B sections. */
-  arAboutNarrativeFirst?: boolean;
+  /** «About us» narrative (all locales) above operational B2B sections. */
+  aboutNarrativeFirst?: boolean;
 };
 
 const SERVICE_CARD_ICONS: WhyIconId[] = ["package", "truck", "clipboard", "shield"];
 
-export function WhyTranspool24Content({ data, locale, arAboutNarrativeFirst = false }: Props) {
-  const rtl = locale === "ar";
+const SITE_ROOT = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com").replace(/\/$/, "");
+
+export async function WhyTranspool24Content({ data, locale, aboutNarrativeFirst = false }: Props) {
+  const loc = locale as Locale;
+  const rtl = loc === "ar" || loc === "ku";
+  const qrTargetUrl = `${SITE_ROOT}/${locale}`;
   const faqMid = Math.ceil(data.faqs.length / 2);
   const faqCol1 = data.faqs.slice(0, faqMid);
   const faqCol2 = data.faqs.slice(faqMid);
+
+  const tAbout =
+    aboutNarrativeFirst && routing.locales.includes(loc)
+      ? await getTranslations({ locale: loc, namespace: "aboutNarrative" })
+      : null;
 
   return (
     <div className="bg-[#f4f6f8] pb-0 pt-6 sm:pt-10" dir={rtl ? "rtl" : "ltr"}>
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <article className="overflow-hidden rounded-[1.25rem] border border-[#0d2137]/8 bg-white shadow-sm sm:rounded-[1.75rem]">
-          {arAboutNarrativeFirst ? (
-            <AboutUsArWhyNarrative />
-          ) : null}
-          {arAboutNarrativeFirst ? (
-            <div className="border-b border-[#0d2137]/6 bg-white px-6 py-8 sm:px-10 sm:py-10">
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--accent)]">
-                التشغيل اليومي للشركات والتجارة
-              </p>
-              <h1 className="mt-3 text-2xl font-extrabold leading-tight text-[var(--primary)] sm:text-3xl md:text-[2rem]">
-                {data.headline}
-              </h1>
-              <p className="mt-4 max-w-3xl text-base leading-relaxed text-[var(--foreground)]/75 sm:text-lg">
-                {data.heroSub}
-              </p>
-            </div>
+          {aboutNarrativeFirst ? <AboutUsWhyNarrative locale={locale} /> : null}
+          {aboutNarrativeFirst ? (
+            tAbout ? (
+              <div className="border-b border-[#0d2137]/6 bg-white px-6 py-8 sm:px-10 sm:py-10">
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-[var(--accent)]">
+                  {tAbout("operationalKicker")}
+                </p>
+                <h1 className="mt-3 text-2xl font-extrabold leading-tight text-[var(--primary)] sm:text-3xl md:text-[2rem]">
+                  {data.headline}
+                </h1>
+                <p className="mt-4 max-w-3xl text-base leading-relaxed text-[var(--foreground)]/75 sm:text-lg">
+                  {data.heroSub}
+                </p>
+              </div>
+            ) : null
           ) : (
             <div className="border-b border-[#0d2137]/6 bg-gradient-to-br from-[#f8fafc] to-white px-6 py-10 sm:px-10 sm:py-12">
               <p className="text-sm font-semibold uppercase tracking-wide text-[var(--accent)]">{data.heroBadge}</p>

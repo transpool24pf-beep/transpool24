@@ -110,7 +110,14 @@
     "siteQr": {
       "title": "Відкрийте сайт з телефону",
       "subtitle": "Відскануйте QR-код, щоб відкрити TransPool24 вашою мовою.",
-      "logoAlt": "TransPool24"
+      "logoAlt": "TransPool24",
+      "copyLink": "Копіювати посилання",
+      "downloadPng": "Завантажити QR (PNG)",
+      "share": "Поділитися",
+      "copied": "Скопійовано!",
+      "shareTitle": "TransPool24",
+      "shareText": "Відкрити TransPool24",
+      "actionError": "Не вдалося виконати. Спробуйте ще або скопіюйте посилання вручну."
     },
     "driverCta": {
       "eyebrow": "Для професійних водіїв",

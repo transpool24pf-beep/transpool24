@@ -242,7 +242,14 @@
     "siteQr": {
       "title": "Visit us on your phone",
       "subtitle": "Scan the QR code to open TransPool24 in your language.",
-      "logoAlt": "TransPool24"
+      "logoAlt": "TransPool24",
+      "copyLink": "Copy link",
+      "downloadPng": "Download QR (PNG)",
+      "share": "Share",
+      "copied": "Copied!",
+      "shareTitle": "TransPool24",
+      "shareText": "Open TransPool24",
+      "actionError": "Could not complete the action. Try again or copy the link manually."
     },
     "driverCta": {
       "eyebrow": "For professional drivers",

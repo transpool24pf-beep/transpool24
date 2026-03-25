@@ -7,11 +7,9 @@ import { DriversCarousel } from "@/components/DriversCarousel";
 import { HomeTransportOperations } from "@/components/HomeTransportOperations";
 import { GermanyConnectSection } from "@/components/GermanyConnectSection";
 import { HomepageDriverLogisticsLottie } from "@/components/HomepageDriverLogisticsLottie";
-import { HomepageSiteQr } from "@/components/HomepageSiteQr";
 import { getHomepageHero } from "@/lib/homepage-hero";
 
 const FALLBACK_IMAGE = "/images/5677.png";
-const SITE_ROOT = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com").replace(/\/$/, "");
 
 export default async function HomePage({
   params,
@@ -26,7 +24,6 @@ export default async function HomePage({
   const heroHeadline = hero.headline || t("heroHeadline");
   const heroSubtitle = hero.subtitle || t("subtitle");
   const heroCta = hero.cta || t("cta");
-  const qrTargetUrl = `${SITE_ROOT}/${locale}`;
 
   return (
     <>
@@ -170,13 +167,6 @@ export default async function HomePage({
         <HomeTransportOperations />
 
         <GermanyConnectSection locale={locale} />
-
-        <HomepageSiteQr
-          url={qrTargetUrl}
-          title={t("siteQr.title")}
-          subtitle={t("siteQr.subtitle")}
-          logoAlt={t("siteQr.logoAlt")}
-        />
 
         {/* Driver CTA — immersive card (sennder-style), single “Become a driver” action */}
         <section className="bg-[#f5f5f5] py-20 sm:py-28">

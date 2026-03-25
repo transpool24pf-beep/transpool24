@@ -110,7 +110,14 @@
     "siteQr": {
       "title": "زُر الموقع من هاتفك",
       "subtitle": "امسح رمز QR لفتح TransPool24 بلغتك مباشرة.",
-      "logoAlt": "TransPool24"
+      "logoAlt": "TransPool24",
+      "copyLink": "نسخ الرابط",
+      "downloadPng": "تحميل QR (صورة)",
+      "share": "مشاركة",
+      "copied": "تم النسخ!",
+      "shareTitle": "TransPool24",
+      "shareText": "افتح TransPool24",
+      "actionError": "تعذّر الإجراء. أعد المحاولة أو انسخ الرابط يدوياً."
     },
     "driverCta": {
       "eyebrow": "لسائقين المحترفين",

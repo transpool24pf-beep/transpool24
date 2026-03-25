@@ -110,7 +110,14 @@
     "siteQr": {
       "title": "Visítanos desde el móvil",
       "subtitle": "Escanea el código QR para abrir TransPool24 en tu idioma.",
-      "logoAlt": "TransPool24"
+      "logoAlt": "TransPool24",
+      "copyLink": "Copiar enlace",
+      "downloadPng": "Descargar QR (PNG)",
+      "share": "Compartir",
+      "copied": "¡Copiado!",
+      "shareTitle": "TransPool24",
+      "shareText": "Abrir TransPool24",
+      "actionError": "No se pudo completar. Inténtalo de nuevo o copia el enlace manualmente."
     },
     "driverCta": {
       "eyebrow": "Para conductores profesionales",

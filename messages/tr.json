@@ -110,7 +110,14 @@
     "siteQr": {
       "title": "Telefondan sitemize gidin",
       "subtitle": "TransPool24’ü dilinizde açmak için QR kodunu tarayın.",
-      "logoAlt": "TransPool24"
+      "logoAlt": "TransPool24",
+      "copyLink": "Bağlantıyı kopyala",
+      "downloadPng": "QR indir (PNG)",
+      "share": "Paylaş",
+      "copied": "Kopyalandı!",
+      "shareTitle": "TransPool24",
+      "shareText": "TransPool24’ü aç",
+      "actionError": "İşlem tamamlanamadı. Tekrar deneyin veya bağlantıyı elle kopyalayın."
     },
     "driverCta": {
       "eyebrow": "Profesyonel sürücüler için",

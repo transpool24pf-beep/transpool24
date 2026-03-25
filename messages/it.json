@@ -110,7 +110,14 @@
     "siteQr": {
       "title": "Apri il sito dal telefono",
       "subtitle": "Scansiona il codice QR per aprire TransPool24 nella tua lingua.",
-      "logoAlt": "TransPool24"
+      "logoAlt": "TransPool24",
+      "copyLink": "Copia link",
+      "downloadPng": "Scarica QR (PNG)",
+      "share": "Condividi",
+      "copied": "Copiato!",
+      "shareTitle": "TransPool24",
+      "shareText": "Apri TransPool24",
+      "actionError": "Operazione non riuscita. Riprova o copia il link manualmente."
     },
     "driverCta": {
       "eyebrow": "Per autisti professionisti",

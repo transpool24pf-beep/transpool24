@@ -110,7 +110,14 @@
     "siteQr": {
       "title": "Accesează site-ul de pe telefon",
       "subtitle": "Scanează codul QR pentru a deschide TransPool24 în limba ta.",
-      "logoAlt": "TransPool24"
+      "logoAlt": "TransPool24",
+      "copyLink": "Copiază linkul",
+      "downloadPng": "Descarcă QR (PNG)",
+      "share": "Distribuie",
+      "copied": "Copiat!",
+      "shareTitle": "TransPool24",
+      "shareText": "Deschide TransPool24",
+      "actionError": "Acțiunea a eșuat. Încearcă din nou sau copiază linkul manual."
     },
     "driverCta": {
       "eyebrow": "Pentru șoferi profesioniști",
