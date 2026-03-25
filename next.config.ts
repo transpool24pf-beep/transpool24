@@ -29,6 +29,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "ui-avatars.com", pathname: "/api/**" },
       { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
       { protocol: "https", hostname: "media.istockphoto.com", pathname: "/id/**" },
+      { protocol: "https", hostname: "channel.mediacdn.vn", pathname: "/**" },
       {
         protocol: "https",
         hostname: "sk-bucket.sgp1.cdn.digitaloceanspaces.com",

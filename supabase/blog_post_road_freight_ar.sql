@@ -25,7 +25,7 @@ VALUES (
   $arabic$
 # نقل بري موثوق داخل ألمانيا: كيف تضمن TransPool24 أمان شحنتك؟
 
-![مستودع ولوجستيات برية حديثة](https://sk-bucket.sgp1.cdn.digitaloceanspaces.com/2022/04/24234214/shutterstock_637016899_censored.jpg)
+![لوجستيات ونقل بري داخل ألمانيا](https://channel.mediacdn.vn/2021/1/29/photo-3-16119097657112112470677.jpg)
 
 > **📌 ملخص:** في عالم اللوجستيات المتسارع، لم يعد نقل البضائع مجرد انتقال من نقطة (أ) إلى نقطة (ب). التحدي الحقيقي يكمن في **الموثوقية**، **الشفافية**، و**السرعة**. في **TransPool24** أعدنا تعريف النقل البري في ألمانيا، وتحديداً في منطقة **بفورتسهايم (Pforzheim)**، لنقدم تجربة رقمية بالكامل تجمع بين الكفاءة الألمانية والحلول التقنية الذكية.
 
@@ -44,6 +44,8 @@ VALUES (
 ### 💳 الأمان المالي عبر Stripe
 
 نعلم أهمية الثقة المالية؛ لذلك نعتمد **الدفع الآمن عبر Stripe Checkout**. يتم تأمين طلبك ونشره للسائقين المعتمدين **فور تأكيد الدفع**، مما يضمن سرعة التنفيذ وموثوقية المعاملة.
+
+![توصيل طرد بأمان إلى العميلة](https://media.istockphoto.com/id/955864950/pt/foto/delivery-man-delivering-parcel-box-to-a-woman-customer.jpg?s=170667a&w=0&k=20&c=wg6tBHkV2GGzJUMKF0mwEJBy5OxJPpCDA7NyqtIAPCY=)
 
 ---
 
@@ -76,7 +78,7 @@ VALUES (
 
 **📍 TransPool24** — نقل بري داخل ألمانيا. [**احجز طلبك الآن**](/ar/order) أو [**اطلب عرض سعر**](/ar/order).
 $arabic$,
-  'https://sk-bucket.sgp1.cdn.digitaloceanspaces.com/2022/04/24234214/shutterstock_637016899_censored.jpg',
+  'https://channel.mediacdn.vn/2021/1/29/photo-3-16119097657112112470677.jpg',
   'نقل بري',
   ARRAY['ألمانيا', 'نقل بري', 'تتبع', 'Stripe', 'Pforzheim', 'بفورتسهايم']::text[],
   'published',
