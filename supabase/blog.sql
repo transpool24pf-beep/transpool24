@@ -75,7 +75,6 @@ CREATE POLICY "blog_posts_public_read" ON public.blog_posts
   USING (
     status = 'published'
     AND published_at IS NOT NULL
-    AND published_at <= NOW()
   );
 
 DROP POLICY IF EXISTS "blog_pages_public_read" ON public.blog_pages;
@@ -85,7 +84,6 @@ CREATE POLICY "blog_pages_public_read" ON public.blog_pages
   USING (
     status = 'published'
     AND published_at IS NOT NULL
-    AND published_at <= NOW()
   );
 
 -- ---------------------------------------------------------------------------

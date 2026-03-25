@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { createServerSupabase } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/admin-api";
 import { slugifyInput } from "@/lib/blog";
+import { clampPublishedAtIfInFuture } from "@/lib/blog-publish";
 import { locales } from "@/i18n/routing";
 
 function revalidateBlogAll() {
@@ -105,6 +106,18 @@ export async function PATCH(req: Request, ctx: Ctx) {
   }
   if (patch.status === "draft" && body.published_at === null) {
     patch.published_at = null;
+  }
+
+  const { data: curPub } = await supabase
+    .from("blog_posts")
+    .select("status, published_at")
+    .eq("id", id)
+    .single();
+  const mergedStatus = (patch.status as string | undefined) ?? curPub?.status ?? "draft";
+  const mergedPublishedAt =
+    patch.published_at !== undefined ? (patch.published_at as string | null) : curPub?.published_at ?? null;
+  if (mergedStatus === "published") {
+    patch.published_at = clampPublishedAtIfInFuture(mergedPublishedAt, "published");
   }
 
   const { data, error } = await supabase.from("blog_posts").update(patch).eq("id", id).select("*").single();

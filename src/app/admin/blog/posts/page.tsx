@@ -103,7 +103,9 @@ export default function AdminBlogPostsPage() {
                       {p.title}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-[#0d2137]/75">{p.locale}</td>
+                  <td className="px-4 py-3 text-[#0d2137]/75" dir="ltr" translate="no">
+                    <span className="font-mono tabular-nums">{p.locale}</span>
+                  </td>
                   <td className="px-4 py-3 font-mono text-xs text-[#0d2137]/65">{p.slug}</td>
                   <td className="px-4 py-3">
                     <span

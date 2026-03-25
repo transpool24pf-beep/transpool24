@@ -5,6 +5,7 @@ import { requireAdmin } from "@/lib/admin-api";
 import { slugifyInput } from "@/lib/blog";
 import { locales, type Locale } from "@/i18n/routing";
 import { otherLocalesThan, translatePostIntoLocales } from "@/lib/blog-translate";
+import { clampPublishedAtIfInFuture } from "@/lib/blog-publish";
 
 /** Auto-translate can take a while (multiple OpenAI batches). Raise on Vercel if needed. */
 export const maxDuration = 120;
@@ -76,6 +77,7 @@ export async function POST(req: Request) {
   if (status === "draft") {
     published_at = typeof body.published_at === "string" ? body.published_at.trim() || null : null;
   }
+  published_at = clampPublishedAtIfInFuture(published_at, status as "draft" | "published");
 
   const row = {
     locale,
