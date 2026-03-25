@@ -5,6 +5,7 @@ import { listPublishedPosts } from "@/lib/blog";
 import { BlogNewsCard } from "@/components/blog/BlogNewsCard";
 import { HomeLogisticsHero } from "@/components/HomeLogisticsHero";
 import { HomeAboutCollage } from "@/components/HomeAboutCollage";
+import { BlogTemplateAfterPosts, BlogTemplateBeforePosts } from "@/components/blog/BlogMarketingSections";
 import { getHomepageHero } from "@/lib/homepage-hero";
 import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
@@ -56,7 +57,8 @@ export default async function BlogIndexPage({ params }: Props) {
 
   const heroImage = hero.imageUrl || HERO_FALLBACK_IMAGE;
   const heroSubtitle = hero.subtitle || tHome("subtitle");
-  const heroCta = hero.cta || tHome("cta");
+  const primaryCta = (hero.cta && hero.cta.trim()) || t("template.heroPrimary");
+  const secondaryCta = t("template.heroSecondary");
 
   const featured = posts.slice(0, 2);
   const more = posts.slice(2);
@@ -68,10 +70,12 @@ export default async function BlogIndexPage({ params }: Props) {
         heroImage={heroImage}
         cmsHeadline={hero.headline}
         heroSubtitle={heroSubtitle}
-        heroCta={heroCta}
+        primaryCta={primaryCta}
+        secondaryCta={secondaryCta}
         truckImageUrl={hero.truckImageUrl}
       />
       <HomeAboutCollage locale={locale} />
+      <BlogTemplateBeforePosts locale={locale} />
 
       <section className="bg-[#f5f6f8] px-4 py-14 sm:px-6 sm:py-20 lg:py-24">
         <div className="mx-auto max-w-7xl">
@@ -154,6 +158,8 @@ export default async function BlogIndexPage({ params }: Props) {
           )}
         </div>
       </section>
+
+      <BlogTemplateAfterPosts locale={locale} />
     </main>
   );
 }

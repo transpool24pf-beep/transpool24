@@ -12,7 +12,10 @@ type Props = {
   /** When set, replaces the template headline (no orange split). */
   cmsHeadline: string | null;
   heroSubtitle: string;
-  heroCta: string;
+  /** Primary hero button (e.g. GET STARTED / CMS CTA). */
+  primaryCta: string;
+  /** Secondary outline button (e.g. ABOUT US). */
+  secondaryCta: string;
   truckImageUrl: string | null;
 };
 
@@ -60,7 +63,8 @@ export async function HomeLogisticsHero({
   heroImage,
   cmsHeadline,
   heroSubtitle,
-  heroCta,
+  primaryCta,
+  secondaryCta,
   truckImageUrl,
 }: Props) {
   const t = await getTranslations({ locale, namespace: "home" });
@@ -110,13 +114,13 @@ export async function HomeLogisticsHero({
                 href={`/${locale}/order`}
                 className="inline-flex items-center justify-center rounded-md bg-[var(--accent)] px-8 py-3.5 text-sm font-bold uppercase tracking-wide text-white shadow-[0_14px_36px_-10px_rgba(232,93,4,0.65)] transition hover:bg-[var(--accent-hover)]"
               >
-                {heroCta}
+                {primaryCta}
               </Link>
               <Link
                 href={`/${locale}/why`}
                 className="inline-flex items-center justify-center rounded-md border-2 border-white/90 bg-transparent px-8 py-3.5 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-white/10"
               >
-                {t("logisticsHero.aboutUs")}
+                {secondaryCta}
               </Link>
             </div>
           </div>
