@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { locales, type Locale } from "@/i18n/routing";
 import type { SiteSocialMediaPayload } from "@/lib/site-social-media";
 import { LOCALE_NATIVE_LABEL } from "@/lib/locale-display";
@@ -12,6 +12,37 @@ import { LocaleFlagIcon } from "@/components/LocaleFlagIcon";
 
 const FALLBACK_LINKEDIN = "https://www.linkedin.com/in/trans-pool-1235803b8";
 const FALLBACK_INSTAGRAM = "https://www.instagram.com/transpool24/";
+
+function GlobeLayers({ shellInset }: { shellInset: string }) {
+  return (
+    <>
+      <div
+        className="pointer-events-none absolute -inset-px rounded-full bg-gradient-to-br from-sky-300/40 via-transparent to-emerald-400/30 opacity-80"
+        aria-hidden
+      />
+      <div
+        className={`pointer-events-none absolute overflow-hidden rounded-full ${shellInset}`}
+        aria-hidden
+      >
+        <div className="absolute inset-0 rounded-full bg-[radial-gradient(ellipse_85%_70%_at_30%_22%,rgba(255,255,255,0.28),transparent_55%),radial-gradient(ellipse_55%_45%_at_72%_58%,rgba(74,222,128,0.4),transparent_50%),radial-gradient(ellipse_40%_35%_at_18%_70%,rgba(34,197,94,0.25),transparent_45%),linear-gradient(155deg,#0a3d5c_0%,#0e7490_32%,#166534_58%,#0c1929_100%)] shadow-[inset_0_-28px_56px_rgba(0,0,0,0.5),inset_0_16px_32px_rgba(255,255,255,0.06)]" />
+        <svg
+          className="pointer-events-none absolute inset-0 h-full w-full text-white"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="xMidYMid slice"
+          aria-hidden
+        >
+          <ellipse cx="50" cy="50" rx="42" ry="48" fill="none" stroke="currentColor" strokeWidth="0.35" opacity="0.2" />
+          <ellipse cx="50" cy="50" rx="24" ry="48" fill="none" stroke="currentColor" strokeWidth="0.28" opacity="0.18" />
+          <ellipse cx="50" cy="50" rx="8" ry="48" fill="none" stroke="currentColor" strokeWidth="0.22" opacity="0.15" />
+          <line x1="10" y1="35" x2="90" y2="35" stroke="currentColor" strokeWidth="0.2" opacity="0.12" />
+          <line x1="10" y1="50" x2="90" y2="50" stroke="currentColor" strokeWidth="0.2" opacity="0.12" />
+          <line x1="10" y1="65" x2="90" y2="65" stroke="currentColor" strokeWidth="0.2" opacity="0.12" />
+        </svg>
+        <div className="pointer-events-none absolute left-[14%] top-[10%] h-[26%] w-[40%] rounded-full bg-white/18 blur-lg" />
+      </div>
+    </>
+  );
+}
 
 function FooterLanguageGlobe({
   currentLocale,
@@ -22,67 +53,80 @@ function FooterLanguageGlobe({
   basePath: string;
   languageLabel: string;
 }) {
-  return (
-    <div
-      className="relative mx-auto w-[min(100%,18rem)] shrink-0 sm:mx-0 sm:w-[18.5rem]"
-      aria-label={languageLabel}
-    >
-      <div className="relative aspect-square overflow-hidden rounded-full shadow-[0_12px_40px_-8px_rgba(0,0,0,0.55)] ring-2 ring-white/20 ring-offset-0 ring-offset-[#1c2128]">
-        <div
-          className="pointer-events-none absolute -inset-px rounded-full bg-gradient-to-br from-sky-300/40 via-transparent to-emerald-400/30 opacity-80"
-          aria-hidden
-        />
-        <div
-          className="absolute inset-[4px] rounded-full bg-[radial-gradient(ellipse_85%_70%_at_30%_22%,rgba(255,255,255,0.28),transparent_55%),radial-gradient(ellipse_55%_45%_at_72%_58%,rgba(74,222,128,0.4),transparent_50%),radial-gradient(ellipse_40%_35%_at_18%_70%,rgba(34,197,94,0.25),transparent_45%),linear-gradient(155deg,#0a3d5c_0%,#0e7490_32%,#166534_58%,#0c1929_100%)] shadow-[inset_0_-28px_56px_rgba(0,0,0,0.5),inset_0_16px_32px_rgba(255,255,255,0.06)]"
-          aria-hidden
-        />
-        <svg
-          className="pointer-events-none absolute inset-[4px] h-[calc(100%-8px)] w-[calc(100%-8px)] rounded-full text-white"
-          viewBox="0 0 100 100"
-          aria-hidden
-        >
-          <ellipse
-            cx="50"
-            cy="50"
-            rx="42"
-            ry="48"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="0.35"
-            opacity="0.2"
-          />
-          <ellipse cx="50" cy="50" rx="24" ry="48" fill="none" stroke="currentColor" strokeWidth="0.28" opacity="0.18" />
-          <ellipse cx="50" cy="50" rx="8" ry="48" fill="none" stroke="currentColor" strokeWidth="0.22" opacity="0.15" />
-          <line x1="10" y1="35" x2="90" y2="35" stroke="currentColor" strokeWidth="0.2" opacity="0.12" />
-          <line x1="10" y1="50" x2="90" y2="50" stroke="currentColor" strokeWidth="0.2" opacity="0.12" />
-          <line x1="10" y1="65" x2="90" y2="65" stroke="currentColor" strokeWidth="0.2" opacity="0.12" />
-        </svg>
-        <div className="pointer-events-none absolute left-[14%] top-[10%] h-[26%] w-[40%] rounded-full bg-white/18 blur-lg" aria-hidden />
+  const [open, setOpen] = useState(false);
+  const wrapRef = useRef<HTMLDivElement>(null);
 
-        <div className="relative z-[1] flex h-full w-full flex-col px-3 pb-3 pt-3 sm:px-3.5 sm:pb-3.5 sm:pt-3.5">
-          <span className="text-center text-[10px] font-bold uppercase tracking-[0.12em] text-white drop-shadow-md sm:text-[11px]">
-            {languageLabel}
-          </span>
-          <div className="mt-1.5 min-h-0 flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] [scrollbar-color:rgba(255,255,255,0.35)_transparent] [scrollbar-width:thin]">
-            <div className="grid grid-cols-2 gap-x-2 gap-y-0.5">
-              {locales.map((loc) => (
-                <Link
-                  key={loc}
-                  href={`/${loc}${basePath === "/" ? "" : basePath}`}
-                  className={`flex min-w-0 items-center gap-1.5 rounded-lg px-1.5 py-1 text-start text-[10px] backdrop-blur-sm sm:gap-2 sm:text-[11px] ${
-                    loc === currentLocale
-                      ? "bg-white/22 font-semibold text-white shadow-sm ring-1 ring-white/35"
-                      : "bg-black/25 text-white/90 hover:bg-black/40 hover:text-white"
-                  }`}
-                >
-                  <LocaleFlagIcon locale={loc} />
-                  <span className="min-w-0 flex-1 truncate leading-tight">{LOCALE_NATIVE_LABEL[loc]}</span>
-                </Link>
-              ))}
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  return (
+    <div ref={wrapRef} className="relative mx-auto shrink-0 sm:mx-0">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        aria-haspopup="dialog"
+        aria-label={languageLabel}
+        className="relative h-[3.25rem] w-[3.25rem] shrink-0 overflow-hidden rounded-full shadow-[0_8px_24px_-6px_rgba(0,0,0,0.55)] ring-2 ring-white/25 ring-offset-2 ring-offset-[#1c2128] transition hover:ring-white/40 focus:outline-none focus-visible:ring-amber-400/90 sm:h-14 sm:w-14"
+      >
+        <GlobeLayers shellInset="inset-[3px]" />
+        <span className="sr-only">{languageLabel}</span>
+      </button>
+
+      {open ? (
+        <div
+          className="absolute bottom-[calc(100%+0.75rem)] left-1/2 z-[80] w-[min(calc(100vw-1.5rem),18.5rem)] -translate-x-1/2 opacity-100 shadow-2xl transition-[opacity,transform] duration-200"
+          role="dialog"
+          aria-label={languageLabel}
+        >
+          <div className="relative aspect-square overflow-hidden rounded-full border border-white/25 bg-[#1c2128] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.75)] ring-1 ring-white/15">
+            <GlobeLayers shellInset="inset-[4px]" />
+            <div className="relative z-[1] flex h-full w-full flex-col px-3 pb-3 pt-3 sm:px-3.5 sm:pb-3.5 sm:pt-3.5">
+              <span className="text-center text-[10px] font-bold uppercase tracking-[0.12em] text-white drop-shadow-md sm:text-[11px]">
+                {languageLabel}
+              </span>
+              <div className="mt-1.5 min-h-0 flex-1 overflow-y-auto overscroll-contain [-webkit-overflow-scrolling:touch] [scrollbar-color:rgba(255,255,255,0.35)_transparent] [scrollbar-width:thin]">
+                <div className="grid grid-cols-2 gap-x-2 gap-y-0.5">
+                  {locales.map((loc) => (
+                    <Link
+                      key={loc}
+                      href={`/${loc}${basePath === "/" ? "" : basePath}`}
+                      onClick={() => setOpen(false)}
+                      className={`flex min-w-0 items-center gap-1.5 rounded-lg px-1.5 py-1 text-start text-[10px] backdrop-blur-sm sm:gap-2 sm:text-[11px] ${
+                        loc === currentLocale
+                          ? "bg-white/22 font-semibold text-white shadow-sm ring-1 ring-white/35"
+                          : "bg-black/25 text-white/90 hover:bg-black/40 hover:text-white"
+                      }`}
+                    >
+                      <LocaleFlagIcon locale={loc} />
+                      <span className="min-w-0 flex-1 truncate leading-tight">{LOCALE_NATIVE_LABEL[loc]}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
+          <div
+            className="pointer-events-none absolute -bottom-2 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 border-b border-r border-white/20 bg-[#0c1929]"
+            aria-hidden
+          />
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }
