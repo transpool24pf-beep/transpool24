@@ -47,7 +47,7 @@ function HeroOverlapCard({
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-[var(--accent)]/55 to-[var(--accent)]/25" />
       <div className="relative z-10 p-5 text-white">
-        <h3 className="text-lg font-bold leading-snug drop-shadow-sm">{title}</h3>
+        <h3 className="text-lg font-bold leading-snug text-[var(--accent)] drop-shadow-sm">{title}</h3>
         <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-white/90">{description}</p>
         <span className="mt-4 inline-flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-white">
           {readMore}
@@ -72,8 +72,9 @@ export async function HomeLogisticsHero({
   const truckSrc = truckImageUrl?.trim() || DEFAULT_TRUCK_UNSPLASH;
   const cardImgRoad =
     "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&q=80&auto=format&fit=crop";
-  const cardImgSea =
-    "https://images.unsplash.com/photo-1494412574643-ff11b0a5c1c3?w=600&q=80&auto=format&fit=crop";
+  /** Second land-service card (no sea/air) — loading / last-mile visual */
+  const cardImgLand2 =
+    "https://images.unsplash.com/photo-1616432043562-7a89e2f4e936?w=600&q=80&auto=format&fit=crop";
 
   return (
     <section className="relative overflow-visible bg-white">
@@ -89,7 +90,7 @@ export async function HomeLogisticsHero({
             sizes="100vw"
             unoptimized={heroImage.startsWith("http")}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/55 to-black/35 rtl:bg-gradient-to-l" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/62 to-black/40 rtl:bg-gradient-to-l" />
         </div>
 
         <div className="relative z-10 mx-auto flex min-h-[min(88vh,46rem)] max-w-7xl flex-col justify-center px-4 py-20 sm:px-6 sm:py-24 lg:min-h-[38rem] lg:py-28">
@@ -118,7 +119,7 @@ export async function HomeLogisticsHero({
               </Link>
               <Link
                 href={`/${locale}/why`}
-                className="inline-flex items-center justify-center rounded-md border-2 border-white/90 bg-transparent px-8 py-3.5 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-white/10"
+                className="inline-flex items-center justify-center rounded-md border-2 border-[var(--accent)] bg-transparent px-8 py-3.5 text-sm font-bold uppercase tracking-wide text-white shadow-[0_0_0_1px_rgba(232,93,4,0.15)] transition hover:bg-[var(--accent)]/15"
               >
                 {secondaryCta}
               </Link>
@@ -139,11 +140,11 @@ export async function HomeLogisticsHero({
               imageUrl={cardImgRoad}
             />
             <HeroOverlapCard
-              title={t("logisticsHero.cardSeaTitle")}
-              description={t("logisticsHero.cardSeaDesc")}
+              title={t("logisticsHero.cardLand2Title")}
+              description={t("logisticsHero.cardLand2Desc")}
               readMore={t("logisticsHero.cardReadMore")}
-              href={`/${locale}/why`}
-              imageUrl={cardImgSea}
+              href={`/${locale}/order`}
+              imageUrl={cardImgLand2}
             />
           </div>
 

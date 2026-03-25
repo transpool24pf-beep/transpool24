@@ -51,12 +51,11 @@ export default async function BlogIndexPage({ params }: Props) {
   }
 
   const t = await getTranslations("blog");
-  const tHome = await getTranslations("home");
   const posts = await listPublishedPosts(locale);
   const hero = await getHomepageHero(locale);
 
   const heroImage = hero.imageUrl || HERO_FALLBACK_IMAGE;
-  const heroSubtitle = hero.subtitle || tHome("subtitle");
+  const heroSubtitle = hero.subtitle?.trim() || t("template.heroSubtitleGermany");
   const primaryCta = (hero.cta && hero.cta.trim()) || t("template.heroPrimary");
   const secondaryCta = t("template.heroSecondary");
 
