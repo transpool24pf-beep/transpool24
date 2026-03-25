@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { listPublishedPosts } from "@/lib/blog";
-import { AboutUsArWhyNarrative } from "@/components/about/AboutUsArWhyNarrative";
+import { AboutUsWhyNarrative } from "@/components/about/AboutUsWhyNarrative";
 import { BlogNewsCard } from "@/components/blog/BlogNewsCard";
 import { HomeLogisticsHero } from "@/components/HomeLogisticsHero";
 import { HomeAboutCollage } from "@/components/HomeAboutCollage";
@@ -58,6 +58,7 @@ export default async function BlogIndexPage({ params }: Props) {
   }
 
   const t = await getTranslations("blog");
+  const tAbout = await getTranslations({ locale, namespace: "aboutNarrative" });
   const posts = await listPublishedPosts(locale);
   const hero = await getHomepageHero(locale);
 
@@ -80,26 +81,24 @@ export default async function BlogIndexPage({ params }: Props) {
         secondaryCta={secondaryCta}
         truckImageUrl={BLOG_HERO_VEHICLE}
         landFreightCardHref={`/${locale}/blog/${BLOG_LAND_FREIGHT_ARTICLE_SLUG}`}
-        secondaryCtaHref={locale === "ar" ? "#about-transpool24-inline" : undefined}
+        secondaryCtaHref="#about-transpool24-inline"
       />
-      {locale === "ar" ? (
-        <section
-          id="about-transpool24-inline"
-          className="scroll-mt-28 border-b border-[#0d2137]/10 bg-[#f0f2f5] px-4 py-10 sm:scroll-mt-32 sm:px-6 sm:py-12"
-          aria-labelledby="about-transpool24-inline-heading"
-          dir="rtl"
-        >
-          <div className="mx-auto max-w-6xl overflow-hidden rounded-2xl border border-[#0d2137]/10 bg-white shadow-[0_20px_50px_-28px_rgba(13,33,55,0.18)]">
-            <h2
-              id="about-transpool24-inline-heading"
-              className="border-b border-[#0d2137]/8 bg-gradient-to-r from-[#0d2137]/[0.04] to-transparent px-6 py-4 text-center text-lg font-extrabold text-[#1a1a1a] sm:px-8 sm:text-xl"
-            >
-              من نحن
-            </h2>
-            <AboutUsArWhyNarrative embedded />
-          </div>
-        </section>
-      ) : null}
+      <section
+        id="about-transpool24-inline"
+        className="scroll-mt-28 border-b border-[#0d2137]/10 bg-[#f0f2f5] px-4 py-10 sm:scroll-mt-32 sm:px-6 sm:py-12"
+        aria-labelledby="about-transpool24-inline-heading"
+        dir={locale === "ar" || locale === "ku" ? "rtl" : "ltr"}
+      >
+        <div className="mx-auto max-w-6xl overflow-hidden rounded-2xl border border-[#0d2137]/10 bg-white shadow-[0_20px_50px_-28px_rgba(13,33,55,0.18)]">
+          <h2
+            id="about-transpool24-inline-heading"
+            className="border-b border-[#0d2137]/8 bg-gradient-to-r from-[#0d2137]/[0.04] to-transparent px-6 py-4 text-center text-lg font-extrabold text-[#1a1a1a] sm:px-8 sm:text-xl"
+          >
+            {tAbout("pageTitle")}
+          </h2>
+          <AboutUsWhyNarrative locale={locale} embedded />
+        </div>
+      </section>
       <HomeAboutCollage locale={locale} />
       <BlogTemplateBeforePosts locale={locale} />
 

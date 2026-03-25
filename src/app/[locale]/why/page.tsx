@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { getWhyPagePayload } from "@/lib/get-why-page-payload";
 import { WhyTranspool24Content } from "@/components/why-transpool24/WhyTranspool24Content";
 import { Header } from "@/components/Header";
@@ -13,14 +14,11 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const data = await getWhyPagePayload(locale);
-  const title =
-    locale === "ar" ? "من نحن | TransPool24 — رؤية رقمية من بفورتسهايم" : data.metaTitle;
-  const description =
-    locale === "ar"
-      ? "رؤية هندسية، لوجستيات مرنة، Minimalist Modern، وأهداف استراتيجية من ألمانيا — ثم تفاصيل التشغيل للشركات."
-      : data.heroSub.slice(0, 155);
-  return { title, description };
+  const t = await getTranslations({ locale, namespace: "aboutNarrative" });
+  return {
+    title: t("metaTitle"),
+    description: t("metaDescription"),
+  };
 }
 
 export default async function WhyTranspool24Page({
@@ -35,11 +33,7 @@ export default async function WhyTranspool24Page({
     <>
       <Header />
       <main>
-        <WhyTranspool24Content
-          data={data}
-          locale={locale}
-          arAboutNarrativeFirst={locale === "ar"}
-        />
+        <WhyTranspool24Content data={data} locale={locale} aboutNarrativeFirst />
       </main>
       <Footer />
     </>
