@@ -7,6 +7,27 @@
     "slogan": "Activos en Pforzheim – Conectados worldwide",
     "blog": "Magazine"
   },
+  "aboutNarrative": {
+    "pageTitle": "Sobre nosotros",
+    "operationalKicker": "OPERACIÓN DIARIA PARA EMPRESAS Y COMERCIO",
+    "metaTitle": "Sobre nosotros | TransPool24 — logística digital desde Pforzheim",
+    "metaDescription": "Visión de ingeniería, logística flexible y objetivos estratégicos en Alemania — más el detalle operativo B2B.",
+    "intro1": "TransPool24 no nació como una simple pantalla de reserva. Nació de una visión de ingeniería: redefinir la logística flexible de extremo a extremo. Nuestro diseño sigue una filosofía minimalista moderna — azul prusiano para autoridad, naranja vibrante para impulso — alineada con las expectativas tecnológicas alemanas y la claridad bajo presión operativa.",
+    "intro2": "Como las plataformas líderes, basamos el producto en transparencia, automatización y confianza mutua.",
+    "strategicTitle": "Nuestros objetivos estratégicos",
+    "strategicLead": "Queremos ser la arteria digital que une Pforzheim con todos los estados federales, cerrando brechas de tiempo y logística:",
+    "bulletAutomation": "Automatización completa: desde precio instantáneo hasta seguimiento fiable del envío.",
+    "bulletTransparency": "Transparencia radical: pagos globales seguros que protegen a todas las partes.",
+    "bulletSocial": "Responsabilidad social: empleo y capacitación.",
+    "csrTitle": "Responsabilidad social: empleo",
+    "csrLead": "Somos parte del tejido social alemán. Activar el mercado laboral es un pilar central:",
+    "csrJobs": "Crear empleo: conductores y proveedores locales en una red profesional con estándares claros.",
+    "csrUnemployment": "Superar el desempleo: la tecnología debe servir a las personas — formación y acceso justo en Baden-Wurtemberg y Alemania.",
+    "federalTitle": "Parte de la República Federal",
+    "federalP": "Como empresa con raíces en Alemania aspiramos a liderar en calidad y cumplimiento. Movemos confianza, no solo mercancías.",
+    "ctaPrefix": "Transporte más inteligente para un futuro más claro.",
+    "ctaLink": "Reservar ahora"
+  },
   "home": {
     "title": "TransPool24 – Tu socio logístico en Pforzheim",
     "heroHeadline": "Tu socio logístico en Pforzheim",
@@ -85,6 +106,11 @@
       "speedDesc": "Reserva, pago y gestión en pocos pasos — rápido y sin complicaciones.",
       "cta": "Reservar ahora",
       "mapAria": "Mapa de Alemania con líneas de conexión animadas entre regiones"
+    },
+    "siteQr": {
+      "title": "Visítanos desde el móvil",
+      "subtitle": "Escanea el código QR para abrir TransPool24 en tu idioma.",
+      "logoAlt": "TransPool24"
     },
     "driverCta": {
       "eyebrow": "Para conductores profesionales",

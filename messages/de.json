@@ -7,6 +7,27 @@
     "slogan": "Aktiv in Pforzheim – Weltweit verbunden",
     "blog": "Magazin"
   },
+  "aboutNarrative": {
+    "pageTitle": "Über uns",
+    "operationalKicker": "TÄGLICHER BETRIEB FÜR UNTERNEHMEN & HANDEL",
+    "metaTitle": "Über uns | TransPool24 — digitale Logistik aus Pforzheim",
+    "metaDescription": "Technische Vision, flexible Logistik und strategische Ziele in Deutschland — gefolgt von operativen Details für B2B.",
+    "intro1": "TransPool24 begann nicht als „nur eine Buchungsseite“ für Transport, sondern aus einer technischen Vision: flexible Logistik neu zu denken. Unser Produkt folgt einem minimalistisch-modernen Ansatz — Preußischblau für Ruhe und Vertrauen, kräftiges Orange für Dynamik — damit die Plattform sowohl deutsche Technologie-Erwartungen als auch Klarheit im Tagesgeschäft trifft. Das Interface ist keine Deko: Es ist eine durchdachte Nutzerreise, die komplexe Abläufe in wenigen Klicks fassbar macht.",
+    "intro2": "Wie führende digitale Logistikplattformen weltweit verankern wir Transparenz, Automatisierung und Vertrauen zwischen Auftraggeber und Fahrer — klarer Status, weniger Telefon-Ping-Pong, planbare Zahlungsflüsse.",
+    "strategicTitle": "Unsere strategischen Ziele",
+    "strategicLead": "Wir wollen das digitale Bindeglied sein, das Pforzheim mit allen Bundesländern verbindet — und Zeit- sowie Logistiklücken im Straßentransport schließt:",
+    "bulletAutomation": "Volle Automatisierung: von der Moment-Preisfindung bis zu nachvollziehbarem Sendungs-Tracking.",
+    "bulletTransparency": "Maximale Transparenz: sichere, internationale Zahlungswege, die alle Parteien schützen.",
+    "bulletSocial": "Soziale Verantwortung: Arbeitsmarkt stärken und Kompetenzen im Feld aufbauen.",
+    "csrTitle": "Soziale Verantwortung: Jobs und Teilhabe",
+    "csrLead": "Wir sind Teil des gesellschaftlichen Gefüges in Deutschland. Die Aktivierung des Arbeitsmarktes ist für uns ein zentrales Standbein:",
+    "csrJobs": "Jobs schaffen: Fahrerinnen und lokale Dienstleister können sich einem professionellen, standards-basierten Netz anschließen.",
+    "csrUnemployment": "Arbeitslosigkeit überwinden: Technologie soll Menschen dienen — wir investieren in Onboarding, digitale Werkzeuge und fairen Zugang, damit Fachkräfte in Baden-Württemberg und deutschlandweit nachhaltig verdienen können.",
+    "federalTitle": "Teil der Bundesrepublik",
+    "federalP": "Als in Deutschland verwurzeltes Unternehmen wollen wir Maßstäbe für Qualität und Compliance setzen. Wir bewegen nicht nur Güter — wir bewegen Vertrauen — und helfen, klassische Logistik in eine intelligentere digitale Industrie zu überführen. Partner beim Aufbau, Beitrag zu stabilen Arbeitsmärkten, stolz auf die Zukunft der Logistik in Deutschland.",
+    "ctaPrefix": "Smarter Transport für eine klarere Zukunft.",
+    "ctaLink": "Jetzt buchen"
+  },
   "blog": {
     "magazineBadge": "Einordnung",
     "magazineTitle": "TransPool24 Magazin",
@@ -217,6 +238,11 @@
       "speedDesc": "Buchung, Bezahlung und Abwicklung in wenigen Schritten — schnell und unkompliziert.",
       "cta": "Jetzt buchen",
       "mapAria": "Karte Deutschlands mit animierten Verbindungslinien zwischen Regionen"
+    },
+    "siteQr": {
+      "title": "TransPool24 auf dem Smartphone",
+      "subtitle": "QR-Code scannen — unsere Website öffnet sich in Ihrer Sprache.",
+      "logoAlt": "TransPool24"
     },
     "driverCta": {
       "eyebrow": "Für Berufsfahrer",

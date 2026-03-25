@@ -7,6 +7,27 @@
     "slogan": "Actifs à Pforzheim – Connectés worldwide",
     "blog": "Magazine"
   },
+  "aboutNarrative": {
+    "pageTitle": "À propos",
+    "operationalKicker": "EXPLOITATION QUOTIDIENNE POUR LES ENTREPRISES ET LE COMMERCE",
+    "metaTitle": "À propos | TransPool24 — logistique numérique depuis Pforzheim",
+    "metaDescription": "Vision d’ingénierie, logistique flexible et objectifs stratégiques en Allemagne — puis le détail opérationnel B2B.",
+    "intro1": "TransPool24 n’a pas commencé comme un simple écran de réservation. Elle est née d’une vision d’ingénierie : repenser la logistique flexible de bout en bout. Notre design suit une philosophie minimaliste moderne — bleu de Prusse pour l’autorité, orange vif pour l’élan — afin de répondre aux attentes technologiques allemandes et à la clarté sous pression opérationnelle.",
+    "intro2": "Comme les grandes plateformes logistiques, nous bâtissons transparence, automatisation et confiance mutuelle.",
+    "strategicTitle": "Nos objectifs stratégiques",
+    "strategicLead": "Nous voulons être l’artère numérique reliant Pforzheim à tous les Länder, en réduisant les délais et ruptures logistiques :",
+    "bulletAutomation": "Automatisation complète : du prix instantané au suivi fiable des envois.",
+    "bulletTransparency": "Transparence : paiements mondiaux sécurisés qui protègent chaque partie.",
+    "bulletSocial": "Responsabilité sociale : emploi et montée en compétences.",
+    "csrTitle": "Responsabilité sociale : emploi",
+    "csrLead": "Nous faisons partie du tissu social allemand. L’activation du marché du travail est essentielle :",
+    "csrJobs": "Créer des emplois : ouvrir notre réseau professionnel aux conducteurs et prestataires locaux.",
+    "csrUnemployment": "Réduire le chômage : la technologie doit servir les personnes — formation et accès équitable en Bade-Wurtemberg et en Allemagne.",
+    "federalTitle": "Partie de la République fédérale",
+    "federalP": "Entreprise ancrée en Allemagne, nous visons l’exemplarité qualité et conformité. Nous transportons la confiance, pas seulement les marchandises.",
+    "ctaPrefix": "Un transport plus intelligent pour un avenir plus clair.",
+    "ctaLink": "Réserver"
+  },
   "home": {
     "title": "TransPool24 – Votre partenaire logistique à Pforzheim",
     "heroHeadline": "Votre partenaire logistique à Pforzheim",
@@ -85,6 +106,11 @@
       "speedDesc": "Réservation, paiement et traitement en quelques étapes — simple et rapide.",
       "cta": "Réserver",
       "mapAria": "Carte de l'Allemagne avec lignes de connexion animées entre les régions"
+    },
+    "siteQr": {
+      "title": "Retrouvez-nous sur mobile",
+      "subtitle": "Scannez le code QR pour ouvrir TransPool24 dans votre langue.",
+      "logoAlt": "TransPool24"
     },
     "driverCta": {
       "eyebrow": "Pour les chauffeurs professionnels",

@@ -7,6 +7,27 @@
     "slogan": "Работаем в Пфорцхайме – глобально",
     "blog": "Magazine"
   },
+  "aboutNarrative": {
+    "pageTitle": "About us",
+    "operationalKicker": "DAY-TO-DAY OPERATIONS FOR BUSINESSES & TRADE",
+    "metaTitle": "About us | TransPool24 — digital logistics from Pforzheim",
+    "metaDescription": "Engineering vision, flexible logistics, and strategic goals in Germany — plus operational detail for B2B shippers.",
+    "intro1": "TransPool24 did not start as “just” a transport booking page. It was born from an engineering vision: to redefine flexible logistics end to end. Our design follows a minimalist-modern philosophy — Prussian blue for calm authority, vibrant orange for momentum — so the product matches both German technology expectations and clarity under operational pressure. This is not decoration: it is a deliberate user journey that turns complex flows into steps you can finish in a few clicks.",
+    "intro2": "Like leading digital logistics platforms worldwide, we build on transparency, automation, and mutual trust between customer and driver — clear status, fewer phone loops, predictable payments.",
+    "strategicTitle": "Our strategic goals",
+    "strategicLead": "We aim to be the digital artery linking Pforzheim with every federal state, closing time and logistics gaps in road transport through:",
+    "bulletAutomation": "Full automation: from instant pricing to shipment tracking you can rely on.",
+    "bulletTransparency": "Radical transparency: secure global payment systems that protect every party.",
+    "bulletSocial": "Social responsibility: tackling unemployment and building workforce capability.",
+    "csrTitle": "Social responsibility: jobs and employability",
+    "csrLead": "We are part of Germany’s social fabric. Activating the labour market is a core pillar for TransPool24:",
+    "csrJobs": "Creating jobs: opening the door for drivers and local providers to join a professional, standards-based network.",
+    "csrUnemployment": "Moving past unemployment: technology should serve people — we help onboard and train teams on our digital tools, reducing friction in the labour market and creating sustainable opportunities across Baden-Württemberg and Germany.",
+    "federalTitle": "Part of the Federal Republic",
+    "federalP": "As a German-rooted company we aspire to lead on quality and compliance. We move not only goods — we move trust — and help turn traditional logistics into a smarter digital industry. Partners in growth, contributors to stable labour markets, proud to be part of Germany’s logistics future.",
+    "ctaPrefix": "Smarter transport for a clearer future.",
+    "ctaLink": "Book now"
+  },
   "home": {
     "title": "TransPool24 – Ваш партнер по логистике в Пфорцхайме",
     "heroHeadline": "Ваш партнер по логистике в Пфорцхайме",
@@ -85,6 +106,11 @@
       "speedDesc": "Забронируйте, оплатите и приступайте к работе за несколько шагов — быстро и просто.",
       "cta": "Забронируйте сейчас",
       "mapAria": "Карта Германии с анимированными линиями сообщения между регионами"
+    },
+    "siteQr": {
+      "title": "Откройте сайт с телефона",
+      "subtitle": "Отсканируйте QR-код, чтобы открыть TransPool24 на вашем языке.",
+      "logoAlt": "TransPool24"
     },
     "driverCta": {
       "eyebrow": "Для профессиональных водителей",

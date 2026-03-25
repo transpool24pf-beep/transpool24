@@ -7,6 +7,27 @@
     "slogan": "Pforzheim'da aktif – Dünyaya bağlı",
     "blog": "Magazine"
   },
+  "aboutNarrative": {
+    "pageTitle": "Hakkımızda",
+    "operationalKicker": "İŞLETMELER VE TİCARET İÇİN GÜNLÜK OPERASYON",
+    "metaTitle": "Hakkımızda | TransPool24 — Pforzheim’dan dijital lojistik",
+    "metaDescription": "Mühendislik vizyonu, esnek lojistik ve Almanya’da stratejik hedefler — ardından B2B operasyonel ayrıntılar.",
+    "intro1": "TransPool24 yalnızca bir taşıma rezervasyon ekranı olarak doğmadı; uçtan uca esnek lojistiği yeniden tanımlayan bir mühendislik vizyonundan doğdu. Tasarımımız minimalist-modern bir çizgiyi takip eder — otorite için Prusya mavisi, dinamizm için canlı turuncu — böylece platform hem Alman teknoloji beklentilerine hem operasyonel baskı altında netliğe uygun olur. Arayüz süs değil; karmaşık süreçleri birkaç tıklamada tamamlanabilir kılan bilinçli bir kullanıcı yolculuğudur.",
+    "intro2": "Dünyanın önde gelen dijital lojistik platformları gibi şeffaflık, otomasyon ve müşteri ile sürücü arasında karşılıklı güven üzerine kurarız.",
+    "strategicTitle": "Stratejik hedeflerimiz",
+    "strategicLead": "Pforzheim’ı tüm eyaletlerle dijital bir omurgayla bağlamayı ve kara taşımacılığında zaman ile lojistik boşluklarını kapatmayı hedefliyoruz:",
+    "bulletAutomation": "Tam otomasyon: anlık fiyatlandırmadan güvenilir gönderi takibine.",
+    "bulletTransparency": "Tam şeffaflık: tüm tarafları koruyan güvenli küresel ödeme altyapıları.",
+    "bulletSocial": "Sosyal sorumluluk: işsizlikle mücadele ve yetkinlik oluşturma.",
+    "csrTitle": "Sosyal sorumluluk: iş ve istihdam",
+    "csrLead": "Almanya’nın toplumsal dokusunun parçasıyız. İşgücü piyasasını canlandırmak temel önceliklerimizdendir:",
+    "csrJobs": "İş yaratmak: sürücülerin ve yerel sağlayıcıların profesyonel ağımıza katılmasına açık kapı.",
+    "csrUnemployment": "İşsizliği aşmak: teknoloji insana hizmet etmeli — dijital araçlarımızda eğitim ve uyum sağlayarak Baden-Württemberg ve Almanya genelinde sürdürülebilir fırsatlar yaratırız.",
+    "federalTitle": "Federal Cumhuriyet’in parçası",
+    "federalP": "Almanya kökenli bir şirket olarak kalite ve uyumda örnek olmayı hedefliyoruz. Sadece yük taşımıyoruz — güven taşıyoruz — ve geleneksel lojistiği daha akıllı bir dijital sektöre dönüştürmeye yardım ediyoruz.",
+    "ctaPrefix": "Daha net bir gelecek için daha akıllı taşıma.",
+    "ctaLink": "Şimdi rezervasyon yap"
+  },
   "home": {
     "title": "TransPool24 – Pforzheim'da lojistik ortağınız",
     "heroHeadline": "Pforzheim'da lojistik ortağınız",
@@ -85,6 +106,11 @@
       "speedDesc": "Birkaç adımda rezervasyon, ödeme ve operasyon — hızlı ve sade.",
       "cta": "Şimdi rezervasyon",
       "mapAria": "Bölgeler arasında hareketli bağlantı çizgileri olan Almanya haritası"
+    },
+    "siteQr": {
+      "title": "Telefondan sitemize gidin",
+      "subtitle": "TransPool24’ü dilinizde açmak için QR kodunu tarayın.",
+      "logoAlt": "TransPool24"
     },
     "driverCta": {
       "eyebrow": "Profesyonel sürücüler için",
