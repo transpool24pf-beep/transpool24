@@ -19,6 +19,8 @@ type Props = {
   truckImageUrl: string | null;
   /** If set, first overlap card (land freight) links here instead of /order. */
   landFreightCardHref?: string | null;
+  /** Secondary hero CTA (e.g. «من نحن»). Default: /[locale]/why */
+  secondaryCtaHref?: string;
 };
 
 /** `clear` = sharp photo, dark band at bottom only (no orange wash, no blur). */
@@ -82,6 +84,7 @@ export async function HomeLogisticsHero({
   secondaryCta,
   truckImageUrl,
   landFreightCardHref,
+  secondaryCtaHref,
 }: Props) {
   const t = await getTranslations({ locale, namespace: "home" });
 
@@ -138,7 +141,7 @@ export async function HomeLogisticsHero({
                 {primaryCta}
               </Link>
               <Link
-                href={`/${locale}/why`}
+                href={secondaryCtaHref?.trim() || `/${locale}/why`}
                 className="inline-flex items-center justify-center rounded-md border-2 border-[var(--accent)] bg-transparent px-8 py-3.5 text-sm font-bold uppercase tracking-wide text-white shadow-[0_0_0_1px_rgba(232,93,4,0.15)] transition hover:bg-[var(--accent)]/15"
               >
                 {secondaryCta}

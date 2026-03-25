@@ -7,13 +7,19 @@ const LOTTIE_1 =
 const LOTTIE_2 =
   "https://lottie.host/458c62f4-7371-43f1-b3b7-c3e39d87883a/TUdNTQ1KvT.lottie";
 
+type Props = {
+  /** Inside blog card: omit bottom border so the host section frames the block. */
+  embedded?: boolean;
+};
+
 /**
- * Arabic «من نحن» narrative for /ar/why — vision, brand, strategy, CSR.
- * Placed above operational B2B sections on the same page.
+ * Arabic «من نحن» — vision, brand, strategy, CSR (+ Lottie). Used on /ar/why and /ar/blog.
  */
-export function AboutUsArWhyNarrative() {
+export function AboutUsArWhyNarrative({ embedded = false }: Props) {
   return (
-    <div className="border-b border-[#0d2137]/6 bg-gradient-to-br from-[#f8fafc] via-white to-[#e85d04]/[0.06] px-6 py-10 sm:px-10 sm:py-12">
+    <div
+      className={`${embedded ? "" : "border-b border-[#0d2137]/6 "}bg-gradient-to-br from-[#f8fafc] via-white to-[#e85d04]/[0.06] px-6 py-10 sm:px-10 sm:py-12`}
+    >
       <div className="mx-auto max-w-3xl text-center">
         <div className="relative mx-auto inline-block rounded-[1.35rem] bg-gradient-to-br from-[#0d2137]/[0.08] via-white to-[#e85d04]/[0.14] p-6 shadow-[0_24px_56px_-28px_rgba(13,33,55,0.28)] ring-1 ring-black/[0.07] sm:p-8">
           <div className="relative mx-auto flex h-36 w-36 items-center justify-center rounded-2xl bg-white/95 shadow-inner ring-1 ring-[#0d2137]/8 sm:h-44 sm:w-44">
@@ -23,7 +29,7 @@ export function AboutUsArWhyNarrative() {
               width={176}
               height={176}
               className="object-contain p-3"
-              priority
+              priority={!embedded}
             />
           </div>
           <p className="mt-4 text-sm font-medium text-[var(--foreground)]/65">

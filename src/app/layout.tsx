@@ -34,7 +34,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="de" suppressHydrationWarning>
+    <html lang="de" className="scroll-smooth" suppressHydrationWarning>
       <head>
         <link rel="icon" href={`${SITE}/favicon.ico`} type="image/png" />
         <link rel="icon" href={`${SITE}/favicon-32.png`} type="image/png" sizes="32x32" />

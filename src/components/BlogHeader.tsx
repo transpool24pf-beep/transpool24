@@ -94,6 +94,9 @@ export function BlogHeader() {
   const pathWithoutLocale = pathname?.replace(/^\/[a-z]{2}(?=\/|$)/, "") || "";
   const blogBase = `/blog`;
   const basePath = pathWithoutLocale.startsWith(blogBase) ? pathWithoutLocale : `${blogBase}`;
+  const isArBlogIndex =
+    locale === "ar" && (pathWithoutLocale === "/blog" || pathWithoutLocale === "/blog/");
+  const aboutNavHref = isArBlogIndex ? `/${locale}/blog#about-transpool24-inline` : `/${locale}/why`;
 
   const navMain =
     "rounded-md px-3 py-2 text-sm font-semibold text-[#2d2d2d] transition hover:bg-black/[0.04] hover:text-[#1a1a1a]";
@@ -134,7 +137,7 @@ export function BlogHeader() {
             <Link href={`/${locale}`} className={pathWithoutLocale === "/" || pathWithoutLocale === "" ? navActive : navMain}>
               {t("template.navHome")}
             </Link>
-            <Link href={`/${locale}/why`} className={pathWithoutLocale.startsWith("/why") ? navActive : navMain}>
+            <Link href={aboutNavHref} className={pathWithoutLocale.startsWith("/why") ? navActive : navMain}>
               {t("template.navAbout")}
             </Link>
 
@@ -295,7 +298,7 @@ export function BlogHeader() {
               <Link href={`/${locale}`} className="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-white" onClick={() => setMobileOpen(false)}>
                 {t("template.navHome")}
               </Link>
-              <Link href={`/${locale}/why`} className="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-white" onClick={() => setMobileOpen(false)}>
+              <Link href={aboutNavHref} className="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-white" onClick={() => setMobileOpen(false)}>
                 {t("template.navAbout")}
               </Link>
               <Link href={`/${locale}/order`} className="rounded-lg px-3 py-2 text-sm font-semibold hover:bg-white" onClick={() => setMobileOpen(false)}>
