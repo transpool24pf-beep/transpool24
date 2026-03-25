@@ -17,6 +17,8 @@ type Props = {
   /** Secondary outline button (e.g. ABOUT US). */
   secondaryCta: string;
   truckImageUrl: string | null;
+  /** If set, first overlap card (land freight) links here instead of /order. */
+  landFreightCardHref?: string | null;
 };
 
 /** `clear` = sharp photo, dark band at bottom only (no orange wash, no blur). */
@@ -79,10 +81,13 @@ export async function HomeLogisticsHero({
   primaryCta,
   secondaryCta,
   truckImageUrl,
+  landFreightCardHref,
 }: Props) {
   const t = await getTranslations({ locale, namespace: "home" });
 
   const truckSrc = truckImageUrl?.trim() || DEFAULT_TRUCK_UNSPLASH;
+  const landCardHref =
+    landFreightCardHref?.trim() || `/${locale}/order`;
   /** Land-freight overlap card — DO Spaces (sharp photo; `overlay="clear"` avoids orange wash). */
   const cardImgRoad =
     "https://sk-bucket.sgp1.cdn.digitaloceanspaces.com/2022/04/24234214/shutterstock_637016899_censored.jpg";
@@ -151,7 +156,7 @@ export async function HomeLogisticsHero({
               title={t("logisticsHero.cardRoadTitle")}
               description={t("logisticsHero.cardRoadDesc")}
               readMore={t("logisticsHero.cardReadMore")}
-              href={`/${locale}/order`}
+              href={landCardHref}
               imageUrl={cardImgRoad}
               overlay="clear"
             />

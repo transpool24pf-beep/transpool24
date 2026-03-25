@@ -17,6 +17,8 @@ const BLOG_HERO_BACKGROUND =
   "https://media.istockphoto.com/id/1795667445/photo/asian-woman-receiving-product-from-delivery-man-at-home-young-owner-woman-order-product-from.jpg?s=170667a&w=0&k=20&c=z4DKtsdWUvhJWsVvLB3OlZ1eVtib_ftEZj0a0fzHoR4=";
 /** Blog hero vehicle: `assets/pngegg.png` → public */
 const BLOG_HERO_VEHICLE = "/images/blog-hero-vehicle.png";
+/** Arabic editorial article linked from land-freight hero card (see supabase/blog_post_road_freight_ar.sql). */
+const BLOG_LAND_FREIGHT_ARTICLE_SLUG = "road-freight-germany-transpool24";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -76,6 +78,9 @@ export default async function BlogIndexPage({ params }: Props) {
         primaryCta={primaryCta}
         secondaryCta={secondaryCta}
         truckImageUrl={BLOG_HERO_VEHICLE}
+        landFreightCardHref={
+          locale === "ar" ? `/${locale}/blog/${BLOG_LAND_FREIGHT_ARTICLE_SLUG}` : null
+        }
       />
       <HomeAboutCollage locale={locale} />
       <BlogTemplateBeforePosts locale={locale} />
