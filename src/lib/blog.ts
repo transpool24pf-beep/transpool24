@@ -245,10 +245,15 @@ export async function listPublishedPosts(locale: string, limit = 80): Promise<Bl
     if (!source) continue;
     try {
       const card = await cachedTranslateCard(source, loc);
-      if (card) out.push(card);
+      if (card) {
+        out.push(card);
+        continue;
+      }
     } catch (e) {
       console.error("[blog] listPublishedPosts translate", e);
     }
+    // No row for this locale and no KI translation (or key missing): still list the article.
+    out.push(toCard(source));
   }
 
   return out;
@@ -298,8 +303,19 @@ export async function getPublishedPostBySlug(
     console.error("[blog] getPublishedPostBySlug translate", e);
   }
 
-  // Avoid showing Arabic (etc.) body on /de/blog when OPENAI failed or key is missing.
-  return null;
+  const fallback = pickSiblingFallbackPost(group, loc);
+  return fallback;
+}
+
+/** Prefer de → en → ar → any, so articles stay readable without OPENAI_API_KEY. */
+function pickSiblingFallbackPost(group: BlogPost[], _loc: Locale): BlogPost | null {
+  if (group.length === 0) return null;
+  const preference: Locale[] = ["de", "en", "ar"];
+  for (const l of preference) {
+    const p = group.find((x) => x.locale === l);
+    if (p) return p;
+  }
+  return group[0] ?? null;
 }
 
 export async function listPublishedPagesNav(locale: string): Promise<

@@ -79,9 +79,7 @@ export default async function BlogIndexPage({ params }: Props) {
         primaryCta={primaryCta}
         secondaryCta={secondaryCta}
         truckImageUrl={BLOG_HERO_VEHICLE}
-        landFreightCardHref={
-          locale === "ar" ? `/${locale}/blog/${BLOG_LAND_FREIGHT_ARTICLE_SLUG}` : null
-        }
+        landFreightCardHref={`/${locale}/blog/${BLOG_LAND_FREIGHT_ARTICLE_SLUG}`}
         secondaryCtaHref={locale === "ar" ? "#about-transpool24-inline" : undefined}
       />
       {locale === "ar" ? (

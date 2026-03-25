@@ -32,9 +32,6 @@ export function AboutUsArWhyNarrative({ embedded = false }: Props) {
               priority={!embedded}
             />
           </div>
-          <p className="mt-4 text-sm font-medium text-[var(--foreground)]/65">
-            Minimalist Modern — Prussian Blue × برتقالٍ نابض
-          </p>
         </div>
       </div>
 

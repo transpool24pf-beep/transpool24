@@ -31,6 +31,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "media.istockphoto.com", pathname: "/id/**" },
       { protocol: "https", hostname: "channel.mediacdn.vn", pathname: "/**" },
       { protocol: "https", hostname: "adex.tn", pathname: "/content/uploads/**" },
+      { protocol: "https", hostname: "linqo.de", pathname: "/wp-content/uploads/**" },
       {
         protocol: "https",
         hostname: "sk-bucket.sgp1.cdn.digitaloceanspaces.com",
