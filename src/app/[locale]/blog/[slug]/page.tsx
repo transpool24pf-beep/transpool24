@@ -2,10 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { AboutUsArArticle } from "@/components/blog/AboutUsArArticle";
 import { BlogMarkdown } from "@/components/BlogMarkdown";
 import { getPublishedPostBySlug } from "@/lib/blog";
-import { isArAboutUsBlogPost } from "@/lib/blog-special-posts";
 import { IconCalendar, IconUser } from "@/components/blog/BlogNewsIcons";
 import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
@@ -126,7 +124,7 @@ export default async function BlogPostPage({ params }: Props) {
           ) : null}
         </header>
 
-        {post.featured_image_url && !isArAboutUsBlogPost(locale, slug) ? (
+        {post.featured_image_url ? (
           <div className="relative mb-10 aspect-[16/9] overflow-hidden rounded-xl bg-[#e8eaed] shadow-inner ring-1 ring-black/[0.04]">
             <Image
               src={post.featured_image_url}
@@ -144,11 +142,7 @@ export default async function BlogPostPage({ params }: Props) {
           <p className="mb-8 text-lg font-medium leading-relaxed text-[#3d3d3d]">{post.excerpt}</p>
         ) : null}
 
-        {isArAboutUsBlogPost(locale, slug) ? (
-          <AboutUsArArticle />
-        ) : (
-          <BlogMarkdown markdown={post.body || ""} />
-        )}
+        <BlogMarkdown markdown={post.body || ""} />
       </article>
     </main>
   );
