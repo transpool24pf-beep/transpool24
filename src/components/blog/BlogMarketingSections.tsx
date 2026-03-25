@@ -8,6 +8,8 @@ const STATS_IMG =
   "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=900&q=80&auto=format&fit=crop";
 const TOUCH_IMG =
   "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=900&q=80&auto=format&fit=crop";
+/** Blog index — closing visual above dark footer (`assets/7654.png` → public). */
+const BLOG_FOOTER_MODEL = "/images/7654.png";
 
 function StarRow() {
   return (
@@ -310,6 +312,22 @@ export async function BlogTemplateAfterPosts({ locale }: { locale: Locale }) {
       </section>
 
       <BlogFaqClient items={faqItems} title={faqTitle} />
+
+      <section
+        className="border-t border-black/[0.06] bg-white px-4 pb-10 pt-8 sm:px-6 sm:pb-14 sm:pt-10"
+        aria-label={t("template.footerModelAria")}
+      >
+        <div className="mx-auto max-w-7xl">
+          <Image
+            src={BLOG_FOOTER_MODEL}
+            alt={t("template.footerModelAlt")}
+            width={800}
+            height={480}
+            className="h-auto w-full rounded-2xl object-contain shadow-[0_24px_60px_-32px_rgba(13,33,55,0.2)] ring-1 ring-[#0d2137]/10"
+            sizes="(max-width: 1280px) 100vw, 1280px"
+          />
+        </div>
+      </section>
     </>
   );
 }
