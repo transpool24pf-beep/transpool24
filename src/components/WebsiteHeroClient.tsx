@@ -8,6 +8,7 @@ import { WEBSITE_CMS_LOCALE_OPTIONS } from "@/lib/website-cms-locales";
 
 type HeroData = {
   imageUrl: string | null;
+  truckImageUrl: string | null;
   headline: Record<string, string>;
   subtitle: Record<string, string>;
   cta: Record<string, string>;
@@ -30,6 +31,7 @@ function pickEnglishSource(d: HeroData): EnglishFields {
 export function WebsiteHeroClient() {
   const [data, setData] = useState<HeroData>({
     imageUrl: null,
+    truckImageUrl: null,
     headline: {},
     subtitle: {},
     cta: {},
@@ -42,6 +44,7 @@ export function WebsiteHeroClient() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
+  const [truckUploading, setTruckUploading] = useState(false);
 
   const load = () =>
     cmsFetch(API_BASE)
@@ -49,6 +52,7 @@ export function WebsiteHeroClient() {
       .then((res) => {
         const next: HeroData = {
           imageUrl: res.imageUrl ?? null,
+          truckImageUrl: res.truckImageUrl ?? null,
           headline: res.headline ?? {},
           subtitle: res.subtitle ?? {},
           cta: res.cta ?? {},
@@ -102,6 +106,46 @@ export function WebsiteHeroClient() {
     }
   };
 
+  const handleTruckFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      alert("Bitte ein Bild wählen (JPEG, PNG oder WebP).");
+      return;
+    }
+    if (file.size > 12 * 1024 * 1024) {
+      alert("Datei zu groß (max. 12 MB).");
+      return;
+    }
+    setTruckUploading(true);
+    try {
+      const dataUrl = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = () => reject(new Error("read failed"));
+        reader.readAsDataURL(file);
+      });
+      const res = await cmsFetch(UPLOAD_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ base64: dataUrl, filename: file.name }),
+      });
+      const body = (await res.json()) as { url?: string; error?: string };
+      if (res.status === 401) {
+        throw new Error(
+          "Nicht angemeldet — bitte /website/login öffnen und erneut anmelden. / الجلسة غير صالحة — سجّل الدخول من جديد.",
+        );
+      }
+      if (!res.ok) throw new Error(body.error || "Upload fehlgeschlagen.");
+      if (body.url) setData((prev) => ({ ...prev, truckImageUrl: body.url! }));
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Upload fehlgeschlagen.");
+    } finally {
+      setTruckUploading(false);
+    }
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -111,6 +155,7 @@ export function WebsiteHeroClient() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           imageUrl: data.imageUrl,
+          truckImageUrl: data.truckImageUrl,
           heroEnglish: english,
         }),
       });
@@ -160,9 +205,67 @@ export function WebsiteHeroClient() {
         <p className="mt-1 text-sm text-[#0d2137]/70" dir="rtl">
           صورة الخلفية والنصوص. أدخل النصوص بالإنجليزية فقط؛ عند الحفظ تُترجم تلقائياً لكل اللغات.
         </p>
+        <p className="mt-2 text-sm font-medium text-[#0d2137]">
+          LKW / Transporter (Vordergrund): optional unter „Hero-LKW“ — PNG mit Transparenz empfohlen.
+        </p>
+        <p className="text-sm text-[#0d2137]/70" dir="rtl">
+          صورة الشاحمة على الغلاف (اختياري) من قسم «Hero-LKW» — يُفضّل PNG بخلفية شفافة.
+        </p>
       </div>
 
       <form onSubmit={handleSave} className="space-y-8">
+        <div className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
+          <h2 className="mb-4 text-lg font-medium text-[#0d2137]">Hero-LKW (überlappend)</h2>
+          <p className="mb-4 text-sm text-[#0d2137]/65">
+            Erscheint auf der Startseite rechts unten über dem Übergang zum weißen Bereich. Ohne Bild: Standard-Foto
+            (Unsplash). Leer lassen und speichern = Standard; URL löschen und speichern = Standard.
+          </p>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+            <div className="relative h-40 w-full max-w-xs shrink-0 overflow-hidden rounded-xl border-2 border-[#0d2137]/10 bg-gray-100">
+              {data.truckImageUrl ? (
+                <Image
+                  key={data.truckImageUrl}
+                  src={data.truckImageUrl}
+                  alt=""
+                  fill
+                  className="object-contain object-center p-2"
+                  unoptimized={data.truckImageUrl.startsWith("http")}
+                  sizes="300px"
+                />
+              ) : (
+                <span className="flex h-full w-full items-center justify-center px-2 text-center text-xs text-[#0d2137]/45">
+                  Standard-LKW (wenn leer)
+                </span>
+              )}
+            </div>
+            <div className="min-w-0 flex-1 space-y-2">
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleTruckFile}
+                disabled={truckUploading}
+                className="block w-full text-sm text-[#0d2137] file:mr-3 file:rounded-lg file:border-0 file:bg-[#0d2137]/10 file:px-4 file:py-2 file:text-sm file:font-medium file:text-[#0d2137] hover:file:opacity-90 disabled:opacity-50"
+              />
+              <input
+                type="url"
+                placeholder="Oder LKW-Bild-URL"
+                value={data.truckImageUrl ?? ""}
+                onChange={(e) =>
+                  setData((prev) => ({ ...prev, truckImageUrl: e.target.value.trim() || null }))
+                }
+                className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 text-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+              />
+              <button
+                type="button"
+                className="text-xs font-medium text-red-700 underline"
+                onClick={() => setData((prev) => ({ ...prev, truckImageUrl: null }))}
+              >
+                LKW-Bild zurücksetzen (Standard)
+              </button>
+            </div>
+          </div>
+        </div>
+
         <div className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-medium text-[#0d2137]">Hintergrundbild</h2>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start">

@@ -27,6 +27,7 @@ const nextConfig: NextConfig = {
           ]
         : []),
       { protocol: "https", hostname: "ui-avatars.com", pathname: "/api/**" },
+      { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
     ],
   },
   async headers() {

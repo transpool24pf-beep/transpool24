@@ -2,7 +2,13 @@ import { unstable_noStore as noStore } from "next/cache";
 import { createServerSupabase } from "./supabase";
 import { locales } from "@/i18n/routing";
 
-const FALLBACK = { imageUrl: null, headline: null, subtitle: null, cta: null } as const;
+const FALLBACK = {
+  imageUrl: null,
+  headline: null,
+  subtitle: null,
+  cta: null,
+  truckImageUrl: null,
+} as const;
 
 export async function getHomepageHero(locale: string) {
   noStore();
@@ -24,12 +30,20 @@ export async function getHomepageHero(locale: string) {
       return FALLBACK;
     }
 
-    const payload = (data?.payload as Record<string, Record<string, string>>) ?? {};
+    const payload = (data?.payload as Record<string, unknown>) ?? {};
+    const truckRaw = payload.truckImageUrl;
+    const truckImageUrl = typeof truckRaw === "string" && truckRaw.trim() ? truckRaw.trim() : null;
+
+    const hl = payload.headline as Record<string, string> | undefined;
+    const st = payload.subtitle as Record<string, string> | undefined;
+    const ct = payload.cta as Record<string, string> | undefined;
+
     return {
       imageUrl: data?.image_url ?? null,
-      headline: payload.headline?.[safeLocale] ?? null,
-      subtitle: payload.subtitle?.[safeLocale] ?? null,
-      cta: payload.cta?.[safeLocale] ?? null,
+      headline: hl?.[safeLocale] ?? null,
+      subtitle: st?.[safeLocale] ?? null,
+      cta: ct?.[safeLocale] ?? null,
+      truckImageUrl,
     };
   } catch {
     return FALLBACK;
