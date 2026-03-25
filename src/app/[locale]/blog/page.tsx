@@ -115,18 +115,19 @@ export default async function BlogIndexPage({ params }: Props) {
                     })}
                   </h1>
                   <p className="mt-5 max-w-md text-base leading-relaxed text-[#6b6b6b]">{t("indexNewsDescription")}</p>
-                  {more.length > 0 ? (
-                    <Link
-                      href="#all-posts"
-                      className="mt-8 inline-flex items-center justify-center rounded-md bg-[var(--accent)] px-8 py-3.5 text-sm font-bold uppercase tracking-wide text-white shadow-[0_12px_28px_-8px_rgba(232,93,4,0.55)] transition hover:bg-[var(--accent-hover)]"
-                    >
-                      {t("viewAllBlog")}
-                    </Link>
-                  ) : null}
+                  <Link
+                    href={more.length > 0 ? "#all-posts" : "#featured-posts"}
+                    className="mt-8 inline-flex items-center justify-center rounded-md bg-[var(--accent)] px-8 py-3.5 text-sm font-bold uppercase tracking-wide text-white shadow-[0_12px_28px_-8px_rgba(232,93,4,0.55)] transition hover:bg-[var(--accent-hover)]"
+                  >
+                    {t("viewAllBlog")}
+                  </Link>
                 </div>
 
                 <div className="lg:col-span-8">
-                  <ul className="grid gap-10 md:grid-cols-2 md:gap-8 lg:gap-10">
+                  <ul
+                    id="featured-posts"
+                    className="grid scroll-mt-24 gap-10 md:grid-cols-2 md:gap-8 lg:gap-10"
+                  >
                     {featured.map((post) => (
                       <li key={post.id}>
                         <BlogNewsCard
