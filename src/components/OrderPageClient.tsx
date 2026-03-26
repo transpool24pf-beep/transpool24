@@ -1,14 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { OrderForm } from "@/components/OrderForm";
 import { OrderBookingSideLottie } from "@/components/OrderBookingSideLottie";
+import { OrderIntroDotLotties } from "@/components/OrderIntroDotLotties";
 
 export function OrderPageClient({ locale, title }: { locale: string; title: string }) {
   const [hideLogo, setHideLogo] = useState(false);
+  const [bookingsPaused, setBookingsPaused] = useState(false);
   const rtl = locale === "ar";
+
+  const refreshBookingsStatus = useCallback(() => {
+    fetch("/api/public/bookings-status", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d: { paused?: boolean }) => setBookingsPaused(Boolean(d.paused)))
+      .catch(() => setBookingsPaused(false));
+  }, []);
+
+  useEffect(() => {
+    refreshBookingsStatus();
+    const onVis = () => {
+      if (document.visibilityState === "visible") refreshBookingsStatus();
+    };
+    document.addEventListener("visibilitychange", onVis);
+    window.addEventListener("focus", refreshBookingsStatus);
+    return () => {
+      document.removeEventListener("visibilitychange", onVis);
+      window.removeEventListener("focus", refreshBookingsStatus);
+    };
+  }, [refreshBookingsStatus]);
 
   return (
     <>
@@ -34,7 +56,12 @@ export function OrderPageClient({ locale, title }: { locale: string; title: stri
                   {title}
                 </h1>
               )}
-              <OrderForm locale={locale} onOrderConfirmed={() => setHideLogo(true)} />
+              <OrderIntroDotLotties />
+              <OrderForm
+                locale={locale}
+                bookingsPaused={bookingsPaused}
+                onOrderConfirmed={() => setHideLogo(true)}
+              />
             </div>
 
             <aside className="hidden lg:flex lg:items-center lg:justify-start lg:py-6">

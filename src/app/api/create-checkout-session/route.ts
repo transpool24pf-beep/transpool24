@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createServerSupabase } from "@/lib/supabase";
+import { getBookingsSettings } from "@/lib/bookings-settings";
 import { calculatePriceBreakdown } from "@/lib/pricing";
 import { getPricingSettings } from "@/lib/settings";
 import { getRouteDistanceKm } from "@/lib/route-distance-server";
@@ -34,6 +35,10 @@ export async function POST(req: Request) {
       }
       job = data;
     } else {
+      const bookings = await getBookingsSettings();
+      if (bookings.paused) {
+        return NextResponse.json({ error: "BOOKINGS_PAUSED" }, { status: 503 });
+      }
       const {
         companyName,
         phone,

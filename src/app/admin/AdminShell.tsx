@@ -4,15 +4,16 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { AdminNavBadges, type AdminNavItem } from "@/components/admin/AdminNavBadges";
 
-const NAV = [
-  { href: "/admin/orders", label: "Aufträge" },
-  { href: "/admin/reports", label: "Berichte" },
-  { href: "/admin/driver-applications", label: "Fahrerbewerbungen" },
-  { href: "/admin/drivers", label: "Fahrer" },
-  { href: "/admin/blog", label: "Blog / Magazin" },
-  { href: "/admin/settings", label: "Einstellungen" },
-  { href: "/admin/support", label: "Support-Nachrichten" },
+const ADMIN_NAV: AdminNavItem[] = [
+  { href: "/admin/orders", label: "Aufträge", badge: "orders" },
+  { href: "/admin/reports", label: "Berichte", badge: null },
+  { href: "/admin/driver-applications", label: "Fahrerbewerbungen", badge: "drivers" },
+  { href: "/admin/drivers", label: "Fahrer", badge: null },
+  { href: "/admin/blog", label: "Blog / Magazin", badge: null },
+  { href: "/admin/settings", label: "Einstellungen", badge: null },
+  { href: "/admin/support", label: "Support-Nachrichten", badge: "support" },
 ];
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
@@ -102,19 +103,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       </main>
       <aside className="sticky top-14 h-[calc(100vh-3.5rem)] w-56 shrink-0 border-l border-[#0d2137]/10 bg-white shadow-sm">
         <nav className="flex flex-col gap-1 p-4">
-          {NAV.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className={`rounded-lg px-4 py-3 text-sm font-medium transition ${
-                pathname === href
-                  ? "bg-[#0d2137] text-white"
-                  : "text-[#0d2137]/80 hover:bg-[#0d2137]/5 hover:text-[#0d2137]"
-              }`}
-            >
-              {label}
-            </Link>
-          ))}
+          <AdminNavBadges items={ADMIN_NAV} />
           <div className="my-2 border-t border-[#0d2137]/10" />
           <button
             type="button"

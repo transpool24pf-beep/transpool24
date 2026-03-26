@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 type Job = {
@@ -32,14 +32,59 @@ type Job = {
   pod_completed_at?: string | null;
 };
 
-const STATUS_CONFIG: Record<string, { labelDe: string; labelAr: string; color: string; bg: string }> = {
-  draft: { labelDe: "Entwurf", labelAr: "مسودة", color: "text-slate-700", bg: "bg-slate-400" },
-  confirmed: { labelDe: "Bestätigt", labelAr: "مؤكد", color: "text-blue-700", bg: "bg-blue-500" },
-  paid: { labelDe: "Bezahlt", labelAr: "مدفوع", color: "text-emerald-700", bg: "bg-emerald-500" },
-  assigned: { labelDe: "Zugewiesen", labelAr: "مُعيَّن", color: "text-amber-700", bg: "bg-amber-500" },
-  in_transit: { labelDe: "Unterwegs", labelAr: "في الطريق", color: "text-violet-700", bg: "bg-violet-500" },
-  delivered: { labelDe: "Zugestellt", labelAr: "تم التوصيل", color: "text-green-700", bg: "bg-green-500" },
-  cancelled: { labelDe: "Storniert", labelAr: "ملغى", color: "text-red-700", bg: "bg-red-500" },
+const STATUS_CONFIG: Record<
+  string,
+  { labelDe: string; labelAr: string; color: string; bg: string; pillBorder: string }
+> = {
+  draft: {
+    labelDe: "Entwurf",
+    labelAr: "مسودة",
+    color: "text-slate-700",
+    bg: "bg-slate-400",
+    pillBorder: "border-slate-400/70",
+  },
+  confirmed: {
+    labelDe: "Bestätigt",
+    labelAr: "مؤكد",
+    color: "text-blue-700",
+    bg: "bg-blue-500",
+    pillBorder: "border-blue-400/80",
+  },
+  paid: {
+    labelDe: "Bezahlt",
+    labelAr: "مدفوع",
+    color: "text-emerald-700",
+    bg: "bg-emerald-500",
+    pillBorder: "border-emerald-500/75",
+  },
+  assigned: {
+    labelDe: "Zugewiesen",
+    labelAr: "مُعيَّن",
+    color: "text-amber-700",
+    bg: "bg-amber-500",
+    pillBorder: "border-amber-500/75",
+  },
+  in_transit: {
+    labelDe: "Unterwegs",
+    labelAr: "في الطريق",
+    color: "text-violet-700",
+    bg: "bg-violet-500",
+    pillBorder: "border-violet-500/75",
+  },
+  delivered: {
+    labelDe: "Zugestellt",
+    labelAr: "تم التوصيل",
+    color: "text-green-700",
+    bg: "bg-green-500",
+    pillBorder: "border-green-500/80",
+  },
+  cancelled: {
+    labelDe: "Storniert",
+    labelAr: "ملغى",
+    color: "text-red-700",
+    bg: "bg-red-500",
+    pillBorder: "border-red-500/80",
+  },
 };
 
 /** طلبات نشطة (ليست مسودة ولا ملغاة ولا مُسلَّمة) */
@@ -83,6 +128,64 @@ function matchSearch(o: Job, q: string): boolean {
     str(serviceTypeCompanyRequestLabel(o.service_type)).includes(s) ||
     str(serviceTypeLabelDe(o.service_type)).includes(s) ||
     str(o.service_type ?? "").includes(s)
+  );
+}
+
+/** قائمة حالة مدمجة: عربي فقط في الشارة (أضيق من عنصر select الافتراضي) */
+function LogisticsStatusPicker({
+  jobId,
+  logisticsStatus,
+  disabled,
+  onPick,
+}: {
+  jobId: string;
+  logisticsStatus: string;
+  disabled: boolean;
+  onPick: (id: string, status: string) => void;
+}) {
+  const detailsRef = useRef<HTMLDetailsElement>(null);
+  const conf = STATUS_CONFIG[logisticsStatus] ?? STATUS_CONFIG.draft;
+
+  return (
+    <details ref={detailsRef} className="relative mx-auto w-full max-w-[6.25rem]" dir="rtl">
+      <summary
+        className={`flex cursor-pointer list-none items-center justify-center gap-1 rounded-full border-2 bg-white py-1 pe-1.5 ps-1 text-[11px] font-semibold leading-tight shadow-sm [&::-webkit-details-marker]:hidden ${conf.color} ${conf.pillBorder}`}
+        title={`${conf.labelAr} (${conf.labelDe})`}
+        aria-label={`الحالة: ${conf.labelAr}`}
+        aria-haspopup="listbox"
+      >
+        <span className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${conf.bg}`} aria-hidden />
+        <span className="min-w-0 flex-1 truncate text-center">{conf.labelAr}</span>
+        <span className="shrink-0 text-[8px] text-[#0d2137]/40" aria-hidden>
+          ▾
+        </span>
+      </summary>
+      <div
+        className="absolute end-0 top-[calc(100%+6px)] z-50 min-w-[8.5rem] rounded-xl border-2 border-[#0d2137]/12 bg-white py-1 shadow-xl"
+        role="listbox"
+        aria-label="اختر الحالة"
+      >
+        {Object.entries(STATUS_CONFIG).map(([value, c]) => (
+          <button
+            key={value}
+            type="button"
+            role="option"
+            disabled={disabled}
+            aria-selected={logisticsStatus === value}
+            onClick={() => {
+              if (value !== logisticsStatus) onPick(jobId, value);
+              if (detailsRef.current) detailsRef.current.open = false;
+            }}
+            className={`flex w-full items-center gap-2 px-2.5 py-1.5 text-right text-[11px] font-medium transition hover:bg-[#0d2137]/6 disabled:opacity-45 ${c.color} ${
+              logisticsStatus === value ? "bg-[#0d2137]/8" : ""
+            }`}
+          >
+            <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${c.bg}`} />
+            {c.labelAr}
+          </button>
+        ))}
+      </div>
+    </details>
   );
 }
 
@@ -200,9 +303,9 @@ export default function AdminOrdersPage() {
           className="rounded-xl border-2 border-[#0d2137]/15 bg-white px-4 py-2.5 text-sm font-medium text-[#0d2137] shadow-sm transition focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30"
         >
           <option value="">Alle Status</option>
-          {Object.entries(STATUS_CONFIG).map(([value, { labelDe, labelAr }]) => (
+          {Object.entries(STATUS_CONFIG).map(([value, { labelAr }]) => (
             <option key={value} value={value}>
-              {labelAr} · {labelDe}
+              {labelAr}
             </option>
           ))}
         </select>
@@ -213,13 +316,15 @@ export default function AdminOrdersPage() {
           <p className="text-[#0d2137]/70">Laden…</p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border-2 border-[#0d2137]/10 bg-white shadow-lg">
-          <div className="w-full overflow-hidden">
+        <div className="overflow-x-auto rounded-2xl border-2 border-[#0d2137]/10 bg-white shadow-lg">
+          <div className="w-full min-w-[920px]">
             <table className="w-full table-fixed text-left text-sm">
               <thead>
                 <tr className="border-b-2 border-[#0d2137]/10 bg-gradient-to-r from-[#0d2137]/10 to-[#0d2137]/5">
                   <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">Nr.</th>
-                  <th className="w-[10%] px-2 py-3 font-semibold text-[#0d2137]">Status</th>
+                  <th className="w-[7%] px-1 py-3 text-center font-semibold text-[#0d2137]" dir="rtl">
+                    الحالة
+                  </th>
                   <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">Datum</th>
                   <th className="w-[9%] px-2 py-3 font-semibold text-[#0d2137]">Firma</th>
                   <th className="w-[12%] px-2 py-3 font-semibold text-[#0d2137]" dir="rtl">
@@ -238,7 +343,6 @@ export default function AdminOrdersPage() {
               </thead>
               <tbody>
                 {filtered.map((o, idx) => {
-                  const statusConf = STATUS_CONFIG[o.logistics_status] ?? STATUS_CONFIG.draft;
                   return (
                     <tr
                       key={o.id}
@@ -249,25 +353,13 @@ export default function AdminOrdersPage() {
                       <td className="min-w-0 px-2 py-2 font-mono text-xs font-semibold text-[#0d2137]">
                         {o.order_number ?? o.id.slice(0, 8)}
                       </td>
-                      <td className="min-w-0 px-2 py-2">
-                        <div className="flex items-center gap-1">
-                          <span
-                            className={`inline-block h-3 w-3 shrink-0 rounded-full ${statusConf.bg}`}
-                            title={`${statusConf.labelAr} / ${statusConf.labelDe}`}
-                          />
-                          <select
-                            value={o.logistics_status}
-                            onChange={(e) => updateStatus(o.id, e.target.value)}
-                            disabled={updating === o.id}
-                            className={`rounded-lg border-2 bg-white px-2 py-1.5 text-xs font-medium ${statusConf.color} focus:border-[var(--accent)] focus:outline-none`}
-                          >
-                            {Object.entries(STATUS_CONFIG).map(([value, { labelDe, labelAr }]) => (
-                              <option key={value} value={value}>
-                                {labelAr} · {labelDe}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
+                      <td className="min-w-0 px-1 py-2 text-center">
+                        <LogisticsStatusPicker
+                          jobId={o.id}
+                          logisticsStatus={o.logistics_status}
+                          disabled={updating === o.id}
+                          onPick={updateStatus}
+                        />
                       </td>
                       <td className="min-w-0 px-2 py-2 text-[#0d2137]/80 text-xs">
                         {new Date(o.created_at).toLocaleDateString("de-DE")}

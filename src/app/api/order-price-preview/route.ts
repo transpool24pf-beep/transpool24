@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getBookingsSettings } from "@/lib/bookings-settings";
 import { getPricingSettings } from "@/lib/settings";
 import { computeOrderPricingFromAddresses } from "@/lib/order-pricing-compute";
 import { isCargoCategoryId } from "@/lib/cargo";
@@ -11,6 +12,10 @@ const VALID_SERVICE = ["driver_only", "driver_car", "driver_car_assistant"] as c
  */
 export async function POST(req: Request) {
   try {
+    const bookings = await getBookingsSettings();
+    if (bookings.paused) {
+      return NextResponse.json({ error: "BOOKINGS_PAUSED" }, { status: 503 });
+    }
     const body = await req.json();
     const pickupAddress = typeof body.pickupAddress === "string" ? body.pickupAddress.trim() : "";
     const deliveryAddress = typeof body.deliveryAddress === "string" ? body.deliveryAddress.trim() : "";

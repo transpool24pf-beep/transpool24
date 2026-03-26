@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getBookingsSettings } from "@/lib/bookings-settings";
 import { createServerSupabase } from "@/lib/supabase";
 
 /** Same bucket as driver docs; path prefix separates order cargo photos. */
@@ -8,6 +9,10 @@ const MAX_SIZE = 4 * 1024 * 1024; // 4MB
 
 export async function POST(req: Request) {
   try {
+    const { paused } = await getBookingsSettings();
+    if (paused) {
+      return NextResponse.json({ error: "BOOKINGS_PAUSED" }, { status: 503 });
+    }
     const body = await req.json();
     const { base64, filename } = body as { base64?: string; filename?: string };
     if (!base64 || typeof filename !== "string") {

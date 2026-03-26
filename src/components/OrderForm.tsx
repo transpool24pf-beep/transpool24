@@ -193,7 +193,15 @@ const initial: OrderFormData = {
   packageCount: 0,
 };
 
-export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrderConfirmed?: () => void }) {
+export function OrderForm({
+  locale,
+  onOrderConfirmed,
+  bookingsPaused = false,
+}: {
+  locale: string;
+  onOrderConfirmed?: () => void;
+  bookingsPaused?: boolean;
+}) {
   const t = useTranslations("order");
   const [step, setStep] = useState(1);
   const [data, setData] = useState<OrderFormData>(initial);
@@ -288,6 +296,12 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
   const priceCents = pricePreview?.breakdown?.totalCents ?? 0;
 
   useEffect(() => {
+    if (bookingsPaused) {
+      setPricePreview(null);
+      setPricePreviewError(null);
+      setPricePreviewLoading(false);
+      return;
+    }
     if (step !== 3 || !step3Complete) {
       setPricePreview(null);
       setPricePreviewError(null);
@@ -317,6 +331,7 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
           });
           const json = (await res.json()) as { error?: string } & Partial<OrderPricePreview>;
           if (!res.ok) {
+            if (json.error === "BOOKINGS_PAUSED") throw new Error(t("bookingsPausedShort"));
             throw new Error(json.error || "preview failed");
           }
           if (!json.breakdown || typeof json.roundTripMinutes !== "number") {
@@ -509,10 +524,14 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ base64: dataUrl, filename: file.name }),
       });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || "Upload failed");
-      if (typeof json.url === "string") {
-        setCargoPhotoUrls((prev) => [...prev, json.url]);
+      const json = (await res.json()) as { error?: string; url?: string };
+      if (!res.ok) {
+        if (json.error === "BOOKINGS_PAUSED") throw new Error(t("bookingsPausedShort"));
+        throw new Error(json.error || "Upload failed");
+      }
+      const url = json.url;
+      if (typeof url === "string") {
+        setCargoPhotoUrls((prev) => [...prev, url]);
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Upload failed");
@@ -540,6 +559,10 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
   };
 
   const handleConfirmOrder = async () => {
+    if (bookingsPaused) {
+      setError(t("bookingsPausedShort"));
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
@@ -572,6 +595,7 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
         if (err === "CARGO_WEIGHT_REQUIRED") throw new Error(t("cargoWeightRequired"));
         if (err === "CARGO_PACKAGES_REQUIRED") throw new Error(t("cargoPackagesRequired"));
         if (err === "CARGO_PHOTOS_REQUIRED") throw new Error(t("cargoPhotosRequired"));
+        if (err === "BOOKINGS_PAUSED") throw new Error(t("bookingsPausedShort"));
         throw new Error(err || "Failed to confirm order");
       }
       if (json.jobId && json.confirmationToken && json.whatsappLink) {
@@ -601,6 +625,20 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
 
   return (
     <div className="mt-8 rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
+      {bookingsPaused && (
+        <div
+          className="mb-5 rounded-xl border-2 border-amber-400 bg-amber-50 px-4 py-3 text-sm text-amber-950"
+          role="status"
+        >
+          <p className="font-semibold">{t("bookingsPausedTitle")}</p>
+          <p className="mt-1 text-amber-900/90">{t("bookingsPausedBody")}</p>
+        </div>
+      )}
+      <div
+        className={
+          bookingsPaused && !orderConfirmed ? "pointer-events-none select-none opacity-[0.5]" : undefined
+        }
+      >
       {!orderConfirmed && (
         <div className="mb-6 flex gap-2">
           {[1, 2, 3, 4].map((s) => (
@@ -1214,6 +1252,7 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
           )}
         </div>
       )}
+      </div>
 
       {step === 4 && orderConfirmed && (
         <div className="space-y-5 rounded-xl border border-green-200 bg-green-50 p-6 text-[var(--primary)]">
@@ -1239,7 +1278,7 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
           <button
             type="button"
             onClick={back}
-            disabled={step === 1}
+            disabled={bookingsPaused || step === 1}
             className="rounded-lg border border-[#0d2137]/20 px-4 py-2 text-sm font-medium text-[var(--foreground)] disabled:opacity-50"
           >
             {t("back")}
@@ -1249,6 +1288,7 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
               type="button"
               onClick={next}
               disabled={
+                bookingsPaused ||
                 distanceLoading ||
                 (step === 1 && !step1Complete) ||
                 (step === 2 && !step2Complete) ||
@@ -1266,7 +1306,7 @@ export function OrderForm({ locale, onOrderConfirmed }: { locale: string; onOrde
             <button
               type="button"
               onClick={handleConfirmOrder}
-              disabled={loading || !confirmChecked}
+              disabled={bookingsPaused || loading || !confirmChecked}
               className="rounded-lg bg-[var(--accent)] px-6 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {loading ? "…" : t("confirmOrder")}

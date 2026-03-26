@@ -60,6 +60,19 @@ export default function AdminSettingsPage() {
   );
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [bookingsPaused, setBookingsPaused] = useState(false);
+  const [bookingsLoading, setBookingsLoading] = useState(true);
+  const [bookingsToggleLoading, setBookingsToggleLoading] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/bookings")
+      .then((r) => r.json())
+      .then((d: { paused?: boolean }) => {
+        if (typeof d.paused === "boolean") setBookingsPaused(d.paused);
+      })
+      .catch(() => {})
+      .finally(() => setBookingsLoading(false));
+  }, []);
 
   useEffect(() => {
     fetch("/api/admin/settings")
@@ -138,6 +151,22 @@ export default function AdminSettingsPage() {
       .finally(() => setSaving(false));
   };
 
+  const toggleBookingsPaused = () => {
+    setBookingsToggleLoading(true);
+    fetch("/api/admin/bookings", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ paused: !bookingsPaused }),
+    })
+      .then((r) => r.json())
+      .then((d: { paused?: boolean }) => {
+        if (typeof d.paused === "boolean") setBookingsPaused(d.paused);
+        else alert("Speichern fehlgeschlagen.");
+      })
+      .catch(() => alert("Anfrage fehlgeschlagen"))
+      .finally(() => setBookingsToggleLoading(false));
+  };
+
   if (loading) {
     return (
       <div className="rounded-xl bg-white p-8 shadow-sm">
@@ -149,6 +178,49 @@ export default function AdminSettingsPage() {
   return (
     <div>
       <h1 className="mb-6 text-2xl font-semibold text-[#0d2137]">Einstellungen</h1>
+
+      <section className="mb-8 rounded-xl border-2 border-amber-300/80 bg-amber-50/40 p-6 shadow-sm ring-1 ring-amber-200/60">
+        <h2 className="mb-1 text-lg font-medium text-[#0d2137]">
+          Online-Buchungen ·{" "}
+          <span className="text-[#0d2137]/85" dir="rtl">
+            حجز الطلبات (الموقع)
+          </span>
+        </h2>
+        <p className="mb-4 text-sm text-[#0d2137]/65" dir="rtl">
+          عند الإيقاف المؤقت لا يمكن بدء طلبات جديدة من صفحة <code className="rounded bg-[#0d2137]/10 px-1">/order</code>.
+          روابط التأكيد والدفع لطلبات موجودة مسبقاً تبقى تعمل.
+        </p>
+        <p className="mb-4 text-sm text-[#0d2137]/60">
+          Wenn pausiert, können auf <code className="rounded bg-[#0d2137]/10 px-1">/order</code> keine neuen Aufträge
+          gestartet werden. Bestehende Bestätigungslinks und Stripe-Checkout bleiben möglich.
+        </p>
+        {bookingsLoading ? (
+          <p className="text-sm text-[#0d2137]/55">Laden…</p>
+        ) : (
+          <div className="flex flex-wrap items-center gap-4">
+            <button
+              type="button"
+              onClick={toggleBookingsPaused}
+              disabled={bookingsToggleLoading}
+              className={`rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition disabled:opacity-60 ${
+                bookingsPaused ? "bg-emerald-600 hover:bg-emerald-700" : "bg-amber-600 hover:bg-amber-700"
+              }`}
+            >
+              {bookingsToggleLoading
+                ? "…"
+                : bookingsPaused
+                  ? "Buchungen aktivieren · تفعيل الحجز"
+                  : "Buchungen pausieren · إيقاف الحجز"}
+            </button>
+            <span
+              className={`text-sm font-medium ${bookingsPaused ? "text-amber-800" : "text-emerald-800"}`}
+            >
+              Status: {bookingsPaused ? "pausiert" : "aktiv"}
+            </span>
+          </div>
+        )}
+      </section>
+
       <form onSubmit={handleSubmit} className="space-y-8">
         <section className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
           <h2 className="mb-1 text-lg font-medium text-[#0d2137]">Preis pro km nach Ladungsgröße</h2>
@@ -284,7 +356,7 @@ export default function AdminSettingsPage() {
             disabled={saving}
             className="rounded-lg bg-[var(--accent)] px-6 py-2.5 font-medium text-white hover:opacity-95 disabled:opacity-60"
           >
-            {saving ? "Speichern…" : "Speichern"}
+            {saving ? "Speichern…" : "Speichern · حفظ الأسعار"}
           </button>
         </div>
       </form>

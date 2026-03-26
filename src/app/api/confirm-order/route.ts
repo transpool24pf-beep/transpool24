@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
+import { getBookingsSettings } from "@/lib/bookings-settings";
 import { getPricingSettings } from "@/lib/settings";
 import { isCargoCategoryId } from "@/lib/cargo";
 import { computeOrderPricingFromAddresses } from "@/lib/order-pricing-compute";
@@ -66,6 +67,11 @@ export async function POST(req: Request) {
     }
     if (photoUrls.length < 1) {
       return NextResponse.json({ error: "CARGO_PHOTOS_REQUIRED" }, { status: 400 });
+    }
+
+    const bookings = await getBookingsSettings();
+    if (bookings.paused) {
+      return NextResponse.json({ error: "BOOKINGS_PAUSED" }, { status: 503 });
     }
 
     const departureTime =
