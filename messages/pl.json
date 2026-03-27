@@ -7,6 +7,27 @@
     "slogan": "Aktywni w Pforzheim – powiązani z całym światem",
     "blog": "Magazine"
   },
+  "siteMetadata": {
+    "title": "TransPool24 – Logistyka w Pforzheim, Niemcy",
+    "description": "Firma transportowa Pforzheim i cyfrowa platforma logistyczna w Niemczech. Transport drogowy Badenia-Wirtembergii, kurier i spedycja. Rezerwacja online, śledzenie przesyłki w czasie rzeczywistym, wycena frachtu. Cyfrowa logistyka, bezpieczna płatność Stripe. Dostawa Pforzheim — TransPool24.",
+    "keywords": [
+      "Firma transportowa Pforzheim",
+      "Platforma logistyczna Niemcy",
+      "Transport drogowy Badenia-Wirtembergia",
+      "Kurier i spedycja",
+      "Rezerwacja transportu online",
+      "Śledzenie przesyłki na żywo",
+      "TransPool24 logistyka",
+      "Kalkulacja ceny frachtu",
+      "Cyfrowa logistyka",
+      "Dostawa Pforzheim",
+      "Płatność Stripe transport",
+      "TransPool24",
+      "Transport mebli Niemcy",
+      "Cyfrowa platforma ładunków",
+      "Rezerwacja transportu drogowego"
+    ]
+  },
   "aboutNarrative": {
     "pageTitle": "About us",
     "operationalKicker": "DAY-TO-DAY OPERATIONS FOR BUSINESSES & TRADE",

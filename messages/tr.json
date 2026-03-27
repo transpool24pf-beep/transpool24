@@ -7,6 +7,27 @@
     "slogan": "Pforzheim'da aktif – Dünyaya bağlı",
     "blog": "Magazine"
   },
+  "siteMetadata": {
+    "title": "TransPool24 – Pforzheim'de lojistik, Almanya",
+    "description": "Pforzheim nakliye şirketi ve Almanya'da dijital lojistik pazaryeri. Baden-Württemberg karayolu taşımacılığı, kurye ve nakliyat. Online rezervasyon, gerçek zamanlı gönderi takibi, navlun fiyatı hesaplama. Dijital lojistik, güvenli Stripe ödemesi. Pforzheim teslimat hizmeti — TransPool24.",
+    "keywords": [
+      "Pforzheim nakliye şirketi",
+      "Almanya lojistik pazaryeri",
+      "Baden-Württemberg karayolu taşımacılığı",
+      "Kurye ve nakliyat",
+      "Online taşıma rezervasyonu",
+      "Gerçek zamanlı gönderi takibi",
+      "TransPool24 lojistik",
+      "Navlun fiyatı hesaplama",
+      "Dijital lojistik",
+      "Pforzheim teslimat hizmeti",
+      "Stripe ödeme taşımacılık",
+      "TransPool24",
+      "Almanya mobilya taşımacılığı",
+      "Dijital yük platformu",
+      "Karayolu taşıma rezervasyonu"
+    ]
+  },
   "aboutNarrative": {
     "pageTitle": "Hakkımızda",
     "operationalKicker": "İŞLETMELER VE TİCARET İÇİN GÜNLÜK OPERASYON",

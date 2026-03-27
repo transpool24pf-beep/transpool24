@@ -17,9 +17,13 @@ const geistMono = Geist_Mono({
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com";
 
 export const metadata: Metadata = {
-  title: "TransPool24 – Logistik in Pforzheim",
-  description: "Transportaufträge einfach online buchen. Pforzheim und Region.",
   metadataBase: new URL(SITE),
+  title: {
+    default: "TransPool24",
+    template: "%s | TransPool24",
+  },
+  description:
+    "Digital logistics & road transport in Pforzheim, Germany — book online, real-time tracking, secure payments.",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
