@@ -22,11 +22,12 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE),
   icons: {
     icon: [
-      { url: "/favicon.ico", type: "image/png", sizes: "any" },
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.png", type: "image/png", sizes: "512x512" },
       { url: "/favicon-32.png", type: "image/png", sizes: "32x32" },
       { url: "/favicon-48.png", type: "image/png", sizes: "48x48" },
     ],
-    apple: "/favicon-48.png",
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
   },
 };
 
@@ -36,9 +37,11 @@ export default function RootLayout({
   return (
     <html lang="de" className="scroll-smooth" suppressHydrationWarning>
       <head>
-        <link rel="icon" href={`${SITE}/favicon.ico`} type="image/png" />
+        <link rel="icon" href={`${SITE}/favicon.ico`} sizes="any" />
+        <link rel="icon" href={`${SITE}/favicon.png`} type="image/png" sizes="512x512" />
         <link rel="icon" href={`${SITE}/favicon-32.png`} type="image/png" sizes="32x32" />
-        <link rel="apple-touch-icon" href={`${SITE}/favicon-48.png`} sizes="48x48" />
+        <link rel="icon" href={`${SITE}/favicon-48.png`} type="image/png" sizes="48x48" />
+        <link rel="apple-touch-icon" href={`${SITE}/apple-touch-icon.png`} sizes="180x180" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
