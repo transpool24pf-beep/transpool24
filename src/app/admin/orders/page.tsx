@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
 type Job = {
@@ -30,7 +30,6 @@ type Job = {
   last_driver_location_at?: string | null;
   pod_photo_url?: string | null;
   pod_completed_at?: string | null;
-  archived_at?: string | null;
 };
 
 const STATUS_CONFIG: Record<
@@ -190,130 +189,23 @@ function LogisticsStatusPicker({
   );
 }
 
-function OrderRemoveMenu({
-  order,
-  disabled,
-  isArchivedTab,
-  onChanged,
-}: {
-  order: Job;
-  disabled: boolean;
-  isArchivedTab: boolean;
-  onChanged: () => void;
-}) {
-  const detailsRef = useRef<HTMLDetailsElement>(null);
-
-  const close = () => {
-    if (detailsRef.current) detailsRef.current.open = false;
-  };
-
-  const archive = async () => {
-    if (!confirm("نقل الطلب إلى الأرشيف؟ يمكن استعادته من تبويب «الأرشيف».")) return;
-    const r = await fetch("/api/admin/orders", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: order.id, archived_at: new Date().toISOString() }),
-    });
-    if (!r.ok) {
-      alert("فشلت الأرشفة.");
-      return;
-    }
-    close();
-    onChanged();
-  };
-
-  const restore = async () => {
-    const r = await fetch("/api/admin/orders", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: order.id, archived_at: null }),
-    });
-    if (!r.ok) {
-      alert("فشلت الاستعادة.");
-      return;
-    }
-    close();
-    onChanged();
-  };
-
-  const hardDelete = async () => {
-    if (!confirm("حذف نهائي من النظام — لا يمكن التراجع. متابعة؟")) return;
-    if (!confirm("تأكيد نهائي: حذف الطلب وجميع البيانات المرتبطة؟")) return;
-    const r = await fetch(`/api/admin/orders/${order.id}`, { method: "DELETE" });
-    const data = (await r.json().catch(() => ({}))) as { error?: string };
-    if (!r.ok) {
-      alert(data.error ?? "فشل الحذف.");
-      return;
-    }
-    close();
-    onChanged();
-  };
-
-  return (
-    <details ref={detailsRef} className="relative inline-block" dir="rtl">
-      <summary
-        className="flex h-8 w-8 cursor-pointer list-none items-center justify-center rounded-lg border border-red-200 bg-red-50 text-lg font-bold leading-none text-red-600 hover:bg-red-100 [&::-webkit-details-marker]:hidden"
-        aria-label="حذف أو أرشفة"
-        title="حذف أو أرشفة"
-      >
-        ×
-      </summary>
-      <div className="absolute end-0 top-[calc(100%+4px)] z-[60] min-w-[11rem] rounded-xl border-2 border-[#0d2137]/12 bg-white py-1 shadow-xl">
-        {!isArchivedTab ? (
-          <button
-            type="button"
-            disabled={disabled}
-            onClick={() => void archive()}
-            className="block w-full px-3 py-2 text-right text-xs font-medium text-[#0d2137] hover:bg-[#0d2137]/6 disabled:opacity-45"
-          >
-            أرشفة (إخفاء من القائمة)
-          </button>
-        ) : (
-          <button
-            type="button"
-            disabled={disabled}
-            onClick={() => void restore()}
-            className="block w-full px-3 py-2 text-right text-xs font-medium text-emerald-800 hover:bg-emerald-50 disabled:opacity-45"
-          >
-            استعادة من الأرشيف
-          </button>
-        )}
-        <button
-          type="button"
-          disabled={disabled}
-          onClick={() => void hardDelete()}
-          className="block w-full border-t border-[#0d2137]/10 px-3 py-2 text-right text-xs font-semibold text-red-600 hover:bg-red-50 disabled:opacity-45"
-        >
-          حذف نهائي
-        </button>
-      </div>
-    </details>
-  );
-}
-
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
-  const [ordersView, setOrdersView] = useState<"active" | "archived">("active");
   const [filter, setFilter] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [updating, setUpdating] = useState<string | null>(null);
   const [sendingDeliveryEmailFor, setSendingDeliveryEmailFor] = useState<string | null>(null);
 
-  const reloadOrders = useCallback(() => {
-    setLoading(true);
-    fetch(`/api/admin/orders?view=${ordersView}`)
+  useEffect(() => {
+    fetch("/api/admin/orders")
       .then((r) => r.json())
       .then((data) => {
         setOrders(Array.isArray(data) ? data : []);
       })
       .catch(() => setOrders([]))
       .finally(() => setLoading(false));
-  }, [ordersView]);
-
-  useEffect(() => {
-    reloadOrders();
-  }, [reloadOrders]);
+  }, []);
 
   const updateStatus = (id: string, logistics_status: string) => {
     setUpdating(id);
@@ -385,7 +277,7 @@ export default function AdminOrdersPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
         <h1 className="text-2xl font-bold text-[#0d2137]">Aufträge / طلبات</h1>
-        {!loading && ordersView === "active" && (
+        {!loading && (
           <a
             href="#admin-order-ops"
             className="inline-flex w-fit items-center gap-2 rounded-xl border-2 border-[var(--accent)] bg-[var(--accent)]/10 px-4 py-2 text-sm font-semibold text-[#0d2137] hover:bg-[var(--accent)]/20"
@@ -397,32 +289,7 @@ export default function AdminOrdersPage() {
         )}
       </div>
 
-      <div className="flex flex-wrap items-center gap-3" dir="rtl">
-        <div className="flex flex-wrap items-center gap-2 rounded-xl border-2 border-[#0d2137]/10 bg-white px-3 py-2 shadow-sm">
-          <span className="text-xs font-semibold text-[#0d2137]/70">قائمة الطلبات</span>
-          <button
-            type="button"
-            onClick={() => setOrdersView("active")}
-            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
-              ordersView === "active"
-                ? "bg-[#0d2137] text-white"
-                : "bg-[#0d2137]/6 text-[#0d2137] hover:bg-[#0d2137]/10"
-            }`}
-          >
-            النشطة
-          </button>
-          <button
-            type="button"
-            onClick={() => setOrdersView("archived")}
-            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
-              ordersView === "archived"
-                ? "bg-amber-700 text-white"
-                : "bg-amber-50 text-amber-900 hover:bg-amber-100"
-            }`}
-          >
-            الأرشيف
-          </button>
-        </div>
+      <div className="flex flex-wrap items-center gap-3">
         <input
           type="search"
           value={searchQuery}
@@ -450,7 +317,7 @@ export default function AdminOrdersPage() {
         </div>
       ) : (
         <div className="overflow-x-auto rounded-2xl border-2 border-[#0d2137]/10 bg-white shadow-lg">
-          <div className="w-full min-w-[980px]">
+          <div className="w-full min-w-[920px]">
             <table className="w-full table-fixed text-left text-sm">
               <thead>
                 <tr className="border-b-2 border-[#0d2137]/10 bg-gradient-to-r from-[#0d2137]/10 to-[#0d2137]/5">
@@ -469,10 +336,7 @@ export default function AdminOrdersPage() {
                     معاون €
                   </th>
                   <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">Zahlung</th>
-                  <th className="w-[4%] px-1 py-3 text-center font-semibold text-[#0d2137]" title="حذف أو أرشفة">
-                    ×
-                  </th>
-                  <th className="w-[9%] px-2 py-3 font-semibold text-[#0d2137]" dir="rtl">
+                  <th className="w-[10%] px-2 py-3 font-semibold text-[#0d2137]" dir="rtl">
                     إجراءات
                   </th>
                 </tr>
@@ -558,14 +422,6 @@ export default function AdminOrdersPage() {
                           {o.payment_status === "paid" ? "Bezahlt" : "Ausstehend"}
                         </span>
                       </td>
-                      <td className="min-w-0 px-1 py-2 text-center align-middle">
-                        <OrderRemoveMenu
-                          order={o}
-                          disabled={updating === o.id}
-                          isArchivedTab={ordersView === "archived"}
-                          onChanged={reloadOrders}
-                        />
-                      </td>
                       <td className="min-w-0 px-2 py-2" dir="rtl">
                         <Link
                           href={`/admin/orders/${o.id}`}
@@ -583,7 +439,7 @@ export default function AdminOrdersPage() {
         </div>
       )}
 
-      {!loading && ordersView === "active" && (
+      {!loading && (
         <div
           id="admin-order-ops"
           className="scroll-mt-24 space-y-8 rounded-2xl border-2 border-[#0d2137]/10 bg-gradient-to-b from-white to-[#0d2137]/[0.02] p-6 shadow-lg ring-2 ring-[var(--accent)]/20"
