@@ -78,6 +78,8 @@ export type Job = {
   pod_completed_at?: string | null;
   customer_driver_rating?: number | null;
   customer_driver_comment?: string | null;
+  /** Admin archive — hidden from default orders list when set */
+  archived_at?: string | null;
   created_at: string;
   updated_at: string;
 };

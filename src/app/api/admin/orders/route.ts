@@ -2,16 +2,25 @@ import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/admin-api";
 
-export async function GET() {
+export async function GET(req: Request) {
   const err = await requireAdmin();
   if (err) return err;
+  const view = new URL(req.url).searchParams.get("view") ?? "active";
   const supabase = createServerSupabase();
-  const { data, error } = await supabase
+  let q = supabase
     .from("jobs")
     .select(
-      "id, order_number, company_name, phone, customer_email, pickup_address, delivery_address, cargo_size, cargo_details, service_type, distance_km, duration_minutes, price_cents, driver_price_cents, assistant_price_cents, payment_status, logistics_status, created_at, preferred_pickup_at, confirmation_token, assigned_driver_application_id, estimated_arrival_at, eta_minutes_remaining, last_driver_location_at, pod_photo_url, pod_completed_at"
+      "id, order_number, company_name, phone, customer_email, pickup_address, delivery_address, cargo_size, cargo_details, service_type, distance_km, duration_minutes, price_cents, driver_price_cents, assistant_price_cents, payment_status, logistics_status, created_at, preferred_pickup_at, confirmation_token, assigned_driver_application_id, estimated_arrival_at, eta_minutes_remaining, last_driver_location_at, pod_photo_url, pod_completed_at, archived_at"
     )
     .order("created_at", { ascending: false });
+  if (view === "archived") {
+    q = q.not("archived_at", "is", null);
+  } else if (view === "all") {
+    /* no archived filter */
+  } else {
+    q = q.is("archived_at", null);
+  }
+  const { data, error } = await q;
   if (error) {
     console.error("[admin/orders]", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -57,6 +66,9 @@ export async function PATCH(req: Request) {
   if (body.last_driver_lat !== undefined) updates.last_driver_lat = body.last_driver_lat == null ? null : Number(body.last_driver_lat);
   if (body.last_driver_lng !== undefined) updates.last_driver_lng = body.last_driver_lng == null ? null : Number(body.last_driver_lng);
   if (body.last_driver_location_at !== undefined) updates.last_driver_location_at = body.last_driver_location_at || null;
+  if (body.archived_at !== undefined) {
+    updates.archived_at = body.archived_at ? String(body.archived_at) : null;
+  }
   const { data, error } = await supabase
     .from("jobs")
     .update(updates)
