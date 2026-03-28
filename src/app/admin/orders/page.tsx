@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useAdminLocale } from "@/contexts/AdminLocaleContext";
+import { serviceTypeLabel, type AdminLocale } from "@/lib/admin-ui-strings";
 
 type Job = {
   id: string;
@@ -90,19 +92,6 @@ const STATUS_CONFIG: Record<
 /** طلبات نشطة (ليست مسودة ولا ملغاة ولا مُسلَّمة) */
 const IN_PROGRESS_STATUSES = new Set(["confirmed", "paid", "assigned", "in_transit"]);
 
-/** عمود «طلب شركة» — يطابق نوع الخدمة المستخدم في التسعير عند الدفع */
-function serviceTypeCompanyRequestLabel(st: string | undefined): string {
-  if (st === "driver_only") return "شوفير من دون سيارة";
-  if (st === "driver_car_assistant") return "شوفير مع سيارة ومعاون";
-  return "شوفير مع سيارة";
-}
-
-function serviceTypeLabelDe(st: string | undefined): string {
-  if (st === "driver_only") return "Nur Fahrer";
-  if (st === "driver_car_assistant") return "Fahrer mit Fahrzeug + Helfer";
-  return "Fahrer mit Fahrzeug";
-}
-
 function matchSearch(o: Job, q: string): boolean {
   if (!q.trim()) return true;
   const s = q.trim().toLowerCase();
@@ -125,37 +114,49 @@ function matchSearch(o: Job, q: string): boolean {
     (o.driver_price_cents != null && str((o.driver_price_cents / 100).toFixed(2)).includes(s)) ||
     (o.assistant_price_cents != null &&
       str((o.assistant_price_cents / 100).toFixed(2)).includes(s)) ||
-    str(serviceTypeCompanyRequestLabel(o.service_type)).includes(s) ||
-    str(serviceTypeLabelDe(o.service_type)).includes(s) ||
+    str(serviceTypeLabel("de", o.service_type)).includes(s) ||
+    str(serviceTypeLabel("ar", o.service_type)).includes(s) ||
     str(o.service_type ?? "").includes(s)
   );
 }
 
-/** قائمة حالة مدمجة: عربي فقط في الشارة (أضيق من عنصر select الافتراضي) */
+function statusText(locale: AdminLocale, logisticsStatus: string) {
+  const c = STATUS_CONFIG[logisticsStatus] ?? STATUS_CONFIG.draft;
+  return locale === "ar" ? c.labelAr : c.labelDe;
+}
+
 function LogisticsStatusPicker({
   jobId,
   logisticsStatus,
   disabled,
+  locale,
+  pickStatusAria,
+  statusSummaryAria,
   onPick,
 }: {
   jobId: string;
   logisticsStatus: string;
   disabled: boolean;
+  locale: AdminLocale;
+  pickStatusAria: string;
+  statusSummaryAria: string;
   onPick: (id: string, status: string) => void;
 }) {
   const detailsRef = useRef<HTMLDetailsElement>(null);
   const conf = STATUS_CONFIG[logisticsStatus] ?? STATUS_CONFIG.draft;
+  const dir = locale === "ar" ? "rtl" : "ltr";
+  const align = locale === "ar" ? "text-right" : "text-left";
 
   return (
-    <details ref={detailsRef} className="relative mx-auto w-full max-w-[6.25rem]" dir="rtl">
+    <details ref={detailsRef} className="relative mx-auto w-full max-w-[6.25rem]" dir={dir}>
       <summary
         className={`flex cursor-pointer list-none items-center justify-center gap-1 rounded-full border-2 bg-white py-1 pe-1.5 ps-1 text-[11px] font-semibold leading-tight shadow-sm [&::-webkit-details-marker]:hidden ${conf.color} ${conf.pillBorder}`}
-        title={`${conf.labelAr} (${conf.labelDe})`}
-        aria-label={`الحالة: ${conf.labelAr}`}
+        title={`${conf.labelDe} / ${conf.labelAr}`}
+        aria-label={`${statusSummaryAria}: ${statusText(locale, logisticsStatus)}`}
         aria-haspopup="listbox"
       >
         <span className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${conf.bg}`} aria-hidden />
-        <span className="min-w-0 flex-1 truncate text-center">{conf.labelAr}</span>
+        <span className="min-w-0 flex-1 truncate text-center">{statusText(locale, logisticsStatus)}</span>
         <span className="shrink-0 text-[8px] text-[#0d2137]/40" aria-hidden>
           ▾
         </span>
@@ -163,7 +164,7 @@ function LogisticsStatusPicker({
       <div
         className="absolute end-0 top-[calc(100%+6px)] z-50 min-w-[8.5rem] rounded-xl border-2 border-[#0d2137]/12 bg-white py-1 shadow-xl"
         role="listbox"
-        aria-label="اختر الحالة"
+        aria-label={pickStatusAria}
       >
         {Object.entries(STATUS_CONFIG).map(([value, c]) => (
           <button
@@ -176,12 +177,12 @@ function LogisticsStatusPicker({
               if (value !== logisticsStatus) onPick(jobId, value);
               if (detailsRef.current) detailsRef.current.open = false;
             }}
-            className={`flex w-full items-center gap-2 px-2.5 py-1.5 text-right text-[11px] font-medium transition hover:bg-[#0d2137]/6 disabled:opacity-45 ${c.color} ${
+            className={`flex w-full items-center gap-2 px-2.5 py-1.5 ${align} text-[11px] font-medium transition hover:bg-[#0d2137]/6 disabled:opacity-45 ${c.color} ${
               logisticsStatus === value ? "bg-[#0d2137]/8" : ""
             }`}
           >
             <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${c.bg}`} />
-            {c.labelAr}
+            {locale === "ar" ? c.labelAr : c.labelDe}
           </button>
         ))}
       </div>
@@ -190,6 +191,8 @@ function LogisticsStatusPicker({
 }
 
 export default function AdminOrdersPage() {
+  const { locale, t } = useAdminLocale();
+  const dateLocale = locale === "ar" ? "ar-SA" : "de-DE";
   const [orders, setOrders] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("");
@@ -276,15 +279,15 @@ export default function AdminOrdersPage() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
-        <h1 className="text-2xl font-bold text-[#0d2137]">Aufträge / طلبات</h1>
+        <h1 className="text-2xl font-bold text-[#0d2137]">{t("orders.title")}</h1>
         {!loading && (
           <a
             href="#admin-order-ops"
             className="inline-flex w-fit items-center gap-2 rounded-xl border-2 border-[var(--accent)] bg-[var(--accent)]/10 px-4 py-2 text-sm font-semibold text-[#0d2137] hover:bg-[var(--accent)]/20"
-            dir="rtl"
+            dir={locale === "ar" ? "rtl" : "ltr"}
           >
             <span aria-hidden>↓</span>
-            قيد التنفيذ وتم التوصيل (صور) — انتقل للأسفل
+            {t("orders.jumpToOps")}
           </a>
         )}
       </div>
@@ -294,7 +297,7 @@ export default function AdminOrdersPage() {
           type="search"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Suche: Auftragsnr., Firma, E-Mail, Adresse, Status …"
+          placeholder={t("orders.searchPlaceholder")}
           className="min-w-[220px] flex-1 rounded-xl border-2 border-[#0d2137]/15 bg-white px-4 py-2.5 text-sm text-[#0d2137] placeholder:text-[#0d2137]/50 shadow-sm transition focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30"
         />
         <select
@@ -302,10 +305,10 @@ export default function AdminOrdersPage() {
           onChange={(e) => setFilter(e.target.value)}
           className="rounded-xl border-2 border-[#0d2137]/15 bg-white px-4 py-2.5 text-sm font-medium text-[#0d2137] shadow-sm transition focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30"
         >
-          <option value="">Alle Status</option>
-          {Object.entries(STATUS_CONFIG).map(([value, { labelAr }]) => (
+          <option value="">{t("orders.filterAllStatus")}</option>
+          {Object.entries(STATUS_CONFIG).map(([value, c]) => (
             <option key={value} value={value}>
-              {labelAr}
+              {locale === "ar" ? c.labelAr : c.labelDe}
             </option>
           ))}
         </select>
@@ -313,7 +316,7 @@ export default function AdminOrdersPage() {
 
       {loading ? (
         <div className="rounded-2xl bg-white p-10 shadow-lg">
-          <p className="text-[#0d2137]/70">Laden…</p>
+          <p className="text-[#0d2137]/70">{t("orders.loading")}</p>
         </div>
       ) : (
         <div className="overflow-x-auto rounded-2xl border-2 border-[#0d2137]/10 bg-white shadow-lg">
@@ -321,23 +324,35 @@ export default function AdminOrdersPage() {
             <table className="w-full table-fixed text-left text-sm">
               <thead>
                 <tr className="border-b-2 border-[#0d2137]/10 bg-gradient-to-r from-[#0d2137]/10 to-[#0d2137]/5">
-                  <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">Nr.</th>
-                  <th className="w-[7%] px-1 py-3 text-center font-semibold text-[#0d2137]" dir="rtl">
-                    الحالة
+                  <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">{t("orders.colNr")}</th>
+                  <th
+                    className="w-[7%] px-1 py-3 text-center font-semibold text-[#0d2137]"
+                    dir={locale === "ar" ? "rtl" : "ltr"}
+                  >
+                    {t("orders.colStatus")}
                   </th>
-                  <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">Datum</th>
-                  <th className="w-[9%] px-2 py-3 font-semibold text-[#0d2137]">Firma</th>
-                  <th className="w-[12%] px-2 py-3 font-semibold text-[#0d2137]" dir="rtl">
-                    طلب شركة
+                  <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">{t("orders.colDate")}</th>
+                  <th className="w-[9%] px-2 py-3 font-semibold text-[#0d2137]">{t("orders.colCompany")}</th>
+                  <th
+                    className="w-[12%] px-2 py-3 font-semibold text-[#0d2137]"
+                    dir={locale === "ar" ? "rtl" : "ltr"}
+                  >
+                    {t("orders.colService")}
                   </th>
-                  <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">Kunde €</th>
-                  <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">Fahrer €</th>
-                  <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]" dir="rtl">
-                    معاون €
+                  <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">{t("orders.colCustomerEur")}</th>
+                  <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">{t("orders.colDriverEur")}</th>
+                  <th
+                    className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]"
+                    dir={locale === "ar" ? "rtl" : "ltr"}
+                  >
+                    {t("orders.colAssistantEur")}
                   </th>
-                  <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">Zahlung</th>
-                  <th className="w-[10%] px-2 py-3 font-semibold text-[#0d2137]" dir="rtl">
-                    إجراءات
+                  <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">{t("orders.colPayment")}</th>
+                  <th
+                    className="w-[10%] px-2 py-3 font-semibold text-[#0d2137]"
+                    dir={locale === "ar" ? "rtl" : "ltr"}
+                  >
+                    {t("orders.colActions")}
                   </th>
                 </tr>
               </thead>
@@ -358,25 +373,32 @@ export default function AdminOrdersPage() {
                           jobId={o.id}
                           logisticsStatus={o.logistics_status}
                           disabled={updating === o.id}
+                          locale={locale}
+                          pickStatusAria={t("orders.statusPick")}
+                          statusSummaryAria={t("orders.statusAria")}
                           onPick={updateStatus}
                         />
                       </td>
                       <td className="min-w-0 px-2 py-2 text-[#0d2137]/80 text-xs">
-                        {new Date(o.created_at).toLocaleDateString("de-DE")}
+                        {new Date(o.created_at).toLocaleDateString(dateLocale)}
                       </td>
                       <td className="min-w-0 truncate px-2 py-2 font-medium text-[#0d2137] text-xs" title={o.company_name}>
                         {o.company_name}
                       </td>
                       <td
                         className="min-w-0 px-2 py-2 text-xs font-medium text-[#0d2137] leading-snug"
-                        dir="rtl"
-                        title={serviceTypeLabelDe(o.service_type)}
+                        dir={locale === "ar" ? "rtl" : "ltr"}
+                        title={
+                          locale === "ar"
+                            ? serviceTypeLabel("de", o.service_type)
+                            : serviceTypeLabel("ar", o.service_type)
+                        }
                       >
-                        {serviceTypeCompanyRequestLabel(o.service_type)}
+                        {serviceTypeLabel(locale, o.service_type)}
                       </td>
                       <td
                         className="min-w-0 px-2 py-2 font-semibold text-[#0d2137] text-xs whitespace-nowrap"
-                        title="Kundenpreis (bei Zahlung nach Service-Typ berechnet)"
+                        title={t("orders.priceTitle")}
                       >
                         € {(o.price_cents / 100).toFixed(2)}
                       </td>
@@ -404,7 +426,7 @@ export default function AdminOrdersPage() {
                             }
                             onBlur={(e) => updateAssistantPrice(o.id, e.target.value)}
                             placeholder="—"
-                            title="تسعير المعاون (لطلبات شوفير + معاون)"
+                            title={t("orders.assistantTitle")}
                             className="w-16 max-w-full rounded border border-violet-200 bg-violet-50/40 px-1.5 py-1 text-xs"
                           />
                         ) : (
@@ -419,15 +441,15 @@ export default function AdminOrdersPage() {
                               : "bg-amber-100 text-amber-800"
                           }`}
                         >
-                          {o.payment_status === "paid" ? "Bezahlt" : "Ausstehend"}
+                          {o.payment_status === "paid" ? t("orders.paymentPaid") : t("orders.paymentPending")}
                         </span>
                       </td>
-                      <td className="min-w-0 px-2 py-2" dir="rtl">
+                      <td className="min-w-0 px-2 py-2" dir={locale === "ar" ? "rtl" : "ltr"}>
                         <Link
                           href={`/admin/orders/${o.id}`}
                           className="inline-flex items-center justify-center rounded-lg bg-[#0d2137] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#0d2137]/90"
                         >
-                          فتح ملف
+                          {t("orders.openFile")}
                         </Link>
                       </td>
                     </tr>
@@ -443,24 +465,24 @@ export default function AdminOrdersPage() {
         <div
           id="admin-order-ops"
           className="scroll-mt-24 space-y-8 rounded-2xl border-2 border-[#0d2137]/10 bg-gradient-to-b from-white to-[#0d2137]/[0.02] p-6 shadow-lg ring-2 ring-[var(--accent)]/20"
-          dir="rtl"
+          dir={locale === "ar" ? "rtl" : "ltr"}
         >
           <p className="border-b border-[#0d2137]/10 pb-3 text-sm font-medium text-[#0d2137]/80">
-            لوحة التشغيل — تظهر دائماً تحت الجدول: الطلبات النشطة ثم المُسلَّمة مع صور الإثبات.
+            {t("orders.opsIntro")}
           </p>
           {orders.length === 0 ? (
             <p className="rounded-xl border border-dashed border-[#0d2137]/25 bg-white p-8 text-center text-sm text-[#0d2137]/65">
-              لا توجد طلبات في النظام (تحقق من الاتصال أو صلاحيات API).
+              {t("orders.noOrders")}
             </p>
           ) : (
             <>
-            <h2 className="text-xl font-bold text-[#0d2137]">تنفيذ الطلبات — قيد التنفيذ</h2>
+            <h2 className="text-xl font-bold text-[#0d2137]">{t("orders.inProgressTitle")}</h2>
             <p className="mt-1 text-sm text-[#0d2137]/65">
-              طلبات مؤكدة أو مسار التوصيل (مؤكد، مدفوع، مُعيَّن، في الطريق). تفاصيل التتبع ووقت الوصول المتوقع هنا فقط.
+              {t("orders.inProgressDesc")}
             </p>
             {inProgressOrders.length === 0 ? (
               <p className="mt-4 rounded-xl border border-dashed border-[#0d2137]/20 bg-white/80 p-6 text-center text-sm text-[#0d2137]/60">
-                لا توجد طلبات قيد التنفيذ حالياً.
+                {t("orders.noInProgress")}
               </p>
             ) : (
               <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -468,14 +490,14 @@ export default function AdminOrdersPage() {
                   const st = STATUS_CONFIG[o.logistics_status] ?? STATUS_CONFIG.draft;
                   const etaStr =
                     o.estimated_arrival_at != null
-                      ? new Date(o.estimated_arrival_at).toLocaleString("ar-SA", {
+                      ? new Date(o.estimated_arrival_at).toLocaleString(dateLocale, {
                           dateStyle: "medium",
                           timeStyle: "short",
                         })
                       : null;
                   const lastGpsStr =
                     o.last_driver_location_at != null
-                      ? new Date(o.last_driver_location_at).toLocaleString("ar-SA", {
+                      ? new Date(o.last_driver_location_at).toLocaleString(dateLocale, {
                           dateStyle: "short",
                           timeStyle: "short",
                         })
@@ -494,82 +516,94 @@ export default function AdminOrdersPage() {
                             className={`mt-1 inline-flex items-center gap-1 rounded-full bg-violet-100 px-2 py-0.5 text-xs font-medium ${st.color}`}
                           >
                             <span className={`h-2 w-2 rounded-full ${st.bg}`} />
-                            {st.labelAr}
+                            {statusText(locale, o.logistics_status)}
                           </span>
                         </div>
                         <Link
                           href={`/admin/orders/${o.id}`}
                           className="shrink-0 rounded-lg bg-[#0d2137] px-2.5 py-1 text-xs font-medium text-white hover:bg-[#0d2137]/90"
                         >
-                          فتح الملف
+                          {t("orders.openFile")}
                         </Link>
                       </div>
                       <dl className="mt-3 space-y-1.5 text-xs text-[#0d2137]/85">
                         <div className="flex justify-between gap-2">
-                          <dt className="text-[#0d2137]/55">الشركة</dt>
-                          <dd className="max-w-[65%] text-left font-medium">{o.company_name}</dd>
+                          <dt className="text-[#0d2137]/55">{t("orders.dtCompany")}</dt>
+                          <dd
+                            className={`max-w-[65%] font-medium ${locale === "ar" ? "text-left" : "text-right"}`}
+                          >
+                            {o.company_name}
+                          </dd>
                         </div>
                         <div className="flex justify-between gap-2">
-                          <dt className="text-[#0d2137]/55">نوع الخدمة</dt>
-                          <dd className="max-w-[65%] text-left">{serviceTypeCompanyRequestLabel(o.service_type)}</dd>
+                          <dt className="text-[#0d2137]/55">{t("orders.dtService")}</dt>
+                          <dd
+                            className={`max-w-[65%] ${locale === "ar" ? "text-left" : "text-right"}`}
+                          >
+                            {serviceTypeLabel(locale, o.service_type)}
+                          </dd>
                         </div>
                         <div className="flex justify-between gap-2">
-                          <dt className="text-[#0d2137]/55">العميل €</dt>
+                          <dt className="text-[#0d2137]/55">{t("orders.dtCustomerEur")}</dt>
                           <dd className="font-semibold">{(o.price_cents / 100).toFixed(2)} €</dd>
                         </div>
                         <div className="flex justify-between gap-2">
-                          <dt className="text-[#0d2137]/55">السائق €</dt>
+                          <dt className="text-[#0d2137]/55">{t("orders.dtDriverEur")}</dt>
                           <dd>
                             {o.driver_price_cents != null ? (o.driver_price_cents / 100).toFixed(2) : "—"} €
                           </dd>
                         </div>
                         <div className="flex justify-between gap-2">
-                          <dt className="text-[#0d2137]/55">الدفع</dt>
+                          <dt className="text-[#0d2137]/55">{t("orders.dtPayment")}</dt>
                           <dd>
                             {o.payment_status === "paid" ? (
-                              <span className="text-emerald-700">مدفوع</span>
+                              <span className="text-emerald-700">{t("orders.paymentPaid")}</span>
                             ) : (
-                              <span className="text-amber-700">قيد الانتظار</span>
+                              <span className="text-amber-700">{t("orders.paymentPending")}</span>
                             )}
                           </dd>
                         </div>
                         {o.distance_km != null && (
                           <div className="flex justify-between gap-2">
-                            <dt className="text-[#0d2137]/55">المسافة</dt>
+                            <dt className="text-[#0d2137]/55">{t("orders.dtDistance")}</dt>
                             <dd>{o.distance_km} km</dd>
                           </div>
                         )}
                         {o.duration_minutes != null && o.duration_minutes > 0 && (
                           <div className="flex justify-between gap-2">
-                            <dt className="text-[#0d2137]/55">مدة التوجيه (دقيقة)</dt>
+                            <dt className="text-[#0d2137]/55">{t("orders.dtDuration")}</dt>
                             <dd>{o.duration_minutes}</dd>
                           </div>
                         )}
                         {o.eta_minutes_remaining != null && (
                           <div className="flex justify-between gap-2">
-                            <dt className="text-[#0d2137]/55">دقائق متبقية (ETA)</dt>
+                            <dt className="text-[#0d2137]/55">{t("orders.dtEtaMin")}</dt>
                             <dd>{o.eta_minutes_remaining}</dd>
                           </div>
                         )}
                         {etaStr && (
                           <div className="flex justify-between gap-2">
-                            <dt className="text-[#0d2137]/55">وصول متوقع</dt>
-                            <dd className="text-left text-[11px] leading-tight">{etaStr}</dd>
+                            <dt className="text-[#0d2137]/55">{t("orders.dtEta")}</dt>
+                            <dd className="text-[11px] leading-tight ltr:text-left rtl:text-left">{etaStr}</dd>
                           </div>
                         )}
                         {lastGpsStr && (
                           <div className="flex justify-between gap-2">
-                            <dt className="text-[#0d2137]/55">آخر موقع GPS</dt>
-                            <dd className="text-left text-[11px] leading-tight">{lastGpsStr}</dd>
+                            <dt className="text-[#0d2137]/55">{t("orders.dtLastGps")}</dt>
+                            <dd className="text-[11px] leading-tight ltr:text-left rtl:text-left">{lastGpsStr}</dd>
                           </div>
                         )}
                         <div className="border-t border-[#0d2137]/10 pt-2">
-                          <dt className="text-[#0d2137]/55">الاستلام</dt>
-                          <dd className="mt-0.5 text-left text-[11px] leading-snug">{o.pickup_address}</dd>
+                          <dt className="text-[#0d2137]/55">{t("orders.dtPickup")}</dt>
+                          <dd className="mt-0.5 text-[11px] leading-snug ltr:text-right rtl:text-left">
+                            {o.pickup_address}
+                          </dd>
                         </div>
                         <div>
-                          <dt className="text-[#0d2137]/55">التسليم</dt>
-                          <dd className="mt-0.5 text-left text-[11px] leading-snug">{o.delivery_address}</dd>
+                          <dt className="text-[#0d2137]/55">{t("orders.dtDelivery")}</dt>
+                          <dd className="mt-0.5 text-[11px] leading-snug ltr:text-right rtl:text-left">
+                            {o.delivery_address}
+                          </dd>
                         </div>
                       </dl>
                     </div>
@@ -579,25 +613,21 @@ export default function AdminOrdersPage() {
             )}
 
           <div className="pt-2">
-            <h2 className="text-xl font-bold text-[#0d2137]">تم التوصيل — إثبات التسليم (صورة)</h2>
+            <h2 className="text-xl font-bold text-[#0d2137]">{t("orders.deliveredTitle")}</h2>
             <p className="mt-1 text-sm text-[#0d2137]/65">
-              الطلبات بحالة «تم التوصيل» مع صورة Liefernachweis التي يرفعها السائق من رابط GPS.
+              {t("orders.deliveredDesc")}
             </p>
             {deliveredOrders.length === 0 ? (
               <div className="mt-4 space-y-2 rounded-xl border border-dashed border-emerald-200 bg-emerald-50/40 p-6 text-center text-sm text-[#0d2137]/70">
-                <p className="font-medium">لا توجد طلبات بحالة «تم التوصيل» بعد.</p>
-                <p className="text-xs leading-relaxed text-[#0d2137]/60">
-                  عندما يرفع السائق صورة التسليم من رابط GPS، أو عندما تضعون الحالة «تم التوصيل» يدوياً، يظهر الطلب هنا مع
-                  <strong className="text-[#0d2137]"> معاينة الصورة</strong>. استخدموا زر «إيميل تأكيد التسليم» لإرسال تأكيد
-                  للعميل (بالألمانية) مع رابط الصورة إن وُجدت.
-                </p>
+                <p className="font-medium">{t("orders.noDeliveredTitle")}</p>
+                <p className="text-xs leading-relaxed text-[#0d2137]/60">{t("orders.noDeliveredDesc")}</p>
               </div>
             ) : (
               <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {deliveredOrders.map((o) => {
                   const podAt =
                     o.pod_completed_at != null
-                      ? new Date(o.pod_completed_at).toLocaleString("ar-SA", {
+                      ? new Date(o.pod_completed_at).toLocaleString(dateLocale, {
                           dateStyle: "medium",
                           timeStyle: "short",
                         })
@@ -612,49 +642,61 @@ export default function AdminOrdersPage() {
                           <p className="font-mono text-sm font-bold text-[#0d2137]">
                             #{o.order_number ?? o.id.slice(0, 8)}
                           </p>
-                          <p className="text-xs text-emerald-800">تم التوصيل</p>
-                          {podAt && <p className="mt-0.5 text-[11px] text-[#0d2137]/65">تأكيد: {podAt}</p>}
+                          <p className="text-xs text-emerald-800">{t("orders.deliveredBadge")}</p>
+                          {podAt && (
+                            <p className="mt-0.5 text-[11px] text-[#0d2137]/65">
+                              {t("orders.podAt")} {podAt}
+                            </p>
+                          )}
                         </div>
                         <Link
                           href={`/admin/orders/${o.id}`}
                           className="shrink-0 rounded-lg bg-emerald-700 px-2.5 py-1 text-xs font-medium text-white hover:bg-emerald-800"
                         >
-                          فتح الملف
+                          {t("orders.openFile")}
                         </Link>
                       </div>
                       <div className="p-4">
                         <dl className="space-y-1.5 text-xs text-[#0d2137]/85">
                           <div className="flex justify-between gap-2">
-                            <dt className="text-[#0d2137]/55">الشركة</dt>
-                            <dd className="max-w-[60%] text-left font-medium">{o.company_name}</dd>
+                            <dt className="text-[#0d2137]/55">{t("orders.dtCompany")}</dt>
+                            <dd
+                              className={`max-w-[60%] font-medium ${locale === "ar" ? "text-left" : "text-right"}`}
+                            >
+                              {o.company_name}
+                            </dd>
                           </div>
                           <div className="flex justify-between gap-2">
-                            <dt className="text-[#0d2137]/55">نوع الخدمة</dt>
-                            <dd className="max-w-[60%] text-left">{serviceTypeCompanyRequestLabel(o.service_type)}</dd>
+                            <dt className="text-[#0d2137]/55">{t("orders.dtService")}</dt>
+                            <dd
+                              className={`max-w-[60%] ${locale === "ar" ? "text-left" : "text-right"}`}
+                            >
+                              {serviceTypeLabel(locale, o.service_type)}
+                            </dd>
                           </div>
                           <div className="flex justify-between gap-2">
-                            <dt className="text-[#0d2137]/55">العميل €</dt>
+                            <dt className="text-[#0d2137]/55">{t("orders.dtCustomerEur")}</dt>
                             <dd className="font-semibold">{(o.price_cents / 100).toFixed(2)} €</dd>
                           </div>
                           <div className="flex justify-between gap-2">
-                            <dt className="text-[#0d2137]/55">السائق €</dt>
+                            <dt className="text-[#0d2137]/55">{t("orders.dtDriverEur")}</dt>
                             <dd>
                               {o.driver_price_cents != null ? (o.driver_price_cents / 100).toFixed(2) : "—"} €
                             </dd>
                           </div>
                           <div className="flex justify-between gap-2">
-                            <dt className="text-[#0d2137]/55">الدفع</dt>
+                            <dt className="text-[#0d2137]/55">{t("orders.dtPayment")}</dt>
                             <dd>
                               {o.payment_status === "paid" ? (
-                                <span className="text-emerald-700">مدفوع</span>
+                                <span className="text-emerald-700">{t("orders.paymentPaid")}</span>
                               ) : (
-                                <span className="text-amber-700">قيد الانتظار</span>
+                                <span className="text-amber-700">{t("orders.paymentPending")}</span>
                               )}
                             </dd>
                           </div>
                         </dl>
                         <div className="mt-4">
-                          <p className="mb-2 text-xs font-semibold text-[#0d2137]/80">صورة إثبات التسليم</p>
+                          <p className="mb-2 text-xs font-semibold text-[#0d2137]/80">{t("orders.podPhoto")}</p>
                           {o.pod_photo_url ? (
                             <a
                               href={o.pod_photo_url}
@@ -665,13 +707,13 @@ export default function AdminOrdersPage() {
                               {/* eslint-disable-next-line @next/next/no-img-element */}
                               <img
                                 src={o.pod_photo_url}
-                                alt="إثبات التسليم"
+                                alt={t("orders.podAlt")}
                                 className="h-40 w-full object-cover object-center hover:opacity-95"
                               />
                             </a>
                           ) : (
                             <p className="rounded-lg border border-dashed border-amber-300 bg-amber-50/60 px-3 py-4 text-center text-xs text-amber-900">
-                              لا توجد صورة مرفوعة — يمكن إضافة رابط يدوياً من ملف الطلب.
+                              {t("orders.podNoPhoto")}
                             </p>
                           )}
                         </div>
@@ -684,12 +726,12 @@ export default function AdminOrdersPage() {
                             }
                             title={
                               !o.customer_email?.trim()
-                                ? "لا يوجد بريد للعميل على هذا الطلب"
-                                : "إرسال إيميل للعميل (ألماني): تأكيد التسليم + صورة إن وُجدت"
+                                ? t("orders.emailNoCustomer")
+                                : t("orders.emailTitle")
                             }
                             onClick={async () => {
                               if (!o.customer_email?.trim()) {
-                                alert("لا يوجد بريد إلكتروني للعميل على هذا الطلب.");
+                                alert(t("orders.alertNoEmail"));
                                 return;
                               }
                               setSendingDeliveryEmailFor(o.id);
@@ -700,12 +742,12 @@ export default function AdminOrdersPage() {
                                 );
                                 const data = (await res.json()) as { error?: string; sentTo?: string };
                                 if (!res.ok) {
-                                  alert(data?.error ?? "فشل الإرسال");
+                                  alert(data?.error ?? t("orders.alertFail"));
                                   return;
                                 }
-                                alert(`تم إرسال تأكيد التسليم إلى: ${data.sentTo ?? o.customer_email}`);
+                                alert(`${t("orders.alertSent")} ${data.sentTo ?? o.customer_email}`);
                               } catch {
-                                alert("خطأ في الشبكة");
+                                alert(t("orders.alertNetwork"));
                               } finally {
                                 setSendingDeliveryEmailFor(null);
                               }
@@ -713,11 +755,11 @@ export default function AdminOrdersPage() {
                             className="w-full rounded-lg bg-sky-600 px-3 py-2 text-xs font-semibold text-white hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             {sendingDeliveryEmailFor === o.id
-                              ? "جاري الإرسال…"
-                              : "إيميل تأكيد التسليم للعميل"}
+                              ? t("orders.emailSending")
+                              : t("orders.emailBtn")}
                           </button>
                           {!o.customer_email?.trim() && (
-                            <p className="mt-1 text-center text-[10px] text-amber-800">أضف بريد العميل من ملف الطلب</p>
+                            <p className="mt-1 text-center text-[10px] text-amber-800">{t("orders.emailHint")}</p>
                           )}
                         </div>
                       </div>
@@ -734,7 +776,7 @@ export default function AdminOrdersPage() {
 
       {!loading && filtered.length === 0 && (
         <p className="rounded-2xl bg-white p-6 text-center text-[#0d2137]/70 shadow-lg">
-          Keine Aufträge.
+          {t("orders.noneFiltered")}
         </p>
       )}
     </div>

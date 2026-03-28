@@ -52,7 +52,14 @@ function unseenCount(current: string[], ackList: string[]): number {
   return current.filter((id) => !ack.has(id)).length;
 }
 
-export function AdminNavBadges({ items }: { items: AdminNavItem[] }) {
+export function AdminNavBadges({
+  items,
+  unreadBadgeAriaLabel = (n: number) => `${n} ungelesen`,
+}: {
+  items: AdminNavItem[];
+  /** e.g. (n) => `${n} غير مقروء` */
+  unreadBadgeAriaLabel?: (count: number) => string;
+}) {
   const pathname = usePathname();
   const [ack, setAck] = useState<AckStore>({ orders: [], drivers: [], support: [] });
   const [hydrated, setHydrated] = useState(false);
@@ -178,7 +185,7 @@ export function AdminNavBadges({ items }: { items: AdminNavItem[] }) {
             {n > 0 ? (
               <span
                 className="admin-notif-badge flex h-6 min-w-6 shrink-0 items-center justify-center rounded-full px-1.5 text-xs font-bold text-white tabular-nums"
-                aria-label={`${n} ungelesen`}
+                aria-label={unreadBadgeAriaLabel(n)}
               >
                 {n > 99 ? "99+" : n}
               </span>

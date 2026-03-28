@@ -1,3 +1,4 @@
+import { AdminLocaleProvider } from "@/contexts/AdminLocaleContext";
 import { AdminShell } from "./AdminShell";
 
 export const metadata = {
@@ -7,5 +8,9 @@ export const metadata = {
 };
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  return <AdminShell>{children}</AdminShell>;
+  return (
+    <AdminLocaleProvider>
+      <AdminShell>{children}</AdminShell>
+    </AdminLocaleProvider>
+  );
 }

@@ -3,24 +3,31 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AdminNavBadges, type AdminNavItem } from "@/components/admin/AdminNavBadges";
+import { useAdminLocale } from "@/contexts/AdminLocaleContext";
 
-const ADMIN_NAV: AdminNavItem[] = [
-  { href: "/admin/orders", label: "Aufträge", badge: "orders" },
-  { href: "/admin/reports", label: "Berichte", badge: null },
-  { href: "/admin/driver-applications", label: "Fahrerbewerbungen", badge: "drivers" },
-  { href: "/admin/drivers", label: "Fahrer", badge: null },
-  { href: "/admin/blog", label: "Blog / Magazin", badge: null },
-  { href: "/admin/settings", label: "Einstellungen", badge: null },
-  { href: "/admin/support", label: "Support-Nachrichten", badge: "support" },
+const NAV_DEF: { href: string; msgKey: string; badge: AdminNavItem["badge"] }[] = [
+  { href: "/admin/orders", msgKey: "nav.orders", badge: "orders" },
+  { href: "/admin/reports", msgKey: "nav.reports", badge: null },
+  { href: "/admin/driver-applications", msgKey: "nav.driverApplications", badge: "drivers" },
+  { href: "/admin/drivers", msgKey: "nav.drivers", badge: null },
+  { href: "/admin/blog", msgKey: "nav.blog", badge: null },
+  { href: "/admin/settings", msgKey: "nav.settings", badge: null },
+  { href: "/admin/support", msgKey: "nav.support", badge: "support" },
 ];
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const { locale, setLocale, t } = useAdminLocale();
   const [checked, setChecked] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
+
+  const navItems: AdminNavItem[] = useMemo(
+    () => NAV_DEF.map(({ href, msgKey, badge }) => ({ href, label: t(msgKey), badge })),
+    [t],
+  );
 
   useEffect(() => {
     if (pathname === "/admin/login") {
@@ -44,7 +51,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   if (!checked) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#0d2137] text-white">
-        <p>Laden…</p>
+        <p>{t("shell.loading")}</p>
       </div>
     );
   }
@@ -57,28 +64,58 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     router.replace("/admin/login");
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#0d2137] text-white">
-        <p>Weiterleitung zur Anmeldung…</p>
+        <p>{t("shell.redirectLogin")}</p>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-[#e8eaed]">
+    <div
+      className="flex min-h-screen bg-[#e8eaed]"
+      dir={locale === "ar" ? "rtl" : "ltr"}
+      lang={locale === "ar" ? "ar" : "de"}
+    >
       <header className="fixed left-0 right-0 top-0 z-10 border-b border-[#0d2137]/10 bg-[#0d2137] px-4 py-3 text-white shadow-sm">
-        <div className="flex items-center justify-between">
-          <Link href="/admin/orders" className="text-lg font-semibold tracking-tight">
-            TransPool24 – Admin
+        <div className="flex items-center justify-between gap-3">
+          <Link href="/admin/orders" className="min-w-0 shrink text-lg font-semibold tracking-tight">
+            {t("shell.headerTitle")}
           </Link>
-          <div className="relative h-10 w-32 shrink-0">
-            <Image
-              src="/logo.png"
-              alt="TransPool24"
-              fill
-              className="object-contain object-right"
-              priority
-            />
-            <div className="absolute left-2 top-1/2 h-5 w-5 -translate-y-1/2 rounded-sm bg-[#0d2137]" aria-hidden />
-            <div className="absolute right-2 top-1/2 h-5 w-5 -translate-y-1/2 rounded-sm bg-[#0d2137]" aria-hidden />
+          <div className="flex shrink-0 items-center gap-3">
+            <div
+              className="flex items-center gap-1 rounded-lg border border-white/20 bg-white/10 p-0.5"
+              role="group"
+              aria-label={t("shell.lang.title")}
+            >
+              <button
+                type="button"
+                onClick={() => setLocale("de")}
+                className={`rounded-md px-2.5 py-1 text-xs font-bold transition ${
+                  locale === "de" ? "bg-white text-[#0d2137]" : "text-white/90 hover:bg-white/10"
+                }`}
+              >
+                {t("shell.lang.de")}
+              </button>
+              <button
+                type="button"
+                onClick={() => setLocale("ar")}
+                className={`rounded-md px-2.5 py-1 text-xs font-bold transition ${
+                  locale === "ar" ? "bg-white text-[#0d2137]" : "text-white/90 hover:bg-white/10"
+                }`}
+              >
+                {t("shell.lang.ar")}
+              </button>
+            </div>
+            <div className="relative h-10 w-32 shrink-0">
+              <Image
+                src="/logo.png"
+                alt="TransPool24"
+                fill
+                className="object-contain object-right"
+                priority
+              />
+              <div className="absolute left-2 top-1/2 h-5 w-5 -translate-y-1/2 rounded-sm bg-[#0d2137]" aria-hidden />
+              <div className="absolute right-2 top-1/2 h-5 w-5 -translate-y-1/2 rounded-sm bg-[#0d2137]" aria-hidden />
+            </div>
           </div>
         </div>
       </header>
@@ -103,14 +140,19 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       </main>
       <aside className="sticky top-14 h-[calc(100vh-3.5rem)] w-56 shrink-0 border-l border-[#0d2137]/10 bg-white shadow-sm">
         <nav className="flex flex-col gap-1 p-4">
-          <AdminNavBadges items={ADMIN_NAV} />
+          <AdminNavBadges
+            items={navItems}
+            unreadBadgeAriaLabel={(n) => `${n} ${t("nav.unread")}`}
+          />
           <div className="my-2 border-t border-[#0d2137]/10" />
           <button
             type="button"
             onClick={handleLogout}
-            className="rounded-lg px-4 py-3 text-left text-sm font-medium text-[#0d2137]/70 hover:bg-red-50 hover:text-red-700"
+            className={`rounded-lg px-4 py-3 text-sm font-medium text-[#0d2137]/70 hover:bg-red-50 hover:text-red-700 ${
+              locale === "ar" ? "text-right" : "text-left"
+            }`}
           >
-            Abmelden
+            {t("shell.logout")}
           </button>
         </nav>
       </aside>
