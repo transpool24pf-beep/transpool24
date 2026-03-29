@@ -14,6 +14,8 @@ const DE: Record<string, string> = {
   "shell.footerDeployLocal": "Lokal / Vorschau — keine Vercel-Metadaten",
   "shell.footerCookieBanner":
     "Öffentliche Website: Cookie-Einwilligung erzwungen bis zur Auswahl (v1, localStorage).",
+  "shell.footerLegal":
+    "Öffentliche Seiten: /privacy & /terms (alle Sprachen, Sitemap).",
   "nav.unread": "ungelesen",
   "nav.orders": "Aufträge",
   "nav.reports": "Berichte",
@@ -107,6 +109,8 @@ const AR: Record<string, string> = {
   "shell.footerDeployLocal": "محلي / معاينة — لا بيانات Vercel",
   "shell.footerCookieBanner":
     "الموقع العام: بانر موافقة الكوكيز إجباري حتى الاختيار (v1، localStorage).",
+  "shell.footerLegal":
+    "صفحات عامة: /privacy و /terms (كل اللغات، خريطة الموقع).",
   "nav.unread": "غير مقروء",
   "nav.orders": "طلبات",
   "nav.reports": "التقارير",

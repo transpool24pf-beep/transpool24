@@ -277,7 +277,7 @@ export function Footer() {
                     </Link>
                   </li>
                   <li>
-                    <Link href={`/${locale}/support`} className="text-white/90 transition hover:text-white hover:underline">
+                    <Link href={`/${locale}/terms`} className="text-white/90 transition hover:text-white hover:underline">
                       {t("linkTerms")}
                     </Link>
                   </li>

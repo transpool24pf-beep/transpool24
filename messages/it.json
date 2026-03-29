@@ -850,5 +850,67 @@
       "footerCopyright": "© {year} TransPool24. All rights reserved.",
       "footerDeveloperCredit": "Design e sviluppo: wisam dandash"
     }
+  },
+  "termsOfUse": {
+    "metaTitle": "Terms of Use | TransPool24",
+    "metaDescription": "Terms governing use of the TransPool24 website and online booking for transport services.",
+    "breadcrumbHome": "Home",
+    "breadcrumbCurrent": "Terms",
+    "pageTitle": "Terms of Use",
+    "pageLead": "These terms govern your use of our website and our online booking for transport and logistics services, and — where applicable — the contractual relationship between us and business or private customers, unless individual agreements take precedence.",
+    "updated": "Last updated: March 2026",
+    "tocTitle": "On this page",
+    "relatedTitle": "Related legal information",
+    "relatedBody": "For how we process personal data, see our privacy policy. Contact us via support if you have questions.",
+    "relatedPrivacy": "Privacy policy",
+    "relatedContact": "Contact / support",
+    "toc": {
+      "scope": "1. Scope",
+      "contract": "2. Contracting party and service",
+      "booking": "3. Offer and conclusion of contract",
+      "payment": "4. Prices and payment",
+      "conduct": "5. Customer obligations",
+      "liability": "6. Liability",
+      "final": "7. Final provisions"
+    },
+    "s1": {
+      "title": "1. Scope",
+      "p1": "The provider is TransPool24 (“we”). These terms in the version published on the website apply, together with applicable law, in particular the German Civil Code (BGB), where relevant.",
+      "p2": "We do not accept conflicting or additional customer terms unless we expressly agree in writing.",
+      "p3": "A “consumer” means any natural person entering into a transaction predominantly for private purposes."
+    },
+    "s2": {
+      "title": "2. Contracting party and description of services",
+      "p1": "We arrange and/or perform transport and logistics services depending on the specific order, with a focus on Pforzheim and the region. Scope, route, time window and price follow from the booking or checkout flow and any written confirmations.",
+      "p2": "If third parties (e.g. subcontractors or drivers) assist in performance, we remain — where contractually agreed — your primary contact unless clearly stated otherwise."
+    },
+    "s3": {
+      "title": "3. Offer, booking and contract formation",
+      "p1": "Website and booking flow content constitutes an invitation for you to make an offer. A contract is formed when we accept your booking or confirm the order, unless the process expressly states otherwise.",
+      "p2": "You must provide accurate and complete information on cargo, addresses, contact details and special circumstances (e.g. access limits). Later changes may affect price or schedule.",
+      "p3": "Cancellations and rescheduling follow the rules communicated at booking time and applicable statutory consumer rights where you are a consumer."
+    },
+    "s4": {
+      "title": "4. Prices, payment, payment provider",
+      "p1": "Prices are in euros unless stated otherwise and include VAT where applicable. Deviations may arise from route, extras, waiting time or special effort.",
+      "p2": "Card payments may be processed via Stripe; Stripe’s terms apply additionally. Rights of retention exist only for counterclaims from the same contract relationship."
+    },
+    "s5": {
+      "title": "5. Cooperation, cargo, safety",
+      "p1": "You ensure the cargo matches your declarations, is properly packed and does not violate legal or contractual transport prohibitions.",
+      "p2": "You must follow reasonable instructions on site relating to safety or proper execution. We may refuse or abort an order in case of grossly negligent or intentional misrepresentation or danger; mandatory consumer law (e.g. § 314 BGB) remains unaffected."
+    },
+    "s6": {
+      "title": "6. Liability",
+      "p1": "We are fully liable for intent and gross negligence and for injury to life, body or health. For ordinary negligence we are liable only for breach of essential contractual duties; liability is then limited to typically foreseeable damage.",
+      "p2": "Further liability is excluded to the extent permitted by law, in particular for indirect damage and lost profit unless mandatory law provides otherwise.",
+      "p3": "The above does not apply where we have assumed a guarantee, or for product liability or fraud."
+    },
+    "s7": {
+      "title": "7. Final provisions",
+      "p1": "German law applies to the exclusion of the UN Sales Convention, without prejudice to mandatory consumer protection of the country where the consumer habitually resides.",
+      "p2": "If individual provisions are or become invalid, the remainder stays effective; invalid terms are replaced where possible by a valid provision closest in economic purpose.",
+      "p3": "We may update these terms. For ongoing contracts, the version effective at contract formation applies unless law requires otherwise."
+    }
   }
 }

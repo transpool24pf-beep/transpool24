@@ -13,5 +13,6 @@ export async function GET() {
     gitSha: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? null,
     vercelUrl: process.env.VERCEL_URL ?? null,
     publicCookieBanner: { version: 1, mandatory: true, storageKey: "tp24_cookie_consent" },
+    publicLegalPages: ["/privacy", "/terms"],
   });
 }

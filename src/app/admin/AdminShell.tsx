@@ -168,6 +168,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </a>
           <p className="mt-1.5 text-[10px] leading-snug text-[#0d2137]/55">{t("shell.footerSecurity")}</p>
           <p className="mt-0.5 text-[10px] leading-snug text-[#0d2137]/50">{t("shell.footerCookieBanner")}</p>
+          <p className="mt-0.5 text-[10px] leading-snug text-[#0d2137]/48">{t("shell.footerLegal")}</p>
           {deployLine ? (
             <p className="mt-0.5 text-[10px] leading-snug text-[#0d2137]/45">{deployLine}</p>
           ) : null}

@@ -7,7 +7,7 @@ const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com")
 );
 
 /** مسارات عامة لكل لغة (بدون صفحات ديناميكية للمدونة لتفادي روابط قديمة). */
-const PUBLIC_PATHS = ["", "/order", "/why", "/support", "/privacy", "/driver", "/blog"] as const;
+const PUBLIC_PATHS = ["", "/order", "/why", "/support", "/privacy", "/terms", "/driver", "/blog"] as const;
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();

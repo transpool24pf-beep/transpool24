@@ -855,5 +855,67 @@
       "p1": "Wir passen diese Erklärung an, wenn sich unsere Datenverarbeitung oder rechtliche Rahmenbedingungen ändern. Die jeweils aktuelle Version finden Sie auf dieser Seite mit Datum „Stand“.",
       "p2": "Bitte prüfen Sie die Erklärung bei wiederkehrendem Besuch, insbesondere wenn Sie neue Funktionen nutzen."
     }
+  },
+  "termsOfUse": {
+    "metaTitle": "Allgemeine Geschäftsbedingungen (AGB) | TransPool24",
+    "metaDescription": "AGB für die Nutzung der Website und Online-Buchung von Transportleistungen bei TransPool24.",
+    "breadcrumbHome": "Startseite",
+    "breadcrumbCurrent": "AGB",
+    "pageTitle": "Allgemeine Geschäftsbedingungen (AGB)",
+    "pageLead": "Diese AGB regeln die Nutzung unserer Website, unseres Buchungsangebots für Transport- und Logistikleistungen sowie ergänzend die vertragliche Beziehung zwischen uns und gewerblichen oder privaten Kundinnen und Kunden, soweit nicht Individualvereinbarungen Vorrang haben.",
+    "updated": "Stand: März 2026",
+    "tocTitle": "Auf dieser Seite",
+    "relatedTitle": "Weitere rechtliche Hinweise",
+    "relatedBody": "Informationen zur Verarbeitung personenbezogener Daten finden Sie in unserer Datenschutzerklärung. Kontaktieren Sie uns bei Fragen über unser Support-Formular.",
+    "relatedPrivacy": "Datenschutzerklärung",
+    "relatedContact": "Kontakt / Support",
+    "toc": {
+      "scope": "1. Geltungsbereich",
+      "contract": "2. Vertragspartner und Leistung",
+      "booking": "3. Angebot und Vertragsschluss",
+      "payment": "4. Preise und Zahlung",
+      "conduct": "5. Pflichten der Kundin / des Kunden",
+      "liability": "6. Haftung",
+      "final": "7. Schlussbestimmungen"
+    },
+    "s1": {
+      "title": "1. Geltungsbereich",
+      "p1": "Anbieter ist TransPool24 (im Folgenden „wir“). Maßgeblich sind diese AGB in der jeweils auf der Website veröffentlichten Fassung sowie — soweit anwendbar — gesetzliche Regelungen, insbesondere des Bürgerlichen Gesetzbuchs (BGB).",
+      "p2": "Abweichende oder entgegenstehende Bedingungen des Kunden erkennen wir nicht an, es sei denn, wir stimmen ihrer Geltung ausdrücklich schriftlich zu.",
+      "p3": "Verbraucher im Sinne dieser AGB ist jede natürliche Person, die ein Rechtsgeschäft zu überwiegend privaten Zwecken abschließt."
+    },
+    "s2": {
+      "title": "2. Vertragspartner und Leistungsbeschreibung",
+      "p1": "Wir vermitteln bzw. erbringen Transport- und Logistikdienstleistungen — je nach konkretem Auftrag — mit Schwerpunkt Pforzheim und Umgebung. Umfang, Strecke, Zeitfenster und Preis ergeben sich aus der Buchung bzw. dem Angebot im Bestellprozess sowie etwaigen schriftlichen Bestätigungen.",
+      "p2": "Sofern Dritte (z. B. Subunternehmer oder eingesetzte Fahrerinnen und Fahrer) zur Leistungserbringung hinzugezogen werden, bleiben wir — soweit vertraglich vereinbart — Ihr erster Ansprechpartner, sofern nicht ausdrücklich anders gekennzeichnet."
+    },
+    "s3": {
+      "title": "3. Angebot, Buchung und Vertragsschluss",
+      "p1": "Darstellungen auf der Website und im Buchungsablauf stellen eine Einladung zur Abgabe eines Angebots durch die Kundin / den Kunden dar. Der Vertrag kommt durch unsere Annahme der Buchung bzw. eine Auftragsbestätigung zustande, sofern im jeweiligen Prozess nicht ausdrücklich etwas Abweichendes angezeigt wird.",
+      "p2": "Die Kundin / der Kunde ist verpflichtet, bei der Buchung wahrheitsgemäße und vollständige Angaben zu Ladung, Adressen, Kontaktdaten und Besonderheiten (z. B. Zugangsbeschränkungen) zu machen. Nachträgliche Änderungen können zu Preis- oder Terminanpassungen führen.",
+      "p3": "Stornierungen und Umbuchungen richten sich nach den zum Zeitpunkt der Buchung mitgeteilten Regelungen sowie dem Gesetz, soweit die Kundin / der Kunde Verbraucherin oder Verbraucher ist."
+    },
+    "s4": {
+      "title": "4. Preise, Zahlung, Zahlungsdienstleister",
+      "p1": "Die angezeigten Preise verstehen sich — sofern nicht anders gekennzeichnet — in Euro und enthalten die gesetzliche Umsatzsteuer, soweit diese anfällt. Abweichungen können sich aus Route, Zusatzleistungen, Wartezeiten oder Sonderaufwand ergeben.",
+      "p2": "Die Abwicklung von Kartenzahlungen kann über den Zahlungsdienstleister Stripe erfolgen. Es gelten ergänzend die jeweiligen Nutzungsbedingungen von Stripe. Ein Zurückbehaltungsrecht steht der Kundin / dem Kunden nur zu, soweit der Gegenanspruch auf demselben Vertragsverhältnis beruht."
+    },
+    "s5": {
+      "title": "5. Mitwirkungspflichten, Ladung, Sicherheit",
+      "p1": "Die Kundin / der Kunde stellt sicher, dass die Ladung den angegebenen Angaben entspricht, ordnungsgemäß verpackt ist und keine gesetzlichen oder vertraglichen Transportverbote verletzt.",
+      "p2": "Anweisungen der eingesetzten Person vor Ort — soweit sie der Verkehrssicherheit oder ordnungsgemäßer Durchführung dienen — sind zu befolgen. Bei grob fahrlässiger oder vorsätzlicher Falschangaben oder Gefährdung können wir den Auftrag ablehnen oder abbrechen; § 314 BGB bleibt für Verbraucher unberührt."
+    },
+    "s6": {
+      "title": "6. Haftung",
+      "p1": "Wir haften unbeschränkt bei Vorsatz und grober Fahrlässigkeit sowie bei Verletzung von Leben, Körper oder Gesundheit. Bei leichter Fahrlässigkeit haften wir nur bei Verletzung wesentlicher Vertragspflichten (Kardinalpflichten); in diesem Fall ist die Haftung auf den typischerweise vorhersehbaren Schaden begrenzt.",
+      "p2": "Eine weitergehende Haftung ist ausgeschlossen, soweit gesetzlich zulässig. Dies gilt insbesondere für mittelbare Schäden und entgangenen Gewinn, sofern nicht zwingendes Haftungsrecht entgegensteht.",
+      "p3": "Haftungsbeschränkungen gelten nicht, soweit wir eine Garantie übernommen haben oder Ansprüche nach dem Produkthaftungsgesetz oder bei Arglist bestehen."
+    },
+    "s7": {
+      "title": "7. Schlussbestimmungen",
+      "p1": "Es gilt das Recht der Bundesrepublik Deutschland unter Ausschluss des UN-Kaufrechts, soweit nicht zwingendes Verbraucherschutzrecht des Staates, in dem der Verbraucher seinen gewöhnlichen Aufenthalt hat, Vorrang hat.",
+      "p2": "Sollten einzelne Bestimmungen dieser AGB unwirksam sein oder werden, bleibt die Wirksamkeit der übrigen Regelungen unberührt. An die Stelle der unwirksamen Bestimmung tritt — soweit möglich — eine wirksame Regelung, die dem wirtschaftlichen Zweck am nächsten kommt.",
+      "p3": "Wir behalten uns vor, diese AGB zu aktualisieren. Für laufende Verträge gilt die zum Vertragsschluss maßgebliche Fassung, sofern gesetzlich nichts anderes vorschreibt."
+    }
   }
 }
