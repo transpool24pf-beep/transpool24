@@ -3,7 +3,13 @@ export type CookieConsentCopy = {
   title: string;
   lead: string;
   body: string;
+  /** Shorter text for the bottom bar layout */
+  bodyShort: string;
   policyLabel: string;
+  /** Link to open category customization (like “Details zeigen”) */
+  showDetails: string;
+  /** Primary label for “essential / technical only” (reference: Technische Cookies) */
+  essentialOnlyBtn: string;
   reject: string;
   customize: string;
   acceptAll: string;
@@ -20,14 +26,18 @@ export type CookieConsentCopy = {
 };
 
 const EN: CookieConsentCopy = {
-  title: "We use cookies",
+  title: "This website uses cookies",
   lead: "Cookies help us improve your experience",
   body:
     "We use essential cookies to run the site. With your consent, we also use cookies for analytics and marketing. By clicking “Accept all”, you agree. Use “Customize” to change categories, or “Reject” to allow only essential cookies. Details: ",
-  policyLabel: "Privacy policy",
+  bodyShort:
+    "Essential cookies are required to operate the site. Analytics and marketing cookies are only used with your consent. More in our ",
+  policyLabel: "privacy policy",
+  showDetails: "Show details ›",
+  essentialOnlyBtn: "Essential cookies only",
   reject: "Reject",
   customize: "Customize",
-  acceptAll: "Accept all",
+  acceptAll: "Allow all cookies",
   customizeTitle: "Cookie preferences",
   necessaryTitle: "Essential",
   necessaryDesc: "Required for the website to function (session, security, forms). Always active.",
@@ -41,14 +51,18 @@ const EN: CookieConsentCopy = {
 };
 
 const DE: CookieConsentCopy = {
-  title: "Wir verwenden Cookies",
+  title: "Diese Webseite verwendet Cookies",
   lead: "Cookies ermöglichen ein besseres Erlebnis",
   body:
     "Wir setzen technisch notwendige Cookies für den Betrieb der Website ein. Mit Ihrer Einwilligung nutzen wir zusätzlich Cookies für Statistik und Marketing. Mit „Alle akzeptieren“ stimmen Sie zu. Unter „Anpassen“ wählen Sie Kategorien; „Ablehnen“ erlaubt nur das Notwendige. Mehr in der ",
+  bodyShort:
+    "Technisch notwendige Cookies sind für den Betrieb erforderlich. Statistik- und Marketing-Cookies nutzen wir nur mit Ihrer Einwilligung. Mehr in der ",
   policyLabel: "Datenschutzerklärung",
+  showDetails: "Details anzeigen ›",
+  essentialOnlyBtn: "Technische Cookies",
   reject: "Ablehnen",
   customize: "Anpassen",
-  acceptAll: "Alle akzeptieren",
+  acceptAll: "Alle Cookies",
   customizeTitle: "Cookie-Einstellungen",
   necessaryTitle: "Notwendig",
   necessaryDesc: "Erforderlich für Funktion, Sicherheit und Bestellablauf. Immer aktiv.",
@@ -62,14 +76,18 @@ const DE: CookieConsentCopy = {
 };
 
 const AR: CookieConsentCopy = {
-  title: "نستخدم ملفات تعريف الارتباط (كوكيز)",
+  title: "يستخدم هذا الموقع ملفات تعريف الارتباط",
   lead: "الكوكيز تساعدنا على تحسين تجربتك",
   body:
     "نستخدم كوكيز ضرورية لتشغيل الموقع. بموافقتك نستخدم أيضاً كوكيز للإحصائيات والتسويق. بالضغط على «قبول الكل» توافق. استخدم «تخصيص» لاختيار الفئات، أو «رفض» للاكتفاء بالضروري فقط. التفاصيل في ",
+  bodyShort:
+    "الكوكيز الضرورية مطلوبة لتشغيل الموقع. كوكيز الإحصائيات والتسويق تُستخدم فقط بموافقتك. المزيد في ",
   policyLabel: "سياسة الخصوصية",
+  showDetails: "عرض التفاصيل ›",
+  essentialOnlyBtn: "كوكيز تقنية فقط",
   reject: "رفض",
   customize: "تخصيص",
-  acceptAll: "قبول الكل",
+  acceptAll: "السماح بكل الكوكيز",
   customizeTitle: "تفضيلات الكوكيز",
   necessaryTitle: "ضروري",
   necessaryDesc: "مطلوب لتشغيل الموقع والأمان والنماذج. دائماً مفعّل.",
