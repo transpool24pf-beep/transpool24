@@ -12,6 +12,8 @@ const DE: Record<string, string> = {
     "Geschützte Admin-Sitzung · HttpOnly-Cookie · Sicherheits-Header (Frame, MIME, Referrer)",
   "shell.footerDeploy": "Deployment: {env} · Commit {sha}",
   "shell.footerDeployLocal": "Lokal / Vorschau — keine Vercel-Metadaten",
+  "shell.footerCookieBanner":
+    "Öffentliche Website: Cookie-Einwilligung erzwungen bis zur Auswahl (v1, localStorage).",
   "nav.unread": "ungelesen",
   "nav.orders": "Aufträge",
   "nav.reports": "Berichte",
@@ -103,6 +105,8 @@ const AR: Record<string, string> = {
     "جلسة إدارة محمية · كوكي HttpOnly · رؤوس أمان (إطار، MIME، Referrer)",
   "shell.footerDeploy": "النشر: {env} · الالتزام {sha}",
   "shell.footerDeployLocal": "محلي / معاينة — لا بيانات Vercel",
+  "shell.footerCookieBanner":
+    "الموقع العام: بانر موافقة الكوكيز إجباري حتى الاختيار (v1، localStorage).",
   "nav.unread": "غير مقروء",
   "nav.orders": "طلبات",
   "nav.reports": "التقارير",

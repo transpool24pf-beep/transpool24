@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { CookieConsentBarrier } from "@/components/CookieConsentBarrier";
 import { defaultLocale, routing, type Locale } from "@/i18n/routing";
 
 const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com").replace(/\/$/, "");
@@ -84,6 +85,7 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   return (
     <NextIntlClientProvider messages={messages}>
+      <CookieConsentBarrier />
       {children}
     </NextIntlClientProvider>
   );
