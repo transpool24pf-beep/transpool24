@@ -45,7 +45,21 @@ const nextConfig: NextConfig = {
     ],
   },
   async headers() {
+    const security = [
+      { key: "X-Frame-Options", value: "SAMEORIGIN" },
+      { key: "X-Content-Type-Options", value: "nosniff" },
+      { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+      { key: "X-DNS-Prefetch-Control", value: "on" },
+      {
+        key: "Permissions-Policy",
+        value: "camera=(), microphone=(), geolocation=(self), interest-cohort=()",
+      },
+    ];
     return [
+      {
+        source: "/:path*",
+        headers: security,
+      },
       {
         source: "/(favicon.ico|favicon-32.png|favicon-48.png|icon.png|email-header.png|transpool24-email-banner.png)",
         headers: [

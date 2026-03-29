@@ -8,6 +8,10 @@ const DE: Record<string, string> = {
   "shell.lang.de": "DE",
   "shell.lang.ar": "AR",
   "shell.lang.title": "Sprache",
+  "shell.footerSecurity":
+    "Geschützte Admin-Sitzung · HttpOnly-Cookie · Sicherheits-Header (Frame, MIME, Referrer)",
+  "shell.footerDeploy": "Deployment: {env} · Commit {sha}",
+  "shell.footerDeployLocal": "Lokal / Vorschau — keine Vercel-Metadaten",
   "nav.unread": "ungelesen",
   "nav.orders": "Aufträge",
   "nav.reports": "Berichte",
@@ -95,6 +99,10 @@ const AR: Record<string, string> = {
   "shell.lang.de": "DE",
   "shell.lang.ar": "عربي",
   "shell.lang.title": "اللغة",
+  "shell.footerSecurity":
+    "جلسة إدارة محمية · كوكي HttpOnly · رؤوس أمان (إطار، MIME، Referrer)",
+  "shell.footerDeploy": "النشر: {env} · الالتزام {sha}",
+  "shell.footerDeployLocal": "محلي / معاينة — لا بيانات Vercel",
   "nav.unread": "غير مقروء",
   "nav.orders": "طلبات",
   "nav.reports": "التقارير",

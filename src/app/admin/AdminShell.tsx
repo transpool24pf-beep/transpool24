@@ -23,6 +23,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const { locale, setLocale, t } = useAdminLocale();
   const [checked, setChecked] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
+  const [deployLine, setDeployLine] = useState<string | null>(null);
 
   const navItems: AdminNavItem[] = useMemo(
     () => NAV_DEF.map(({ href, msgKey, badge }) => ({ href, label: t(msgKey), badge })),
@@ -33,6 +34,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     if (pathname === "/admin/login") {
       setChecked(true);
       setAuthenticated(false);
+      setDeployLine(null);
       return;
     }
     fetch("/api/admin/me")
@@ -43,6 +45,34 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       .catch(() => setAuthenticated(false))
       .finally(() => setChecked(true));
   }, [pathname]);
+
+  useEffect(() => {
+    if (!authenticated || pathname === "/admin/login") {
+      setDeployLine(null);
+      return;
+    }
+    let cancelled = false;
+    fetch("/api/admin/deploy-info")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j: { vercelEnv?: string | null; gitSha?: string | null } | null) => {
+        if (cancelled || !j) return;
+        if (!j.vercelEnv && !j.gitSha) {
+          setDeployLine(t("shell.footerDeployLocal"));
+        } else {
+          setDeployLine(
+            t("shell.footerDeploy")
+              .replace("{env}", j.vercelEnv ?? "—")
+              .replace("{sha}", j.gitSha ?? "—")
+          );
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setDeployLine(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [authenticated, pathname, t]);
 
   const handleLogout = () => {
     fetch("/api/admin/logout", { method: "POST" }).then(() => router.push("/admin/login"));
@@ -132,10 +162,14 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         >
           {children}
         </div>
-        <footer className="border-t border-[#0d2137]/10 bg-white py-2 text-center text-xs text-[#0d2137]/60">
+        <footer className="border-t border-[#0d2137]/10 bg-white py-2 px-2 text-center text-xs text-[#0d2137]/60">
           <a href="https://www.transpool24.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#0d2137]">
             www.transpool24.com
           </a>
+          <p className="mt-1.5 text-[10px] leading-snug text-[#0d2137]/55">{t("shell.footerSecurity")}</p>
+          {deployLine ? (
+            <p className="mt-0.5 text-[10px] leading-snug text-[#0d2137]/45">{deployLine}</p>
+          ) : null}
         </footer>
       </main>
       <aside className="sticky top-14 h-[calc(100vh-3.5rem)] w-56 shrink-0 border-l border-[#0d2137]/10 bg-white shadow-sm">
