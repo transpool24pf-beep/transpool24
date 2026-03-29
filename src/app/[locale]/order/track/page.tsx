@@ -1,7 +1,23 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { OrderTrackClient } from "@/components/OrderTrackClient";
+import { localeAlternatesAndSocial } from "@/lib/locale-seo-metadata";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations("order");
+  return localeAlternatesAndSocial(locale, "/order/track", {
+    title: t("trackPageTitle"),
+    description: t("trackPageTitle"),
+    robots: { index: false, follow: false },
+  });
+}
 
 export default async function OrderTrackPage({
   params,

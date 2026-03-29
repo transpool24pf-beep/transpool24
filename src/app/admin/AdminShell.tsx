@@ -24,6 +24,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const [checked, setChecked] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
   const [deployLine, setDeployLine] = useState<string | null>(null);
+  const [seoLinks, setSeoLinks] = useState<{
+    publicSiteUrl: string;
+    sitemapUrl: string;
+    robotsUrl: string;
+  } | null>(null);
 
   const navItems: AdminNavItem[] = useMemo(
     () => NAV_DEF.map(({ href, msgKey, badge }) => ({ href, label: t(msgKey), badge })),
@@ -35,6 +40,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       setChecked(true);
       setAuthenticated(false);
       setDeployLine(null);
+      setSeoLinks(null);
       return;
     }
     fetch("/api/admin/me")
@@ -49,25 +55,46 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!authenticated || pathname === "/admin/login") {
       setDeployLine(null);
+      setSeoLinks(null);
       return;
     }
     let cancelled = false;
     fetch("/api/admin/deploy-info")
       .then((r) => (r.ok ? r.json() : null))
-      .then((j: { vercelEnv?: string | null; gitSha?: string | null } | null) => {
-        if (cancelled || !j) return;
-        if (!j.vercelEnv && !j.gitSha) {
-          setDeployLine(t("shell.footerDeployLocal"));
-        } else {
-          setDeployLine(
-            t("shell.footerDeploy")
-              .replace("{env}", j.vercelEnv ?? "—")
-              .replace("{sha}", j.gitSha ?? "—")
-          );
-        }
-      })
+      .then(
+        (
+          j: {
+            vercelEnv?: string | null;
+            gitSha?: string | null;
+            seo?: { publicSiteUrl: string; sitemapUrl: string; robotsUrl: string };
+          } | null,
+        ) => {
+          if (cancelled || !j) return;
+          if (!j.vercelEnv && !j.gitSha) {
+            setDeployLine(t("shell.footerDeployLocal"));
+          } else {
+            setDeployLine(
+              t("shell.footerDeploy")
+                .replace("{env}", j.vercelEnv ?? "—")
+                .replace("{sha}", j.gitSha ?? "—")
+            );
+          }
+          if (j.seo?.publicSiteUrl && j.seo.sitemapUrl && j.seo.robotsUrl) {
+            setSeoLinks({
+              publicSiteUrl: j.seo.publicSiteUrl,
+              sitemapUrl: j.seo.sitemapUrl,
+              robotsUrl: j.seo.robotsUrl,
+            });
+          } else {
+            setSeoLinks(null);
+          }
+        },
+      )
       .catch(() => {
-        if (!cancelled) setDeployLine(null);
+        if (!cancelled) {
+          setDeployLine(null);
+          setSeoLinks(null);
+        }
       });
     return () => {
       cancelled = true;
@@ -169,6 +196,39 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <p className="mt-1.5 text-[10px] leading-snug text-[#0d2137]/55">{t("shell.footerSecurity")}</p>
           <p className="mt-0.5 text-[10px] leading-snug text-[#0d2137]/50">{t("shell.footerCookieBanner")}</p>
           <p className="mt-0.5 text-[10px] leading-snug text-[#0d2137]/48">{t("shell.footerLegal")}</p>
+          {seoLinks ? (
+            <p className="mt-0.5 text-[10px] leading-snug text-[#0d2137]/46">
+              {t("shell.footerSeoIntro")}{" "}
+              <a
+                href={seoLinks.publicSiteUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-[#0d2137]"
+              >
+                {t("shell.footerSeoSite")}
+              </a>
+              {" · "}
+              <a
+                href={seoLinks.sitemapUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-[#0d2137]"
+              >
+                {t("shell.footerSeoSitemap")}
+              </a>
+              {" · "}
+              <a
+                href={seoLinks.robotsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline hover:text-[#0d2137]"
+              >
+                {t("shell.footerSeoRobots")}
+              </a>
+              {" · "}
+              {t("shell.footerSeoGsc")}
+            </p>
+          ) : null}
           {deployLine ? (
             <p className="mt-0.5 text-[10px] leading-snug text-[#0d2137]/45">{deployLine}</p>
           ) : null}

@@ -7,6 +7,7 @@ import { getPublishedPostBySlug } from "@/lib/blog";
 import { IconCalendar, IconUser } from "@/components/blog/BlogNewsIcons";
 import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
+import { localeAlternatesAndSocial } from "@/lib/locale-seo-metadata";
 
 export const revalidate = 60;
 
@@ -22,17 +23,14 @@ export async function generateMetadata({ params }: Props) {
   }
   const title = post.meta_title?.trim() || post.title;
   const description = post.meta_description?.trim() || post.excerpt || t("metaIndexDescription");
-  return {
-    title: `${title} | ${t("magazineTitle")}`,
+  const pageTitle = `${title} | ${t("magazineTitle")}`;
+  return localeAlternatesAndSocial(locale, `/blog/${slug}`, {
+    title: pageTitle,
     description,
-    openGraph: {
-      title,
-      description,
-      type: "article",
-      publishedTime: post.published_at ?? undefined,
-      images: post.featured_image_url ? [{ url: post.featured_image_url }] : undefined,
-    },
-  };
+    ogType: "article",
+    publishedTime: post.published_at ?? undefined,
+    ogImage: post.featured_image_url ?? undefined,
+  });
 }
 
 function formatDate(iso: string | null, locale: string) {

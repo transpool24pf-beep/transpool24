@@ -1,7 +1,23 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { DriverShareLocationClient } from "@/components/DriverShareLocationClient";
+import { localeAlternatesAndSocial } from "@/lib/locale-seo-metadata";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "driverShare" });
+  return localeAlternatesAndSocial(locale, "/driver/share-location", {
+    title: t("pageTitle"),
+    description: t("pageSubtitle"),
+    robots: { index: false, follow: false },
+  });
+}
 
 export default async function DriverShareLocationPage({
   params,

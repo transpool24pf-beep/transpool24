@@ -10,6 +10,7 @@ import { BlogTemplateAfterPosts, BlogTemplateBeforePosts } from "@/components/bl
 import { getHomepageHero } from "@/lib/homepage-hero";
 import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
+import { localeAlternatesAndSocial } from "@/lib/locale-seo-metadata";
 
 export const revalidate = 60;
 
@@ -26,15 +27,10 @@ type Props = { params: Promise<{ locale: string }> };
 export async function generateMetadata({ params }: Props) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "blog" });
-  return {
+  return localeAlternatesAndSocial(locale, "/blog", {
     title: t("metaIndexTitle"),
     description: t("metaIndexDescription"),
-    openGraph: {
-      title: t("metaIndexTitle"),
-      description: t("metaIndexDescription"),
-      siteName: "TransPool24",
-    },
-  };
+  });
 }
 
 function formatDateLong(iso: string | null, locale: string) {

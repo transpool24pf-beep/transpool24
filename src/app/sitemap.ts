@@ -1,10 +1,8 @@
 import type { MetadataRoute } from "next";
 import { defaultLocale, locales } from "@/i18n/routing";
+import { getPublicSiteUrl } from "@/lib/public-site-url";
 
-const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com").replace(
-  /\/$/,
-  "",
-);
+const SITE = getPublicSiteUrl();
 
 /** مسارات عامة لكل لغة (بدون صفحات ديناميكية للمدونة لتفادي روابط قديمة). */
 const PUBLIC_PATHS = ["", "/order", "/why", "/support", "/privacy", "/terms", "/driver", "/blog"] as const;

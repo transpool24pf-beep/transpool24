@@ -16,6 +16,11 @@ const DE: Record<string, string> = {
     "Öffentliche Website: Cookie-Einwilligung erzwungen bis zur Auswahl (v1, localStorage).",
   "shell.footerLegal":
     "Öffentliche Seiten: /privacy & /terms (alle Sprachen, Sitemap).",
+  "shell.footerSeoIntro": "SEO & Indexierung:",
+  "shell.footerSeoSite": "Öffentliche Site",
+  "shell.footerSeoSitemap": "Sitemap",
+  "shell.footerSeoRobots": "Robots",
+  "shell.footerSeoGsc": "Google: Meta-Verifizierung im Root-Layout.",
   "nav.unread": "ungelesen",
   "nav.orders": "Aufträge",
   "nav.reports": "Berichte",
@@ -111,6 +116,11 @@ const AR: Record<string, string> = {
     "الموقع العام: بانر موافقة الكوكيز إجباري حتى الاختيار (v1، localStorage).",
   "shell.footerLegal":
     "صفحات عامة: /privacy و /terms (كل اللغات، خريطة الموقع).",
+  "shell.footerSeoIntro": "SEO والفهرسة:",
+  "shell.footerSeoSite": "الموقع العام",
+  "shell.footerSeoSitemap": "خريطة الموقع",
+  "shell.footerSeoRobots": "Robots",
+  "shell.footerSeoGsc": "Google: التحقق عبر وسم ميتا في الجذر.",
   "nav.unread": "غير مقروء",
   "nav.orders": "طلبات",
   "nav.reports": "التقارير",

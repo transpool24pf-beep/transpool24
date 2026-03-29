@@ -7,9 +7,25 @@ import { DriversCarousel } from "@/components/DriversCarousel";
 import { HomeTransportOperations } from "@/components/HomeTransportOperations";
 import { GermanyConnectSection } from "@/components/GermanyConnectSection";
 import { HomepageDriverLogisticsLottie } from "@/components/HomepageDriverLogisticsLottie";
+import { HomeJsonLd } from "@/components/seo/HomeJsonLd";
 import { getHomepageHero } from "@/lib/homepage-hero";
+import { localeAlternatesAndSocial } from "@/lib/locale-seo-metadata";
 
 const FALLBACK_IMAGE = "/images/5677.png";
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "siteMetadata" });
+  const rawKw = t.raw("keywords");
+  const keywords = Array.isArray(rawKw)
+    ? (rawKw as unknown[]).filter((k): k is string => typeof k === "string")
+    : [];
+  return localeAlternatesAndSocial(locale, "", {
+    title: t("title"),
+    description: t("description"),
+    keywords,
+  });
+}
 
 export default async function HomePage({
   params,
@@ -27,6 +43,7 @@ export default async function HomePage({
 
   return (
     <>
+      <HomeJsonLd locale={locale} />
       <Header />
       <main className="min-h-[calc(100vh-8rem)]">
         {/* Hero — CMS-driven (classic homepage; logistics cover lives on /blog) */}

@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { DriverPageClient } from "@/components/DriverPageClient";
+import { localeAlternatesAndSocial } from "@/lib/locale-seo-metadata";
 
 export async function generateMetadata({
   params,
@@ -11,10 +12,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "driver.landing" });
-  return {
-    title: `${t("metaTitle")} | TransPool24`,
+  return localeAlternatesAndSocial(locale, "/driver", {
+    title: t("metaTitle"),
     description: t("metaDescription"),
-  };
+  });
 }
 
 export default async function DriverApplyPage({

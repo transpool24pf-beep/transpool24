@@ -6,6 +6,7 @@ import { BlogMarkdown } from "@/components/BlogMarkdown";
 import { getPublishedPageBySlug } from "@/lib/blog";
 import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
+import { localeAlternatesAndSocial } from "@/lib/locale-seo-metadata";
 
 export const revalidate = 60;
 
@@ -21,11 +22,11 @@ export async function generateMetadata({ params }: Props) {
   }
   const title = page.meta_title?.trim() || page.title;
   const description = page.meta_description?.trim() || t("metaIndexDescription");
-  return {
-    title: `${title} | ${t("magazineTitle")}`,
+  const pageTitle = `${title} | ${t("magazineTitle")}`;
+  return localeAlternatesAndSocial(locale, `/blog/pages/${slug}`, {
+    title: pageTitle,
     description,
-    openGraph: { title, description },
-  };
+  });
 }
 
 export default async function BlogStaticPage({ params }: Props) {
