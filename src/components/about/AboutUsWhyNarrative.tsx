@@ -72,6 +72,16 @@ export async function AboutUsWhyNarrative({ locale, embedded = false }: Props) {
         </section>
 
         <section>
+          <h2 className="text-xl font-bold text-[var(--primary)] sm:text-2xl">{t("dailyOpsTitle")}</h2>
+          <p className="mt-4 leading-relaxed text-[var(--foreground)]/82 whitespace-pre-line">{t("dailyOpsLead")}</p>
+          <ul className="mt-4 list-disc space-y-3 ps-6 leading-relaxed text-[var(--foreground)]/80">
+            <li className="whitespace-pre-line">{t("dailyOpsB1")}</li>
+            <li className="whitespace-pre-line">{t("dailyOpsB2")}</li>
+            <li className="whitespace-pre-line">{t("dailyOpsB3")}</li>
+          </ul>
+        </section>
+
+        <section>
           <h3 className="text-lg font-bold text-[var(--primary)] sm:text-xl whitespace-pre-line">
             {t("csrTitle")}
           </h3>
