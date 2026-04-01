@@ -46,6 +46,10 @@ const DE: Record<string, string> = {
   "orders.colPayment": "Zahlung",
   "orders.colActions": "Aktionen",
   "orders.openFile": "Öffnen",
+  "orders.deleteAria": "Auftrag endgültig löschen",
+  "orders.deleteConfirm":
+    "Auftrag {order} endgültig aus dem System löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+  "orders.deleteFailed": "Löschen fehlgeschlagen",
   "orders.paymentPaid": "Bezahlt",
   "orders.paymentPending": "Ausstehend",
   "orders.priceTitle": "Kundenpreis (berechnet nach Service-Typ bei Zahlung)",
@@ -146,6 +150,10 @@ const AR: Record<string, string> = {
   "orders.colPayment": "الدفع",
   "orders.colActions": "إجراءات",
   "orders.openFile": "فتح ملف",
+  "orders.deleteAria": "حذف الطلب نهائياً",
+  "orders.deleteConfirm":
+    "حذف الطلب {order} نهائياً من النظام؟ لا يمكن التراجع عن هذا الإجراء.",
+  "orders.deleteFailed": "فشل الحذف",
   "orders.paymentPaid": "مدفوع",
   "orders.paymentPending": "قيد الانتظار",
   "orders.priceTitle": "سعر العميل (يُحسب عند الدفع حسب نوع الخدمة)",

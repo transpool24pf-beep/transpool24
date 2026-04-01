@@ -198,6 +198,7 @@ export default function AdminOrdersPage() {
   const [filter, setFilter] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [updating, setUpdating] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
   const [sendingDeliveryEmailFor, setSendingDeliveryEmailFor] = useState<string | null>(null);
 
   useEffect(() => {
@@ -240,6 +241,24 @@ export default function AdminOrdersPage() {
         setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, ...data } : o)));
       }
     });
+  };
+
+  const deleteOrder = (o: Job) => {
+    const label = `#${o.order_number ?? o.id.slice(0, 8)}`;
+    const msg = t("orders.deleteConfirm").replace("{order}", label);
+    if (!window.confirm(msg)) return;
+    setDeleting(o.id);
+    fetch(`/api/admin/orders/${o.id}`, { method: "DELETE" })
+      .then(async (r) => {
+        if (!r.ok) {
+          const data = (await r.json().catch(() => ({}))) as { error?: string };
+          alert(data?.error ?? t("orders.deleteFailed"));
+          return;
+        }
+        setOrders((prev) => prev.filter((x) => x.id !== o.id));
+      })
+      .catch(() => alert(t("orders.deleteFailed")))
+      .finally(() => setDeleting(null));
   };
 
   const updateAssistantPrice = (id: string, eurValue: string) => {
@@ -320,11 +339,13 @@ export default function AdminOrdersPage() {
         </div>
       ) : (
         <div className="overflow-x-auto rounded-2xl border-2 border-[#0d2137]/10 bg-white shadow-lg">
-          <div className="w-full min-w-[920px]">
+          <div className="w-full min-w-[980px]">
             <table className="w-full table-fixed text-left text-sm">
               <thead>
                 <tr className="border-b-2 border-[#0d2137]/10 bg-gradient-to-r from-[#0d2137]/10 to-[#0d2137]/5">
-                  <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">{t("orders.colNr")}</th>
+                  <th className="w-[11%] min-w-[7.5rem] px-2 py-3 font-semibold text-[#0d2137]">
+                    {t("orders.colNr")}
+                  </th>
                   <th
                     className="w-[7%] px-1 py-3 text-center font-semibold text-[#0d2137]"
                     dir={locale === "ar" ? "rtl" : "ltr"}
@@ -332,7 +353,7 @@ export default function AdminOrdersPage() {
                     {t("orders.colStatus")}
                   </th>
                   <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">{t("orders.colDate")}</th>
-                  <th className="w-[9%] px-2 py-3 font-semibold text-[#0d2137]">{t("orders.colCompany")}</th>
+                  <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">{t("orders.colCompany")}</th>
                   <th
                     className="w-[12%] px-2 py-3 font-semibold text-[#0d2137]"
                     dir={locale === "ar" ? "rtl" : "ltr"}
@@ -365,8 +386,27 @@ export default function AdminOrdersPage() {
                         idx % 2 === 1 ? "bg-[#0d2137]/[0.02]" : ""
                       }`}
                     >
-                      <td className="min-w-0 px-2 py-2 font-mono text-xs font-semibold text-[#0d2137]">
-                        {o.order_number ?? o.id.slice(0, 8)}
+                      <td className="min-w-[7.5rem] whitespace-nowrap px-2 py-2 align-middle">
+                        <div
+                          className="inline-flex max-w-full items-center gap-2"
+                          dir={locale === "ar" ? "rtl" : "ltr"}
+                        >
+                          <span className="font-mono text-xs font-semibold text-[#0d2137] tabular-nums">
+                            {o.order_number ?? o.id.slice(0, 8)}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => deleteOrder(o)}
+                            disabled={deleting === o.id || updating === o.id}
+                            title={t("orders.deleteAria")}
+                            aria-label={t("orders.deleteAria")}
+                            className="inline-flex h-7 min-h-[1.75rem] min-w-[1.75rem] shrink-0 items-center justify-center rounded-md border border-red-300 bg-red-50 text-lg font-bold leading-none text-red-700 shadow-sm transition hover:border-red-400 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-45"
+                          >
+                            <span aria-hidden className="-mt-px block">
+                              ×
+                            </span>
+                          </button>
+                        </div>
                       </td>
                       <td className="min-w-0 px-1 py-2 text-center">
                         <LogisticsStatusPicker
