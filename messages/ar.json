@@ -216,6 +216,8 @@
     "addressPostcodePlaceholder": "75172",
     "addressPostcodeHint": "أدخل الرمز البريدي الألماني (5 أرقام) واسم الشارع ورقم المنزل يدوياً. تظهر اقتراحات أثناء الكتابة في حقل اسم الشارع.",
     "addressOneLinePlaceholder": "مثال: Musterstraße 12، 75172 Pforzheim",
+    "addressHistorySection": "عناوينك السابقة",
+    "addressSuggestionsSection": "اقتراحات الخريطة",
     "addressStreet": "اسم الشارع",
     "addressStreetPlaceholder": "مثال: Hauptstraße",
     "addressHouseNumber": "رقم المنزل",

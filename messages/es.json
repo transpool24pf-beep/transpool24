@@ -214,6 +214,8 @@
     "addressPostcodePlaceholder": "75172",
     "addressPostcodeHint": "Escriba usted mismo el código postal alemán (5 dígitos), la calle y el número. Aparecen sugerencias al escribir en el campo de calle.",
     "addressOneLinePlaceholder": "ej. Musterstraße 12, 75172 Pforzheim",
+    "addressHistorySection": "Tus direcciones recientes",
+    "addressSuggestionsSection": "Sugerencias del mapa",
     "addressStreet": "Calle",
     "addressStreetPlaceholder": "p. ej. Hauptstraße",
     "addressHouseNumber": "Número",

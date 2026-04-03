@@ -354,6 +354,8 @@
     "addressPostcodePlaceholder": "75172",
     "addressPostcodeHint": "Postleitzahl (5 Ziffern), Straße und Hausnummer selbst eintragen. Vorschläge erscheinen beim Tippen im Straßenfeld.",
     "addressOneLinePlaceholder": "z. B. Musterstraße 12, 75172 Pforzheim",
+    "addressHistorySection": "Ihre letzten Adressen",
+    "addressSuggestionsSection": "Kartenvorschläge",
     "addressStreet": "Straße",
     "addressStreetPlaceholder": "z. B. Musterstraße",
     "addressHouseNumber": "Hausnummer",

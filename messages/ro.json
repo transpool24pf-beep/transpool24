@@ -214,6 +214,8 @@
     "addressPostcodePlaceholder": "75172",
     "addressPostcodeHint": "Introduceți manual codul poștal german (5 cifre), strada și numărul. Sugestiile apar în timp ce scrieți în câmpul stradă.",
     "addressOneLinePlaceholder": "ex. Musterstraße 12, 75172 Pforzheim",
+    "addressHistorySection": "Adresele tale recente",
+    "addressSuggestionsSection": "Sugestii hartă",
     "addressStreet": "Stradă",
     "addressStreetPlaceholder": "ex. Hauptstraße",
     "addressHouseNumber": "Număr",

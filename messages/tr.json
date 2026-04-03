@@ -213,6 +213,8 @@
     "addressPostcodePlaceholder": "75172",
     "addressPostcodeHint": "Almanya posta kodunu (5 rakam), sokak ve kapı numarasını kendiniz yazın. Sokak alanına yazarken öneriler görünür.",
     "addressOneLinePlaceholder": "ör. Musterstraße 12, 75172 Pforzheim",
+    "addressHistorySection": "Son adresleriniz",
+    "addressSuggestionsSection": "Harita önerileri",
     "addressStreet": "Sokak",
     "addressStreetPlaceholder": "örn. Hauptstraße",
     "addressHouseNumber": "Kapı numarası",

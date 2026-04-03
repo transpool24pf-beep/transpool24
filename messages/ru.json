@@ -212,6 +212,8 @@
     "addressPostcodePlaceholder": "75172",
     "addressPostcodeHint": "Введите вручную индекс (5 цифр), улицу и номер дома. Подсказки появляются при вводе в поле улицы.",
     "addressOneLinePlaceholder": "напр. Musterstraße 12, 75172 Pforzheim",
+    "addressHistorySection": "Ваши недавние адреса",
+    "addressSuggestionsSection": "Подсказки карты",
     "addressStreet": "Улица",
     "addressStreetPlaceholder": "напр. Hauptstraße",
     "addressHouseNumber": "Номер дома",

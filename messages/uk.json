@@ -213,6 +213,8 @@
     "addressPostcodePlaceholder": "75172",
     "addressPostcodeHint": "Введіть вручну німецький індекс (5 цифр), вулицю та номер будинку. Підказки з’являються під час введення у полі вулиці.",
     "addressOneLinePlaceholder": "напр. Musterstraße 12, 75172 Pforzheim",
+    "addressHistorySection": "Ваші недавні адреси",
+    "addressSuggestionsSection": "Підказки карти",
     "addressStreet": "Вулиця",
     "addressStreetPlaceholder": "напр. Hauptstraße",
     "addressHouseNumber": "Номер будинку",

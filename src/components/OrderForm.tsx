@@ -12,6 +12,11 @@ import {
   type PriceBreakdown,
 } from "@/lib/pricing";
 import { getLoadUnloadMinutes, CARGO_CATEGORIES, type CargoCategoryId } from "@/lib/cargo";
+import {
+  loadOrderAddressHistory,
+  mergePersistedAddresses,
+  filterAddressHistoryForQuery,
+} from "@/lib/order-address-history";
 
 const RouteMap = dynamic(
   () => import("@/components/RouteMapInner").then((m) => m.RouteMapInner),
@@ -212,6 +217,7 @@ export function OrderForm({
   const [confirmChecked, setConfirmChecked] = useState(false);
   const [pickupSuggestions, setPickupSuggestions] = useState<Suggestion[]>([]);
   const [deliverySuggestions, setDeliverySuggestions] = useState<Suggestion[]>([]);
+  const [addressHistory, setAddressHistory] = useState<string[]>([]);
   const [suggestionsOpen, setSuggestionsOpen] = useState<"pickup" | "delivery" | null>(null);
   const [distanceLoading, setDistanceLoading] = useState(false);
   const [distanceFromRoute, setDistanceFromRoute] = useState(false);
@@ -250,6 +256,10 @@ export function OrderForm({
   });
 
   useEffect(() => {
+    setAddressHistory(loadOrderAddressHistory());
+  }, []);
+
+  useEffect(() => {
     const close = (e: MouseEvent) => {
       if (countryCodeRef.current && !countryCodeRef.current.contains(e.target as Node)) {
         setCountryCodeOpen(false);
@@ -260,6 +270,82 @@ export function OrderForm({
       return () => document.removeEventListener("click", close);
     }
   }, [countryCodeOpen]);
+
+  const pickupHistoryMatches = useMemo(
+    () => filterAddressHistoryForQuery(addressHistory, data.pickupAddressLine, 10),
+    [addressHistory, data.pickupAddressLine]
+  );
+  const deliveryHistoryMatches = useMemo(
+    () => filterAddressHistoryForQuery(addressHistory, data.deliveryAddressLine, 10),
+    [addressHistory, data.deliveryAddressLine]
+  );
+
+  const pickupHistoryKeySet = useMemo(
+    () => new Set(pickupHistoryMatches.map((l) => l.trim().toLowerCase().replace(/\s+/g, " "))),
+    [pickupHistoryMatches]
+  );
+  const deliveryHistoryKeySet = useMemo(
+    () => new Set(deliveryHistoryMatches.map((l) => l.trim().toLowerCase().replace(/\s+/g, " "))),
+    [deliveryHistoryMatches]
+  );
+
+  const pickupApiSuggestionsDeduped = useMemo(
+    () =>
+      pickupSuggestions.filter((s) => {
+        const k = s.display_name.trim().toLowerCase().replace(/\s+/g, " ");
+        return k.length > 0 && !pickupHistoryKeySet.has(k);
+      }),
+    [pickupSuggestions, pickupHistoryKeySet]
+  );
+  const deliveryApiSuggestionsDeduped = useMemo(
+    () =>
+      deliverySuggestions.filter((s) => {
+        const k = s.display_name.trim().toLowerCase().replace(/\s+/g, " ");
+        return k.length > 0 && !deliveryHistoryKeySet.has(k);
+      }),
+    [deliverySuggestions, deliveryHistoryKeySet]
+  );
+
+  const applyAddressLineSuggestion = useCallback((field: "pickup" | "delivery", s: Suggestion) => {
+    void (async () => {
+      const rotateSession = () => {
+        placesSessionRef.current =
+          typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+            ? crypto.randomUUID()
+            : `tp24-${Date.now()}`;
+      };
+      const key = field === "pickup" ? "pickupAddressLine" : "deliveryAddressLine";
+      try {
+        if (s.place_id) {
+          const res = await fetch(
+            `/api/place-details?place_id=${encodeURIComponent(s.place_id)}&session=${encodeURIComponent(placesSessionRef.current)}`
+          );
+          const j = (await res.json()) as PlaceDetailsJson;
+          rotateSession();
+          setData((prev) => ({
+            ...prev,
+            [key]: lineFromPlaceDetails(j, s.display_name || (field === "pickup" ? prev.pickupAddressLine : prev.deliveryAddressLine)),
+          }));
+          setError(null);
+        } else {
+          setData((prev) => ({
+            ...prev,
+            [key]: s.display_name || (field === "pickup" ? prev.pickupAddressLine : prev.deliveryAddressLine),
+          }));
+          setError(null);
+        }
+      } catch {
+        setData((prev) => ({
+          ...prev,
+          [key]: s.display_name || (field === "pickup" ? prev.pickupAddressLine : prev.deliveryAddressLine),
+        }));
+        setError(null);
+      }
+      if (field === "pickup") setPickupSuggestions([]);
+      else setDeliverySuggestions([]);
+      setSuggestionsOpen(null);
+    })();
+  }, []);
 
   const normalizePhone = (value: string, countryCode: string = phoneCountryCode) => {
     const digits = value.replace(/\D/g, "");
@@ -543,6 +629,9 @@ export function OrderForm({
   const next = () => {
     if (step < 4) {
       if (step === 2 && step2Complete) {
+        setAddressHistory((prev) =>
+          mergePersistedAddresses(prev, data.pickupAddressLine, data.deliveryAddressLine)
+        );
         setDistanceLoading(true);
         fetchRealDistance().finally(() => {
           setDistanceLoading(false);
@@ -765,59 +854,55 @@ export function OrderForm({
                 placeholder={t("addressOneLinePlaceholder")}
                 className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
               />
-              {suggestionsOpen === "pickup" && pickupSuggestions.length > 0 && (
-                <ul className="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-lg border border-[#0d2137]/20 bg-white py-1 shadow-lg">
-                  {pickupSuggestions.map((s, i) => (
-                    <li key={i}>
-                      <button
-                        type="button"
-                        className="w-full px-4 py-2 text-left text-sm hover:bg-[#0d2137]/5"
-                        onMouseDown={(ev) => {
-                          ev.preventDefault();
-                          void (async () => {
-                            const rotateSession = () => {
-                              placesSessionRef.current =
-                                typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-                                  ? crypto.randomUUID()
-                                  : `tp24-${Date.now()}`;
-                            };
-                            try {
-                              if (s.place_id) {
-                                const res = await fetch(
-                                  `/api/place-details?place_id=${encodeURIComponent(s.place_id)}&session=${encodeURIComponent(placesSessionRef.current)}`
-                                );
-                                const j = (await res.json()) as PlaceDetailsJson;
-                                rotateSession();
-                                setData((prev) => ({
-                                  ...prev,
-                                  pickupAddressLine: lineFromPlaceDetails(j, s.display_name || prev.pickupAddressLine),
-                                }));
-                                setError(null);
-                              } else {
-                                setData((prev) => ({
-                                  ...prev,
-                                  pickupAddressLine: s.display_name || prev.pickupAddressLine,
-                                }));
-                                setError(null);
-                              }
-                            } catch {
-                              setData((prev) => ({
-                                ...prev,
-                                pickupAddressLine: s.display_name || prev.pickupAddressLine,
-                              }));
-                              setError(null);
-                            }
-                            setPickupSuggestions([]);
-                            setSuggestionsOpen(null);
-                          })();
-                        }}
-                      >
-                        {s.display_name}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              {suggestionsOpen === "pickup" &&
+                (pickupHistoryMatches.length > 0 || pickupApiSuggestionsDeduped.length > 0) && (
+                  <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-[#0d2137]/20 bg-white py-1 shadow-lg">
+                    {pickupHistoryMatches.length > 0 && (
+                      <>
+                        <li className="pointer-events-none px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--foreground)]/50">
+                          {t("addressHistorySection")}
+                        </li>
+                        {pickupHistoryMatches.map((line, i) => (
+                          <li key={`hist-pu-${i}-${line.slice(0, 24)}`}>
+                            <button
+                              type="button"
+                              className="w-full px-4 py-2 text-left text-sm hover:bg-[#0d2137]/5"
+                              onMouseDown={(ev) => {
+                                ev.preventDefault();
+                                applyAddressLineSuggestion("pickup", { display_name: line });
+                              }}
+                            >
+                              {line}
+                            </button>
+                          </li>
+                        ))}
+                      </>
+                    )}
+                    {pickupApiSuggestionsDeduped.length > 0 && (
+                      <>
+                        {pickupHistoryMatches.length > 0 && (
+                          <li className="pointer-events-none border-t border-[#0d2137]/10 px-3 py-1 pt-2 text-[10px] font-semibold uppercase tracking-wide text-[var(--foreground)]/50">
+                            {t("addressSuggestionsSection")}
+                          </li>
+                        )}
+                        {pickupApiSuggestionsDeduped.map((s, i) => (
+                          <li key={s.place_id || `api-pu-${i}`}>
+                            <button
+                              type="button"
+                              className="w-full px-4 py-2 text-left text-sm hover:bg-[#0d2137]/5"
+                              onMouseDown={(ev) => {
+                                ev.preventDefault();
+                                applyAddressLineSuggestion("pickup", s);
+                              }}
+                            >
+                              {s.display_name}
+                            </button>
+                          </li>
+                        ))}
+                      </>
+                    )}
+                  </ul>
+                )}
             </div>
           </div>
           <div className="space-y-2">
@@ -839,59 +924,55 @@ export function OrderForm({
                 placeholder={t("addressOneLinePlaceholder")}
                 className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
               />
-              {suggestionsOpen === "delivery" && deliverySuggestions.length > 0 && (
-                <ul className="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-lg border border-[#0d2137]/20 bg-white py-1 shadow-lg">
-                  {deliverySuggestions.map((s, i) => (
-                    <li key={i}>
-                      <button
-                        type="button"
-                        className="w-full px-4 py-2 text-left text-sm hover:bg-[#0d2137]/5"
-                        onMouseDown={(ev) => {
-                          ev.preventDefault();
-                          void (async () => {
-                            const rotateSession = () => {
-                              placesSessionRef.current =
-                                typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
-                                  ? crypto.randomUUID()
-                                  : `tp24-${Date.now()}`;
-                            };
-                            try {
-                              if (s.place_id) {
-                                const res = await fetch(
-                                  `/api/place-details?place_id=${encodeURIComponent(s.place_id)}&session=${encodeURIComponent(placesSessionRef.current)}`
-                                );
-                                const j = (await res.json()) as PlaceDetailsJson;
-                                rotateSession();
-                                setData((prev) => ({
-                                  ...prev,
-                                  deliveryAddressLine: lineFromPlaceDetails(j, s.display_name || prev.deliveryAddressLine),
-                                }));
-                                setError(null);
-                              } else {
-                                setData((prev) => ({
-                                  ...prev,
-                                  deliveryAddressLine: s.display_name || prev.deliveryAddressLine,
-                                }));
-                                setError(null);
-                              }
-                            } catch {
-                              setData((prev) => ({
-                                ...prev,
-                                deliveryAddressLine: s.display_name || prev.deliveryAddressLine,
-                              }));
-                              setError(null);
-                            }
-                            setDeliverySuggestions([]);
-                            setSuggestionsOpen(null);
-                          })();
-                        }}
-                      >
-                        {s.display_name}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
+              {suggestionsOpen === "delivery" &&
+                (deliveryHistoryMatches.length > 0 || deliveryApiSuggestionsDeduped.length > 0) && (
+                  <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-[#0d2137]/20 bg-white py-1 shadow-lg">
+                    {deliveryHistoryMatches.length > 0 && (
+                      <>
+                        <li className="pointer-events-none px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--foreground)]/50">
+                          {t("addressHistorySection")}
+                        </li>
+                        {deliveryHistoryMatches.map((line, i) => (
+                          <li key={`hist-de-${i}-${line.slice(0, 24)}`}>
+                            <button
+                              type="button"
+                              className="w-full px-4 py-2 text-left text-sm hover:bg-[#0d2137]/5"
+                              onMouseDown={(ev) => {
+                                ev.preventDefault();
+                                applyAddressLineSuggestion("delivery", { display_name: line });
+                              }}
+                            >
+                              {line}
+                            </button>
+                          </li>
+                        ))}
+                      </>
+                    )}
+                    {deliveryApiSuggestionsDeduped.length > 0 && (
+                      <>
+                        {deliveryHistoryMatches.length > 0 && (
+                          <li className="pointer-events-none border-t border-[#0d2137]/10 px-3 py-1 pt-2 text-[10px] font-semibold uppercase tracking-wide text-[var(--foreground)]/50">
+                            {t("addressSuggestionsSection")}
+                          </li>
+                        )}
+                        {deliveryApiSuggestionsDeduped.map((s, i) => (
+                          <li key={s.place_id || `api-de-${i}`}>
+                            <button
+                              type="button"
+                              className="w-full px-4 py-2 text-left text-sm hover:bg-[#0d2137]/5"
+                              onMouseDown={(ev) => {
+                                ev.preventDefault();
+                                applyAddressLineSuggestion("delivery", s);
+                              }}
+                            >
+                              {s.display_name}
+                            </button>
+                          </li>
+                        ))}
+                      </>
+                    )}
+                  </ul>
+                )}
             </div>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

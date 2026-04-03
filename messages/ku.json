@@ -214,6 +214,8 @@
     "addressPostcodePlaceholder": "75172",
     "addressPostcodeHint": "Koda posta ya Almanî (5 hejmar), kolan û hejmara malê bi destê xwe binivîse. Pêşniyar dema ku di qada kolanê de dinivîsin derdikevin.",
     "addressOneLinePlaceholder": "mînak Musterstraße 12, 75172 Pforzheim",
+    "addressHistorySection": "Navnîşanên we yên berê",
+    "addressSuggestionsSection": "Pêşniyarên nexşeyê",
     "addressStreet": "Kolan",
     "addressStreetPlaceholder": "mînak Hauptstraße",
     "addressHouseNumber": "Hejmara malê",
