@@ -116,22 +116,27 @@ export function Header({ hideLogo }: HeaderProps) {
     </nav>
   );
 
-  /** Direct locale picks (no dropdown): thin strip above the main header row */
+  /** Glossy pill row (reference: one row of codes; active = dark shiny capsule, rest = chrome pills) */
+  const localePillInactive =
+    "shrink-0 rounded-full border border-[#0d2137]/15 bg-gradient-to-b from-white to-[#dfe5ee] px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-[#0d2137] tabular-nums shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_1px_3px_rgba(13,33,55,0.08)] transition hover:from-[#fafcff] hover:to-[#e8edf5] hover:shadow-[inset_0_1px_0_rgba(255,255,255,1),0_2px_8px_rgba(13,33,55,0.12)] active:translate-y-px sm:px-2.5 sm:py-1 sm:text-[11px]";
+  const localePillActive =
+    "shrink-0 rounded-full border border-[#e85d04]/50 bg-gradient-to-b from-[#2a5580] via-[#0d2137] to-[#061018] px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white tabular-nums shadow-[inset_0_1px_0_rgba(255,255,255,0.28),inset_0_-2px_4px_rgba(0,0,0,0.35),0_2px_12px_rgba(13,33,55,0.35),0_0_14px_rgba(232,93,4,0.28)] ring-1 ring-white/20 sm:px-2.5 sm:py-1 sm:text-[11px]";
+
   const localeStrip = (
-    <div className="relative z-20 border-b border-[#0d2137]/10 bg-gradient-to-b from-[#eef1f6] to-[#e4e8ef]">
+    <div className="relative z-20 overflow-hidden border-b border-[#0d2137]/12 bg-gradient-to-b from-[#f6f8fc] via-[#e9eef6] to-[#dce4ef] shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white to-transparent opacity-90"
+        aria-hidden
+      />
       <nav
-        className="mx-auto flex max-w-6xl flex-nowrap items-center justify-start gap-0.5 overflow-x-auto overscroll-x-contain px-2 py-1 [-webkit-overflow-scrolling:touch] sm:justify-center sm:gap-1 sm:px-4 sm:py-1.5"
+        className="relative mx-auto flex max-w-6xl flex-nowrap items-center justify-start gap-1 overflow-x-auto overscroll-x-contain px-2 py-2 [-webkit-overflow-scrolling:touch] sm:justify-center sm:gap-1.5 sm:px-4 sm:py-2.5"
         aria-label={t("language")}
       >
         {locales.map((loc) => (
           <Link
             key={loc}
             href={`/${loc}${basePath === "/" ? "" : basePath}`}
-            className={`shrink-0 rounded-md px-2 py-0.5 text-[11px] font-semibold tabular-nums transition sm:px-2.5 sm:py-1 sm:text-xs ${
-              loc === locale
-                ? "bg-[#0d2137] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]"
-                : "text-[#0d2137]/88 hover:bg-[#0d2137]/12"
-            }`}
+            className={loc === locale ? localePillActive : localePillInactive}
             aria-current={loc === locale ? "page" : undefined}
           >
             {LOCALE_SHORT_CODE[loc]}
