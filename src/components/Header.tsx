@@ -18,10 +18,13 @@ function isLocaleHomePath(pathname: string | null, locale: string): boolean {
   return parts.length === 1 && parts[0]!.toLowerCase() === locale.toLowerCase();
 }
 
-/** Order, drivers, magazine: large centered logo */
+/** Order, drivers, magazine: large centered logo (segment-based; reliable with usePathname). */
 function isLargeCenterLogoPath(pathname: string | null): boolean {
   if (!pathname) return false;
-  return /^\/[a-z]{2}\/(order|driver|blog)(\/|$)/i.test(pathname);
+  const parts = pathname.split("/").filter(Boolean);
+  if (parts.length < 2) return false;
+  const section = parts[1]!.toLowerCase();
+  return section === "order" || section === "driver" || section === "blog";
 }
 
 export function Header({ hideLogo }: HeaderProps) {
@@ -56,8 +59,9 @@ export function Header({ hideLogo }: HeaderProps) {
   const langBtnClass =
     "flex items-center gap-1.5 rounded-lg border border-[#0d2137]/20 px-2 py-0.5 text-sm font-medium leading-none text-[var(--foreground)] sm:gap-2 sm:px-2 sm:py-0.5";
 
-  const logoSizesCenter =
-    "relative block h-[3.25rem] w-[min(88vw,17.5rem)] sm:h-[3.875rem] sm:w-[min(88vw,20rem)] md:h-[4.5rem] md:w-[min(90vw,22rem)] lg:h-[5rem] lg:w-[min(92vw,24rem)]";
+  /** Order / driver / blog: prominent centered logo (intrinsic size + max bounds, no short letterbox strip). */
+  const centerLogoImgClass =
+    "h-auto w-auto max-h-[3.75rem] max-w-[min(90vw,18rem)] object-contain object-center sm:max-h-[4.5rem] sm:max-w-[21rem] md:max-h-[5.35rem] md:max-w-[25rem] lg:max-h-[6rem] lg:max-w-[28rem] xl:max-h-[6.5rem] xl:max-w-[30rem]";
 
   const homePath = isLocaleHomePath(pathname, locale);
 
@@ -73,9 +77,9 @@ export function Header({ hideLogo }: HeaderProps) {
       width={1024}
       height={558}
       quality={100}
-      className="h-full w-full object-contain object-center"
+      className={centerLogoImgClass}
       priority={showLargeCenterLogo}
-      sizes="(max-width: 640px) 88vw, (max-width: 1024px) 20rem, 24rem"
+      sizes="(max-width: 640px) 90vw, (max-width: 1024px) 25rem, 30rem"
     />
   );
 
@@ -163,14 +167,14 @@ export function Header({ hideLogo }: HeaderProps) {
           {nav}
         </div>
       ) : showLargeCenterLogo ? (
-        <div className="mx-auto grid max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 py-0.5 sm:gap-3 sm:px-6 sm:py-1">
+        <div className="mx-auto grid w-full max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 py-1 sm:gap-3 sm:px-6 sm:py-1.5 md:py-2">
           <div className="min-w-0" aria-hidden />
           <Link
             href={`/${locale}`}
             className="flex justify-center justify-self-center"
             aria-label="TransPool24"
           >
-            <span className={logoSizesCenter}>{logoImageCenter}</span>
+            <span className="relative inline-flex shrink-0 items-center justify-center">{logoImageCenter}</span>
           </Link>
           <div className="min-w-0 justify-self-end">{nav}</div>
         </div>
