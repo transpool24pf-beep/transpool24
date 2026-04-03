@@ -220,7 +220,7 @@
     "addressHouseNumber": "Kapı numarası",
     "addressHouseNumberPlaceholder": "12",
     "pickupDate": "Alış tarihi",
-    "pickupDatePlaceholder": "GG.AA.YYYY",
+    "pickupDatePlaceholder": "GG/AA/YYYY",
     "pickupDateInvalid": "Lütfen bugünden itibaren geçerli bir tarih girin (ör. 05.04.2026).",
     "pickupTime": "Alış saati",
     "cargoSize": "Yük boyutu",

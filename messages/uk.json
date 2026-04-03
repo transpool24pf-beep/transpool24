@@ -220,7 +220,7 @@
     "addressHouseNumber": "Номер будинку",
     "addressHouseNumberPlaceholder": "12",
     "pickupDate": "Дата отримання",
-    "pickupDatePlaceholder": "ДД.ММ.РРРР",
+    "pickupDatePlaceholder": "ДД/ММ/РРРР",
     "pickupDateInvalid": "Введіть коректну дату (сьогодні або пізніше), напр. 05.04.2026.",
     "pickupTime": "Час отримання",
     "cargoSize": "Розмір вантажу",

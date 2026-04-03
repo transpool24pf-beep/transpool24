@@ -21,6 +21,7 @@ import { localeToHtmlLang } from "@/lib/locale-html-lang";
 import {
   formatIsoDateForOrderInput,
   localTodayIso,
+  maskPickupDateInput,
   parseOrderDateInputToIso,
 } from "@/lib/order-pickup-date-input";
 import {
@@ -281,7 +282,7 @@ export function OrderForm({
     if (d) {
       setStep(Math.min(4, Math.max(1, d.step)));
       setData(d.data);
-      setPickupDateField(d.pickupDateField);
+      setPickupDateField(maskPickupDateInput(d.pickupDateField));
       setCargoPhotoUrls(Array.isArray(d.cargoPhotoUrls) ? d.cargoPhotoUrls : []);
       setPhoneCountryCode(d.phoneCountryCode || "+49");
       setDistanceFromRoute(Boolean(d.distanceFromRoute));
@@ -1127,7 +1128,7 @@ export function OrderForm({
                 lang={htmlLang}
                 placeholder={t("pickupDatePlaceholder")}
                 value={pickupDateField}
-                onChange={(e) => setPickupDateField(e.target.value)}
+                onChange={(e) => setPickupDateField(maskPickupDateInput(e.target.value))}
                 onBlur={handlePickupDateBlur}
                 className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
               />

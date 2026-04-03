@@ -220,7 +220,7 @@
     "addressHouseNumber": "Numer domu",
     "addressHouseNumberPlaceholder": "12",
     "pickupDate": "Data odbioru",
-    "pickupDatePlaceholder": "DD.MM.RRRR",
+    "pickupDatePlaceholder": "DD/MM/RRRR",
     "pickupDateInvalid": "Podaj prawidłową datę (od dzisiaj), np. 05.04.2026.",
     "pickupTime": "Czas odbioru",
     "cargoSize": "Rozmiar ładunku",

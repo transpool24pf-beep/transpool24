@@ -7,17 +7,24 @@ export function localTodayIso(): string {
   return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 }
 
-/** Show stored ISO date in a locale-typical typed format (not OS-dependent). */
-export function formatIsoDateForOrderInput(iso: string, locale: string): string {
+/**
+ * Live typing: keep digits only (max 8) and insert slashes → DD/MM/YYYY.
+ * Pasting "01081992" becomes "01/08/1992".
+ */
+export function maskPickupDateInput(raw: string): string {
+  const digits = raw.replace(/\D/g, "").slice(0, 8);
+  if (digits.length <= 2) return digits;
+  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+}
+
+/** Show stored ISO as DD/MM/YYYY with slashes (matches mask while typing). */
+export function formatIsoDateForOrderInput(iso: string, _locale?: string): string {
   if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return "";
   const [y, m, d] = iso.split("-");
   const dd = d!.padStart(2, "0");
   const mm = m!.padStart(2, "0");
   const yyyy = y!;
-  const dotted = ["de", "pl", "ru", "uk", "tr"];
-  if (dotted.includes(locale)) {
-    return `${dd}.${mm}.${yyyy}`;
-  }
   return `${dd}/${mm}/${yyyy}`;
 }
 

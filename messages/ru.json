@@ -219,7 +219,7 @@
     "addressHouseNumber": "Номер дома",
     "addressHouseNumberPlaceholder": "12",
     "pickupDate": "Дата получения",
-    "pickupDatePlaceholder": "ДД.ММ.ГГГГ",
+    "pickupDatePlaceholder": "ДД/ММ/ГГГГ",
     "pickupDateInvalid": "Введите корректную дату (сегодня или позже), напр. 05.04.2026.",
     "pickupTime": "Время получения",
     "cargoSize": "Размер груза",
