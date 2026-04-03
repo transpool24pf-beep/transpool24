@@ -4,10 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
-import { useState, useRef, useEffect, useMemo } from "react";
-import { locales, type Locale } from "@/i18n/routing";
-import { LOCALE_NATIVE_LABEL, LOCALE_SHORT_CODE } from "@/lib/locale-display";
-import { LocaleFlagIcon } from "@/components/LocaleFlagIcon";
+import { useMemo } from "react";
+import { type Locale } from "@/i18n/routing";
 import { HeaderCarLottieTrack } from "@/components/HeaderCarLottieTrack";
 
 type HeaderProps = { hideLogo?: boolean };
@@ -41,8 +39,6 @@ export function Header({ hideLogo }: HeaderProps) {
   const t = useTranslations("common");
   const pathname = usePathname();
   const locale = useLocale() as Locale;
-  const [langOpen, setLangOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
 
   const rtl = locale === "ar" || locale === "ku";
 
@@ -53,25 +49,12 @@ export function Header({ hideLogo }: HeaderProps) {
 
   const hideNavOnMobileOrderDriver = useMemo(() => isOrderOrDriverFlowPath(pathname), [pathname]);
 
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setLangOpen(false);
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const pathWithoutLocale = pathname?.replace(/^\/[a-z]{2}(?=\/|$)/, "") || "";
-  const basePath = pathWithoutLocale || "/";
-
-  /** Glossy chrome: light top edge + soft depth (Magazine / Drivers / language) */
+  /** Glossy chrome: Drivers secondary pill */
   const navLinkClass =
-    "rounded-lg border border-[#0d2137]/14 bg-gradient-to-b from-white to-[#e9ecf1] px-2 py-0.5 text-sm font-medium leading-none text-[var(--foreground)] shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_1px_2px_rgba(13,33,55,0.06)] transition hover:from-[#fafbfc] hover:to-[#e2e6ec] hover:shadow-[inset_0_1px_0_rgba(255,255,255,1),0_2px_8px_rgba(13,33,55,0.08)] active:translate-y-px sm:px-2.5 sm:py-0.5";
-  /** Primary CTA: richer gradient, glow, stronger inset highlight */
+    "shrink-0 whitespace-nowrap rounded-lg border border-[#0d2137]/14 bg-gradient-to-b from-white to-[#e9ecf1] px-2 py-0.5 text-xs font-medium leading-none text-[var(--foreground)] shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_1px_2px_rgba(13,33,55,0.06)] transition hover:from-[#fafbfc] hover:to-[#e2e6ec] hover:shadow-[inset_0_1px_0_rgba(255,255,255,1),0_2px_8px_rgba(13,33,55,0.08)] active:translate-y-px sm:px-2.5 sm:py-0.5 sm:text-sm";
+  /** Primary CTA: richer gradient; mobile: full label, no wrap, comfortable tap */
   const navCtaClass =
-    "relative overflow-hidden rounded-lg border border-[#b84702]/35 bg-gradient-to-b from-[#ffa64d] via-[#e85d04] to-[#c24a03] px-2.5 py-0.5 text-sm font-semibold leading-none text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2px_10px_rgba(232,93,4,0.42),0_1px_0_rgba(0,0,0,0.12)_inset] ring-1 ring-white/20 transition hover:brightness-[1.06] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_4px_16px_rgba(232,93,4,0.48)] active:translate-y-px active:brightness-[0.98] sm:px-3 sm:py-0.5";
-  const langBtnClass =
-    "flex items-center gap-1.5 rounded-lg border border-[#0d2137]/14 bg-gradient-to-b from-white to-[#e9ecf1] px-2 py-0.5 text-sm font-medium leading-none text-[var(--foreground)] shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_1px_2px_rgba(13,33,55,0.06)] transition hover:from-[#fafbfc] hover:to-[#e2e6ec] hover:shadow-[inset_0_1px_0_rgba(255,255,255,1),0_2px_8px_rgba(13,33,55,0.08)] active:translate-y-px sm:gap-2 sm:px-2 sm:py-0.5";
+    "relative shrink-0 overflow-hidden whitespace-nowrap rounded-lg border border-[#b84702]/35 bg-gradient-to-b from-[#ffa64d] via-[#e85d04] to-[#c24a03] px-3 py-1 text-[13px] font-semibold leading-none text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2px_10px_rgba(232,93,4,0.42),0_1px_0_rgba(0,0,0,0.12)_inset] ring-1 ring-white/20 transition hover:brightness-[1.06] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_4px_16px_rgba(232,93,4,0.48)] active:translate-y-px active:brightness-[0.98] sm:px-3 sm:py-0.5 sm:text-sm";
 
   /** Order / driver / blog: prominent centered logo (intrinsic size + max bounds, no short letterbox strip). */
   const centerLogoImgClass =
@@ -81,7 +64,7 @@ export function Header({ hideLogo }: HeaderProps) {
 
   /** Corner rows: no fixed-height box (avoids empty band above/below wide logo with object-contain). */
   const cornerLogoImgClass = homePath
-    ? "h-auto w-auto max-h-[3.35rem] max-w-[min(90vw,17rem)] object-contain object-start rtl:object-right sm:max-h-[3.85rem] sm:max-w-[19rem] md:max-h-[4.35rem] md:max-w-[21.5rem] lg:max-h-[4.75rem] lg:max-w-[24rem]"
+    ? "h-auto w-auto max-h-[2.55rem] max-w-[9.25rem] object-contain object-start rtl:object-right sm:max-h-[3.35rem] sm:max-w-[min(90vw,17rem)] md:max-h-[3.85rem] md:max-w-[19rem] lg:max-h-[4.35rem] lg:max-w-[21.5rem] xl:max-h-[4.75rem] xl:max-w-[24rem]"
     : "h-auto w-auto max-h-[2.2rem] max-w-[min(56vw,8.75rem)] object-contain object-start rtl:object-right sm:max-h-[2.4rem] sm:max-w-[9.75rem] md:max-h-[2.55rem]";
 
   const logoImageCenter = (
@@ -116,62 +99,16 @@ export function Header({ hideLogo }: HeaderProps) {
 
   const nav = (
     <nav
-      className={`min-w-0 items-center justify-end gap-1.5 sm:gap-2 md:gap-2.5 ${
+      className={`shrink-0 flex-nowrap items-center justify-end gap-2 sm:gap-2.5 md:gap-3 ${
         hideNavOnMobileOrderDriver ? "hidden sm:flex" : "flex"
       }`}
     >
-      <Link href={`/${locale}/blog`} className={navLinkClass}>
-        {t("blog")}
-      </Link>
       <Link href={`/${locale}/driver`} className={navLinkClass}>
         {t("drivers")}
       </Link>
       <Link href={`/${locale}/order`} className={navCtaClass}>
         {t("order")}
       </Link>
-      <div className="relative shrink-0" ref={ref}>
-        <button
-          type="button"
-          onClick={() => setLangOpen((o) => !o)}
-          className={langBtnClass}
-          aria-expanded={langOpen}
-          aria-haspopup="listbox"
-          aria-label={`${t("language")}: ${LOCALE_NATIVE_LABEL[locale]}`}
-        >
-          <LocaleFlagIcon locale={locale} />
-          <span className="tabular-nums">{LOCALE_SHORT_CODE[locale]}</span>
-          <span className="text-[10px] leading-none text-[#0d2137]/70" aria-hidden>
-            ▾
-          </span>
-        </button>
-        {langOpen && (
-          <div
-            className="absolute end-0 top-full z-[60] mt-1 w-[min(22rem,calc(100vw-1.25rem))] rounded-xl border border-[#0d2137]/10 bg-[var(--background)] p-3 shadow-lg"
-            role="listbox"
-          >
-            <p className="mb-2 px-1 text-xs font-semibold uppercase tracking-wide text-[#0d2137]/55">
-              {t("language")}
-            </p>
-            <div className="grid grid-cols-2 gap-x-2 gap-y-0.5">
-              {locales.map((loc) => (
-                <Link
-                  key={loc}
-                  href={`/${loc}${basePath === "/" ? "" : basePath}`}
-                  role="option"
-                  aria-selected={loc === locale}
-                  className={`flex min-w-0 items-center gap-2 rounded-lg px-2 py-2 text-sm transition hover:bg-[#0d2137]/5 ${
-                    loc === locale ? "bg-[#0d2137]/[0.07] font-medium text-[#0d2137]" : "text-[var(--foreground)]"
-                  }`}
-                  onClick={() => setLangOpen(false)}
-                >
-                  <LocaleFlagIcon locale={loc} />
-                  <span className="min-w-0 truncate leading-tight">{LOCALE_NATIVE_LABEL[loc]}</span>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
     </nav>
   );
 
@@ -214,9 +151,9 @@ export function Header({ hideLogo }: HeaderProps) {
           </div>
         ) : (
           <div
-            className={`flex w-full items-center justify-between gap-2 sm:gap-3 ${
+            className={`flex w-full min-w-0 items-center justify-between gap-2 sm:gap-3 ${
               homePath
-                ? "py-1 ps-1.5 pe-3 sm:py-1.5 sm:ps-2 sm:pe-4 md:pe-5"
+                ? "py-1 ps-1.5 pe-2 sm:py-1.5 sm:ps-2 sm:pe-4 md:pe-5"
                 : "mx-auto max-w-6xl px-4 py-0 sm:px-6 sm:py-0.5"
             }`}
           >
