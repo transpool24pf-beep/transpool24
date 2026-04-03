@@ -128,6 +128,7 @@
       "loading": "Chargement…",
       "demoNotice": "Données de démonstration – seront automatiquement remplacées par de vrais chauffeurs une fois ajoutés",
       "reviewLead": "Avis client · {customer}",
+      "reviewNoComment": "Le client a attribué {rating} étoiles sur 5 (sans commentaire écrit).",
       "carouselPrev": "Témoignage précédent",
       "carouselNext": "Témoignage suivant",
       "carouselDotsAria": "Témoignages chauffeurs",

@@ -128,6 +128,7 @@
       "loading": "Cargando…",
       "demoNotice": "Datos de demostración – se reemplazarán automáticamente con conductores reales una vez agregados",
       "reviewLead": "Opinión de cliente · {customer}",
+      "reviewNoComment": "El cliente valoró el servicio con {rating} de 5 estrellas (sin comentario escrito).",
       "carouselPrev": "Historia anterior",
       "carouselNext": "Historia siguiente",
       "carouselDotsAria": "Testimonios de conductores",

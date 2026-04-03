@@ -127,6 +127,7 @@
       "loading": "Załadunek…",
       "demoNotice": "Dane demonstracyjne – po dodaniu zostaną automatycznie zastąpione prawdziwymi sterownikami",
       "reviewLead": "Opinia klienta · {customer}",
+      "reviewNoComment": "Klient ocenił usługę na {rating} z 5 gwiazdek (bez komentarza tekstowego).",
       "carouselPrev": "Poprzednia opinia",
       "carouselNext": "Następna opinia",
       "carouselDotsAria": "Opinie o kierowcach",

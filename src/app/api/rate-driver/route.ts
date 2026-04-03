@@ -48,8 +48,14 @@ export async function POST(req: Request) {
   if (fetchErr || !job) {
     return NextResponse.json({ error: "Invalid or expired link" }, { status: 404 });
   }
-  const updatePayload: { customer_driver_rating: number; customer_driver_comment?: string | null } = {
+  const ratedAt = new Date().toISOString();
+  const updatePayload: {
+    customer_driver_rating: number;
+    customer_driver_comment?: string | null;
+    customer_driver_rated_at: string;
+  } = {
     customer_driver_rating: Math.round(rating),
+    customer_driver_rated_at: ratedAt,
   };
   if (comment !== undefined) updatePayload.customer_driver_comment = comment || null;
   const { error: updateErr } = await supabase

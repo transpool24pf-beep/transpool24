@@ -9,6 +9,7 @@ import { useAdminLocale } from "@/contexts/AdminLocaleContext";
 
 const NAV_DEF: { href: string; msgKey: string; badge: AdminNavItem["badge"] }[] = [
   { href: "/admin/orders", msgKey: "nav.orders", badge: "orders" },
+  { href: "/admin/ratings", msgKey: "nav.ratings", badge: null },
   { href: "/admin/reports", msgKey: "nav.reports", badge: null },
   { href: "/admin/driver-applications", msgKey: "nav.driverApplications", badge: "drivers" },
   { href: "/admin/drivers", msgKey: "nav.drivers", badge: null },

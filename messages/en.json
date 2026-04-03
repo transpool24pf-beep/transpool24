@@ -264,6 +264,7 @@
       "loading": "Loading…",
       "demoNotice": "Demo data – will be automatically replaced with real drivers once added",
       "reviewLead": "Customer review · {customer}",
+      "reviewNoComment": "The customer rated the service {rating} out of 5 stars (no written comment).",
       "carouselPrev": "Previous driver story",
       "carouselNext": "Next driver story",
       "carouselDotsAria": "Driver testimonials",

@@ -78,6 +78,8 @@ export type Job = {
   pod_completed_at?: string | null;
   customer_driver_rating?: number | null;
   customer_driver_comment?: string | null;
+  customer_driver_rated_at?: string | null;
+  customer_review_published?: boolean;
   created_at: string;
   updated_at: string;
 };

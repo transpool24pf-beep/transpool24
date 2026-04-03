@@ -57,6 +57,21 @@ export async function PATCH(req: Request) {
   if (body.last_driver_lat !== undefined) updates.last_driver_lat = body.last_driver_lat == null ? null : Number(body.last_driver_lat);
   if (body.last_driver_lng !== undefined) updates.last_driver_lng = body.last_driver_lng == null ? null : Number(body.last_driver_lng);
   if (body.last_driver_location_at !== undefined) updates.last_driver_location_at = body.last_driver_location_at || null;
+  if (body.customer_review_published !== undefined) {
+    const pub = Boolean(body.customer_review_published);
+    const { data: ratedJob, error: ratedErr } = await supabase
+      .from("jobs")
+      .select("id, customer_driver_rating")
+      .eq("id", id)
+      .single();
+    if (ratedErr || !ratedJob) {
+      return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    }
+    if (ratedJob.customer_driver_rating == null) {
+      return NextResponse.json({ error: "No customer rating to publish" }, { status: 400 });
+    }
+    updates.customer_review_published = pub;
+  }
   const { data, error } = await supabase
     .from("jobs")
     .update(updates)

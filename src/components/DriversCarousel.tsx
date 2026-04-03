@@ -112,6 +112,7 @@ function MainDriverBubble({
   isRtl: boolean;
   reviewLead: string;
 }) {
+  const t = useTranslations("home.drivers");
   return (
     <article
       dir={isRtl ? "rtl" : "ltr"}
@@ -142,7 +143,11 @@ function MainDriverBubble({
             </div>
           </div>
           <p className="mt-4 text-start text-sm leading-relaxed text-[var(--foreground)]/80 sm:mt-5 sm:text-[0.9375rem]">
-            &ldquo;{driver.comment}&rdquo;
+            {driver.comment?.trim() ? (
+              <span>&ldquo;{driver.comment}&rdquo;</span>
+            ) : (
+              t("reviewNoComment", { rating: driver.rating })
+            )}
           </p>
           <p className="mt-4 text-start text-xs font-semibold text-[var(--foreground)]/45 sm:text-sm">
             {driver.customerName}

@@ -127,6 +127,7 @@
       "loading": "Yükleniyor…",
       "demoNotice": "Demo veriler – gerçek sürücüler eklendiğinde otomatik olarak değiştirilecek",
       "reviewLead": "Müşteri yorumu · {customer}",
+      "reviewNoComment": "Müşteri hizmeti 5 üzerinden {rating} yıldızla değerlendirdi (yazılı yorum yok).",
       "carouselPrev": "Önceki hikâye",
       "carouselNext": "Sonraki hikâye",
       "carouselDotsAria": "Sürücü yorumları",

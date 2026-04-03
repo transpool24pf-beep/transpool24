@@ -130,6 +130,7 @@
       "loading": "جاري التحميل…",
       "demoNotice": "بيانات تجريبية - سيتم استبدالها بالسائقين الحقيقيين عند إضافتهم",
       "reviewLead": "رأي عميل · {customer}",
+      "reviewNoComment": "قيم العميل الخدمة بـ {rating} من 5 نجوم (بدون تعليق نصي).",
       "carouselPrev": "القصة السابقة",
       "carouselNext": "القصة التالية",
       "carouselDotsAria": "شهادات السائقين",

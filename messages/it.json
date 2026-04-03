@@ -128,6 +128,7 @@
       "loading": "Caricamento…",
       "demoNotice": "Dati demo: verranno automaticamente sostituiti con driver reali una volta aggiunti",
       "reviewLead": "Recensione cliente · {customer}",
+      "reviewNoComment": "Il cliente ha valutato il servizio con {rating} su 5 stelle (nessun commento scritto).",
       "carouselPrev": "Storia precedente",
       "carouselNext": "Storia successiva",
       "carouselDotsAria": "Testimonianze autisti",
