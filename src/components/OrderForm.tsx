@@ -819,7 +819,6 @@ export function OrderForm({
                 </ul>
               )}
             </div>
-            <p className="text-xs text-[var(--foreground)]/60">{t("addressOneLineHint")}</p>
           </div>
           <div className="space-y-2">
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
@@ -894,7 +893,6 @@ export function OrderForm({
                 </ul>
               )}
             </div>
-            <p className="text-xs text-[var(--foreground)]/60">{t("addressOneLineHint")}</p>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>

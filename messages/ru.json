@@ -211,7 +211,6 @@
     "deliveryPlaceholder": "Улица, почтовый индекс, город",
     "addressPostcodePlaceholder": "75172",
     "addressPostcodeHint": "Введите вручную индекс (5 цифр), улицу и номер дома. Подсказки появляются при вводе в поле улицы.",
-    "addressOneLineHint": "Введите улицу, номер дома и немецкий индекс (5 цифр) в одной строке. Подсказки при вводе.",
     "addressOneLinePlaceholder": "напр. Musterstraße 12, 75172 Pforzheim",
     "addressStreet": "Улица",
     "addressStreetPlaceholder": "напр. Hauptstraße",

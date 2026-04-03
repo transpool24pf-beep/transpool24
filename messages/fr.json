@@ -213,7 +213,6 @@
     "deliveryPlaceholder": "Rue, code postal, ville",
     "addressPostcodePlaceholder": "75172",
     "addressPostcodeHint": "Saisissez vous-même le code postal allemand (5 chiffres), la rue et le numéro. Des suggestions apparaissent pendant la saisie du champ rue.",
-    "addressOneLineHint": "Saisissez rue, numéro et code postal allemand (5 chiffres) sur une ligne. Des suggestions apparaissent pendant la saisie.",
     "addressOneLinePlaceholder": "ex. Musterstraße 12, 75172 Pforzheim",
     "addressStreet": "Rue",
     "addressStreetPlaceholder": "ex. Hauptstraße",

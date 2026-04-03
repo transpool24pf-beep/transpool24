@@ -349,7 +349,6 @@
     "deliveryPlaceholder": "Street, postal code, city",
     "addressPostcodePlaceholder": "75172",
     "addressPostcodeHint": "Enter the German postcode (5 digits), street, and house number yourself. Suggestions appear as you type in the street field.",
-    "addressOneLineHint": "Enter street, house number, and German postcode (5 digits) in one line. Suggestions appear as you type.",
     "addressOneLinePlaceholder": "e.g. Musterstraße 12, 75172 Pforzheim",
     "addressStreet": "Street",
     "addressStreetPlaceholder": "e.g. Musterstraße",

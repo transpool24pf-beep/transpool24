@@ -213,7 +213,6 @@
     "deliveryPlaceholder": "Via, codice postale, città",
     "addressPostcodePlaceholder": "75172",
     "addressPostcodeHint": "Inserisci tu CAP tedesco (5 cifre), via e numero civico. Suggerimenti mentre digiti nel campo via.",
-    "addressOneLineHint": "Inserisci via, numero civico e CAP tedesco (5 cifre) in una riga. Suggerimenti mentre digiti.",
     "addressOneLinePlaceholder": "es. Musterstraße 12, 75172 Pforzheim",
     "addressStreet": "Via",
     "addressStreetPlaceholder": "es. Hauptstraße",
