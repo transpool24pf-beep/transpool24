@@ -358,7 +358,13 @@ function buildDeliveryConfirmationHtml(
 export async function sendDeliveryConfirmationEmail(
   to: string,
   job: Job,
-  options: { trackOrderUrl: string | null; rateDriverUrl: string | null; podPhotoUrl: string | null }
+  options: {
+    trackOrderUrl: string | null;
+    rateDriverUrl: string | null;
+    podPhotoUrl: string | null;
+    /** Optional image attachment (base64, no data: prefix) — same URL as podPhotoUrl, fetched server-side */
+    podPhotoAttachment?: { filename: string; contentBase64: string } | null;
+  }
 ): Promise<{ success: boolean; error?: string }> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
@@ -374,6 +380,7 @@ export async function sendDeliveryConfirmationEmail(
         })
       : new Date().toLocaleString("de-DE", { dateStyle: "medium", timeStyle: "short" });
   const resend = new Resend(apiKey);
+  const att = options.podPhotoAttachment;
   try {
     const { error } = await resend.emails.send({
       from: FROM_EMAIL,
@@ -385,6 +392,11 @@ export async function sendDeliveryConfirmationEmail(
         podPhotoUrl: options.podPhotoUrl,
         deliveredAtDe,
       }),
+      ...(att && att.contentBase64.length > 0
+        ? {
+            attachments: [{ filename: att.filename, content: att.contentBase64 }],
+          }
+        : {}),
     });
     if (error) {
       const raw =

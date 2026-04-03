@@ -3,15 +3,24 @@ import crypto from "crypto";
 import { createServerSupabase } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/admin-api";
 import { sendDeliveryConfirmationEmail } from "@/lib/email";
+import { isTrustedPodImageUrl } from "@/lib/trusted-image-url";
 import type { Job } from "@/lib/supabase";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com";
+const MAX_ATTACH_BYTES = 5 * 1024 * 1024;
 
-export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const err = await requireAdmin();
   if (err) return err;
   const { id: jobId } = await params;
   if (!jobId) return NextResponse.json({ error: "Missing job id" }, { status: 400 });
+
+  const body = await req.json().catch(() => ({}));
+  const bodyPodUrl =
+    typeof (body as { pod_photo_url?: unknown }).pod_photo_url === "string"
+      ? (body as { pod_photo_url: string }).pod_photo_url.trim()
+      : "";
+  const attachPhoto = (body as { attach_photo?: unknown }).attach_photo === true;
 
   const supabase = createServerSupabase();
   const { data: job, error: fetchErr } = await supabase
@@ -30,13 +39,20 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
     return NextResponse.json({ error: "No customer email for this order" }, { status: 400 });
   }
 
-  const isDelivered =
-    row.logistics_status === "delivered" || (row.pod_completed_at != null && String(row.pod_completed_at).length > 0);
-  if (!isDelivered) {
+  const dbPod =
+    typeof row.pod_photo_url === "string" && row.pod_photo_url.trim().length > 0 ? row.pod_photo_url.trim() : "";
+  const effectivePodUrl = bodyPodUrl || dbPod || null;
+
+  const hasDeliveredState =
+    row.logistics_status === "delivered" ||
+    (row.pod_completed_at != null && String(row.pod_completed_at).length > 0);
+  const hasPodPhoto = Boolean(effectivePodUrl);
+
+  if (!hasDeliveredState && !hasPodPhoto) {
     return NextResponse.json(
       {
         error:
-          "Order is not marked as delivered yet. Set status to Zugestellt or complete driver POD upload first.",
+          "Set order to delivered / complete POD, or provide a delivery photo URL (e.g. from driver upload).",
       },
       { status: 400 }
     );
@@ -54,17 +70,44 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
     : null;
   const rateDriverUrl = `${SITE}/de/rate-driver?token=${encodeURIComponent(rating_token)}`;
 
-  const podPhotoUrl =
-    typeof row.pod_photo_url === "string" && row.pod_photo_url.trim().length > 0 ? row.pod_photo_url.trim() : null;
+  let podPhotoAttachment: { filename: string; contentBase64: string } | null = null;
+  if (attachPhoto && effectivePodUrl && isTrustedPodImageUrl(effectivePodUrl)) {
+    try {
+      const res = await fetch(effectivePodUrl, {
+        redirect: "follow",
+        signal: AbortSignal.timeout(20_000),
+        headers: { Accept: "image/*,*/*" },
+      });
+      if (res.ok) {
+        const buf = Buffer.from(await res.arrayBuffer());
+        const ct = (res.headers.get("content-type") || "").split(";")[0]?.trim().toLowerCase() || "";
+        if (buf.length > 0 && buf.length <= MAX_ATTACH_BYTES && ct.startsWith("image/")) {
+          const ext = ct.includes("png") ? "png" : ct.includes("webp") ? "webp" : ct.includes("gif") ? "gif" : "jpg";
+          podPhotoAttachment = {
+            filename: `TransPool24-Liefernachweis-${jobId.slice(0, 8)}.${ext}`,
+            contentBase64: buf.toString("base64"),
+          };
+        }
+      }
+    } catch (e) {
+      console.warn("[send-delivery-confirmation-email] POD attach fetch failed", e);
+    }
+  }
 
   const result = await sendDeliveryConfirmationEmail(email, row as Job, {
     trackOrderUrl,
     rateDriverUrl,
-    podPhotoUrl,
+    podPhotoUrl: effectivePodUrl,
+    podPhotoAttachment,
   });
 
   if (!result.success) {
     return NextResponse.json({ error: result.error ?? "Email failed" }, { status: 500 });
   }
-  return NextResponse.json({ ok: true, sentTo: email });
+  return NextResponse.json({
+    ok: true,
+    sentTo: email,
+    photoIncludedInEmail: Boolean(effectivePodUrl),
+    photoAttached: Boolean(podPhotoAttachment),
+  });
 }
