@@ -35,7 +35,9 @@ const DE: Record<string, string> = {
   "inProgress.empty": "Derzeit keine Aufträge in Ausführung.",
   "inProgress.loading": "Laden…",
   "inProgress.refresh": "Aktualisieren",
-  "inProgress.countdown": "Restzeit (Countdown)",
+  "inProgress.countdown": "Zeit (Std. : Min. : Sek.)",
+  "inProgress.remainingCaption": "Noch bis zur voraussichtlichen Zeit",
+  "inProgress.overdueCaption": "Seit Überschreitung der voraussichtlichen Zeit",
   "inProgress.noDeadline": "Keine ETA / keine Routenzeit — bitte im Auftrag pflegen.",
   "inProgress.overdue": "Frist überschritten",
   "inProgress.dangerHint":
@@ -177,7 +179,9 @@ const AR: Record<string, string> = {
   "inProgress.empty": "لا توجد طلبات قيد التنفيذ حالياً.",
   "inProgress.loading": "جاري التحميل…",
   "inProgress.refresh": "تحديث",
-  "inProgress.countdown": "الوقت المتبقي (تنازلي)",
+  "inProgress.countdown": "الوقت (ساعات : دقائق : ثوانٍ)",
+  "inProgress.remainingCaption": "متبقي حتى الموعد المتوقع",
+  "inProgress.overdueCaption": "منذ تجاوز الموعد المتوقع",
   "inProgress.noDeadline": "لا يوجد ETA أو مدة مسار — عيّنها من ملف الطلب.",
   "inProgress.overdue": "تجاوز الوقت",
   "inProgress.dangerHint":

@@ -70,8 +70,14 @@ function buildWhatsappPodReminderDe(
     podLine =
       "Die voraussichtliche Zeit ist erreicht oder überschritten. Bitte senden Sie die Zustellfotos (Liefernachweis / POD) umgehend.";
   } else {
-    const m = Math.max(1, Math.ceil(remainingMs / 60_000));
-    podLine = `Restzeit laut System: etwa ${m} Minute(n). Bitte reichen Sie die Zustellfotos (Liefernachweis / POD) rechtzeitig ein.`;
+    const totalMin = Math.max(1, Math.ceil(remainingMs / 60_000));
+    const h = Math.floor(totalMin / 60);
+    const m = totalMin % 60;
+    const hm =
+      h > 0
+        ? `etwa ${h} Stunde(n) und ${m} Minute(n)`
+        : `etwa ${m} Minute(n)`;
+    podLine = `Restzeit laut System: ${hm}. Bitte reichen Sie die Zustellfotos (Liefernachweis / POD) rechtzeitig ein.`;
   }
 
   return `${greeting}
@@ -86,13 +92,13 @@ Mit freundlichen Grüßen
 Ihr TransPool24-Team`;
 }
 
-function formatCountdown(remainingMs: number): string {
-  const s = Math.floor(remainingMs / 1000);
-  const h = Math.floor(s / 3600);
-  const m = Math.floor((s % 3600) / 60);
-  const sec = s % 60;
-  if (h > 0) return `${h}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
-  return `${m}:${String(sec).padStart(2, "0")}`;
+/** Always show H:MM:SS (hours may exceed 99). Used for remaining and overdue (absolute value). */
+function formatHoursMinutesSeconds(absMs: number): string {
+  const secTotal = Math.floor(absMs / 1000);
+  const h = Math.floor(secTotal / 3600);
+  const m = Math.floor((secTotal % 3600) / 60);
+  const s = secTotal % 60;
+  return `${h}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
 function InProgressOrderCard({
@@ -176,20 +182,29 @@ function InProgressOrderCard({
         }`}
       >
         <p className="text-[10px] font-semibold uppercase tracking-wide opacity-80">{t("inProgress.countdown")}</p>
-        <p className="mt-0.5 font-mono text-lg font-bold tabular-nums">
-          {end == null
-            ? "—"
-            : remainingMs != null && remainingMs <= 0
-              ? t("inProgress.overdue")
-              : remainingMs != null
-                ? formatCountdown(remainingMs)
-                : "—"}
-        </p>
-        {end == null && (
-          <p className="mt-1 text-[10px] leading-snug opacity-80">{t("inProgress.noDeadline")}</p>
+        {end == null ? (
+          <>
+            <p className="mt-0.5 font-mono text-lg font-bold tabular-nums">—</p>
+            <p className="mt-1 text-[10px] leading-snug opacity-80">{t("inProgress.noDeadline")}</p>
+          </>
+        ) : remainingMs != null ? (
+          <>
+            <p className="mt-0.5 font-mono text-2xl font-bold tabular-nums leading-tight tracking-tight">
+              {remainingMs < 0 ? <span className="text-red-700">−</span> : null}
+              {formatHoursMinutesSeconds(Math.abs(remainingMs))}
+            </p>
+            <p className={`mt-1 text-[11px] font-medium ${remainingMs < 0 ? "text-red-800" : "text-[#0d2137]/80"}`}>
+              {remainingMs < 0 ? t("inProgress.overdueCaption") : t("inProgress.remainingCaption")}
+            </p>
+            {remainingMs < 0 && (
+              <p className="mt-0.5 text-[10px] font-semibold text-red-900">{t("inProgress.overdue")}</p>
+            )}
+          </>
+        ) : (
+          <p className="mt-0.5 font-mono text-lg font-bold tabular-nums">—</p>
         )}
-        {isDanger && end != null && (
-          <p className="mt-1 text-[10px] font-medium leading-snug text-red-900">{t("inProgress.dangerHint")}</p>
+        {isDanger && end != null && remainingMs != null && (
+          <p className="mt-2 text-[10px] font-medium leading-snug text-red-900">{t("inProgress.dangerHint")}</p>
         )}
       </div>
 
