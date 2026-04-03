@@ -7,6 +7,7 @@ import { DriversCarousel } from "@/components/DriversCarousel";
 import { HomeTransportOperations } from "@/components/HomeTransportOperations";
 import { GermanyConnectSection } from "@/components/GermanyConnectSection";
 import { HomepageDriverLogisticsLottie } from "@/components/HomepageDriverLogisticsLottie";
+import { HeroWhiteStripCarLottie } from "@/components/HeroWhiteStripCarLottie";
 import { HomeJsonLd } from "@/components/seo/HomeJsonLd";
 import { getHomepageHero } from "@/lib/homepage-hero";
 import { localeAlternatesAndSocial } from "@/lib/locale-seo-metadata";
@@ -47,8 +48,8 @@ export default async function HomePage({
       <Header />
       <main className="min-h-[calc(100vh-8rem)]">
         {/* Hero — CMS-driven (classic homepage; logistics cover lives on /blog) */}
-        <section className="relative min-h-[min(90vh,42rem)] overflow-hidden">
-          <div className="absolute inset-0">
+        <section className="relative flex min-h-[min(90vh,42rem)] flex-col overflow-hidden">
+          <div className="absolute inset-0 z-0">
             <Image
               src={heroImage}
               alt=""
@@ -61,43 +62,51 @@ export default async function HomePage({
             />
             <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent rtl:bg-gradient-to-l rtl:from-black/70 rtl:via-black/40 rtl:to-transparent" />
           </div>
-          <div className="relative flex min-h-[min(90vh,42rem)] flex-col justify-center px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
-            <div className="mx-auto w-full max-w-7xl">
-              <div className="max-w-2xl">
-                <div
-                  className="relative inline-block max-w-full rounded-xl border-2 border-white/55 bg-[var(--accent)] px-5 py-4 sm:px-8 sm:py-6 md:px-9 md:py-7"
-                  style={{
-                    boxShadow:
-                      "0 8px 32px rgba(232,93,4,0.4), inset 0 0 0 1px rgba(255,255,255,0.3), 0 0 0 3px rgba(255,255,255,0.12)",
-                  }}
-                >
-                  <div className="absolute left-2 top-2 h-5 w-5 rounded-tl border-l-2 border-t-2 border-white/60" aria-hidden />
-                  <div className="absolute right-2 top-2 h-5 w-5 rounded-tr border-r-2 border-t-2 border-white/60" aria-hidden />
-                  <div className="absolute bottom-2 left-2 h-5 w-5 rounded-bl border-b-2 border-l-2 border-white/60" aria-hidden />
-                  <div className="absolute bottom-2 right-2 h-5 w-5 rounded-br border-b-2 border-r-2 border-white/60" aria-hidden />
-                  <h1 className="relative text-2xl font-bold leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl">
-                    {heroHeadline}
-                  </h1>
-                </div>
-                <p className="mt-6 max-w-2xl text-xl font-semibold leading-snug text-white/95 drop-shadow-sm sm:text-2xl md:text-2xl">
-                  {heroSubtitle}
-                </p>
-                <Link
-                  href={`/${locale}/order`}
-                  className="mt-10 inline-flex items-center gap-2 rounded-xl border-2 border-white/50 bg-[var(--accent)] px-10 py-4 text-lg font-bold text-white shadow-[0_4px_20px_rgba(0,0,0,0.3),inset_0_0_0_1px_rgba(255,255,255,0.2)] transition hover:brightness-110"
-                >
-                  {heroCta}
-                  <svg
-                    className="h-5 w-5 rtl:rotate-180"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    aria-hidden
+          <div className="relative z-20 flex min-h-[min(90vh,42rem)] flex-1 flex-col">
+            <div className="flex flex-1 flex-col justify-center px-4 pb-6 pt-24 sm:px-6 sm:pb-8 sm:pt-32 lg:px-8">
+              <div className="mx-auto w-full max-w-7xl">
+                <div className="max-w-2xl">
+                  <div
+                    className="relative inline-block max-w-full rounded-xl border-2 border-white/55 bg-[var(--accent)] px-5 py-4 sm:px-8 sm:py-6 md:px-9 md:py-7"
+                    style={{
+                      boxShadow:
+                        "0 8px 32px rgba(232,93,4,0.4), inset 0 0 0 1px rgba(255,255,255,0.3), 0 0 0 3px rgba(255,255,255,0.12)",
+                    }}
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </Link>
+                    <div className="absolute left-2 top-2 h-5 w-5 rounded-tl border-l-2 border-t-2 border-white/60" aria-hidden />
+                    <div className="absolute right-2 top-2 h-5 w-5 rounded-tr border-r-2 border-t-2 border-white/60" aria-hidden />
+                    <div className="absolute bottom-2 left-2 h-5 w-5 rounded-bl border-b-2 border-l-2 border-white/60" aria-hidden />
+                    <div className="absolute bottom-2 right-2 h-5 w-5 rounded-br border-b-2 border-r-2 border-white/60" aria-hidden />
+                    <h1 className="relative text-2xl font-bold leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl">
+                      {heroHeadline}
+                    </h1>
+                  </div>
+                  <p className="mt-6 max-w-2xl text-xl font-semibold leading-snug text-white/95 drop-shadow-sm sm:text-2xl md:text-2xl">
+                    {heroSubtitle}
+                  </p>
+                  <Link
+                    href={`/${locale}/order`}
+                    className="mt-10 inline-flex items-center gap-2 rounded-xl border-2 border-white/50 bg-[var(--accent)] px-10 py-4 text-lg font-bold text-white shadow-[0_4px_20px_rgba(0,0,0,0.3),inset_0_0_0_1px_rgba(255,255,255,0.2)] transition hover:brightness-110"
+                  >
+                    {heroCta}
+                    <svg
+                      className="h-5 w-5 rtl:rotate-180"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      aria-hidden
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </Link>
+                </div>
               </div>
+            </div>
+            <div
+              className="relative z-30 h-14 w-full shrink-0 border-t border-white/35 bg-white shadow-[0_-6px_28px_rgba(0,0,0,0.12)] sm:h-16"
+              aria-hidden
+            >
+              <HeroWhiteStripCarLottie />
             </div>
           </div>
         </section>

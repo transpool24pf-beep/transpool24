@@ -67,38 +67,38 @@ body {
   will-change: transform;
 }
 
-/* Header: DotLottie car crosses behind toolbar (right → left, physical) */
-@keyframes header-car-lottie-cross {
+/* Homepage hero: car on bottom white strip (right → left, full width) */
+@keyframes hero-strip-car-cross {
   0% {
     left: 100%;
   }
   100% {
-    left: -320px;
+    left: -280px;
   }
 }
 
-.header-car-lottie-inner {
+.hero-strip-car-inner {
   width: 300px;
   height: 300px;
-  transform: scale(0.34);
+  transform: scale(0.24);
   transform-origin: center center;
 }
 
-.header-car-lottie-rider {
+.hero-strip-car-rider {
   position: absolute;
   top: 50%;
   margin-top: -150px;
   width: 300px;
   height: 300px;
-  animation: header-car-lottie-cross 16s linear infinite;
+  animation: hero-strip-car-cross 20s linear infinite;
   will-change: left;
-  opacity: 0.88;
+  opacity: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .header-car-lottie-rider {
+  .hero-strip-car-rider {
     animation: none;
-    left: 62%;
+    left: 58%;
     margin-left: -150px;
   }
 }
