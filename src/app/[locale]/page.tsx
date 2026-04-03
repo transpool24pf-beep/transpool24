@@ -65,17 +65,17 @@ export default async function HomePage({
             <div className="mx-auto w-full max-w-7xl">
               <div className="max-w-2xl">
                 <div
-                  className="relative inline-block max-w-full rounded-lg border border-white/50 bg-[var(--accent)] px-4 py-2.5 sm:px-5 sm:py-3 md:px-6 md:py-3.5"
+                  className="relative w-fit max-w-[min(100%,13.5rem)] rounded-md border border-white/45 bg-[var(--accent)] px-2.5 py-1.5 sm:max-w-[15rem] sm:px-3 sm:py-2 md:max-w-[16.5rem]"
                   style={{
                     boxShadow:
-                      "0 4px 20px rgba(232,93,4,0.35), inset 0 0 0 1px rgba(255,255,255,0.25), 0 0 0 2px rgba(255,255,255,0.1)",
+                      "0 3px 16px rgba(232,93,4,0.32), inset 0 0 0 1px rgba(255,255,255,0.22), 0 0 0 1px rgba(255,255,255,0.08)",
                   }}
                 >
-                  <div className="absolute left-1.5 top-1.5 h-3 w-3 rounded-tl border-l border-t border-white/55" aria-hidden />
-                  <div className="absolute right-1.5 top-1.5 h-3 w-3 rounded-tr border-r border-t border-white/55" aria-hidden />
-                  <div className="absolute bottom-1.5 left-1.5 h-3 w-3 rounded-bl border-b border-l border-white/55" aria-hidden />
-                  <div className="absolute bottom-1.5 right-1.5 h-3 w-3 rounded-br border-b border-r border-white/55" aria-hidden />
-                  <h1 className="relative text-lg font-bold leading-snug text-white sm:text-xl md:text-2xl lg:text-2xl">
+                  <div className="absolute left-1 top-1 h-2 w-2 rounded-tl border-l border-t border-white/50" aria-hidden />
+                  <div className="absolute right-1 top-1 h-2 w-2 rounded-tr border-r border-t border-white/50" aria-hidden />
+                  <div className="absolute bottom-1 left-1 h-2 w-2 rounded-bl border-b border-l border-white/50" aria-hidden />
+                  <div className="absolute bottom-1 right-1 h-2 w-2 rounded-br border-b border-r border-white/50" aria-hidden />
+                  <h1 className="relative text-sm font-bold leading-tight text-white sm:text-base md:text-lg">
                     {heroHeadline}
                   </h1>
                 </div>

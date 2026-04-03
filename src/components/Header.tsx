@@ -11,9 +11,11 @@ import { LocaleFlagIcon } from "@/components/LocaleFlagIcon";
 
 type HeaderProps = { hideLogo?: boolean };
 
-function isLocaleHomePath(pathname: string | null): boolean {
+/** Locale is first segment; home is exactly `/{locale}` (avoids regex edge cases with usePathname). */
+function isLocaleHomePath(pathname: string | null, locale: string): boolean {
   if (!pathname) return false;
-  return /^\/[a-z]{2}\/?$/i.test(pathname);
+  const parts = pathname.split("/").filter(Boolean);
+  return parts.length === 1 && parts[0]!.toLowerCase() === locale.toLowerCase();
 }
 
 /** Order, drivers, magazine: large centered logo */
@@ -56,13 +58,13 @@ export function Header({ hideLogo }: HeaderProps) {
 
   const logoSizesCenter =
     "relative block h-[3.25rem] w-[min(88vw,17.5rem)] sm:h-[3.875rem] sm:w-[min(88vw,20rem)] md:h-[4.5rem] md:w-[min(90vw,22rem)] lg:h-[5rem] lg:w-[min(92vw,24rem)]";
-  /** Home only: prominent corner logo; header row is full-width so it sits at the viewport edge */
+  /** Home only: large corner logo; row is full-bleed with minimal inline-start padding */
   const logoSizesHomeCorner =
-    "relative block h-[4rem] w-[min(88vw,18rem)] shrink-0 sm:h-[4.5rem] sm:w-[20rem] md:h-[5rem] md:w-[22rem] lg:h-[5.25rem] lg:w-[24rem]";
+    "relative block h-[4.25rem] w-[min(90vw,19rem)] shrink-0 sm:h-[4.75rem] sm:w-[21rem] md:h-[5.25rem] md:w-[23.5rem] lg:h-[5.75rem] lg:w-[26rem]";
   const logoSizesCornerOther =
     "relative block h-[2.35rem] w-[min(62vw,9.5rem)] shrink-0 sm:h-[2.65rem] sm:w-[10.5rem] md:h-[2.85rem] md:w-[11.25rem]";
 
-  const homePath = isLocaleHomePath(pathname);
+  const homePath = isLocaleHomePath(pathname, locale);
   const logoCornerClass = homePath ? logoSizesHomeCorner : logoSizesCornerOther;
 
   const logoImage = (
@@ -78,7 +80,7 @@ export function Header({ hideLogo }: HeaderProps) {
         showLargeCenterLogo
           ? "(max-width: 640px) 88vw, (max-width: 1024px) 20rem, 24rem"
           : homePath
-            ? "(max-width: 640px) 88vw, (max-width: 1024px) 22rem, 24rem"
+            ? "(max-width: 640px) 90vw, (max-width: 1024px) 24rem, 26rem"
             : "(max-width: 640px) 40vw, 11rem"
       }
     />
@@ -166,13 +168,17 @@ export function Header({ hideLogo }: HeaderProps) {
         <div
           className={`flex w-full items-center justify-between gap-2 sm:gap-3 ${
             homePath
-              ? "px-4 py-1.5 sm:px-6 sm:py-2 lg:px-8"
+              ? "py-1 ps-1.5 pe-3 sm:py-1.5 sm:ps-2 sm:pe-4 md:pe-5"
               : "mx-auto min-h-[3.75rem] max-w-6xl px-4 py-2 sm:min-h-[4.25rem] sm:px-6 md:min-h-[4.5rem]"
           }`}
         >
           <Link
             href={`/${locale}`}
-            className={`flex shrink-0 items-center ${homePath ? "py-0" : "min-w-0 py-0.5"}`}
+            className={
+              homePath
+                ? "-ms-0.5 flex shrink-0 items-center py-0 sm:-ms-1"
+                : "flex min-w-0 shrink-0 items-center py-0.5"
+            }
             aria-label="TransPool24"
           >
             <span className={logoCornerClass}>{logoImage}</span>
