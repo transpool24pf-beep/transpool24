@@ -16,7 +16,36 @@ export async function GET() {
     console.error("[admin/orders]", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-  return NextResponse.json(data ?? []);
+  const rows = data ?? [];
+  const appIds = [
+    ...new Set(
+      rows
+        .map((j) => (j as { assigned_driver_application_id?: string | null }).assigned_driver_application_id)
+        .filter((id): id is string => typeof id === "string" && id.length > 0),
+    ),
+  ];
+  const phoneByAppId = new Map<string, string>();
+  if (appIds.length > 0) {
+    const { data: drivers, error: dErr } = await supabase
+      .from("driver_applications")
+      .select("id, phone")
+      .in("id", appIds);
+    if (dErr) {
+      console.error("[admin/orders] driver phones", dErr);
+    } else {
+      for (const d of drivers ?? []) {
+        const id = (d as { id?: string }).id;
+        const phone = String((d as { phone?: string | null }).phone ?? "").trim();
+        if (id && phone) phoneByAppId.set(id, phone);
+      }
+    }
+  }
+  const enriched = rows.map((j) => {
+    const aid = (j as { assigned_driver_application_id?: string | null }).assigned_driver_application_id;
+    const p = aid ? phoneByAppId.get(aid) ?? null : null;
+    return { ...j, driver_whatsapp_phone: p };
+  });
+  return NextResponse.json(enriched);
 }
 
 export async function PATCH(req: Request) {
