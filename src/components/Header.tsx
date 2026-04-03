@@ -56,9 +56,9 @@ export function Header({ hideLogo }: HeaderProps) {
 
   const logoSizesCenter =
     "relative block h-[3.25rem] w-[min(88vw,17.5rem)] sm:h-[3.875rem] sm:w-[min(88vw,20rem)] md:h-[4.5rem] md:w-[min(90vw,22rem)] lg:h-[5rem] lg:w-[min(92vw,24rem)]";
-  /** Home only: larger corner logo (still smaller than order/driver/blog centered strip) */
+  /** Home only: prominent corner logo; header row is full-width so it sits at the viewport edge */
   const logoSizesHomeCorner =
-    "relative block h-[3.5rem] w-[min(84vw,16rem)] shrink-0 sm:h-[4rem] sm:w-[17.5rem] md:h-[4.35rem] md:w-[19rem] lg:h-[4.75rem] lg:w-[21rem]";
+    "relative block h-[4rem] w-[min(88vw,18rem)] shrink-0 sm:h-[4.5rem] sm:w-[20rem] md:h-[5rem] md:w-[22rem] lg:h-[5.25rem] lg:w-[24rem]";
   const logoSizesCornerOther =
     "relative block h-[2.35rem] w-[min(62vw,9.5rem)] shrink-0 sm:h-[2.65rem] sm:w-[10.5rem] md:h-[2.85rem] md:w-[11.25rem]";
 
@@ -78,7 +78,7 @@ export function Header({ hideLogo }: HeaderProps) {
         showLargeCenterLogo
           ? "(max-width: 640px) 88vw, (max-width: 1024px) 20rem, 24rem"
           : homePath
-            ? "(max-width: 640px) 84vw, (max-width: 1024px) 18rem, 21rem"
+            ? "(max-width: 640px) 88vw, (max-width: 1024px) 22rem, 24rem"
             : "(max-width: 640px) 40vw, 11rem"
       }
     />
@@ -164,15 +164,15 @@ export function Header({ hideLogo }: HeaderProps) {
         </div>
       ) : (
         <div
-          className={`mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-2 sm:gap-3 sm:px-6 ${
+          className={`flex w-full items-center justify-between gap-2 py-2 sm:gap-3 ${
             homePath
-              ? "min-h-[4.25rem] sm:min-h-[4.75rem] md:min-h-[5rem]"
-              : "min-h-[3.75rem] sm:min-h-[4.25rem] md:min-h-[4.5rem]"
+              ? "min-h-[4.75rem] px-4 sm:min-h-[5.25rem] sm:px-6 md:min-h-[5.5rem] lg:px-8"
+              : "mx-auto min-h-[3.75rem] max-w-6xl px-4 sm:min-h-[4.25rem] sm:px-6 md:min-h-[4.5rem]"
           }`}
         >
           <Link
             href={`/${locale}`}
-            className="flex min-w-0 py-0.5"
+            className={`flex shrink-0 py-0.5 ${homePath ? "" : "min-w-0"}`}
             aria-label="TransPool24"
           >
             <span className={logoCornerClass}>{logoImage}</span>
