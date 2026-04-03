@@ -221,6 +221,8 @@
     "addressHouseNumber": "Hejmara malê",
     "addressHouseNumberPlaceholder": "12",
     "pickupDate": "Dîroka hilgirtinê",
+    "pickupDatePlaceholder": "Roj / Meh / Sal",
+    "pickupDateInvalid": "Ji kerema xwe dîrokek derbasdar binivîse (îro an paşê), mînak 05.04.2026.",
     "pickupTime": "Dema hilgirtinê",
     "cargoSize": "Mezinahiya bargiraniyê",
     "serviceType": "Cureyê xizmetê",

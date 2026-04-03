@@ -17,6 +17,12 @@ import {
   mergePersistedAddresses,
   filterAddressHistoryForQuery,
 } from "@/lib/order-address-history";
+import { localeToHtmlLang } from "@/lib/locale-html-lang";
+import {
+  formatIsoDateForOrderInput,
+  localTodayIso,
+  parseOrderDateInputToIso,
+} from "@/lib/order-pickup-date-input";
 
 const RouteMap = dynamic(
   () => import("@/components/RouteMapInner").then((m) => m.RouteMapInner),
@@ -208,8 +214,10 @@ export function OrderForm({
   bookingsPaused?: boolean;
 }) {
   const t = useTranslations("order");
+  const htmlLang = useMemo(() => localeToHtmlLang(locale), [locale]);
   const [step, setStep] = useState(1);
   const [data, setData] = useState<OrderFormData>(initial);
+  const [pickupDateField, setPickupDateField] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [orderConfirmed, setOrderConfirmed] = useState<{ jobId: string; token: string; whatsappLink: string } | null>(null);
@@ -258,6 +266,10 @@ export function OrderForm({
   useEffect(() => {
     setAddressHistory(loadOrderAddressHistory());
   }, []);
+
+  useEffect(() => {
+    setPickupDateField(data.pickupDate ? formatIsoDateForOrderInput(data.pickupDate, locale) : "");
+  }, [data.pickupDate, locale]);
 
   useEffect(() => {
     const close = (e: MouseEvent) => {
@@ -511,15 +523,16 @@ export function OrderForm({
     };
   }, [data.pickupAddressLine, data.deliveryAddressLine, suggestionsOpen, fetchSuggestions]);
 
-  const fetchRealDistance = useCallback(async () => {
+  const fetchRealDistance = useCallback(
+    async (departureOverride?: { pickupDate: string; pickupTime: string }) => {
     if (!pickupAddress.trim() || !deliveryAddress.trim()) return;
     setDistanceLoading(true);
     setDistanceError(null);
     setDistanceHint(null);
+    const pd = departureOverride?.pickupDate ?? data.pickupDate;
+    const pt = departureOverride?.pickupTime ?? data.pickupTime;
     const departureParam =
-      data.pickupDate && data.pickupTime
-        ? `&departure_time=${encodeURIComponent(`${data.pickupDate}T${data.pickupTime}`)}`
-        : "";
+      pd && pt ? `&departure_time=${encodeURIComponent(`${pd}T${pt}`)}` : "";
     try {
       const res = await fetch(
         `/api/route-distance?pickup=${encodeURIComponent(pickupAddress)}&delivery=${encodeURIComponent(deliveryAddress)}${departureParam}&_=${Date.now()}`
@@ -555,7 +568,8 @@ export function OrderForm({
     } finally {
       setDistanceLoading(false);
     }
-  }, [pickupAddress, deliveryAddress, data.pickupDate, data.pickupTime]);
+  },
+  [pickupAddress, deliveryAddress, data.pickupDate, data.pickupTime]);
 
   // If we have distance but no map data (e.g. old API response), refetch once to get from/to for the map
   useEffect(() => {
@@ -590,6 +604,39 @@ export function OrderForm({
   const update = (partial: Partial<OrderFormData>) => {
     setData((prev) => ({ ...prev, ...partial }));
     setError(null);
+  };
+
+  const applyPickupDateCommit = useCallback((): { ok: true; iso: string } | { ok: false } => {
+    const parsed = parseOrderDateInputToIso(pickupDateField);
+    if (parsed.kind === "invalid") {
+      setError(t("pickupDateInvalid"));
+      setPickupDateField(
+        data.pickupDate ? formatIsoDateForOrderInput(data.pickupDate, locale) : ""
+      );
+      return { ok: false };
+    }
+    if (parsed.kind === "empty") {
+      setData((prev) => ({ ...prev, pickupDate: "" }));
+      setPickupDateField("");
+      setError(null);
+      return { ok: true, iso: "" };
+    }
+    const min = localTodayIso();
+    if (parsed.iso < min) {
+      setError(t("pickupDateInvalid"));
+      setPickupDateField(
+        data.pickupDate ? formatIsoDateForOrderInput(data.pickupDate, locale) : ""
+      );
+      return { ok: false };
+    }
+    setData((prev) => ({ ...prev, pickupDate: parsed.iso }));
+    setPickupDateField(formatIsoDateForOrderInput(parsed.iso, locale));
+    setError(null);
+    return { ok: true, iso: parsed.iso };
+  }, [pickupDateField, data.pickupDate, locale, t]);
+
+  const handlePickupDateBlur = () => {
+    void applyPickupDateCommit();
   };
 
   const MAX_CARGO_PHOTOS = 8;
@@ -629,11 +676,17 @@ export function OrderForm({
   const next = () => {
     if (step < 4) {
       if (step === 2 && step2Complete) {
+        const dateCommit = applyPickupDateCommit();
+        if (!dateCommit.ok) return;
         setAddressHistory((prev) =>
           mergePersistedAddresses(prev, data.pickupAddressLine, data.deliveryAddressLine)
         );
         setDistanceLoading(true);
-        fetchRealDistance().finally(() => {
+        const dep =
+          dateCommit.iso && data.pickupTime
+            ? { pickupDate: dateCommit.iso, pickupTime: data.pickupTime }
+            : undefined;
+        fetchRealDistance(dep).finally(() => {
           setDistanceLoading(false);
           setStep((s) => s + 1);
         });
@@ -981,10 +1034,14 @@ export function OrderForm({
                 {t("pickupDate")}
               </label>
               <input
-                type="date"
-                value={data.pickupDate}
-                onChange={(e) => update({ pickupDate: e.target.value })}
-                min={new Date().toISOString().slice(0, 10)}
+                type="text"
+                inputMode="numeric"
+                autoComplete="off"
+                lang={htmlLang}
+                placeholder={t("pickupDatePlaceholder")}
+                value={pickupDateField}
+                onChange={(e) => setPickupDateField(e.target.value)}
+                onBlur={handlePickupDateBlur}
                 className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
               />
             </div>
@@ -994,6 +1051,7 @@ export function OrderForm({
               </label>
               <input
                 type="time"
+                lang={htmlLang}
                 value={data.pickupTime}
                 onChange={(e) => update({ pickupTime: e.target.value })}
                 className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
@@ -1005,7 +1063,15 @@ export function OrderForm({
               <div className="rounded-lg border border-[#0d2137]/15 bg-[#0d2137]/5 p-4">
                 <button
                   type="button"
-                  onClick={fetchRealDistance}
+                  onClick={() => {
+                    const r = applyPickupDateCommit();
+                    if (!r.ok) return;
+                    void fetchRealDistance(
+                      r.iso && data.pickupTime
+                        ? { pickupDate: r.iso, pickupTime: data.pickupTime }
+                        : undefined
+                    );
+                  }}
                   disabled={distanceLoading}
                   className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-70"
                 >
@@ -1291,7 +1357,19 @@ export function OrderForm({
             <p><strong>{t("pickup")}:</strong> {pickupAddress}</p>
             <p><strong>{t("delivery")}:</strong> {deliveryAddress}</p>
             {(data.pickupDate || data.pickupTime) && (
-              <p><strong>{t("pickupDate")} / {t("pickupTime")}:</strong> {data.pickupDate ? new Date(data.pickupDate).toLocaleDateString() : "—"} {data.pickupTime ? data.pickupTime : ""}</p>
+              <p>
+                <strong>
+                  {t("pickupDate")} / {t("pickupTime")}:
+                </strong>{" "}
+                {data.pickupDate
+                  ? new Date(`${data.pickupDate}T12:00:00`).toLocaleDateString(htmlLang, {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })
+                  : "—"}{" "}
+                {data.pickupTime ? data.pickupTime : ""}
+              </p>
             )}
             <p><strong>{t("serviceType")}:</strong> {data.serviceType ? t(SERVICE_OPTIONS.find((o) => o.value === data.serviceType)?.key ?? "serviceDriverCar") : "—"}</p>
             {data.cargoCategory && (

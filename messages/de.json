@@ -361,6 +361,8 @@
     "addressHouseNumber": "Hausnummer",
     "addressHouseNumberPlaceholder": "12",
     "pickupDate": "Abholdatum",
+    "pickupDatePlaceholder": "TT.MM.JJJJ",
+    "pickupDateInvalid": "Bitte ein gültiges Datum ab heute eingeben, z. B. 05.04.2026.",
     "pickupTime": "Abholzeit",
     "cargoSize": "Ladungsgröße",
     "serviceType": "Art der Leistung",

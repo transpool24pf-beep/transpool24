@@ -223,6 +223,8 @@
     "addressHouseNumber": "رقم المنزل",
     "addressHouseNumberPlaceholder": "12",
     "pickupDate": "تاريخ الاستلام",
+    "pickupDatePlaceholder": "يوم / شهر / سنة",
+    "pickupDateInvalid": "يرجى إدخال تاريخ صالح (اليوم أو بعده)، مثل 05/04/2026.",
     "pickupTime": "وقت الاستلام",
     "cargoSize": "حجم الحمولة",
     "serviceType": "نوع الخدمة",

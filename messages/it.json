@@ -221,6 +221,8 @@
     "addressHouseNumber": "Numero civico",
     "addressHouseNumberPlaceholder": "12",
     "pickupDate": "Data di ritiro",
+    "pickupDatePlaceholder": "GG/MM/AAAA",
+    "pickupDateInvalid": "Inserisci una data valida (oggi o successiva), es. 05/04/2026.",
     "pickupTime": "Orario di ritiro",
     "cargoSize": "Dimensioni del carico",
     "serviceType": "Tipo di servizio",

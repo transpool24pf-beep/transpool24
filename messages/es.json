@@ -221,6 +221,8 @@
     "addressHouseNumber": "Número",
     "addressHouseNumberPlaceholder": "12",
     "pickupDate": "Fecha de recogida",
+    "pickupDatePlaceholder": "DD/MM/AAAA",
+    "pickupDateInvalid": "Introduzca una fecha válida (hoy o posterior), p. ej. 05/04/2026.",
     "pickupTime": "Hora de recogida",
     "cargoSize": "Tamaño de carga",
     "serviceType": "Tipo de servicio",

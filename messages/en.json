@@ -357,6 +357,8 @@
     "addressHouseNumber": "House number",
     "addressHouseNumberPlaceholder": "12",
     "pickupDate": "Pickup date",
+    "pickupDatePlaceholder": "DD/MM/YYYY",
+    "pickupDateInvalid": "Please enter a valid date (today or later), e.g. 05/04/2026.",
     "pickupTime": "Pickup time",
     "cargoSize": "Cargo size",
     "serviceType": "Service type",

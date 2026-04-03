@@ -221,6 +221,8 @@
     "addressHouseNumber": "Număr",
     "addressHouseNumberPlaceholder": "12",
     "pickupDate": "Data ridicării",
+    "pickupDatePlaceholder": "ZZ/LL/AAAA",
+    "pickupDateInvalid": "Introduceți o dată validă (azi sau ulterior), ex. 05/04/2026.",
     "pickupTime": "Ora de ridicare",
     "cargoSize": "Dimensiunea încărcăturii",
     "serviceType": "Tipul serviciului",
