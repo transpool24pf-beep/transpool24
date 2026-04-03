@@ -32,6 +32,13 @@ export type OrderEmailDriverInfo = {
   star_rating: number | null;
 };
 
+/** Header block + footer brand img src + optional inline logo attachment (must match HTML cid). */
+export type TransactionalEmailBranding = {
+  headerHtml: string;
+  brandImgSrc: string;
+  logoAttachment: Attachment | null;
+};
+
 // ALL EMAIL CONTENT IS IN GERMAN (DE) - NO ARABIC TEXT
 function buildConfirmationHtml(
   job: Job,
@@ -40,7 +47,8 @@ function buildConfirmationHtml(
     trackOrderUrl?: string | null;
     rateDriverUrl?: string | null;
     driver?: OrderEmailDriverInfo | null;
-  } = {}
+  } = {},
+  branding: TransactionalEmailBranding
 ): string {
   const { confirmPaymentUrl, trackOrderUrl, rateDriverUrl, driver } = options;
   const totalEur = (job.price_cents / 100).toFixed(2);
@@ -118,7 +126,7 @@ function buildConfirmationHtml(
 <html dir="ltr" lang="de">
 <head><meta charset="utf-8">${emailDeHeadMeta()}<title>Auftragsbestätigung – TransPool24</title></head>
 <body style="margin:0; font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f4f4; direction:ltr; text-align:left;">
-  ${emailTransactionalHeaderBannerHtml()}
+  ${branding.headerHtml}
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; padding: 32px 20px; direction:ltr;">
     <tr><td style="text-align:left;">
       <div style="background: #fff; border-radius: 12px; padding: 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); direction:ltr; text-align:left;">
@@ -223,6 +231,7 @@ export async function sendOrderConfirmationEmail(
   const resend = new Resend(apiKey);
   const hasPdf = pdfBuffer != null && pdfBuffer.byteLength > 0;
   try {
+    const branding = await loadTransactionalEmailBranding();
     const pdfAtt: Attachment[] | undefined = hasPdf
       ? [
           {
@@ -231,7 +240,7 @@ export async function sendOrderConfirmationEmail(
           },
         ]
       : undefined;
-    const mergedAtt = appendTransactionalLogoAttachment(pdfAtt);
+    const mergedAtt = mergeAttachmentsWithLogo(branding.logoAttachment, pdfAtt);
     const { error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: [to],
@@ -241,7 +250,7 @@ export async function sendOrderConfirmationEmail(
         trackOrderUrl: options.trackOrderUrl,
         rateDriverUrl: options.rateDriverUrl,
         driver: options.driver,
-      }),
+      }, branding),
       ...(mergedAtt?.length ? { attachments: mergedAtt } : {}),
     });
     if (error) {
@@ -272,7 +281,7 @@ export async function sendOrderConfirmationEmail(
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com";
 /** Bump after replacing public/transpool24-email-logo.png (Gmail/proxy cache). */
-const EMAIL_HEADER_CACHE_BUST = process.env.EMAIL_HEADER_CACHE_BUST?.trim() || "20260403f";
+const EMAIL_HEADER_CACHE_BUST = process.env.EMAIL_HEADER_CACHE_BUST?.trim() || "20260403g";
 /** Dedicated file for mail + support forms — avoids production /5439.png (site header) being an old banner strip. */
 const EMAIL_HEADER_LOGO_URL = `${SITE_URL}/transpool24-email-logo.png?v=${encodeURIComponent(EMAIL_HEADER_CACHE_BUST)}`;
 /**
@@ -297,26 +306,45 @@ function readTransactionalEmailLogoFile(): Buffer | null {
   return null;
 }
 
-/** Inline logo for Resend — bytes always match repo (not whatever is hosted at /5439.png). */
-function transactionalEmailLogoAttachment(): Attachment | null {
-  const buf = readTransactionalEmailLogoFile();
-  if (!buf?.length) return null;
+/** Logo bytes for inline CID: local public/ first, then HTTPS (covers Vercel when fs has no public/). */
+async function loadTransactionalEmailLogoBytes(): Promise<Buffer | null> {
+  let buf = readTransactionalEmailLogoFile();
+  if (buf?.length) return buf;
+  try {
+    const res = await fetch(EMAIL_HEADER_LOGO_URL, { cache: "no-store" });
+    if (!res.ok) return null;
+    return Buffer.from(await res.arrayBuffer());
+  } catch {
+    return null;
+  }
+}
+
+export async function loadTransactionalEmailBranding(): Promise<TransactionalEmailBranding> {
+  const buf = await loadTransactionalEmailLogoBytes();
+  if (buf?.length) {
+    const logoAttachment: Attachment = {
+      filename: "transpool24-logo.png",
+      content: buf,
+      contentType: "image/png",
+      contentId: EMAIL_HEADER_LOGO_CID,
+    };
+    const cid = `cid:${EMAIL_HEADER_LOGO_CID}`;
+    return {
+      logoAttachment,
+      headerHtml: emailHeaderBannerHtmlWithSrc(cid),
+      brandImgSrc: cid,
+    };
+  }
   return {
-    filename: "transpool24-logo.png",
-    content: buf,
-    contentType: "image/png",
-    contentId: EMAIL_HEADER_LOGO_CID,
+    logoAttachment: null,
+    headerHtml: emailHeaderBannerHtmlWithSrc(EMAIL_HEADER_LOGO_URL),
+    brandImgSrc: EMAIL_HEADER_LOGO_URL,
   };
 }
 
-function transactionalEmailBrandLogoSrcForHtml(): string {
-  return transactionalEmailLogoAttachment() ? `cid:${EMAIL_HEADER_LOGO_CID}` : EMAIL_HEADER_LOGO_URL;
-}
-
-function appendTransactionalLogoAttachment(attachments?: Attachment[]): Attachment[] | undefined {
-  const logo = transactionalEmailLogoAttachment();
-  if (!logo) return attachments?.length ? attachments : undefined;
-  return [...(attachments ?? []), logo];
+function mergeAttachmentsWithLogo(logo: Attachment | null, existing?: Attachment[]): Attachment[] | undefined {
+  const merged = [...(existing ?? []), ...(logo ? [logo] : [])];
+  return merged.length ? merged : undefined;
 }
 
 function emailHeaderBannerHtmlWithSrc(imgSrc: string): string {
@@ -337,11 +365,6 @@ export function buildEmailHeaderBannerHtml(): string {
   return emailHeaderBannerHtmlWithSrc(EMAIL_HEADER_LOGO_URL);
 }
 
-/** Transactional HTML built inside this module: CID when logo file is readable (send path adds attachment). */
-function emailTransactionalHeaderBannerHtml(): string {
-  return emailHeaderBannerHtmlWithSrc(transactionalEmailBrandLogoSrcForHtml());
-}
-
 /** Customer: delivery completed + optional POD photo link (German only, no PDF). */
 function buildDeliveryConfirmationHtml(
   job: Job,
@@ -350,7 +373,8 @@ function buildDeliveryConfirmationHtml(
     rateDriverUrl: string | null;
     podPhotoUrl: string | null;
     deliveredAtDe: string;
-  }
+  },
+  branding: TransactionalEmailBranding
 ): string {
   const orderRef = job.order_number != null ? String(job.order_number) : job.id.slice(0, 8);
   const companyName = (job.company_name || "").trim() || "Kunde";
@@ -376,7 +400,7 @@ function buildDeliveryConfirmationHtml(
 <html dir="ltr" lang="de">
 <head><meta charset="utf-8" />${emailDeHeadMeta()}<title>Zustellung bestätigt – TransPool24</title></head>
 <body style="margin:0; font-family:'Segoe UI',Tahoma,sans-serif; background:#f1f5f9; direction:ltr; text-align:left;">
-  ${emailTransactionalHeaderBannerHtml()}
+  ${branding.headerHtml}
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px; margin:0 auto; padding:28px 18px 40px;">
     <tr><td>
       <div style="background:#fff; border-radius:14px; padding:26px; border:1px solid #e2e8f0; box-shadow:0 2px 10px rgba(0,0,0,0.06);">
@@ -428,11 +452,12 @@ export async function sendDeliveryConfirmationEmail(
   const resend = new Resend(apiKey);
   const att = options.podPhotoAttachment;
   try {
+    const branding = await loadTransactionalEmailBranding();
     const podAtt: Attachment[] | undefined =
       att && att.contentBase64.length > 0
         ? [{ filename: att.filename, content: att.contentBase64 }]
         : undefined;
-    const mergedAtt = appendTransactionalLogoAttachment(podAtt);
+    const mergedAtt = mergeAttachmentsWithLogo(branding.logoAttachment, podAtt);
     const { error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: [to],
@@ -442,7 +467,7 @@ export async function sendDeliveryConfirmationEmail(
         rateDriverUrl: options.rateDriverUrl,
         podPhotoUrl: options.podPhotoUrl,
         deliveredAtDe,
-      }),
+      }, branding),
       ...(mergedAtt?.length ? { attachments: mergedAtt } : {}),
     });
     if (error) {
@@ -492,7 +517,8 @@ Ihr digitaler Logistikpartner in Pforzheim &amp; Region`;
 /** Thank-you after delivery: same header/banner style as other transactional mail (German). */
 function buildThankYouDeliveryHtml(
   job: Job,
-  options: { deliveryPhotoUrl: string; rateDriverUrl: string }
+  options: { deliveryPhotoUrl: string; rateDriverUrl: string },
+  branding: TransactionalEmailBranding
 ): string {
   const company = (job.company_name || "").trim();
   const greeting = company
@@ -508,7 +534,7 @@ function buildThankYouDeliveryHtml(
 <html dir="ltr" lang="de">
 <head><meta charset="utf-8" />${emailDeHeadMeta()}<title>Vielen Dank – TransPool24</title></head>
 <body style="margin:0; font-family:'Segoe UI',Tahoma,sans-serif; background:#f1f5f9; direction:ltr; text-align:left;">
-  ${emailTransactionalHeaderBannerHtml()}
+  ${branding.headerHtml}
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px; margin:0 auto; padding:28px 18px 40px;">
     <tr><td>
       <div style="background:#fff; border-radius:14px; padding:26px; border:1px solid #e2e8f0; box-shadow:0 2px 10px rgba(0,0,0,0.06);">
@@ -567,11 +593,12 @@ export async function sendThankYouDeliveryEmail(
   const resend = new Resend(apiKey);
   const att = options.photoAttachment;
   try {
+    const branding = await loadTransactionalEmailBranding();
     const photoAtt: Attachment[] | undefined =
       att && att.contentBase64.length > 0
         ? [{ filename: att.filename, content: att.contentBase64 }]
         : undefined;
-    const mergedAtt = appendTransactionalLogoAttachment(photoAtt);
+    const mergedAtt = mergeAttachmentsWithLogo(branding.logoAttachment, photoAtt);
     const { error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: [to],
@@ -579,7 +606,7 @@ export async function sendThankYouDeliveryEmail(
       html: buildThankYouDeliveryHtml(job, {
         deliveryPhotoUrl: options.deliveryPhotoUrl,
         rateDriverUrl: options.rateDriverUrl,
-      }),
+      }, branding),
       ...(mergedAtt?.length ? { attachments: mergedAtt } : {}),
     });
     if (error) {
@@ -609,7 +636,8 @@ function buildTrackingUpdateHtml(
     trackOrderUrl: string;
     googleMapsDirectionsUrl: string;
     driver?: OrderEmailDriverInfo | null;
-  }
+  },
+  branding: TransactionalEmailBranding
 ): string {
   const headerBlue = "#0d2137";
   const orderRef = job.order_number != null ? String(job.order_number) : job.id.slice(0, 8);
@@ -664,7 +692,7 @@ function buildTrackingUpdateHtml(
 <html dir="ltr" lang="de">
 <head><meta charset="utf-8">${emailDeHeadMeta()}<title>TransPool24 – Sendungsverfolgung</title></head>
 <body style="margin:0; font-family:'Segoe UI',Tahoma,Arial,sans-serif; background:#eef2f6; direction:ltr; text-align:left;">
-  ${emailTransactionalHeaderBannerHtml()}
+  ${branding.headerHtml}
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width:620px; margin:0 auto; padding:28px 16px; direction:ltr;">
     <tr><td style="text-align:left;">
       <div style="background:#fff; border-radius:14px; padding:26px; box-shadow:0 2px 14px rgba(0,0,0,0.07); direction:ltr; text-align:left;">
@@ -720,12 +748,13 @@ export async function sendTrackingUpdateEmail(
   const orderRef = job.order_number != null ? String(job.order_number) : job.id.slice(0, 8);
   const resend = new Resend(apiKey);
   try {
-    const mergedAtt = appendTransactionalLogoAttachment();
+    const branding = await loadTransactionalEmailBranding();
+    const mergedAtt = mergeAttachmentsWithLogo(branding.logoAttachment);
     const { error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: [to],
       subject: `TransPool24 – Live-Tracking Auftrag #${orderRef}`,
-      html: buildTrackingUpdateHtml(job, options),
+      html: buildTrackingUpdateHtml(job, options, branding),
       ...(mergedAtt?.length ? { attachments: mergedAtt } : {}),
     });
     if (error) {
@@ -755,7 +784,11 @@ export type DriverApprovalData = {
   personal_photo_url?: string | null;
 };
 
-function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string | null): string {
+function buildDriverApprovalHtml(
+  data: DriverApprovalData,
+  whatsAppLink: string | null | undefined,
+  branding: TransactionalEmailBranding
+): string {
   const driverNum = data.driver_number != null ? String(data.driver_number).padStart(5, "0") : "—";
   const dateStr = new Date(data.approved_at).toLocaleDateString("de-DE", {
     day: "2-digit",
@@ -774,7 +807,7 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
   <title>TransPool24 – Fahrer-Anfrage genehmigt</title>
 </head>
 <body style="margin:0; padding:0; font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background:#f0f0f0; direction:ltr; text-align:left;">
-  ${emailTransactionalHeaderBannerHtml()}
+  ${branding.headerHtml}
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f0f0; padding: 24px 16px;">
     <tr><td align="center">
       <table width="560" cellpadding="0" cellspacing="0" style="max-width:560px; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 2px 12px rgba(0,0,0,0.08);">
@@ -826,7 +859,7 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
         </tr>
         <tr>
           <td style="background:#0d2137; padding: 28px 24px; text-align: center;">
-            <img src="${transactionalEmailBrandLogoSrcForHtml()}" alt="TransPool24" width="${EMAIL_HEADER_LOGO_MAX_WIDTH_PX}" style="display:block; margin:0 auto 16px auto; width:100%; max-width:${EMAIL_HEADER_LOGO_MAX_WIDTH_PX}px; height:auto; object-fit:contain; object-position:center center; border:0; -ms-interpolation-mode:bicubic;" />
+            <img src="${branding.brandImgSrc}" alt="TransPool24" width="${EMAIL_HEADER_LOGO_MAX_WIDTH_PX}" style="display:block; margin:0 auto 16px auto; width:100%; max-width:${EMAIL_HEADER_LOGO_MAX_WIDTH_PX}px; height:auto; object-fit:contain; object-position:center center; border:0; -ms-interpolation-mode:bicubic;" />
             <p style="margin:0; font-size:18px; font-weight:700; color:#fff; line-height:1.4;">
               Ihr Weg ist sicher – und unser Team steht immer hinter Ihnen.
             </p>
@@ -866,7 +899,7 @@ export type DriverPaymentInvoiceEmailData = {
   total_eur: string;
 };
 
-function buildDriverPaymentInvoiceEmailHtml(data: DriverPaymentInvoiceEmailData): string {
+function buildDriverPaymentInvoiceEmailHtml(data: DriverPaymentInvoiceEmailData, branding: TransactionalEmailBranding): string {
   const headerBlue = "#0d2137";
   const cardBg = "#ffffff";
   const summaryBg = "#f0f4f8";
@@ -879,7 +912,7 @@ function buildDriverPaymentInvoiceEmailHtml(data: DriverPaymentInvoiceEmailData)
 <html dir="ltr" lang="de">
 <head><meta charset="utf-8">${emailDeHeadMeta()}<title>Zahlungsnachweis – TransPool24</title></head>
 <body style="margin:0; font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f4f4; direction:ltr; text-align:left;">
-  ${emailTransactionalHeaderBannerHtml()}
+  ${branding.headerHtml}
   <table width="100%" cellpadding="0" cellspacing="0" style="background: #fff; border-bottom: 1px solid #eee;"><tr><td align="right" style="padding: 8px 24px;"><a href="${SITE_URL}" style="color:#000; text-decoration:underline; font-size:13px;">www.transpool24.com</a></td></tr></table>
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; padding: 32px 20px; direction:ltr;">
     <tr><td style="text-align:left;">
@@ -913,7 +946,7 @@ function buildDriverPaymentInvoiceEmailHtml(data: DriverPaymentInvoiceEmailData)
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; padding: 0 20px 24px;">
     <tr><td>
       <div style="background: ${headerBlue}; border-radius: 0 0 16px 16px; padding: 32px 24px; text-align: center;">
-        <img src="${transactionalEmailBrandLogoSrcForHtml()}" alt="TransPool24" width="${EMAIL_HEADER_LOGO_MAX_WIDTH_PX}" style="display:block; margin:0 auto 20px; width:100%; max-width:${EMAIL_HEADER_LOGO_MAX_WIDTH_PX}px; height:auto; object-fit:contain; object-position:center center; border:0; -ms-interpolation-mode:bicubic;" />
+        <img src="${branding.brandImgSrc}" alt="TransPool24" width="${EMAIL_HEADER_LOGO_MAX_WIDTH_PX}" style="display:block; margin:0 auto 20px; width:100%; max-width:${EMAIL_HEADER_LOGO_MAX_WIDTH_PX}px; height:auto; object-fit:contain; object-position:center center; border:0; -ms-interpolation-mode:bicubic;" />
         <p style="margin: 0 0 20px 0; font-size: 18px; font-weight: bold; color: #ffffff;">Ihr Weg ist sicher – und unser Team steht immer hinter Ihnen.</p>
         <a href="${supportUrl}" style="display: inline-block; margin: 0 0 24px 0; padding: 14px 28px; background: #00BFFF; color: #fff; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 15px;">Wir sind an Ihrer Seite bei jedem Kilometer.</a>
         <p style="margin: 0 0 12px 0; font-size: 13px; color: rgba(255,255,255,0.9);">Folgen Sie uns</p>
@@ -945,15 +978,16 @@ export async function sendDriverPaymentInvoiceEmail(
   }
   const resend = new Resend(apiKey);
   try {
+    const branding = await loadTransactionalEmailBranding();
     const attachmentContent = Buffer.from(pdfBuffer).toString("base64");
-    const mergedAtt = appendTransactionalLogoAttachment([
+    const mergedAtt = mergeAttachmentsWithLogo(branding.logoAttachment, [
       { filename: pdfFilename, content: attachmentContent },
     ]);
     const { error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: [to],
       subject: `TransPool24 – Zahlungsnachweis ${data.invoice_number}`,
-      html: buildDriverPaymentInvoiceEmailHtml(data),
+      html: buildDriverPaymentInvoiceEmailHtml(data, branding),
       ...(mergedAtt?.length ? { attachments: mergedAtt } : {}),
     });
     if (error) {
@@ -985,7 +1019,8 @@ export async function sendDriverApprovalEmail(
     return { success: false, error: "RESEND_API_KEY not set" };
   }
   const resend = new Resend(apiKey);
-  const html = buildDriverApprovalHtml(data, options?.whatsAppLink ?? null);
+  const branding = await loadTransactionalEmailBranding();
+  const html = buildDriverApprovalHtml(data, options?.whatsAppLink ?? null, branding);
   const pdfAtt: Attachment[] | undefined = options?.pdfBuffer
     ? [
         {
@@ -994,7 +1029,7 @@ export async function sendDriverApprovalEmail(
         },
       ]
     : undefined;
-  const mergedAtt = appendTransactionalLogoAttachment(pdfAtt);
+  const mergedAtt = mergeAttachmentsWithLogo(branding.logoAttachment, pdfAtt);
   try {
     const { error } = await resend.emails.send({
       from: FROM_EMAIL,

@@ -1,5 +1,5 @@
 import { Resend } from "resend";
-import { buildEmailHeaderBannerHtml } from "@/lib/email";
+import { loadTransactionalEmailBranding } from "@/lib/email";
 import { getPublicSiteUrl } from "@/lib/public-site-url";
 
 function getFromEmail(): string {
@@ -22,10 +22,11 @@ export async function sendOpsStatusReminderEmail(
     ? `${site}/de/order/track?job_id=${encodeURIComponent(job.id)}&token=${encodeURIComponent(job.confirmation_token)}`
     : null;
   const resend = new Resend(apiKey);
+  const branding = await loadTransactionalEmailBranding();
   const html = `<!DOCTYPE html>
 <html lang="de"><head><meta charset="utf-8" /></head>
 <body style="margin:0;font-family:'Segoe UI',Tahoma,sans-serif;background:#f4f4f4;">
-${buildEmailHeaderBannerHtml()}
+${branding.headerHtml}
 <div style="max-width:600px;margin:0 auto;padding:24px 20px;">
   <div style="background:#fff;border-radius:12px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
     <p style="margin:0 0 12px;font-size:16px;color:#0d2137;">Guten Tag,</p>
@@ -42,11 +43,13 @@ ${buildEmailHeaderBannerHtml()}
   </div>
 </div>
 </body></html>`;
+  const logoAtt = branding.logoAttachment ? [branding.logoAttachment] : undefined;
   const { error } = await resend.emails.send({
     from: getFromEmail(),
     to: [to],
     subject: `TransPool24 – Ihr Auftrag #${orderRef} wird bearbeitet`,
     html,
+    ...(logoAtt ? { attachments: logoAtt } : {}),
   });
   if (error) return { ok: false, error: error.message };
   return { ok: true };

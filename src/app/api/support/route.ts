@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { rateLimitResponse } from "@/lib/rate-limit";
-import { buildEmailHeaderBannerHtml } from "@/lib/email";
+import { loadTransactionalEmailBranding } from "@/lib/email";
 import { createServerSupabase } from "@/lib/supabase";
 import { buildPhoneE164 } from "@/lib/country-dial-codes";
 
@@ -130,6 +130,7 @@ export async function POST(req: Request) {
     if (apiKey) {
       const resend = new Resend(apiKey);
       const to = getToEmail();
+      const branding = await loadTransactionalEmailBranding();
       const subject =
         requesterType === "customer"
           ? `[TransPool24 Kontakt] ${name} (${inquiryType || "Anfrage"})`
@@ -139,7 +140,7 @@ export async function POST(req: Request) {
 <html lang="de">
 <head><meta charset="utf-8" /></head>
 <body style="margin:0; font-family:'Segoe UI',Tahoma,sans-serif; background:#f4f4f4;">
-${buildEmailHeaderBannerHtml()}
+${branding.headerHtml}
 <div style="max-width:600px; margin:0 auto; padding:24px 20px;">
   <div style="background:#fff; border-radius:12px; padding:24px; box-shadow:0 2px 12px rgba(0,0,0,0.06);">
     <p><strong>Typ:</strong> ${escapeHtml(requesterType === "customer" ? "Kunde / Allgemein" : "Fahrer")}</p>
@@ -160,12 +161,14 @@ ${buildEmailHeaderBannerHtml()}
 </div>
 </body>
 </html>`;
+      const logoAtt = branding.logoAttachment ? [branding.logoAttachment] : undefined;
       const { error } = await resend.emails.send({
         from: getFromEmail(),
         to: [to],
         replyTo: email,
         subject,
         html,
+        ...(logoAtt ? { attachments: logoAtt } : {}),
       });
       if (error) console.error("[support] email", error);
     }
