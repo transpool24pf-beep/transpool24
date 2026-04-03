@@ -28,6 +28,15 @@ function isLargeCenterLogoPath(pathname: string | null): boolean {
   return section === "order" || section === "driver" || section === "blog";
 }
 
+/** Order / driver flows: on small screens hide nav (logo + header car only — avoids crowding). */
+function isOrderOrDriverFlowPath(pathname: string | null): boolean {
+  if (!pathname) return false;
+  const parts = pathname.split("/").filter(Boolean);
+  if (parts.length < 2) return false;
+  const section = parts[1]!.toLowerCase();
+  return section === "order" || section === "driver";
+}
+
 export function Header({ hideLogo }: HeaderProps) {
   const t = useTranslations("common");
   const pathname = usePathname();
@@ -41,6 +50,8 @@ export function Header({ hideLogo }: HeaderProps) {
     () => !hideLogo && isLargeCenterLogoPath(pathname),
     [hideLogo, pathname]
   );
+
+  const hideNavOnMobileOrderDriver = useMemo(() => isOrderOrDriverFlowPath(pathname), [pathname]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -104,7 +115,11 @@ export function Header({ hideLogo }: HeaderProps) {
   );
 
   const nav = (
-    <nav className="flex min-w-0 items-center justify-end gap-1.5 sm:gap-2 md:gap-2.5">
+    <nav
+      className={`min-w-0 items-center justify-end gap-1.5 sm:gap-2 md:gap-2.5 ${
+        hideNavOnMobileOrderDriver ? "hidden sm:flex" : "flex"
+      }`}
+    >
       <Link href={`/${locale}/blog`} className={navLinkClass}>
         {t("blog")}
       </Link>
@@ -173,8 +188,17 @@ export function Header({ hideLogo }: HeaderProps) {
             {nav}
           </div>
         ) : showLargeCenterLogo ? (
-          <div className="mx-auto grid w-full max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 py-1 sm:gap-3 sm:px-6 sm:py-1.5 md:py-2">
-            <div className="min-w-0" aria-hidden />
+          <div
+            className={`mx-auto grid w-full max-w-6xl items-center gap-2 px-4 py-1 sm:gap-3 sm:px-6 sm:py-1.5 md:py-2 ${
+              hideNavOnMobileOrderDriver
+                ? "max-sm:grid-cols-1 max-sm:justify-items-center sm:grid-cols-[1fr_auto_1fr]"
+                : "grid-cols-[1fr_auto_1fr]"
+            }`}
+          >
+            <div
+              className={`min-w-0 ${hideNavOnMobileOrderDriver ? "hidden sm:block" : ""}`}
+              aria-hidden
+            />
             <Link
               href={`/${locale}`}
               className="flex justify-center justify-self-center"
@@ -182,7 +206,11 @@ export function Header({ hideLogo }: HeaderProps) {
             >
               <span className="relative inline-flex shrink-0 items-center justify-center">{logoImageCenter}</span>
             </Link>
-            <div className="min-w-0 justify-self-end">{nav}</div>
+            <div
+              className={`min-w-0 justify-self-end ${hideNavOnMobileOrderDriver ? "hidden sm:block" : ""}`}
+            >
+              {nav}
+            </div>
           </div>
         ) : (
           <div
