@@ -13,13 +13,8 @@ export function ensureDotlottieScript(): Promise<void> {
   if (customElements.get("dotlottie-wc")) return Promise.resolve();
   const existing = document.querySelector("script[data-tp-dotlottie-wc]");
   if (existing) {
-    return new Promise((resolve, reject) => {
-      if (customElements.get("dotlottie-wc")) {
-        resolve();
-        return;
-      }
-      existing.addEventListener("load", () => resolve(), { once: true });
-      existing.addEventListener("error", () => reject(new Error("dotlottie-wc load error")), { once: true });
+    return waitForDotlottieWcRegistered(12000).then((ok) => {
+      if (!ok) throw new Error("dotlottie-wc not registered");
     });
   }
   if (!scriptPromise) {
@@ -34,4 +29,14 @@ export function ensureDotlottieScript(): Promise<void> {
     });
   }
   return scriptPromise;
+}
+
+/** After script `load`, `customElements.define` may run on next tick — poll. Call after `ensureDotlottieScript()`. */
+export async function waitForDotlottieWcRegistered(maxMs = 10000): Promise<boolean> {
+  const deadline = Date.now() + maxMs;
+  while (Date.now() < deadline) {
+    if (customElements.get("dotlottie-wc")) return true;
+    await new Promise((r) => setTimeout(r, 40));
+  }
+  return false;
 }

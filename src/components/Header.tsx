@@ -164,7 +164,7 @@ export function Header({ hideLogo }: HeaderProps) {
       className="sticky top-0 z-50 relative overflow-hidden border-b border-[#0d2137]/10"
     >
       <HeaderCarLottieTrack />
-      <div className="relative z-10 bg-[var(--background)]/88 backdrop-blur-md">
+      <div className="relative z-10 bg-[var(--background)]/72 backdrop-blur-sm">
         {hideLogo ? (
           <div className="mx-auto flex max-w-6xl items-center justify-end gap-2 px-4 py-0.5 sm:px-6 sm:py-1">
             {nav}
