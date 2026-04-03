@@ -67,38 +67,38 @@ body {
   will-change: transform;
 }
 
-/* Homepage hero: car on bottom white strip (right → left, full width) */
-@keyframes hero-strip-car-cross {
+/* Header: car crosses left → right (physical), full toolbar width */
+@keyframes header-bar-car-ltr {
   0% {
-    left: 100%;
+    left: -320px;
   }
   100% {
-    left: -280px;
+    left: 100%;
   }
 }
 
-.hero-strip-car-inner {
+.header-bar-car-inner {
   width: 300px;
   height: 300px;
-  transform: scale(0.24);
+  transform: scale(0.3);
   transform-origin: center center;
 }
 
-.hero-strip-car-rider {
+.header-bar-car-rider {
   position: absolute;
   top: 50%;
   margin-top: -150px;
   width: 300px;
   height: 300px;
-  animation: hero-strip-car-cross 20s linear infinite;
+  animation: header-bar-car-ltr 18s linear infinite;
   will-change: left;
-  opacity: 1;
+  opacity: 0.9;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-strip-car-rider {
+  .header-bar-car-rider {
     animation: none;
-    left: 58%;
+    left: 45%;
     margin-left: -150px;
   }
 }

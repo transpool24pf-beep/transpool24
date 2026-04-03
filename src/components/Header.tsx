@@ -8,6 +8,7 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import { locales, type Locale } from "@/i18n/routing";
 import { LOCALE_NATIVE_LABEL, LOCALE_SHORT_CODE } from "@/lib/locale-display";
 import { LocaleFlagIcon } from "@/components/LocaleFlagIcon";
+import { HeaderCarLottieTrack } from "@/components/HeaderCarLottieTrack";
 
 type HeaderProps = { hideLogo?: boolean };
 
@@ -160,46 +161,49 @@ export function Header({ hideLogo }: HeaderProps) {
   return (
     <header
       dir={rtl ? "rtl" : "ltr"}
-      className="sticky top-0 z-50 border-b border-[#0d2137]/10 bg-[var(--background)]/95 backdrop-blur"
+      className="sticky top-0 z-50 relative overflow-hidden border-b border-[#0d2137]/10"
     >
-      {hideLogo ? (
-        <div className="mx-auto flex max-w-6xl items-center justify-end gap-2 px-4 py-0.5 sm:px-6 sm:py-1">
-          {nav}
-        </div>
-      ) : showLargeCenterLogo ? (
-        <div className="mx-auto grid w-full max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 py-1 sm:gap-3 sm:px-6 sm:py-1.5 md:py-2">
-          <div className="min-w-0" aria-hidden />
-          <Link
-            href={`/${locale}`}
-            className="flex justify-center justify-self-center"
-            aria-label="TransPool24"
-          >
-            <span className="relative inline-flex shrink-0 items-center justify-center">{logoImageCenter}</span>
-          </Link>
-          <div className="min-w-0 justify-self-end">{nav}</div>
-        </div>
-      ) : (
-        <div
-          className={`flex w-full items-center justify-between gap-2 sm:gap-3 ${
-            homePath
-              ? "py-1 ps-1.5 pe-3 sm:py-1.5 sm:ps-2 sm:pe-4 md:pe-5"
-              : "mx-auto max-w-6xl px-4 py-0 sm:px-6 sm:py-0.5"
-          }`}
-        >
-          <Link
-            href={`/${locale}`}
-            className={
+      <HeaderCarLottieTrack />
+      <div className="relative z-10 bg-[var(--background)]/88 backdrop-blur-md">
+        {hideLogo ? (
+          <div className="mx-auto flex max-w-6xl items-center justify-end gap-2 px-4 py-0.5 sm:px-6 sm:py-1">
+            {nav}
+          </div>
+        ) : showLargeCenterLogo ? (
+          <div className="mx-auto grid w-full max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 py-1 sm:gap-3 sm:px-6 sm:py-1.5 md:py-2">
+            <div className="min-w-0" aria-hidden />
+            <Link
+              href={`/${locale}`}
+              className="flex justify-center justify-self-center"
+              aria-label="TransPool24"
+            >
+              <span className="relative inline-flex shrink-0 items-center justify-center">{logoImageCenter}</span>
+            </Link>
+            <div className="min-w-0 justify-self-end">{nav}</div>
+          </div>
+        ) : (
+          <div
+            className={`flex w-full items-center justify-between gap-2 sm:gap-3 ${
               homePath
-                ? "-ms-0.5 flex shrink-0 items-center sm:-ms-1"
-                : "flex min-w-0 shrink-0 items-center"
-            }
-            aria-label="TransPool24"
+                ? "py-1 ps-1.5 pe-3 sm:py-1.5 sm:ps-2 sm:pe-4 md:pe-5"
+                : "mx-auto max-w-6xl px-4 py-0 sm:px-6 sm:py-0.5"
+            }`}
           >
-            <span className="relative inline-flex shrink-0 items-center">{logoImageCorner}</span>
-          </Link>
-          {nav}
-        </div>
-      )}
+            <Link
+              href={`/${locale}`}
+              className={
+                homePath
+                  ? "-ms-0.5 flex shrink-0 items-center sm:-ms-1"
+                  : "flex min-w-0 shrink-0 items-center"
+              }
+              aria-label="TransPool24"
+            >
+              <span className="relative inline-flex shrink-0 items-center">{logoImageCorner}</span>
+            </Link>
+            {nav}
+          </div>
+        )}
+      </div>
     </header>
   );
 }

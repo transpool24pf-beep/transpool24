@@ -1,13 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ensureDotlottieScript, HERO_STRIP_CAR_LOTTIE_SRC } from "@/lib/dotlottie-wc-script";
+import { ensureDotlottieScript, HEADER_CAR_LOTTIE_SRC } from "@/lib/dotlottie-wc-script";
 
 /**
- * Car runs along the full width of the white strip at the bottom of the hero.
- * Strip sits under headline/CTA; header stays solid with no animation underneath.
+ * Car crosses the header bar left → right (physical), under semi-transparent toolbar.
  */
-export function HeroWhiteStripCarLottie() {
+export function HeaderCarLottieTrack() {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -25,15 +24,15 @@ export function HeroWhiteStripCarLottie() {
 
   return (
     <div
-      className="hero-strip-car-layer pointer-events-none absolute inset-0 overflow-hidden"
+      className="header-bar-car-layer pointer-events-none absolute inset-0 z-0 overflow-hidden"
       dir="ltr"
       aria-hidden
     >
       {show ? (
-        <div className="hero-strip-car-rider">
-          <div className="hero-strip-car-inner">
+        <div className="header-bar-car-rider">
+          <div className="header-bar-car-inner">
             <dotlottie-wc
-              src={HERO_STRIP_CAR_LOTTIE_SRC}
+              src={HEADER_CAR_LOTTIE_SRC}
               autoplay
               loop
               style={{ width: 300, height: 300, display: "block" }}

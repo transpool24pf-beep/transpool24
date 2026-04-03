@@ -3,7 +3,7 @@
 export const DOTLOTTIE_WC_SCRIPT_SRC =
   "https://unpkg.com/@lottiefiles/dotlottie-wc@0.9.10/dist/dotlottie-wc.js";
 
-export const HERO_STRIP_CAR_LOTTIE_SRC =
+export const HEADER_CAR_LOTTIE_SRC =
   "https://lottie.host/7cfe2424-ad66-4ffc-b5ad-ca19d0e350a0/Cnfq4FzaWh.lottie";
 
 let scriptPromise: Promise<void> | null = null;
