@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useAdminLocale } from "@/contexts/AdminLocaleContext";
 import { cargoCategoryLabelDe } from "@/lib/cargo";
@@ -169,6 +169,10 @@ export default function AdminOrderDetailPage({
   const [sendingTrackOnly, setSendingTrackOnly] = useState(false);
   const [sendingDeliveryConfirm, setSendingDeliveryConfirm] = useState(false);
   const [attachPodToEmail, setAttachPodToEmail] = useState(true);
+  const [thankYouFile, setThankYouFile] = useState<File | null>(null);
+  const [thankYouPreview, setThankYouPreview] = useState<string | null>(null);
+  const [sendingThankYou, setSendingThankYou] = useState(false);
+  const thankYouFileInputRef = useRef<HTMLInputElement>(null);
   const [ensuringDriverLink, setEnsuringDriverLink] = useState(false);
   const [id, setId] = useState<string | null>(null);
   const [drivers, setDrivers] = useState<DriverOption[]>([]);
@@ -233,6 +237,25 @@ export default function AdminOrderDetailPage({
     setLngIn(order.last_driver_lng != null ? String(order.last_driver_lng) : "");
     setAttachPodToEmail(Boolean(order.pod_photo_url?.trim()));
   }, [order]);
+
+  const lastThankYouOrderIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!order?.id) return;
+    if (lastThankYouOrderIdRef.current === order.id) return;
+    lastThankYouOrderIdRef.current = order.id;
+    setThankYouFile(null);
+    setThankYouPreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
+    if (thankYouFileInputRef.current) thankYouFileInputRef.current.value = "";
+  }, [order?.id]);
+
+  useEffect(() => {
+    return () => {
+      if (thankYouPreview) URL.revokeObjectURL(thankYouPreview);
+    };
+  }, [thankYouPreview]);
 
   const assignDriver = (driverApplicationId: string | null) => {
     if (!order) return;
@@ -926,6 +949,68 @@ export default function AdminOrderDetailPage({
                   {sendingTrackOnly ? OD_MAIL_DE.trackingEmailSending : OD_MAIL_DE.trackingEmailBtn}
                 </button>
                 <p className="text-xs text-[#0d2137]/65">{OD_MAIL_DE.trackingEmailHint}</p>
+                <div className="rounded-xl border-2 border-teal-200 bg-teal-50/50 p-3">
+                  <p className="text-sm font-semibold text-teal-950">{odT(locale, "od.thankYouBlockTitle")}</p>
+                  <p className="mt-1 text-xs text-[#0d2137]/75">{odT(locale, "od.thankYouBlockDesc")}</p>
+                  <input
+                    ref={thankYouFileInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    className="mt-2 block w-full text-sm text-[#0d2137] file:me-2 file:rounded-lg file:border-0 file:bg-teal-700 file:px-3 file:py-2 file:text-sm file:font-medium file:text-white"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0] ?? null;
+                      setThankYouPreview((prev) => {
+                        if (prev) URL.revokeObjectURL(prev);
+                        return f ? URL.createObjectURL(f) : null;
+                      });
+                      setThankYouFile(f);
+                    }}
+                  />
+                  {thankYouPreview ? (
+                    <div className="mt-2 overflow-hidden rounded-lg border border-teal-200 bg-white">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={thankYouPreview} alt="" className="max-h-52 w-full object-contain" />
+                    </div>
+                  ) : null}
+                  <button
+                    type="button"
+                    disabled={sendingThankYou || !thankYouFile || !order.customer_email?.trim()}
+                    onClick={async () => {
+                      if (!thankYouFile) {
+                        alert(odT(locale, "od.thankYouNoFile"));
+                        return;
+                      }
+                      setSendingThankYou(true);
+                      try {
+                        const fd = new FormData();
+                        fd.append("file", thankYouFile);
+                        const res = await fetch(`/api/admin/orders/${order.id}/send-thankyou-delivery`, {
+                          method: "POST",
+                          body: fd,
+                        });
+                        const data = (await res.json()) as { error?: string; sentTo?: string };
+                        if (!res.ok) {
+                          alert(data?.error ?? odT(locale, "od.thankYouFail"));
+                          return;
+                        }
+                        alert(odT(locale, "od.thankYouSent") + (data.sentTo ?? order.customer_email));
+                        setThankYouFile(null);
+                        setThankYouPreview((prev) => {
+                          if (prev) URL.revokeObjectURL(prev);
+                          return null;
+                        });
+                        if (thankYouFileInputRef.current) thankYouFileInputRef.current.value = "";
+                      } catch {
+                        alert(OD_MAIL_DE.alertNetwork);
+                      } finally {
+                        setSendingThankYou(false);
+                      }
+                    }}
+                    className="mt-3 w-full rounded-xl bg-teal-700 px-4 py-3 text-sm font-medium text-white hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {sendingThankYou ? odT(locale, "od.thankYouSending") : odT(locale, "od.thankYouSendBtn")}
+                  </button>
+                </div>
               </>
             )}
             <hr className="border-[#0d2137]/10" />
