@@ -9,6 +9,7 @@ import { useAdminLocale } from "@/contexts/AdminLocaleContext";
 
 const NAV_DEF: { href: string; msgKey: string; badge: AdminNavItem["badge"] }[] = [
   { href: "/admin/orders", msgKey: "nav.orders", badge: "orders" },
+  { href: "/admin/in-progress", msgKey: "nav.inProgress", badge: null },
   { href: "/admin/ratings", msgKey: "nav.ratings", badge: null },
   { href: "/admin/reports", msgKey: "nav.reports", badge: null },
   { href: "/admin/driver-applications", msgKey: "nav.driverApplications", badge: "drivers" },
@@ -197,6 +198,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         <div
           className={`mx-auto flex-1 px-4 py-8 ${
             pathname === "/admin/orders" ||
+            pathname === "/admin/in-progress" ||
             pathname?.startsWith("/admin/driver-applications") ||
             pathname === "/admin/reports" ||
             pathname?.startsWith("/admin/blog")

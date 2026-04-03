@@ -111,7 +111,10 @@ export function AdminNavBadges({
 
   useEffect(() => {
     if (!hydrated) return;
-    const onOrders = pathname === "/admin/orders" || pathname?.startsWith("/admin/orders/");
+    const onOrders =
+      pathname === "/admin/orders" ||
+      pathname === "/admin/in-progress" ||
+      pathname?.startsWith("/admin/orders/");
     const onDrivers = pathname === "/admin/driver-applications" || pathname?.startsWith("/admin/driver-applications/");
     const onSupport = pathname === "/admin/support";
 

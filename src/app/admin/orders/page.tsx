@@ -3,6 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useAdminLocale } from "@/contexts/AdminLocaleContext";
+import {
+  ADMIN_IN_PROGRESS_STATUS_SET,
+  ADMIN_ORDER_STATUS_CONFIG,
+  adminOrderStatusText,
+} from "@/lib/admin-orders-status";
 import { serviceTypeLabel, type AdminLocale } from "@/lib/admin-ui-strings";
 
 type Job = {
@@ -34,70 +39,12 @@ type Job = {
   pod_completed_at?: string | null;
 };
 
-const STATUS_CONFIG: Record<
-  string,
-  { labelDe: string; labelAr: string; color: string; bg: string; pillBorder: string }
-> = {
-  draft: {
-    labelDe: "Entwurf",
-    labelAr: "مسودة",
-    color: "text-slate-700",
-    bg: "bg-slate-400",
-    pillBorder: "border-slate-400/70",
-  },
-  confirmed: {
-    labelDe: "Bestätigt",
-    labelAr: "مؤكد",
-    color: "text-blue-700",
-    bg: "bg-blue-500",
-    pillBorder: "border-blue-400/80",
-  },
-  paid: {
-    labelDe: "Bezahlt",
-    labelAr: "مدفوع",
-    color: "text-emerald-700",
-    bg: "bg-emerald-500",
-    pillBorder: "border-emerald-500/75",
-  },
-  assigned: {
-    labelDe: "Zugewiesen",
-    labelAr: "مُعيَّن",
-    color: "text-amber-700",
-    bg: "bg-amber-500",
-    pillBorder: "border-amber-500/75",
-  },
-  in_transit: {
-    labelDe: "Unterwegs",
-    labelAr: "في الطريق",
-    color: "text-violet-700",
-    bg: "bg-violet-500",
-    pillBorder: "border-violet-500/75",
-  },
-  delivered: {
-    labelDe: "Zugestellt",
-    labelAr: "تم التوصيل",
-    color: "text-green-700",
-    bg: "bg-green-500",
-    pillBorder: "border-green-500/80",
-  },
-  cancelled: {
-    labelDe: "Storniert",
-    labelAr: "ملغى",
-    color: "text-red-700",
-    bg: "bg-red-500",
-    pillBorder: "border-red-500/80",
-  },
-};
-
-/** طلبات نشطة (ليست مسودة ولا ملغاة ولا مُسلَّمة) */
-const IN_PROGRESS_STATUSES = new Set(["confirmed", "paid", "assigned", "in_transit"]);
-
 function matchSearch(o: Job, q: string): boolean {
   if (!q.trim()) return true;
   const s = q.trim().toLowerCase();
   const str = (v: unknown) => (v == null ? "" : String(v)).toLowerCase();
-  const statusLabelDe = STATUS_CONFIG[o.logistics_status]?.labelDe ?? "";
-  const statusLabelAr = STATUS_CONFIG[o.logistics_status]?.labelAr ?? "";
+  const statusLabelDe = ADMIN_ORDER_STATUS_CONFIG[o.logistics_status]?.labelDe ?? "";
+  const statusLabelAr = ADMIN_ORDER_STATUS_CONFIG[o.logistics_status]?.labelAr ?? "";
   return (
     str(o.id).includes(s) ||
     (o.order_number != null && str(o.order_number).includes(s)) ||
@@ -120,11 +67,6 @@ function matchSearch(o: Job, q: string): boolean {
   );
 }
 
-function statusText(locale: AdminLocale, logisticsStatus: string) {
-  const c = STATUS_CONFIG[logisticsStatus] ?? STATUS_CONFIG.draft;
-  return locale === "ar" ? c.labelAr : c.labelDe;
-}
-
 function LogisticsStatusPicker({
   jobId,
   logisticsStatus,
@@ -143,7 +85,7 @@ function LogisticsStatusPicker({
   onPick: (id: string, status: string) => void;
 }) {
   const detailsRef = useRef<HTMLDetailsElement>(null);
-  const conf = STATUS_CONFIG[logisticsStatus] ?? STATUS_CONFIG.draft;
+  const conf = ADMIN_ORDER_STATUS_CONFIG[logisticsStatus] ?? ADMIN_ORDER_STATUS_CONFIG.draft;
   const dir = locale === "ar" ? "rtl" : "ltr";
   const align = locale === "ar" ? "text-right" : "text-left";
 
@@ -152,11 +94,11 @@ function LogisticsStatusPicker({
       <summary
         className={`flex cursor-pointer list-none items-center justify-center gap-1 rounded-full border-2 bg-white py-1 pe-1.5 ps-1 text-[11px] font-semibold leading-tight shadow-sm [&::-webkit-details-marker]:hidden ${conf.color} ${conf.pillBorder}`}
         title={`${conf.labelDe} / ${conf.labelAr}`}
-        aria-label={`${statusSummaryAria}: ${statusText(locale, logisticsStatus)}`}
+        aria-label={`${statusSummaryAria}: ${adminOrderStatusText(locale, logisticsStatus)}`}
         aria-haspopup="listbox"
       >
         <span className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${conf.bg}`} aria-hidden />
-        <span className="min-w-0 flex-1 truncate text-center">{statusText(locale, logisticsStatus)}</span>
+        <span className="min-w-0 flex-1 truncate text-center">{adminOrderStatusText(locale, logisticsStatus)}</span>
         <span className="shrink-0 text-[8px] text-[#0d2137]/40" aria-hidden>
           ▾
         </span>
@@ -166,7 +108,7 @@ function LogisticsStatusPicker({
         role="listbox"
         aria-label={pickStatusAria}
       >
-        {Object.entries(STATUS_CONFIG).map(([value, c]) => (
+        {Object.entries(ADMIN_ORDER_STATUS_CONFIG).map(([value, c]) => (
           <button
             key={value}
             type="button"
@@ -283,7 +225,7 @@ export default function AdminOrdersPage() {
     .filter((o) => matchSearch(o, searchQuery));
 
   const inProgressOrders = orders
-    .filter((o) => IN_PROGRESS_STATUSES.has(o.logistics_status))
+    .filter((o) => ADMIN_IN_PROGRESS_STATUS_SET.has(o.logistics_status))
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
   const deliveredOrders = orders
@@ -334,7 +276,7 @@ export default function AdminOrdersPage() {
           className="rounded-xl border-2 border-[#0d2137]/15 bg-white px-4 py-2.5 text-sm font-medium text-[#0d2137] shadow-sm transition focus:border-[var(--accent)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/30"
         >
           <option value="">{t("orders.filterAllStatus")}</option>
-          {Object.entries(STATUS_CONFIG).map(([value, c]) => (
+          {Object.entries(ADMIN_ORDER_STATUS_CONFIG).map(([value, c]) => (
             <option key={value} value={value}>
               {locale === "ar" ? c.labelAr : c.labelDe}
             </option>
@@ -536,7 +478,7 @@ export default function AdminOrdersPage() {
             ) : (
               <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
                 {inProgressOrders.map((o) => {
-                  const st = STATUS_CONFIG[o.logistics_status] ?? STATUS_CONFIG.draft;
+                  const st = ADMIN_ORDER_STATUS_CONFIG[o.logistics_status] ?? ADMIN_ORDER_STATUS_CONFIG.draft;
                   const etaStr =
                     o.estimated_arrival_at != null
                       ? new Date(o.estimated_arrival_at).toLocaleString(dateLocale, {
@@ -565,7 +507,7 @@ export default function AdminOrdersPage() {
                             className={`mt-1 inline-flex items-center gap-1 rounded-full bg-violet-100 px-2 py-0.5 text-xs font-medium ${st.color}`}
                           >
                             <span className={`h-2 w-2 rounded-full ${st.bg}`} />
-                            {statusText(locale, o.logistics_status)}
+                            {adminOrderStatusText(locale, o.logistics_status)}
                           </span>
                         </div>
                         <Link
