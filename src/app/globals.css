@@ -67,6 +67,42 @@ body {
   will-change: transform;
 }
 
+/* Header: DotLottie car crosses behind toolbar (right → left, physical) */
+@keyframes header-car-lottie-cross {
+  0% {
+    left: 100%;
+  }
+  100% {
+    left: -320px;
+  }
+}
+
+.header-car-lottie-inner {
+  width: 300px;
+  height: 300px;
+  transform: scale(0.34);
+  transform-origin: center center;
+}
+
+.header-car-lottie-rider {
+  position: absolute;
+  top: 50%;
+  margin-top: -150px;
+  width: 300px;
+  height: 300px;
+  animation: header-car-lottie-cross 16s linear infinite;
+  will-change: left;
+  opacity: 0.88;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header-car-lottie-rider {
+    animation: none;
+    left: 62%;
+    margin-left: -150px;
+  }
+}
+
 /* Customer tracking: live driver position = round photo filling the pin (no gaps / no Leaflet div border) */
 .leaflet-driver-photo-marker.leaflet-div-icon {
   background: transparent !important;
