@@ -51,7 +51,12 @@ export function HeaderCarLottieTrack() {
       aria-hidden
     >
       <div className="header-bar-car-rider">
-        <div className="header-bar-car-inner" ref={mountRef} />
+        <div className="header-bar-car-inner">
+          {/* Lottie art sits high in the 300×300 frame; nudge down so wheels sit on header bottom line */}
+          <div className="header-bar-car-nudge">
+            <div className="header-bar-car-mount" ref={mountRef} />
+          </div>
+        </div>
       </div>
     </div>
   );

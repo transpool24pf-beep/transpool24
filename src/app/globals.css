@@ -77,10 +77,23 @@ body {
   }
 }
 
+.header-bar-car-mount {
+  width: 300px;
+  height: 300px;
+}
+
+/* Shift artwork down inside the square canvas (van is drawn toward the top of the frame) */
+.header-bar-car-nudge {
+  width: 300px;
+  height: 300px;
+  transform: translateY(104px);
+  transform-origin: top center;
+}
+
 .header-bar-car-inner {
   width: 300px;
   height: 300px;
-  /* Anchor to bottom so the van sits on the header baseline / border line */
+  flex-shrink: 0;
   transform: scale(0.42);
   transform-origin: bottom center;
   backface-visibility: hidden;
@@ -88,11 +101,15 @@ body {
 
 .header-bar-car-rider {
   position: absolute;
+  top: 0;
   bottom: 0;
-  top: auto;
+  left: 0;
   margin-top: 0;
   width: 300px;
-  height: 300px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
   animation: header-bar-car-ltr 18s linear infinite;
   will-change: left;
   opacity: 1;
@@ -104,8 +121,8 @@ body {
     animation: none;
     left: 45%;
     margin-left: -150px;
+    top: 0;
     bottom: 0;
-    top: auto;
     margin-top: 0;
   }
 }
