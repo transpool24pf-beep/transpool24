@@ -5,7 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
 import { useMemo } from "react";
-import { type Locale } from "@/i18n/routing";
+import { locales, type Locale } from "@/i18n/routing";
+import { LOCALE_SHORT_CODE } from "@/lib/locale-display";
 import { HeaderCarLottieTrack } from "@/components/HeaderCarLottieTrack";
 
 type HeaderProps = { hideLogo?: boolean };
@@ -48,6 +49,9 @@ export function Header({ hideLogo }: HeaderProps) {
   );
 
   const hideNavOnMobileOrderDriver = useMemo(() => isOrderOrDriverFlowPath(pathname), [pathname]);
+
+  const pathWithoutLocale = pathname?.replace(/^\/[a-z]{2}(?=\/|$)/, "") || "";
+  const basePath = pathWithoutLocale || "/";
 
   /** Glossy chrome: Drivers secondary pill */
   const navLinkClass =
@@ -112,11 +116,37 @@ export function Header({ hideLogo }: HeaderProps) {
     </nav>
   );
 
+  /** Direct locale picks (no dropdown): thin strip above the main header row */
+  const localeStrip = (
+    <div className="relative z-20 border-b border-[#0d2137]/10 bg-gradient-to-b from-[#eef1f6] to-[#e4e8ef]">
+      <nav
+        className="mx-auto flex max-w-6xl flex-nowrap items-center justify-start gap-0.5 overflow-x-auto overscroll-x-contain px-2 py-1 [-webkit-overflow-scrolling:touch] sm:justify-center sm:gap-1 sm:px-4 sm:py-1.5"
+        aria-label={t("language")}
+      >
+        {locales.map((loc) => (
+          <Link
+            key={loc}
+            href={`/${loc}${basePath === "/" ? "" : basePath}`}
+            className={`shrink-0 rounded-md px-2 py-0.5 text-[11px] font-semibold tabular-nums transition sm:px-2.5 sm:py-1 sm:text-xs ${
+              loc === locale
+                ? "bg-[#0d2137] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]"
+                : "text-[#0d2137]/88 hover:bg-[#0d2137]/12"
+            }`}
+            aria-current={loc === locale ? "page" : undefined}
+          >
+            {LOCALE_SHORT_CODE[loc]}
+          </Link>
+        ))}
+      </nav>
+    </div>
+  );
+
   return (
     <header
       dir={rtl ? "rtl" : "ltr"}
       className="sticky top-0 z-50 relative overflow-hidden border-b border-[#0d2137]/10 bg-[var(--background)]"
     >
+      {localeStrip}
       <HeaderCarLottieTrack />
       {/* No backdrop-blur / frosted layer — it blurs the DotLottie behind this row */}
       <div className="relative z-10">
