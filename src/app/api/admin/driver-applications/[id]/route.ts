@@ -63,15 +63,88 @@ export async function PATCH(
   const action = body?.action as string;
   if (
     !action ||
-    !["approve", "reject", "assign_number", "suspend", "unsuspend", "update_desired_note", "update_star_rating", "update_bank_info"].includes(action)
+    ![
+      "approve",
+      "reject",
+      "assign_number",
+      "suspend",
+      "unsuspend",
+      "update_desired_note",
+      "update_star_rating",
+      "update_bank_info",
+      "record_driver_payment",
+      "add_payable_balance",
+      "set_payable_balance",
+    ].includes(action)
   ) {
     return NextResponse.json(
-      { error: "action must be approve, reject, assign_number, suspend, unsuspend, update_desired_note, update_star_rating, or update_bank_info" },
+      {
+        error:
+          "action must be approve, reject, assign_number, suspend, unsuspend, update_desired_note, update_star_rating, update_bank_info, record_driver_payment, add_payable_balance, or set_payable_balance",
+      },
       { status: 400 }
     );
   }
 
   const supabase = createServerSupabase();
+
+  if (action === "record_driver_payment" || action === "add_payable_balance" || action === "set_payable_balance") {
+    const { data: row, error: fetchErr } = await supabase
+      .from("driver_applications")
+      .select("id, payable_balance_cents")
+      .eq("id", id)
+      .single();
+    if (fetchErr || !row) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+    const current = Number((row as { payable_balance_cents?: number }).payable_balance_cents ?? 0) || 0;
+    let next = current;
+    if (action === "set_payable_balance") {
+      const v = body.value_cents ?? body.payable_balance_cents;
+      const n = typeof v === "number" ? Math.floor(v) : parseInt(String(v), 10);
+      if (!Number.isFinite(n) || n < 0) {
+        return NextResponse.json({ error: "value_cents must be a non-negative integer" }, { status: 400 });
+      }
+      next = n;
+    } else if (action === "add_payable_balance") {
+      const a = body.amount_cents ?? (body.amount_eur != null ? Math.round(Number(body.amount_eur) * 100) : NaN);
+      const add = typeof a === "number" ? Math.floor(a) : NaN;
+      if (!Number.isFinite(add) || add <= 0) {
+        return NextResponse.json({ error: "amount_cents or amount_eur must be positive" }, { status: 400 });
+      }
+      next = current + add;
+    } else {
+      const a = body.amount_cents ?? (body.amount_eur != null ? Math.round(Number(body.amount_eur) * 100) : NaN);
+      const sub = typeof a === "number" ? Math.floor(a) : NaN;
+      if (!Number.isFinite(sub) || sub <= 0) {
+        return NextResponse.json({ error: "amount_cents or amount_eur must be positive" }, { status: 400 });
+      }
+      next = current - sub;
+      if (next < 0) {
+        return NextResponse.json(
+          { error: `Payment exceeds balance. Current: ${(current / 100).toFixed(2)} €` },
+          { status: 400 }
+        );
+      }
+    }
+    const { error: upErr } = await supabase
+      .from("driver_applications")
+      .update({ payable_balance_cents: next, updated_at: new Date().toISOString() })
+      .eq("id", id);
+    if (upErr) {
+      if (upErr.message?.includes("payable_balance") || upErr.code === "42703") {
+        return NextResponse.json(
+          {
+            error:
+              "Database column missing: run supabase/add_driver_payable_balance.sql in Supabase SQL Editor.",
+          },
+          { status: 500 }
+        );
+      }
+      return NextResponse.json({ error: upErr.message }, { status: 500 });
+    }
+    return NextResponse.json({ ok: true, payable_balance_cents: next });
+  }
 
   if (action === "suspend" || action === "unsuspend") {
     const { error: updateErr } = await supabase

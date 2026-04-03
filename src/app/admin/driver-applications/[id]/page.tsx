@@ -48,6 +48,8 @@ type DriverApp = {
   created_at: string;
   iban: string | null;
   bank_account_holder_name: string | null;
+  /** Cents still owed to driver; decreases when admin records a payment */
+  payable_balance_cents?: number;
 };
 
 const UPLOAD_URL = "/api/driver-applications/upload";
@@ -79,6 +81,10 @@ export default function AdminDriverApplicationDetailPage({
   const [modalIban, setModalIban] = useState("");
   const [modalHolderName, setModalHolderName] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [balancePayEur, setBalancePayEur] = useState("");
+  const [balanceAddEur, setBalanceAddEur] = useState("");
+  const [balanceSetEur, setBalanceSetEur] = useState("");
+  const [balanceLoading, setBalanceLoading] = useState(false);
 
   const fetchApp = () => {
     if (!id) return;
@@ -335,6 +341,193 @@ export default function AdminDriverApplicationDetailPage({
                   </button>
                 ))}
               </span>
+            </div>
+          </div>
+        )}
+
+        {app.status === "approved" && (
+          <div className="mt-6 rounded-xl border-2 border-emerald-400/50 bg-gradient-to-br from-emerald-50/95 to-white p-5 shadow-sm">
+            <p className="text-sm font-semibold text-[#0d2137]/90">Offener Saldo (an Fahrer zu zahlen)</p>
+            <p className="mt-1 text-3xl font-bold tabular-nums text-emerald-900">
+              {((app.payable_balance_cents ?? 0) / 100).toFixed(2)} €
+            </p>
+            <p className="mt-2 text-xs text-[#0d2137]/55">
+              Bei Überweisung an den Fahrer den Betrag hier verbuchen — der Saldo sinkt automatisch.
+            </p>
+            <div className="mt-4 flex flex-wrap items-end gap-3">
+              <div>
+                <label className="block text-xs font-medium text-[#0d2137]/70">Zahlung verbuchen (€)</label>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={balancePayEur}
+                  onChange={(e) => setBalancePayEur(e.target.value)}
+                  placeholder="z. B. 128,95"
+                  className="mt-1 w-36 rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm"
+                />
+              </div>
+              <button
+                type="button"
+                disabled={balanceLoading}
+                onClick={async () => {
+                  const t = balancePayEur.trim().replace(",", ".");
+                  const n = parseFloat(t);
+                  if (!Number.isFinite(n) || n <= 0) {
+                    alert("Bitte einen positiven Betrag eingeben.");
+                    return;
+                  }
+                  setBalanceLoading(true);
+                  try {
+                    const res = await fetch(`/api/admin/driver-applications/${id}`, {
+                      method: "PATCH",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ action: "record_driver_payment", amount_eur: n }),
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                      setBalancePayEur("");
+                      fetchApp();
+                    } else {
+                      alert(data?.error ?? "Fehlgeschlagen");
+                    }
+                  } catch {
+                    alert("Verbindungsfehler");
+                  } finally {
+                    setBalanceLoading(false);
+                  }
+                }}
+                className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800 disabled:opacity-50"
+              >
+                Abziehen
+              </button>
+            </div>
+            <div className="mt-4 flex flex-wrap items-end gap-3 border-t border-emerald-200/80 pt-4">
+              <div>
+                <label className="block text-xs font-medium text-[#0d2137]/70">Gutschrift hinzufügen (€)</label>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={balanceAddEur}
+                  onChange={(e) => setBalanceAddEur(e.target.value)}
+                  placeholder="0,00"
+                  className="mt-1 w-36 rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm"
+                />
+              </div>
+              <button
+                type="button"
+                disabled={balanceLoading}
+                onClick={async () => {
+                  const t = balanceAddEur.trim().replace(",", ".");
+                  const n = parseFloat(t);
+                  if (!Number.isFinite(n) || n <= 0) {
+                    alert("Bitte einen positiven Betrag eingeben.");
+                    return;
+                  }
+                  setBalanceLoading(true);
+                  try {
+                    const res = await fetch(`/api/admin/driver-applications/${id}`, {
+                      method: "PATCH",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ action: "add_payable_balance", amount_eur: n }),
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                      setBalanceAddEur("");
+                      fetchApp();
+                    } else {
+                      alert(data?.error ?? "Fehlgeschlagen");
+                    }
+                  } catch {
+                    alert("Verbindungsfehler");
+                  } finally {
+                    setBalanceLoading(false);
+                  }
+                }}
+                className="rounded-lg border border-emerald-600/40 bg-white px-4 py-2 text-sm font-medium text-emerald-900 hover:bg-emerald-50 disabled:opacity-50"
+              >
+                Gutschreiben
+              </button>
+              {app.stats != null && (
+                <button
+                  type="button"
+                  disabled={balanceLoading}
+                  onClick={async () => {
+                    const sum = app.stats!.total_paid_cents;
+                    if (
+                      !window.confirm(
+                        `Saldo komplett auf Summe Fahrerpreis aller Aufträge setzen: ${(sum / 100).toFixed(2)} €? Der bisherige Saldo wird ersetzt.`
+                      )
+                    )
+                      return;
+                    setBalanceLoading(true);
+                    try {
+                      const res = await fetch(`/api/admin/driver-applications/${id}`, {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ action: "set_payable_balance", value_cents: sum }),
+                      });
+                      const data = await res.json();
+                      if (res.ok) fetchApp();
+                      else alert(data?.error ?? "Fehlgeschlagen");
+                    } catch {
+                      alert("Verbindungsfehler");
+                    } finally {
+                      setBalanceLoading(false);
+                    }
+                  }}
+                  className="rounded-lg bg-[#0d2137]/10 px-3 py-2 text-xs font-medium text-[#0d2137]/80 hover:bg-[#0d2137]/15 disabled:opacity-50"
+                >
+                  Saldo = Summe Aufträge
+                </button>
+              )}
+            </div>
+            <div className="mt-3 flex flex-wrap items-end gap-3">
+              <div>
+                <label className="block text-xs font-medium text-[#0d2137]/70">Saldo manuell setzen (€)</label>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  value={balanceSetEur}
+                  onChange={(e) => setBalanceSetEur(e.target.value)}
+                  placeholder="0,00"
+                  className="mt-1 w-36 rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm"
+                />
+              </div>
+              <button
+                type="button"
+                disabled={balanceLoading}
+                onClick={async () => {
+                  const t = balanceSetEur.trim().replace(",", ".");
+                  const n = parseFloat(t);
+                  if (!Number.isFinite(n) || n < 0) {
+                    alert("Bitte einen gültigen Betrag ≥ 0 eingeben.");
+                    return;
+                  }
+                  if (!window.confirm(`Saldo auf ${n.toFixed(2)} € setzen?`)) return;
+                  setBalanceLoading(true);
+                  try {
+                    const res = await fetch(`/api/admin/driver-applications/${id}`, {
+                      method: "PATCH",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ action: "set_payable_balance", value_cents: Math.round(n * 100) }),
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                      setBalanceSetEur("");
+                      fetchApp();
+                    } else {
+                      alert(data?.error ?? "Fehlgeschlagen");
+                    }
+                  } catch {
+                    alert("Verbindungsfehler");
+                  } finally {
+                    setBalanceLoading(false);
+                  }
+                }}
+                className="rounded-lg border border-[#0d2137]/25 px-3 py-2 text-xs font-medium text-[#0d2137]/80 hover:bg-[#0d2137]/5 disabled:opacity-50"
+              >
+                Saldo überschreiben
+              </button>
             </div>
           </div>
         )}
