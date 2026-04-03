@@ -50,24 +50,23 @@ export function Header({ hideLogo }: HeaderProps) {
   const basePath = pathWithoutLocale || "/";
 
   const navLinkClass =
-    "rounded-lg border border-[#0d2137]/15 px-2 py-1 text-sm font-medium leading-none text-[var(--foreground)] transition hover:bg-[#0d2137]/5 sm:px-2.5 sm:py-1";
+    "rounded-lg border border-[#0d2137]/15 px-2 py-0.5 text-sm font-medium leading-none text-[var(--foreground)] transition hover:bg-[#0d2137]/5 sm:px-2.5 sm:py-0.5";
   const navCtaClass =
-    "rounded-lg bg-[var(--accent)] px-2.5 py-1 text-sm font-medium leading-none text-white transition hover:opacity-90 sm:px-3 sm:py-1";
+    "rounded-lg bg-[var(--accent)] px-2.5 py-0.5 text-sm font-medium leading-none text-white transition hover:opacity-90 sm:px-3 sm:py-0.5";
   const langBtnClass =
-    "flex items-center gap-1.5 rounded-lg border border-[#0d2137]/20 px-2 py-1 text-sm font-medium leading-none text-[var(--foreground)] sm:gap-2 sm:px-2 sm:py-1";
+    "flex items-center gap-1.5 rounded-lg border border-[#0d2137]/20 px-2 py-0.5 text-sm font-medium leading-none text-[var(--foreground)] sm:gap-2 sm:px-2 sm:py-0.5";
 
   const logoSizesCenter =
     "relative block h-[3.25rem] w-[min(88vw,17.5rem)] sm:h-[3.875rem] sm:w-[min(88vw,20rem)] md:h-[4.5rem] md:w-[min(90vw,22rem)] lg:h-[5rem] lg:w-[min(92vw,24rem)]";
-  /** Home only: large corner logo; row is full-bleed with minimal inline-start padding */
-  const logoSizesHomeCorner =
-    "relative block h-[4.25rem] w-[min(90vw,19rem)] shrink-0 sm:h-[4.75rem] sm:w-[21rem] md:h-[5.25rem] md:w-[23.5rem] lg:h-[5.75rem] lg:w-[26rem]";
-  const logoSizesCornerOther =
-    "relative block h-[2.35rem] w-[min(62vw,9.5rem)] shrink-0 sm:h-[2.65rem] sm:w-[10.5rem] md:h-[2.85rem] md:w-[11.25rem]";
 
   const homePath = isLocaleHomePath(pathname, locale);
-  const logoCornerClass = homePath ? logoSizesHomeCorner : logoSizesCornerOther;
 
-  const logoImage = (
+  /** Corner rows: no fixed-height box (avoids empty band above/below wide logo with object-contain). */
+  const cornerLogoImgClass = homePath
+    ? "h-auto w-auto max-h-[2.65rem] max-w-[min(76vw,14rem)] object-contain object-start rtl:object-right sm:max-h-[2.85rem] sm:max-w-[15.25rem] md:max-h-[3rem] md:max-w-[16.5rem]"
+    : "h-auto w-auto max-h-[2.2rem] max-w-[min(56vw,8.75rem)] object-contain object-start rtl:object-right sm:max-h-[2.4rem] sm:max-w-[9.75rem] md:max-h-[2.55rem]";
+
+  const logoImageCenter = (
     <Image
       src="/5439.png"
       alt="TransPool24"
@@ -75,13 +74,24 @@ export function Header({ hideLogo }: HeaderProps) {
       height={558}
       quality={100}
       className="h-full w-full object-contain object-center"
-      priority={homePath || showLargeCenterLogo}
+      priority={showLargeCenterLogo}
+      sizes="(max-width: 640px) 88vw, (max-width: 1024px) 20rem, 24rem"
+    />
+  );
+
+  const logoImageCorner = (
+    <Image
+      src="/5439.png"
+      alt="TransPool24"
+      width={1024}
+      height={558}
+      quality={100}
+      className={cornerLogoImgClass}
+      priority={homePath}
       sizes={
-        showLargeCenterLogo
-          ? "(max-width: 640px) 88vw, (max-width: 1024px) 20rem, 24rem"
-          : homePath
-            ? "(max-width: 640px) 90vw, (max-width: 1024px) 24rem, 26rem"
-            : "(max-width: 640px) 40vw, 11rem"
+        homePath
+          ? "(max-width: 640px) 76vw, (max-width: 1024px) 15rem, 16rem"
+          : "(max-width: 640px) 56vw, (max-width: 1024px) 10rem, 11rem"
       }
     />
   );
@@ -149,18 +159,18 @@ export function Header({ hideLogo }: HeaderProps) {
       className="sticky top-0 z-50 border-b border-[#0d2137]/10 bg-[var(--background)]/95 backdrop-blur"
     >
       {hideLogo ? (
-        <div className="mx-auto flex max-w-6xl items-center justify-end gap-2 px-4 py-1 sm:px-6 sm:py-1.5">
+        <div className="mx-auto flex max-w-6xl items-center justify-end gap-2 px-4 py-0.5 sm:px-6 sm:py-1">
           {nav}
         </div>
       ) : showLargeCenterLogo ? (
-        <div className="mx-auto grid max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 py-1 sm:gap-3 sm:px-6 sm:py-1.5">
+        <div className="mx-auto grid max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 py-0.5 sm:gap-3 sm:px-6 sm:py-1">
           <div className="min-w-0" aria-hidden />
           <Link
             href={`/${locale}`}
             className="flex justify-center justify-self-center"
             aria-label="TransPool24"
           >
-            <span className={logoSizesCenter}>{logoImage}</span>
+            <span className={logoSizesCenter}>{logoImageCenter}</span>
           </Link>
           <div className="min-w-0 justify-self-end">{nav}</div>
         </div>
@@ -168,8 +178,8 @@ export function Header({ hideLogo }: HeaderProps) {
         <div
           className={`flex w-full items-center justify-between gap-2 sm:gap-3 ${
             homePath
-              ? "py-0.5 ps-1.5 pe-3 sm:ps-2 sm:pe-4 md:pe-5"
-              : "mx-auto max-w-6xl px-4 py-1 sm:px-6 sm:py-1.5"
+              ? "py-0 ps-1.5 pe-3 sm:ps-2 sm:pe-4 md:pe-5"
+              : "mx-auto max-w-6xl px-4 py-0 sm:px-6 sm:py-0.5"
           }`}
         >
           <Link
@@ -181,7 +191,7 @@ export function Header({ hideLogo }: HeaderProps) {
             }
             aria-label="TransPool24"
           >
-            <span className={logoCornerClass}>{logoImage}</span>
+            <span className="relative inline-flex shrink-0 items-center">{logoImageCorner}</span>
           </Link>
           {nav}
         </div>
