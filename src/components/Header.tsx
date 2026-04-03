@@ -53,12 +53,14 @@ export function Header({ hideLogo }: HeaderProps) {
   const pathWithoutLocale = pathname?.replace(/^\/[a-z]{2}(?=\/|$)/, "") || "";
   const basePath = pathWithoutLocale || "/";
 
+  /** Glossy chrome: light top edge + soft depth (Magazine / Drivers / language) */
   const navLinkClass =
-    "rounded-lg border border-[#0d2137]/15 px-2 py-0.5 text-sm font-medium leading-none text-[var(--foreground)] transition hover:bg-[#0d2137]/5 sm:px-2.5 sm:py-0.5";
+    "rounded-lg border border-[#0d2137]/14 bg-gradient-to-b from-white to-[#e9ecf1] px-2 py-0.5 text-sm font-medium leading-none text-[var(--foreground)] shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_1px_2px_rgba(13,33,55,0.06)] transition hover:from-[#fafbfc] hover:to-[#e2e6ec] hover:shadow-[inset_0_1px_0_rgba(255,255,255,1),0_2px_8px_rgba(13,33,55,0.08)] active:translate-y-px sm:px-2.5 sm:py-0.5";
+  /** Primary CTA: richer gradient, glow, stronger inset highlight */
   const navCtaClass =
-    "rounded-lg bg-[var(--accent)] px-2.5 py-0.5 text-sm font-medium leading-none text-white transition hover:opacity-90 sm:px-3 sm:py-0.5";
+    "relative overflow-hidden rounded-lg border border-[#b84702]/35 bg-gradient-to-b from-[#ffa64d] via-[#e85d04] to-[#c24a03] px-2.5 py-0.5 text-sm font-semibold leading-none text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2px_10px_rgba(232,93,4,0.42),0_1px_0_rgba(0,0,0,0.12)_inset] ring-1 ring-white/20 transition hover:brightness-[1.06] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_4px_16px_rgba(232,93,4,0.48)] active:translate-y-px active:brightness-[0.98] sm:px-3 sm:py-0.5";
   const langBtnClass =
-    "flex items-center gap-1.5 rounded-lg border border-[#0d2137]/20 px-2 py-0.5 text-sm font-medium leading-none text-[var(--foreground)] sm:gap-2 sm:px-2 sm:py-0.5";
+    "flex items-center gap-1.5 rounded-lg border border-[#0d2137]/14 bg-gradient-to-b from-white to-[#e9ecf1] px-2 py-0.5 text-sm font-medium leading-none text-[var(--foreground)] shadow-[inset_0_1px_0_rgba(255,255,255,0.92),0_1px_2px_rgba(13,33,55,0.06)] transition hover:from-[#fafbfc] hover:to-[#e2e6ec] hover:shadow-[inset_0_1px_0_rgba(255,255,255,1),0_2px_8px_rgba(13,33,55,0.08)] active:translate-y-px sm:gap-2 sm:px-2 sm:py-0.5";
 
   /** Order / driver / blog: prominent centered logo (intrinsic size + max bounds, no short letterbox strip). */
   const centerLogoImgClass =
