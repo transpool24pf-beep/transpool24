@@ -65,21 +65,23 @@ export default async function HomePage({
             <div className="mx-auto w-full max-w-7xl">
               <div className="max-w-2xl">
                 <div
-                  className="relative w-fit max-w-[min(100%,13.5rem)] rounded-md border border-white/45 bg-[var(--accent)] px-2.5 py-1.5 sm:max-w-[15rem] sm:px-3 sm:py-2 md:max-w-[16.5rem]"
+                  className="relative inline-block max-w-full rounded-xl border-2 border-white/55 bg-[var(--accent)] px-5 py-4 sm:px-8 sm:py-6 md:px-9 md:py-7"
                   style={{
                     boxShadow:
-                      "0 3px 16px rgba(232,93,4,0.32), inset 0 0 0 1px rgba(255,255,255,0.22), 0 0 0 1px rgba(255,255,255,0.08)",
+                      "0 8px 32px rgba(232,93,4,0.4), inset 0 0 0 1px rgba(255,255,255,0.3), 0 0 0 3px rgba(255,255,255,0.12)",
                   }}
                 >
-                  <div className="absolute left-1 top-1 h-2 w-2 rounded-tl border-l border-t border-white/50" aria-hidden />
-                  <div className="absolute right-1 top-1 h-2 w-2 rounded-tr border-r border-t border-white/50" aria-hidden />
-                  <div className="absolute bottom-1 left-1 h-2 w-2 rounded-bl border-b border-l border-white/50" aria-hidden />
-                  <div className="absolute bottom-1 right-1 h-2 w-2 rounded-br border-b border-r border-white/50" aria-hidden />
-                  <h1 className="relative text-sm font-bold leading-tight text-white sm:text-base md:text-lg">
+                  <div className="absolute left-2 top-2 h-5 w-5 rounded-tl border-l-2 border-t-2 border-white/60" aria-hidden />
+                  <div className="absolute right-2 top-2 h-5 w-5 rounded-tr border-r-2 border-t-2 border-white/60" aria-hidden />
+                  <div className="absolute bottom-2 left-2 h-5 w-5 rounded-bl border-b-2 border-l-2 border-white/60" aria-hidden />
+                  <div className="absolute bottom-2 right-2 h-5 w-5 rounded-br border-b-2 border-r-2 border-white/60" aria-hidden />
+                  <h1 className="relative text-2xl font-bold leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl">
                     {heroHeadline}
                   </h1>
                 </div>
-                <p className="mt-6 max-w-xl text-lg text-white/95 sm:text-xl">{heroSubtitle}</p>
+                <p className="mt-6 max-w-2xl text-xl font-semibold leading-snug text-white/95 drop-shadow-sm sm:text-2xl md:text-2xl">
+                  {heroSubtitle}
+                </p>
                 <Link
                   href={`/${locale}/order`}
                   className="mt-10 inline-flex items-center gap-2 rounded-xl border-2 border-white/50 bg-[var(--accent)] px-10 py-4 text-lg font-bold text-white shadow-[0_4px_20px_rgba(0,0,0,0.3),inset_0_0_0_1px_rgba(255,255,255,0.2)] transition hover:brightness-110"

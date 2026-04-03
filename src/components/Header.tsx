@@ -63,7 +63,7 @@ export function Header({ hideLogo }: HeaderProps) {
 
   /** Corner rows: no fixed-height box (avoids empty band above/below wide logo with object-contain). */
   const cornerLogoImgClass = homePath
-    ? "h-auto w-auto max-h-[2.65rem] max-w-[min(76vw,14rem)] object-contain object-start rtl:object-right sm:max-h-[2.85rem] sm:max-w-[15.25rem] md:max-h-[3rem] md:max-w-[16.5rem]"
+    ? "h-auto w-auto max-h-[3.35rem] max-w-[min(90vw,17rem)] object-contain object-start rtl:object-right sm:max-h-[3.85rem] sm:max-w-[19rem] md:max-h-[4.35rem] md:max-w-[21.5rem] lg:max-h-[4.75rem] lg:max-w-[24rem]"
     : "h-auto w-auto max-h-[2.2rem] max-w-[min(56vw,8.75rem)] object-contain object-start rtl:object-right sm:max-h-[2.4rem] sm:max-w-[9.75rem] md:max-h-[2.55rem]";
 
   const logoImageCenter = (
@@ -90,7 +90,7 @@ export function Header({ hideLogo }: HeaderProps) {
       priority={homePath}
       sizes={
         homePath
-          ? "(max-width: 640px) 76vw, (max-width: 1024px) 15rem, 16rem"
+          ? "(max-width: 640px) 90vw, (max-width: 1024px) 20rem, 24rem"
           : "(max-width: 640px) 56vw, (max-width: 1024px) 10rem, 11rem"
       }
     />
@@ -178,7 +178,7 @@ export function Header({ hideLogo }: HeaderProps) {
         <div
           className={`flex w-full items-center justify-between gap-2 sm:gap-3 ${
             homePath
-              ? "py-0 ps-1.5 pe-3 sm:ps-2 sm:pe-4 md:pe-5"
+              ? "py-1 ps-1.5 pe-3 sm:py-1.5 sm:ps-2 sm:pe-4 md:pe-5"
               : "mx-auto max-w-6xl px-4 py-0 sm:px-6 sm:py-0.5"
           }`}
         >
