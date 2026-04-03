@@ -29,6 +29,12 @@ import {
   loadOrderFormDraft,
   saveOrderFormDraft,
 } from "@/lib/order-form-draft";
+import {
+  filterContactHistoryForQuery,
+  loadOrderContactHistory,
+  mergePersistedContact,
+  type OrderContactEntry,
+} from "@/lib/order-contact-history";
 
 const RouteMap = dynamic(
   () => import("@/components/RouteMapInner").then((m) => m.RouteMapInner),
@@ -235,6 +241,8 @@ export function OrderForm({
   const [pickupSuggestions, setPickupSuggestions] = useState<Suggestion[]>([]);
   const [deliverySuggestions, setDeliverySuggestions] = useState<Suggestion[]>([]);
   const [addressHistory, setAddressHistory] = useState<string[]>([]);
+  const [contactHistory, setContactHistory] = useState<OrderContactEntry[]>([]);
+  const [contactSuggestionsOpen, setContactSuggestionsOpen] = useState(false);
   const [suggestionsOpen, setSuggestionsOpen] = useState<"pickup" | "delivery" | null>(null);
   const [distanceLoading, setDistanceLoading] = useState(false);
   const [distanceFromRoute, setDistanceFromRoute] = useState(false);
@@ -275,6 +283,10 @@ export function OrderForm({
 
   useEffect(() => {
     setAddressHistory(loadOrderAddressHistory());
+  }, []);
+
+  useEffect(() => {
+    setContactHistory(loadOrderContactHistory());
   }, []);
 
   useEffect(() => {
@@ -396,6 +408,23 @@ export function OrderForm({
       }),
     [pickupSuggestions, pickupHistoryKeySet]
   );
+  const contactFiltered = useMemo(
+    () => filterContactHistoryForQuery(contactHistory, data.companyName, data.email, data.phone),
+    [contactHistory, data.companyName, data.email, data.phone]
+  );
+
+  const applyContactSuggestion = useCallback((c: OrderContactEntry) => {
+    setPhoneCountryCode(c.phoneCountryCode || "+49");
+    setData((prev) => ({
+      ...prev,
+      companyName: c.companyName,
+      email: c.email,
+      phone: c.phone,
+    }));
+    setError(null);
+    setContactSuggestionsOpen(false);
+  }, []);
+
   const deliveryApiSuggestionsDeduped = useMemo(
     () =>
       deliverySuggestions.filter((s) => {
@@ -762,6 +791,18 @@ export function OrderForm({
 
   const next = () => {
     if (step < 4) {
+      if (step === 1 && step1Complete) {
+        setContactHistory((prev) =>
+          mergePersistedContact(prev, {
+            companyName: data.companyName.trim(),
+            email: data.email.trim(),
+            phoneCountryCode,
+            phone: data.phone.trim(),
+          })
+        );
+        setStep((s) => s + 1);
+        return;
+      }
       if (step === 2 && step2Complete) {
         const dateCommit = applyPickupDateCommit();
         if (!dateCommit.ok) return;
@@ -777,7 +818,7 @@ export function OrderForm({
           setDistanceLoading(false);
           setStep((s) => s + 1);
         });
-      } else {
+      } else if (step !== 1) {
         setStep((s) => s + 1);
       }
     }
@@ -883,7 +924,7 @@ export function OrderForm({
       )}
 
       {step === 1 && (
-        <div className="space-y-4">
+        <div className="relative space-y-4">
           <h2 className="text-lg font-semibold text-[var(--primary)]">
             {t("step1")}
           </h2>
@@ -895,6 +936,8 @@ export function OrderForm({
               type="text"
               value={data.companyName}
               onChange={(e) => update({ companyName: e.target.value })}
+              onFocus={() => setContactSuggestionsOpen(true)}
+              onBlur={() => setTimeout(() => setContactSuggestionsOpen(false), 200)}
               placeholder={t("companyNamePlaceholder")}
               className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
             />
@@ -907,6 +950,8 @@ export function OrderForm({
               type="email"
               value={data.email}
               onChange={(e) => update({ email: e.target.value })}
+              onFocus={() => setContactSuggestionsOpen(true)}
+              onBlur={() => setTimeout(() => setContactSuggestionsOpen(false), 200)}
               placeholder={t("emailPlaceholder")}
               className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
             />
@@ -963,11 +1008,41 @@ export function OrderForm({
                 type="tel"
                 value={data.phone}
                 onChange={(e) => update({ phone: e.target.value })}
+                onFocus={() => setContactSuggestionsOpen(true)}
+                onBlur={() => setTimeout(() => setContactSuggestionsOpen(false), 200)}
                 placeholder={t("whatsappPlaceholder")}
                 className="min-w-0 flex-1 rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
               />
             </div>
           </div>
+          {contactSuggestionsOpen && contactFiltered.length > 0 && (
+            <ul
+              className="absolute left-0 right-0 top-full z-30 mt-1 max-h-56 overflow-auto rounded-lg border border-[#0d2137]/20 bg-white py-1 shadow-lg"
+              dir={isRtlLocale ? "rtl" : "ltr"}
+              lang={htmlLang}
+            >
+              <li className="pointer-events-none px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--foreground)]/50">
+                {t("contactHistorySection")}
+              </li>
+              {contactFiltered.map((c, i) => (
+                <li key={`${c.email}-${i}`}>
+                  <button
+                    type="button"
+                    className="flex w-full flex-col items-start gap-0.5 px-4 py-2 text-start text-sm hover:bg-[#0d2137]/5"
+                    onMouseDown={(ev) => {
+                      ev.preventDefault();
+                      applyContactSuggestion(c);
+                    }}
+                  >
+                    <span className="font-medium text-[var(--foreground)]">{c.companyName}</span>
+                    <span className="text-xs text-[var(--foreground)]/70">
+                      {c.email} · {c.phoneCountryCode} {c.phone}
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
 

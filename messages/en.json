@@ -335,6 +335,7 @@
     "step4": "Summary & payment",
     "companyName": "Company name",
     "companyNamePlaceholder": "e.g. Example GmbH",
+    "contactHistorySection": "Your recent contact details",
     "email": "Email",
     "emailPlaceholder": "example@company.com",
     "phone": "Phone number",
