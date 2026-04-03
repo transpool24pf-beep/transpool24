@@ -272,12 +272,14 @@ export async function sendOrderConfirmationEmail(
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com";
 /** Bump after replacing public/transpool24-email-logo.png (Gmail/proxy cache). */
-const EMAIL_HEADER_CACHE_BUST = process.env.EMAIL_HEADER_CACHE_BUST?.trim() || "20260403e";
+const EMAIL_HEADER_CACHE_BUST = process.env.EMAIL_HEADER_CACHE_BUST?.trim() || "20260403f";
 /** Dedicated file for mail + support forms — avoids production /5439.png (site header) being an old banner strip. */
 const EMAIL_HEADER_LOGO_URL = `${SITE_URL}/transpool24-email-logo.png?v=${encodeURIComponent(EMAIL_HEADER_CACHE_BUST)}`;
-/** Same slot as before (320×84): white strip + logo, contain = no squashing, letterboxing on white. */
-const EMAIL_HEADER_LOGO_DISPLAY_W = 320;
-const EMAIL_HEADER_LOGO_DISPLAY_H = 84;
+/**
+ * Fluid logo in mail: scales down on phones (no fixed height → no vertical squashing),
+ * uses full width up to this cap on desktop.
+ */
+const EMAIL_HEADER_LOGO_MAX_WIDTH_PX = 560;
 const EMAIL_HEADER_LOGO_CID = "tp24-email-header-logo";
 
 function readTransactionalEmailLogoFile(): Buffer | null {
@@ -319,13 +321,12 @@ function appendTransactionalLogoAttachment(attachments?: Attachment[]): Attachme
 
 function emailHeaderBannerHtmlWithSrc(imgSrc: string): string {
   const bg = "#ffffff";
-  const w = EMAIL_HEADER_LOGO_DISPLAY_W;
-  const h = EMAIL_HEADER_LOGO_DISPLAY_H;
+  const maxW = EMAIL_HEADER_LOGO_MAX_WIDTH_PX;
   return `
   <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:${bg}; border-collapse:collapse; border-bottom:1px solid #e2e8f0;">
     <tr>
-      <td align="center" valign="middle" style="padding:18px 20px; line-height:0; mso-line-height-rule:exactly; background:${bg};">
-        <img src="${imgSrc}" alt="TransPool24" width="${w}" height="${h}" style="display:block; margin:0 auto; border:0; outline:none; width:${w}px; height:${h}px; max-width:100%; object-fit:contain; object-position:center center; background:${bg};" />
+      <td align="center" valign="middle" style="padding:16px 14px 18px 14px; line-height:0; mso-line-height-rule:exactly; background:${bg};">
+        <img src="${imgSrc}" alt="TransPool24" width="${maxW}" style="display:block; margin:0 auto; border:0; outline:none; width:100%; max-width:${maxW}px; height:auto; object-fit:contain; object-position:center center; background:${bg}; -ms-interpolation-mode:bicubic;" />
       </td>
     </tr>
   </table>`;
@@ -825,7 +826,7 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
         </tr>
         <tr>
           <td style="background:#0d2137; padding: 28px 24px; text-align: center;">
-            <img src="${transactionalEmailBrandLogoSrcForHtml()}" alt="TransPool24" width="${EMAIL_HEADER_LOGO_DISPLAY_W}" height="${EMAIL_HEADER_LOGO_DISPLAY_H}" style="display:block; margin:0 auto 16px auto; width:${EMAIL_HEADER_LOGO_DISPLAY_W}px; height:${EMAIL_HEADER_LOGO_DISPLAY_H}px; max-width:100%; object-fit:contain; object-position:center center; border:0;" />
+            <img src="${transactionalEmailBrandLogoSrcForHtml()}" alt="TransPool24" width="${EMAIL_HEADER_LOGO_MAX_WIDTH_PX}" style="display:block; margin:0 auto 16px auto; width:100%; max-width:${EMAIL_HEADER_LOGO_MAX_WIDTH_PX}px; height:auto; object-fit:contain; object-position:center center; border:0; -ms-interpolation-mode:bicubic;" />
             <p style="margin:0; font-size:18px; font-weight:700; color:#fff; line-height:1.4;">
               Ihr Weg ist sicher – und unser Team steht immer hinter Ihnen.
             </p>
@@ -912,7 +913,7 @@ function buildDriverPaymentInvoiceEmailHtml(data: DriverPaymentInvoiceEmailData)
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; padding: 0 20px 24px;">
     <tr><td>
       <div style="background: ${headerBlue}; border-radius: 0 0 16px 16px; padding: 32px 24px; text-align: center;">
-        <img src="${transactionalEmailBrandLogoSrcForHtml()}" alt="TransPool24" width="${EMAIL_HEADER_LOGO_DISPLAY_W}" height="${EMAIL_HEADER_LOGO_DISPLAY_H}" style="display:block; margin:0 auto 20px; width:${EMAIL_HEADER_LOGO_DISPLAY_W}px; height:${EMAIL_HEADER_LOGO_DISPLAY_H}px; max-width:100%; object-fit:contain; object-position:center center; border:0;" />
+        <img src="${transactionalEmailBrandLogoSrcForHtml()}" alt="TransPool24" width="${EMAIL_HEADER_LOGO_MAX_WIDTH_PX}" style="display:block; margin:0 auto 20px; width:100%; max-width:${EMAIL_HEADER_LOGO_MAX_WIDTH_PX}px; height:auto; object-fit:contain; object-position:center center; border:0; -ms-interpolation-mode:bicubic;" />
         <p style="margin: 0 0 20px 0; font-size: 18px; font-weight: bold; color: #ffffff;">Ihr Weg ist sicher – und unser Team steht immer hinter Ihnen.</p>
         <a href="${supportUrl}" style="display: inline-block; margin: 0 0 24px 0; padding: 14px 28px; background: #00BFFF; color: #fff; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 15px;">Wir sind an Ihrer Seite bei jedem Kilometer.</a>
         <p style="margin: 0 0 12px 0; font-size: 13px; color: rgba(255,255,255,0.9);">Folgen Sie uns</p>
