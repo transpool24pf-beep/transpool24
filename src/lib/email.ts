@@ -203,7 +203,7 @@ function emailDeHeadMeta(): string {
 export async function sendOrderConfirmationEmail(
   to: string,
   job: Job & { rating_token?: string | null },
-  pdfBuffer: Uint8Array,
+  pdfBuffer: Uint8Array | null | undefined,
   options: {
     rateDriverUrl?: string | null;
     confirmPaymentUrl?: string | null;
@@ -219,6 +219,7 @@ export async function sendOrderConfirmationEmail(
 
   const orderRef = job.order_number != null ? String(job.order_number) : job.id.slice(0, 8);
   const resend = new Resend(apiKey);
+  const hasPdf = pdfBuffer != null && pdfBuffer.byteLength > 0;
   try {
     const { error } = await resend.emails.send({
       from: FROM_EMAIL,
@@ -230,12 +231,16 @@ export async function sendOrderConfirmationEmail(
         rateDriverUrl: options.rateDriverUrl,
         driver: options.driver,
       }),
-      attachments: [
-        {
-          filename: `TransPool24-Rechnung-${orderRef}.pdf`,
-          content: Buffer.from(pdfBuffer).toString("base64"),
-        },
-      ],
+      ...(hasPdf
+        ? {
+            attachments: [
+              {
+                filename: `TransPool24-Rechnung-${orderRef}.pdf`,
+                content: Buffer.from(pdfBuffer).toString("base64"),
+              },
+            ],
+          }
+        : {}),
     });
     if (error) {
       console.error("[TransPool24] Resend error:", error);

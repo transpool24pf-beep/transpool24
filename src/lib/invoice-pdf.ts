@@ -5,6 +5,20 @@ import { cargoCategoryLabelDe } from "./cargo";
 
 export type InvoiceType = "customer" | "driver";
 
+/**
+ * Standard PDF fonts (Helvetica) use WinAnsi; Arabic, emoji, etc. throw at draw time.
+ * Keep Latin-1 + ASCII; map Euro; replace the rest so invoices never crash.
+ */
+export function sanitizeTextForStandardPdfFont(text: string, maxLen = 2400): string {
+  const s = (text ?? "").normalize("NFC").slice(0, maxLen);
+  return s
+    .replace(/\u20AC/g, "EUR")
+    .replace(/[\u2013\u2014\u2212]/g, "-")
+    .replace(/\u2026/g, "...")
+    .replace(/[\u00AD\u200B-\u200D\uFEFF]/g, "")
+    .replace(/[^\u0020-\u007E\u00A0-\u00FF]/g, "?");
+}
+
 function getOrderDisplayId(job: Job & { order_number?: number | null }): string {
   if (job.order_number != null) return String(job.order_number);
   return job.id;
@@ -78,7 +92,8 @@ export async function generateInvoicePdf(
     opts: { x: number; y: number; size?: number; bold?: boolean }
   ): number {
     const { x, y, size = 10, bold = false } = opts;
-    p.drawText(text, { x, y, size, font: bold ? fB : f, color: rgb(0.1, 0.1, 0.1) });
+    const safe = sanitizeTextForStandardPdfFont(text);
+    p.drawText(safe, { x, y, size, font: bold ? fB : f, color: rgb(0.1, 0.1, 0.1) });
     return y - size - 4;
   }
 
@@ -96,7 +111,8 @@ export async function generateInvoicePdf(
   const draw = (text: string, opts: { size?: number; bold?: boolean } = {}) => {
     const size = opts.size ?? 10;
     const f = opts.bold ? fontBold : font;
-    page.drawText(text, { x: margin, y, size, font: f, color: rgb(0.1, 0.1, 0.1) });
+    const safe = sanitizeTextForStandardPdfFont(text);
+    page.drawText(safe, { x: margin, y, size, font: f, color: rgb(0.1, 0.1, 0.1) });
     y -= size + 4;
   };
 

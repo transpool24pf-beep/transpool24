@@ -59,20 +59,20 @@ export async function POST(req: Request) {
     ? `${SITE}/de/order/track?job_id=${encodeURIComponent(job.id)}&token=${encodeURIComponent(token)}`
     : null;
 
+  let pdf: Uint8Array | null = null;
   try {
-    const pdf = await generateInvoicePdf(job as Job);
-    const result = await sendOrderConfirmationEmail(email, job, pdf, {
-      rateDriverUrl,
-      confirmPaymentUrl,
-      trackOrderUrl,
-      driver: driverInfo,
-    });
-    if (!result.success) {
-      return NextResponse.json({ error: result.error ?? "Email failed" }, { status: 500 });
-    }
-    return NextResponse.json({ ok: true });
+    pdf = await generateInvoicePdf(job as Job);
   } catch (e) {
-    console.error("[admin/send-order-email]", e);
-    return NextResponse.json({ error: "Failed to send email" }, { status: 500 });
+    console.error("[admin/send-order-email] PDF generation failed (sending email without attachment)", e);
   }
+  const result = await sendOrderConfirmationEmail(email, job, pdf, {
+    rateDriverUrl,
+    confirmPaymentUrl,
+    trackOrderUrl,
+    driver: driverInfo,
+  });
+  if (!result.success) {
+    return NextResponse.json({ error: result.error ?? "Email failed" }, { status: 500 });
+  }
+  return NextResponse.json({ ok: true, pdfAttached: pdf != null && pdf.byteLength > 0 });
 }

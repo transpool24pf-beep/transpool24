@@ -71,8 +71,13 @@ export async function POST(req: Request) {
       .eq("id", jobId);
 
     if (customerEmail) {
+      let pdfBuffer: Uint8Array | null = null;
       try {
-        const pdfBuffer = await generateInvoicePdf({ ...job, customer_email: customerEmail });
+        pdfBuffer = await generateInvoicePdf({ ...job, customer_email: customerEmail });
+      } catch (e) {
+        console.error("[TransPool24] Invoice PDF failed; sending confirmation without PDF:", e);
+      }
+      try {
         const token = job.confirmation_token as string | null | undefined;
         const confirmPaymentUrl = token
           ? `${SITE}/de/order/confirm?job_id=${encodeURIComponent(jobId)}&token=${encodeURIComponent(token)}`
@@ -80,12 +85,20 @@ export async function POST(req: Request) {
         const trackOrderUrl = token
           ? `${SITE}/de/order/track?job_id=${encodeURIComponent(jobId)}&token=${encodeURIComponent(token)}`
           : null;
-        await sendOrderConfirmationEmail(customerEmail, { ...job, customer_email: customerEmail }, pdfBuffer, {
-          confirmPaymentUrl,
-          trackOrderUrl,
-        });
+        const sent = await sendOrderConfirmationEmail(
+          customerEmail,
+          { ...job, customer_email: customerEmail },
+          pdfBuffer,
+          {
+            confirmPaymentUrl,
+            trackOrderUrl,
+          },
+        );
+        if (!sent.success) {
+          console.error("[TransPool24] Confirmation email:", sent.error);
+        }
       } catch (e) {
-        console.error("[TransPool24] Confirmation email/PDF failed:", e);
+        console.error("[TransPool24] Confirmation email failed:", e);
       }
     } else {
       console.warn("[TransPool24] No customer email in session, skipping confirmation email");
