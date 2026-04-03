@@ -124,10 +124,6 @@ export function OrderTrackClient({
     load();
   }, [load]);
 
-  const lat = job?.last_driver_lat != null ? Number(job.last_driver_lat) : null;
-  const lng = job?.last_driver_lng != null ? Number(job.last_driver_lng) : null;
-  const hasLivePosition = lat != null && lng != null && Number.isFinite(lat) && Number.isFinite(lng);
-
   const trailForMap: TrailPointMap[] = useMemo(
     () =>
       trail.map((p) => ({
@@ -138,6 +134,29 @@ export function OrderTrackClient({
     [trail]
   );
 
+  /** API returns trail newest-first; first valid point = latest driver GPS. */
+  const newestTrailPoint = useMemo(() => {
+    for (const p of trailForMap) {
+      if (Number.isFinite(p.lat) && Number.isFinite(p.lng)) return p;
+    }
+    return null;
+  }, [trailForMap]);
+
+  const jobLat = job?.last_driver_lat != null ? Number(job.last_driver_lat) : null;
+  const jobLng = job?.last_driver_lng != null ? Number(job.last_driver_lng) : null;
+  const hasJobGps =
+    jobLat != null &&
+    jobLng != null &&
+    Number.isFinite(jobLat) &&
+    Number.isFinite(jobLng);
+  const effectiveLat = hasJobGps ? jobLat : newestTrailPoint?.lat ?? null;
+  const effectiveLng = hasJobGps ? jobLng : newestTrailPoint?.lng ?? null;
+  const hasEffectiveLive =
+    effectiveLat != null &&
+    effectiveLng != null &&
+    Number.isFinite(effectiveLat) &&
+    Number.isFinite(effectiveLng);
+
   const googleDirUrl = useMemo(() => {
     if (!job) return "";
     return `https://www.google.com/maps/dir/${encodeURIComponent(job.pickup_address)}/${encodeURIComponent(job.delivery_address)}`;
@@ -145,15 +164,15 @@ export function OrderTrackClient({
 
   /** Opens Google Maps centered on live GPS with street-level zoom (better than plain ?q= for tracking). */
   const googleMapsLiveTrackingUrl = useMemo(() => {
-    if (!hasLivePosition || lat == null || lng == null) return "";
-    const la = lat.toFixed(6);
-    const ln = lng.toFixed(6);
+    if (!hasEffectiveLive || effectiveLat == null || effectiveLng == null) return "";
+    const la = effectiveLat.toFixed(6);
+    const ln = effectiveLng.toFixed(6);
     return `https://www.google.com/maps/@${la},${ln},17z`;
-  }, [hasLivePosition, lat, lng]);
+  }, [hasEffectiveLive, effectiveLat, effectiveLng]);
 
   const showMap = Boolean(
     routePlan ||
-      hasLivePosition ||
+      hasEffectiveLive ||
       trailForMap.length >= 1
   );
 
@@ -298,7 +317,7 @@ export function OrderTrackClient({
       </div>
 
       {!delivered &&
-        !hasLivePosition &&
+        !hasEffectiveLive &&
         job.logistics_status !== "cancelled" &&
         job.logistics_status !== "draft" && (
           <div className="rounded-lg border border-sky-200 bg-sky-50/90 p-4 text-sm text-sky-950">
@@ -322,7 +341,11 @@ export function OrderTrackClient({
                 : null
             }
             routeLine={routePlan?.line ?? null}
-            livePosition={hasLivePosition && lat != null && lng != null ? { lat, lng } : null}
+            livePosition={
+              hasEffectiveLive && effectiveLat != null && effectiveLng != null
+                ? { lat: effectiveLat, lng: effectiveLng }
+                : null
+            }
             liveMarkerPhotoUrl={driver?.personal_photo_url ?? null}
             trail={trailForMap}
             pickupLabel={t("trackPickup")}
@@ -346,7 +369,7 @@ export function OrderTrackClient({
         </div>
       )}
 
-      {hasLivePosition && googleMapsLiveTrackingUrl && (
+      {hasEffectiveLive && googleMapsLiveTrackingUrl && (
         <a
           href={googleMapsLiveTrackingUrl}
           target="_blank"
