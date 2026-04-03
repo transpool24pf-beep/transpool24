@@ -24,11 +24,11 @@ export async function GET() {
         .filter((id): id is string => typeof id === "string" && id.length > 0),
     ),
   ];
-  const phoneByAppId = new Map<string, string>();
+  const driverByAppId = new Map<string, { phone: string; full_name: string | null }>();
   if (appIds.length > 0) {
     const { data: drivers, error: dErr } = await supabase
       .from("driver_applications")
-      .select("id, phone")
+      .select("id, phone, full_name")
       .in("id", appIds);
     if (dErr) {
       console.error("[admin/orders] driver phones", dErr);
@@ -36,14 +36,17 @@ export async function GET() {
       for (const d of drivers ?? []) {
         const id = (d as { id?: string }).id;
         const phone = String((d as { phone?: string | null }).phone ?? "").trim();
-        if (id && phone) phoneByAppId.set(id, phone);
+        const fullName = String((d as { full_name?: string | null }).full_name ?? "").trim() || null;
+        if (id) driverByAppId.set(id, { phone, full_name: fullName });
       }
     }
   }
   const enriched = rows.map((j) => {
     const aid = (j as { assigned_driver_application_id?: string | null }).assigned_driver_application_id;
-    const p = aid ? phoneByAppId.get(aid) ?? null : null;
-    return { ...j, driver_whatsapp_phone: p };
+    const dr = aid ? driverByAppId.get(aid) : undefined;
+    const p = dr?.phone ? dr.phone : null;
+    const n = dr?.full_name ?? null;
+    return { ...j, driver_whatsapp_phone: p || null, driver_whatsapp_full_name: n };
   });
   return NextResponse.json(enriched);
 }

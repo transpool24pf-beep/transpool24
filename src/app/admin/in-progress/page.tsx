@@ -32,6 +32,7 @@ type Job = {
   eta_minutes_remaining?: number | null;
   last_driver_location_at?: string | null;
   driver_whatsapp_phone?: string | null;
+  driver_whatsapp_full_name?: string | null;
 };
 
 function deadlineMs(o: Job): number | null {
@@ -53,19 +54,36 @@ function waPhoneDigits(raw: string): string | null {
   return d;
 }
 
-function buildWhatsappPodReminderDe(orderRef: string, remainingMs: number | null): string {
-  let timeLine: string;
+function buildWhatsappPodReminderDe(
+  orderRef: string,
+  remainingMs: number | null,
+  driverFullName: string | null
+): string {
+  const name = (driverFullName ?? "").trim();
+  const greeting = name ? `Hallo ${name},` : "Guten Tag,";
+
+  let podLine: string;
   if (remainingMs == null) {
-    timeLine =
+    podLine =
       "Bitte senden Sie die Zustellfotos (Liefernachweis / POD) rechtzeitig über den vorgegebenen Link bzw. die App.";
   } else if (remainingMs <= 0) {
-    timeLine =
-      "Die voraussichtliche Zeit ist erreicht oder überschritten. Bitte senden Sie die Zustellfotos (Liefernachweis) umgehend.";
+    podLine =
+      "Die voraussichtliche Zeit ist erreicht oder überschritten. Bitte senden Sie die Zustellfotos (Liefernachweis / POD) umgehend.";
   } else {
     const m = Math.max(1, Math.ceil(remainingMs / 60_000));
-    timeLine = `Restzeit laut System: etwa ${m} Minute(n). Bitte rechtzeitig die Zustellfotos (Liefernachweis / POD) einreichen.`;
+    podLine = `Restzeit laut System: etwa ${m} Minute(n). Bitte reichen Sie die Zustellfotos (Liefernachweis / POD) rechtzeitig ein.`;
   }
-  return `Hallo, hier eine kurze Erinnerung von TransPool24 zum Auftrag #${orderRef}.\n\n${timeLine}\n\nVielen Dank!`;
+
+  return `${greeting}
+
+vielen Dank für Ihren Einsatz! Hier eine kurze Erinnerung von TransPool24 zum Auftrag #${orderRef}.
+
+${podLine}
+
+Bitte achten Sie unterwegs besonders auf Ihre Sicherheit und fahren Sie vorsichtig.
+
+Mit freundlichen Grüßen
+Ihr TransPool24-Team`;
 }
 
 function formatCountdown(remainingMs: number): string {
@@ -104,9 +122,10 @@ function InProgressOrderCard({
   const orderRef = String(o.order_number ?? o.id.slice(0, 8));
   const rawPhone = (o.driver_whatsapp_phone ?? "").trim();
   const waDigits = rawPhone ? waPhoneDigits(rawPhone) : null;
+  const driverName = (o.driver_whatsapp_full_name ?? "").trim() || null;
   const waHref =
     waDigits != null
-      ? `https://wa.me/${waDigits}?text=${encodeURIComponent(buildWhatsappPodReminderDe(orderRef, remainingMs))}`
+      ? `https://wa.me/${waDigits}?text=${encodeURIComponent(buildWhatsappPodReminderDe(orderRef, remainingMs, driverName))}`
       : null;
 
   const st = ADMIN_ORDER_STATUS_CONFIG[o.logistics_status] ?? ADMIN_ORDER_STATUS_CONFIG.draft;
