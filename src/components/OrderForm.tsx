@@ -23,6 +23,11 @@ import {
   localTodayIso,
   parseOrderDateInputToIso,
 } from "@/lib/order-pickup-date-input";
+import {
+  clearOrderFormDraft,
+  loadOrderFormDraft,
+  saveOrderFormDraft,
+} from "@/lib/order-form-draft";
 
 const RouteMap = dynamic(
   () => import("@/components/RouteMapInner").then((m) => m.RouteMapInner),
@@ -245,6 +250,7 @@ export function OrderForm({
   const [pricePreviewError, setPricePreviewError] = useState<string | null>(null);
   const [phoneCountryCode, setPhoneCountryCode] = useState("+49");
   const [countryCodeOpen, setCountryCodeOpen] = useState(false);
+  const [draftRestored, setDraftRestored] = useState(false);
   const countryCodeRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   /** Links Google Autocomplete + Place Details billing sessions */
@@ -271,8 +277,85 @@ export function OrderForm({
   }, []);
 
   useEffect(() => {
-    setPickupDateField(data.pickupDate ? formatIsoDateForOrderInput(data.pickupDate, locale) : "");
-  }, [data.pickupDate, locale]);
+    const d = loadOrderFormDraft();
+    if (d) {
+      setStep(Math.min(4, Math.max(1, d.step)));
+      setData(d.data);
+      setPickupDateField(d.pickupDateField);
+      setCargoPhotoUrls(Array.isArray(d.cargoPhotoUrls) ? d.cargoPhotoUrls : []);
+      setPhoneCountryCode(d.phoneCountryCode || "+49");
+      setDistanceFromRoute(Boolean(d.distanceFromRoute));
+      setDistanceError(d.distanceError);
+      setDistanceHint(d.distanceHint);
+      setRouteDurationMinutes(d.routeDurationMinutes);
+      setRouteGeo(
+        d.routeGeo
+          ? {
+              from: d.routeGeo.from,
+              to: d.routeGeo.to,
+              geometry: d.routeGeo.geometry as GeoJSON.LineString | null,
+            }
+          : null
+      );
+      setConfirmChecked(Boolean(d.confirmChecked));
+    }
+    setDraftRestored(true);
+  }, []);
+
+  /** Keep partial typing in the field; only derive display from ISO when we have a committed date (or locale changes). */
+  useEffect(() => {
+    if (!draftRestored) return;
+    setPickupDateField((display) => {
+      if (!data.pickupDate) return display;
+      return formatIsoDateForOrderInput(data.pickupDate, locale);
+    });
+  }, [draftRestored, locale, data.pickupDate]);
+
+  useEffect(() => {
+    if (!draftRestored || orderConfirmed) return;
+    const tid = setTimeout(() => {
+      saveOrderFormDraft({
+        v: 1,
+        step,
+        data,
+        pickupDateField,
+        cargoPhotoUrls,
+        phoneCountryCode,
+        distanceFromRoute,
+        distanceError,
+        distanceHint,
+        routeDurationMinutes,
+        routeGeo: routeGeo
+          ? {
+              from: routeGeo.from,
+              to: routeGeo.to,
+              geometry: routeGeo.geometry
+                ? {
+                    type: "LineString" as const,
+                    coordinates: routeGeo.geometry.coordinates as [number, number][],
+                  }
+                : null,
+            }
+          : null,
+        confirmChecked,
+      });
+    }, 400);
+    return () => clearTimeout(tid);
+  }, [
+    draftRestored,
+    orderConfirmed,
+    step,
+    data,
+    pickupDateField,
+    cargoPhotoUrls,
+    phoneCountryCode,
+    distanceFromRoute,
+    distanceError,
+    distanceHint,
+    routeDurationMinutes,
+    routeGeo,
+    confirmChecked,
+  ]);
 
   useEffect(() => {
     const close = (e: MouseEvent) => {
@@ -744,6 +827,7 @@ export function OrderForm({
         throw new Error(err || "Failed to confirm order");
       }
       if (json.jobId && json.confirmationToken && json.whatsappLink) {
+        clearOrderFormDraft();
         setOrderConfirmed({
           jobId: json.jobId,
           token: json.confirmationToken,
