@@ -164,15 +164,15 @@ export function Header({ hideLogo }: HeaderProps) {
         </div>
       ) : (
         <div
-          className={`flex w-full items-center justify-between gap-2 py-2 sm:gap-3 ${
+          className={`flex w-full items-center justify-between gap-2 sm:gap-3 ${
             homePath
-              ? "min-h-[4.75rem] px-4 sm:min-h-[5.25rem] sm:px-6 md:min-h-[5.5rem] lg:px-8"
-              : "mx-auto min-h-[3.75rem] max-w-6xl px-4 sm:min-h-[4.25rem] sm:px-6 md:min-h-[4.5rem]"
+              ? "px-4 py-1.5 sm:px-6 sm:py-2 lg:px-8"
+              : "mx-auto min-h-[3.75rem] max-w-6xl px-4 py-2 sm:min-h-[4.25rem] sm:px-6 md:min-h-[4.5rem]"
           }`}
         >
           <Link
             href={`/${locale}`}
-            className={`flex shrink-0 py-0.5 ${homePath ? "" : "min-w-0"}`}
+            className={`flex shrink-0 items-center ${homePath ? "py-0" : "min-w-0 py-0.5"}`}
             aria-label="TransPool24"
           >
             <span className={logoCornerClass}>{logoImage}</span>

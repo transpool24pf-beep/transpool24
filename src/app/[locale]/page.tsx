@@ -65,17 +65,17 @@ export default async function HomePage({
             <div className="mx-auto w-full max-w-7xl">
               <div className="max-w-2xl">
                 <div
-                  className="relative inline-block rounded-xl border-2 border-white/55 bg-[var(--accent)] px-7 py-6 sm:px-9 sm:py-7"
+                  className="relative inline-block max-w-full rounded-lg border border-white/50 bg-[var(--accent)] px-4 py-2.5 sm:px-5 sm:py-3 md:px-6 md:py-3.5"
                   style={{
                     boxShadow:
-                      "0 8px 32px rgba(232,93,4,0.4), inset 0 0 0 1px rgba(255,255,255,0.3), 0 0 0 3px rgba(255,255,255,0.12)",
+                      "0 4px 20px rgba(232,93,4,0.35), inset 0 0 0 1px rgba(255,255,255,0.25), 0 0 0 2px rgba(255,255,255,0.1)",
                   }}
                 >
-                  <div className="absolute left-2 top-2 h-5 w-5 rounded-tl border-l-2 border-t-2 border-white/60" aria-hidden />
-                  <div className="absolute right-2 top-2 h-5 w-5 rounded-tr border-r-2 border-t-2 border-white/60" aria-hidden />
-                  <div className="absolute bottom-2 left-2 h-5 w-5 rounded-bl border-b-2 border-l-2 border-white/60" aria-hidden />
-                  <div className="absolute bottom-2 right-2 h-5 w-5 rounded-br border-b-2 border-r-2 border-white/60" aria-hidden />
-                  <h1 className="relative text-2xl font-bold leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl">
+                  <div className="absolute left-1.5 top-1.5 h-3 w-3 rounded-tl border-l border-t border-white/55" aria-hidden />
+                  <div className="absolute right-1.5 top-1.5 h-3 w-3 rounded-tr border-r border-t border-white/55" aria-hidden />
+                  <div className="absolute bottom-1.5 left-1.5 h-3 w-3 rounded-bl border-b border-l border-white/55" aria-hidden />
+                  <div className="absolute bottom-1.5 right-1.5 h-3 w-3 rounded-br border-b border-r border-white/55" aria-hidden />
+                  <h1 className="relative text-lg font-bold leading-snug text-white sm:text-xl md:text-2xl lg:text-2xl">
                     {heroHeadline}
                   </h1>
                 </div>
