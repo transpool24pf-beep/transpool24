@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo, useId } from "react";
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { OrderRouteLottie } from "@/components/OrderRouteLottie";
@@ -215,6 +215,9 @@ export function OrderForm({
 }) {
   const t = useTranslations("order");
   const htmlLang = useMemo(() => localeToHtmlLang(locale), [locale]);
+  const isRtlLocale = locale === "ar" || locale === "ku";
+  const cargoPhotoInputId = useId();
+  const cargoPhotoInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState(1);
   const [data, setData] = useState<OrderFormData>(initial);
   const [pickupDateField, setPickupDateField] = useState("");
@@ -1198,8 +1201,15 @@ export function OrderForm({
               </div>
             </div>
             <div className="mt-4">
-              <label className="mb-1 block text-xs font-medium text-[var(--foreground)]/80">{t("cargoPhotosLabel")} *</label>
+              <label
+                htmlFor={cargoPhotoInputId}
+                className="mb-1 block text-xs font-medium text-[var(--foreground)]/80"
+              >
+                {t("cargoPhotosLabel")} *
+              </label>
               <input
+                ref={cargoPhotoInputRef}
+                id={cargoPhotoInputId}
                 type="file"
                 accept="image/*"
                 multiple
@@ -1215,8 +1225,29 @@ export function OrderForm({
                     e.target.value = "";
                   })();
                 }}
-                className="block w-full text-sm text-[var(--foreground)] file:mr-3 file:rounded file:border-0 file:bg-[var(--accent)] file:px-3 file:py-1.5 file:text-white"
+                className="sr-only"
               />
+              <div
+                className="flex flex-wrap items-center gap-3"
+                dir={isRtlLocale ? "rtl" : "ltr"}
+                lang={htmlLang}
+              >
+                <button
+                  type="button"
+                  className="rounded-lg bg-[var(--accent)] px-3 py-1.5 text-sm font-medium text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                  disabled={photoUploading || cargoPhotoUrls.length >= MAX_CARGO_PHOTOS}
+                  onClick={() => cargoPhotoInputRef.current?.click()}
+                >
+                  {t("cargoPhotosChooseButton")}
+                </button>
+                <span className="text-sm text-[var(--foreground)]/70" aria-live="polite">
+                  {photoUploading
+                    ? t("cargoPhotosStatusUploading")
+                    : cargoPhotoUrls.length === 0
+                      ? t("cargoPhotosStatusNone")
+                      : t("cargoPhotosStatusCount", { count: cargoPhotoUrls.length })}
+                </span>
+              </div>
               <p className="mt-1 text-xs text-[var(--foreground)]/60">{t("cargoPhotosHint", { max: MAX_CARGO_PHOTOS })}</p>
               {cargoPhotoUrls.length > 0 && (
                 <ul className="mt-2 flex flex-wrap gap-2">
