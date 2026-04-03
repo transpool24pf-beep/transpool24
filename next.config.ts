@@ -61,7 +61,7 @@ const nextConfig: NextConfig = {
         headers: security,
       },
       {
-        source: "/(favicon.ico|favicon-32.png|favicon-48.png|icon.png|email-header.png|transpool24-email-banner.png)",
+        source: "/(favicon.ico|favicon-32.png|favicon-48.png|icon.png|email-header.png|transpool24-email-banner.png|5439.png)",
         headers: [
           { key: "Cache-Control", value: "public, max-age=0, must-revalidate" },
         ],

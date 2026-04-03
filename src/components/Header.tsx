@@ -31,28 +31,34 @@ export function Header({ hideLogo }: HeaderProps) {
 
   return (
     <header className="sticky top-0 z-50 border-b border-[#0d2137]/10 bg-[var(--background)]/95 backdrop-blur">
-      <div className="mx-auto flex min-h-[4.75rem] items-center justify-between px-4 py-2 sm:min-h-[5.25rem] md:min-h-[6rem] sm:px-6 max-w-6xl">
+      <div className="mx-auto grid min-h-[4.75rem] max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-2 px-4 py-2 sm:min-h-[5.25rem] sm:gap-3 sm:px-6 md:min-h-[6rem]">
+        <div className="min-w-0" aria-hidden />
         {!hideLogo ? (
           <Link
             href={`/${locale}`}
-            className="flex shrink-0 items-center py-0.5"
+            className="flex justify-center justify-self-center py-0.5"
             aria-label="TransPool24"
           >
-            <Image
-              src="/345remov.png"
-              alt="TransPool24"
-              width={677}
-              height={369}
-              quality={100}
-              className="h-[3.75rem] w-auto max-h-[3.75rem] max-w-[min(90vw,21rem)] object-contain object-start sm:h-[4.5rem] sm:max-h-[4.5rem] sm:max-w-[min(90vw,25rem)] md:h-[5.25rem] md:max-h-[5.25rem] md:max-w-[min(92vw,29rem)] lg:h-[5.75rem] lg:max-h-[5.75rem] lg:max-w-[min(92vw,32rem)]"
-              priority
-              sizes="(max-width: 640px) 90vw, (max-width: 1024px) 25rem, 32rem"
-            />
+            <span className="relative block h-[3.25rem] w-[min(88vw,17.5rem)] overflow-hidden sm:h-[3.875rem] sm:w-[min(88vw,20rem)] md:h-[4.5rem] md:w-[min(90vw,22rem)] lg:h-[5rem] lg:w-[min(92vw,24rem)]">
+              <Image
+                src="/5439.png"
+                alt="TransPool24"
+                width={1600}
+                height={600}
+                quality={100}
+                className="h-full w-full object-cover object-center"
+                priority
+                sizes="(max-width: 640px) 88vw, (max-width: 1024px) 20rem, 24rem"
+              />
+            </span>
           </Link>
         ) : (
-          <div className="min-w-[14rem] sm:min-w-[18rem] md:min-w-[22rem] lg:min-w-[24rem]" aria-hidden />
+          <div
+            className="h-[3.25rem] w-[min(88vw,17.5rem)] justify-self-center sm:h-[3.875rem] sm:w-[min(88vw,20rem)] md:h-[4.5rem] md:w-[min(90vw,22rem)] lg:h-[5rem] lg:w-[min(92vw,24rem)]"
+            aria-hidden
+          />
         )}
-        <nav className="flex items-center gap-4">
+        <nav className="flex min-w-0 items-center justify-end justify-self-end gap-2 sm:gap-4">
           <Link
             href={`/${locale}/blog`}
             className="rounded-lg border border-[#0d2137]/15 px-3 py-2 text-sm font-medium text-[var(--foreground)] transition hover:bg-[#0d2137]/5 sm:px-4"

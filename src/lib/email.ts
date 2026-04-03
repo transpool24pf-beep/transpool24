@@ -269,24 +269,26 @@ export async function sendOrderConfirmationEmail(
 }
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com";
-const LOGO_BLUE_URL = `${SITE_URL}/356.png`;
-/** Banner from assets/Snapshot_1.PNG → public/transpool24-email-banner.png. Bump EMAIL_HEADER_CACHE_BUST after each image replace (defeats Gmail/proxy cache). */
-const EMAIL_HEADER_CACHE_BUST =
-  process.env.EMAIL_HEADER_CACHE_BUST?.trim() || "20260320a";
-const EMAIL_HEADER_WIDTH = 600;
-const EMAIL_HEADER_HEIGHT = 120;
-const EMAIL_HEADER_BANNER_URL = `${SITE_URL}/transpool24-email-banner.png?v=${encodeURIComponent(EMAIL_HEADER_CACHE_BUST)}`;
+/** Bump after replacing public/5439.png (Gmail/proxy cache). */
+const EMAIL_HEADER_CACHE_BUST = process.env.EMAIL_HEADER_CACHE_BUST?.trim() || "20260403a";
+const EMAIL_HEADER_LOGO_URL = `${SITE_URL}/5439.png?v=${encodeURIComponent(EMAIL_HEADER_CACHE_BUST)}`;
+/** Body/logo blocks (payment invoice, etc.) — same asset as email header */
+const LOGO_BLUE_URL = EMAIL_HEADER_LOGO_URL;
+/** Display box: wide × short so object-fit crops top/bottom of tall artwork (no squashing). */
+const EMAIL_HEADER_LOGO_DISPLAY_W = 320;
+const EMAIL_HEADER_LOGO_DISPLAY_H = 84;
 
-/** Top-of-email header (full width in clients, max 600px) */
+/** Top-of-email: navy bar, logo perfectly centered; high-res src scales into fixed box with cover crop. */
 function emailHeaderBannerHtml(): string {
   const bg = "#0d2137";
-  const h = EMAIL_HEADER_HEIGHT;
-  const w = EMAIL_HEADER_WIDTH;
+  const w = EMAIL_HEADER_LOGO_DISPLAY_W;
+  const h = EMAIL_HEADER_LOGO_DISPLAY_H;
+  const src = EMAIL_HEADER_LOGO_URL;
   return `
-  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:${bg};">
+  <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:${bg}; border-collapse:collapse;">
     <tr>
-      <td align="center" style="padding:0; line-height:0; font-size:0;">
-        <img src="${EMAIL_HEADER_BANNER_URL}" alt="TransPool24" width="${w}" height="${h}" style="display:block; width:100%; max-width:${w}px; height:${h}px; margin:0 auto; border:0; outline:none;" />
+      <td align="center" valign="middle" style="padding:18px 20px; line-height:0; mso-line-height-rule:exactly;">
+        <img src="${src}" alt="TransPool24" width="${w}" height="${h}" style="display:block; margin:0 auto; border:0; outline:none; width:${w}px; height:${h}px; max-width:100%; object-fit:cover; object-position:center center;" />
       </td>
     </tr>
   </table>`;
@@ -774,7 +776,7 @@ function buildDriverApprovalHtml(data: DriverApprovalData, whatsAppLink?: string
         </tr>
         <tr>
           <td style="background:#0d2137; padding: 28px 24px; text-align: center;">
-            <img src="${LOGO_BLUE_URL}" alt="TransPool24" width="320" height="90" style="height:90px; width:auto; max-width:320px; display:block; margin:0 auto 16px auto; background:transparent;" />
+            <img src="${LOGO_BLUE_URL}" alt="TransPool24" width="${EMAIL_HEADER_LOGO_DISPLAY_W}" height="${EMAIL_HEADER_LOGO_DISPLAY_H}" style="display:block; margin:0 auto 16px auto; width:${EMAIL_HEADER_LOGO_DISPLAY_W}px; height:${EMAIL_HEADER_LOGO_DISPLAY_H}px; max-width:100%; object-fit:cover; object-position:center center; border:0;" />
             <p style="margin:0; font-size:18px; font-weight:700; color:#fff; line-height:1.4;">
               Ihr Weg ist sicher – und unser Team steht immer hinter Ihnen.
             </p>
@@ -861,7 +863,7 @@ function buildDriverPaymentInvoiceEmailHtml(data: DriverPaymentInvoiceEmailData)
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; padding: 0 20px 24px;">
     <tr><td>
       <div style="background: ${headerBlue}; border-radius: 0 0 16px 16px; padding: 32px 24px; text-align: center;">
-        <img src="${LOGO_BLUE_URL}" alt="TransPool24" width="280" height="80" style="display:block; margin: 0 auto 20px; max-width:280px; height:auto; max-height:80px;" />
+        <img src="${LOGO_BLUE_URL}" alt="TransPool24" width="${EMAIL_HEADER_LOGO_DISPLAY_W}" height="${EMAIL_HEADER_LOGO_DISPLAY_H}" style="display:block; margin:0 auto 20px; width:${EMAIL_HEADER_LOGO_DISPLAY_W}px; height:${EMAIL_HEADER_LOGO_DISPLAY_H}px; max-width:100%; object-fit:cover; object-position:center center; border:0;" />
         <p style="margin: 0 0 20px 0; font-size: 18px; font-weight: bold; color: #ffffff;">Ihr Weg ist sicher – und unser Team steht immer hinter Ihnen.</p>
         <a href="${supportUrl}" style="display: inline-block; margin: 0 0 24px 0; padding: 14px 28px; background: #00BFFF; color: #fff; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 15px;">Wir sind an Ihrer Seite bei jedem Kilometer.</a>
         <p style="margin: 0 0 12px 0; font-size: 13px; color: rgba(255,255,255,0.9);">Folgen Sie uns</p>
