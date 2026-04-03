@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
+import { rateLimitResponse } from "@/lib/rate-limit";
 import { getBookingsSettings } from "@/lib/bookings-settings";
 import { getPricingSettings } from "@/lib/settings";
 import { isCargoCategoryId } from "@/lib/cargo";
@@ -20,6 +21,8 @@ function generateToken(): string {
 
 export async function POST(req: Request) {
   try {
+    const limited = rateLimitResponse(req, "confirm");
+    if (limited) return limited;
     const body = await req.json();
     const {
       companyName,

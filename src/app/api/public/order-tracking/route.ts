@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { rateLimitResponse } from "@/lib/rate-limit";
 import { createServerSupabase } from "@/lib/supabase";
 import { geocodeAddressForMap } from "@/lib/route-distance-server";
 
@@ -29,6 +30,8 @@ async function fetchOsrmLine(
  * Returns status, ETA, driver summary, planned route (geocoded), trail, stops.
  */
 export async function GET(req: Request) {
+  const limited = rateLimitResponse(req, "publicDriver");
+  if (limited) return limited;
   const { searchParams } = new URL(req.url);
   const jobId = searchParams.get("job_id");
   const token = searchParams.get("token");

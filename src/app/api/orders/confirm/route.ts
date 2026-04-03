@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
+import { rateLimitResponse } from "@/lib/rate-limit";
 import { createServerSupabase } from "@/lib/supabase";
 
 export async function GET(req: Request) {
   try {
+    const limited = rateLimitResponse(req, "orderConfirmLink");
+    if (limited) return limited;
     const { searchParams } = new URL(req.url);
     const jobId = searchParams.get("job_id");
     const token = searchParams.get("token");

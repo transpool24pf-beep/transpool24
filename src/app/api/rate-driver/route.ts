@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
+import { rateLimitResponse } from "@/lib/rate-limit";
 import { createServerSupabase } from "@/lib/supabase";
 
 export async function GET(req: Request) {
+  const limited = rateLimitResponse(req, "publicDriver");
+  if (limited) return limited;
   const { searchParams } = new URL(req.url);
   const token = searchParams.get("token");
   if (!token) {
@@ -24,6 +27,8 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  const limited = rateLimitResponse(req, "publicDriver");
+  if (limited) return limited;
   const body = await req.json();
   const token = typeof body?.token === "string" ? body.token.trim() : null;
   const rating = body?.rating != null ? Number(body.rating) : null;

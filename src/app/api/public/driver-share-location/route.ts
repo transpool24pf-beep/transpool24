@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { rateLimitResponse } from "@/lib/rate-limit";
 import { createServerSupabase } from "@/lib/supabase";
 import { recordDriverLocationForJob } from "@/lib/record-driver-location";
 
@@ -8,6 +9,8 @@ import { recordDriverLocationForJob } from "@/lib/record-driver-location";
  * POST: record position (same as admin driver-location, no admin cookie).
  */
 export async function GET(req: Request) {
+  const limited = rateLimitResponse(req, "publicDriver");
+  if (limited) return limited;
   const { searchParams } = new URL(req.url);
   const jobId = searchParams.get("job_id");
   const token = searchParams.get("token");
@@ -48,6 +51,8 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+  const limited = rateLimitResponse(req, "publicDriver");
+  if (limited) return limited;
   const body = await req.json().catch(() => ({}));
   const jobId = typeof body.job_id === "string" ? body.job_id : null;
   const token = typeof body.token === "string" ? body.token : null;

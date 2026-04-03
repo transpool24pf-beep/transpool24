@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
+import { rateLimitResponse } from "@/lib/rate-limit";
 
 export async function POST(req: Request) {
+  const limited = rateLimitResponse(req, "driverApply");
+  if (limited) return limited;
   const body = await req.json();
   const full_name = String(body.fullName || "").trim();
   const email = String(body.email || "").trim();

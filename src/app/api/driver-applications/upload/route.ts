@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { rateLimitResponse } from "@/lib/rate-limit";
 import { createServerSupabase } from "@/lib/supabase";
 
 const BUCKET = "driver-documents";
@@ -6,6 +7,8 @@ const MAX_SIZE = 4 * 1024 * 1024; // 4MB
 
 export async function POST(req: Request) {
   try {
+    const limited = rateLimitResponse(req, "upload");
+    if (limited) return limited;
     const body = await req.json();
     const { base64, filename } = body as { base64?: string; filename?: string };
     if (!base64 || typeof filename !== "string") {

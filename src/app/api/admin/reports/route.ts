@@ -47,6 +47,16 @@ export async function GET() {
       price_cents: j.price_cents ?? 0,
       created_at: j.created_at,
     }));
+  const inTransitCount = list.filter((j) => j.logistics_status === "in_transit").length;
+  const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const { count: supportCount, error: supErr } = await supabase
+    .from("support_requests")
+    .select("id", { count: "exact", head: true })
+    .gte("created_at", since);
+  if (supErr) {
+    console.warn("[admin/reports] support_requests count", supErr.message);
+  }
+  const supportTickets7d = supErr ? 0 : supportCount ?? 0;
   return NextResponse.json({
     totalOrders,
     revenueEur: (revenueCents / 100).toFixed(2),
@@ -59,5 +69,7 @@ export async function GET() {
     paidRevenueEur: (paidRevenueCents / 100).toFixed(2),
     byPayment,
     paidInvoices,
+    inTransitCount,
+    supportTickets7d,
   });
 }

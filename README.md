@@ -98,3 +98,28 @@ Default UI language: **German**. Language switcher in header: Arabic, English, T
 ## Deploy on Vercel
 
 Connect the repo, add the same env vars as in `.env.local`, and set `NEXT_PUBLIC_APP_URL` to your production URL. Use that URL in Stripe for the webhook endpoint. For the admin dashboard, add `ADMIN_PASSWORD` in Vercel environment variables.
+
+Pushes to the connected branch trigger a production deployment; the admin footer shows **environment**, **commit SHA**, and a **link to the current Vercel host** when `VERCEL_URL` is present.
+
+### Database hardening (recommended for existing Supabase projects)
+
+Run **`supabase/hardening_2026.sql`** once in the SQL Editor. It removes anonymous `INSERT` on `jobs`, enables **RLS** on `support_requests` (server-only via service role), adds **`jobs.last_ops_reminder_at`**, and adds useful **indexes**.
+
+### API rate limits
+
+Public POST/GET routes use a **per-instance** sliding window (IP from `x-forwarded-for`). Set **`RATE_LIMIT_DISABLED=1`** only for local stress tests. For strict multi-region limits, add Redis (e.g. Upstash) later.
+
+### Cron: customer “still processing” reminder
+
+`vercel.json` schedules **`GET /api/cron/order-reminders`** daily. In Vercel → Settings → Environment variables, set **`CRON_SECRET`** (same value Vercel sends as `Authorization: Bearer …` on cron invocations). Requires **`RESEND_API_KEY`** and the `last_ops_reminder_at` column from `hardening_2026.sql`.
+
+### Tests
+
+```bash
+npm test
+```
+
+### Admin exports & reports
+
+- **Orders → CSV export** downloads all jobs as CSV (authenticated admin).
+- **Reports** includes **in_transit** count and **support tickets (7 days)**.

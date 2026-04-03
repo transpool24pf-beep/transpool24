@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { rateLimitResponse } from "@/lib/rate-limit";
 import { createServerSupabase } from "@/lib/supabase";
 import { randomUUID } from "crypto";
 
@@ -13,6 +14,8 @@ const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp", "image/jp
  */
 export async function POST(req: Request) {
   try {
+    const limited = rateLimitResponse(req, "upload");
+    if (limited) return limited;
     const body = await req.json();
     const jobId = typeof body.job_id === "string" ? body.job_id : null;
     const token = typeof body.token === "string" ? body.token : null;

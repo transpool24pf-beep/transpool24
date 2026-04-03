@@ -22,6 +22,8 @@ type ReportPayload = {
   paidRevenueEur: string;
   byPayment: Record<string, number>;
   paidInvoices?: PaidInvoiceRow[];
+  inTransitCount?: number;
+  supportTickets7d?: number;
 };
 
 export default function AdminReportsPage() {
@@ -67,10 +69,19 @@ export default function AdminReportsPage() {
         Kundenrechnung als PDF öffnen (enthält „Zahlungsstatus: Bezahlt“ und ggf. Liefernachweis-Datum).
       </p>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-7">
         <div className="rounded-2xl border-2 border-[#0d2137]/10 bg-white p-5 shadow-sm">
           <p className="text-xs font-medium uppercase tracking-wide text-[#0d2137]/50">Aufträge gesamt</p>
           <p className="mt-1 text-3xl font-bold text-[#0d2137]">{data.totalOrders}</p>
+        </div>
+        <div className="rounded-2xl border-2 border-violet-200 bg-violet-50/50 p-5 shadow-sm">
+          <p className="text-xs font-medium uppercase tracking-wide text-violet-900/70">Unterwegs (in_transit)</p>
+          <p className="mt-1 text-3xl font-bold text-violet-900">{data.inTransitCount ?? 0}</p>
+        </div>
+        <div className="rounded-2xl border-2 border-slate-200 bg-slate-50/50 p-5 shadow-sm">
+          <p className="text-xs font-medium uppercase tracking-wide text-slate-700/70">Support (7 Tage)</p>
+          <p className="mt-1 text-3xl font-bold text-slate-900">{data.supportTickets7d ?? 0}</p>
+          <p className="mt-1 text-xs text-slate-600/80">Einträge in support_requests</p>
         </div>
         <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50/50 p-5 shadow-sm">
           <p className="text-xs font-medium uppercase tracking-wide text-emerald-800/70">Umsatz (ca.)</p>

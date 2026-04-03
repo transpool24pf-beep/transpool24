@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { createServerSupabase } from "@/lib/supabase";
 import { sendOrderConfirmationEmail } from "@/lib/email";
 import { generateInvoicePdf } from "@/lib/invoice-pdf";
+import { jobIdFromCheckoutSession } from "@/lib/stripe-webhook-helpers";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com";
 
@@ -35,7 +36,7 @@ export async function POST(req: Request) {
     }
 
     const session = event.data.object as Stripe.Checkout.Session;
-    const jobId = session.metadata?.job_id || session.client_reference_id;
+    const jobId = jobIdFromCheckoutSession(session);
     if (!jobId) {
       console.error("No job_id in Stripe session");
       return NextResponse.json({ received: true });

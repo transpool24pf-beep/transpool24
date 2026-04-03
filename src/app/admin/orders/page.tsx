@@ -300,14 +300,23 @@ export default function AdminOrdersPage() {
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
         <h1 className="text-2xl font-bold text-[#0d2137]">{t("orders.title")}</h1>
         {!loading && (
-          <a
-            href="#admin-order-ops"
-            className="inline-flex w-fit items-center gap-2 rounded-xl border-2 border-[var(--accent)] bg-[var(--accent)]/10 px-4 py-2 text-sm font-semibold text-[#0d2137] hover:bg-[var(--accent)]/20"
-            dir={locale === "ar" ? "rtl" : "ltr"}
-          >
-            <span aria-hidden>↓</span>
-            {t("orders.jumpToOps")}
-          </a>
+          <div className="flex flex-wrap items-center gap-2">
+            <a
+              href="/api/admin/orders/export"
+              className="inline-flex w-fit items-center gap-2 rounded-xl border-2 border-[#0d2137]/20 bg-white px-4 py-2 text-sm font-semibold text-[#0d2137] shadow-sm hover:bg-[#0d2137]/5"
+              dir={locale === "ar" ? "rtl" : "ltr"}
+            >
+              {t("orders.exportCsv")}
+            </a>
+            <a
+              href="#admin-order-ops"
+              className="inline-flex w-fit items-center gap-2 rounded-xl border-2 border-[var(--accent)] bg-[var(--accent)]/10 px-4 py-2 text-sm font-semibold text-[#0d2137] hover:bg-[var(--accent)]/20"
+              dir={locale === "ar" ? "rtl" : "ltr"}
+            >
+              <span aria-hidden>↓</span>
+              {t("orders.jumpToOps")}
+            </a>
+          </div>
         )}
       </div>
 

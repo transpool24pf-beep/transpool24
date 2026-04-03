@@ -88,9 +88,8 @@ CREATE POLICY "Users can insert own profile" ON public.profiles FOR INSERT WITH 
 DROP POLICY IF EXISTS "Users can view own jobs" ON public.jobs;
 DROP POLICY IF EXISTS "Users can insert jobs" ON public.jobs;
 DROP POLICY IF EXISTS "Service role full access" ON public.jobs;
--- Jobs: customers see own jobs; service role can do everything (for webhook)
+-- Jobs: customers see own jobs; inserts/updates only via server (service role bypasses RLS — never expose service key in browser)
 CREATE POLICY "Users can view own jobs" ON public.jobs FOR SELECT USING (auth.uid() = customer_id);
-CREATE POLICY "Users can insert jobs" ON public.jobs FOR INSERT WITH CHECK (true);
 CREATE POLICY "Service role full access" ON public.jobs FOR ALL USING (auth.jwt() ->> 'role' = 'service_role');
 
 DROP POLICY IF EXISTS "Drivers can view own documents" ON public.driver_documents;
@@ -132,3 +131,13 @@ DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- Ops reminder (cron); optional — see supabase/hardening_2026.sql for existing projects
+ALTER TABLE public.jobs ADD COLUMN IF NOT EXISTS last_ops_reminder_at TIMESTAMPTZ;
+COMMENT ON COLUMN public.jobs.last_ops_reminder_at IS 'Last customer ops reminder email (see /api/cron/order-reminders)';
+
+CREATE INDEX IF NOT EXISTS idx_jobs_created_at_desc ON public.jobs (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_jobs_logistics_created ON public.jobs (logistics_status, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_jobs_payment_status ON public.jobs (payment_status);
+CREATE INDEX IF NOT EXISTS idx_jobs_stripe_session ON public.jobs (stripe_session_id) WHERE stripe_session_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_jobs_customer_email ON public.jobs (customer_email) WHERE customer_email IS NOT NULL;

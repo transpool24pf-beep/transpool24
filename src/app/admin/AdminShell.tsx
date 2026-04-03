@@ -24,6 +24,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const [checked, setChecked] = useState(false);
   const [authenticated, setAuthenticated] = useState(false);
   const [deployLine, setDeployLine] = useState<string | null>(null);
+  const [deployMeta, setDeployMeta] = useState<{
+    deploymentAbsoluteUrl: string | null;
+    rateLimit: "off" | "memory";
+    cronOrderRemindersConfigured: boolean;
+  } | null>(null);
   const [seoLinks, setSeoLinks] = useState<{
     publicSiteUrl: string;
     sitemapUrl: string;
@@ -40,6 +45,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       setChecked(true);
       setAuthenticated(false);
       setDeployLine(null);
+      setDeployMeta(null);
       setSeoLinks(null);
       return;
     }
@@ -55,6 +61,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!authenticated || pathname === "/admin/login") {
       setDeployLine(null);
+      setDeployMeta(null);
       setSeoLinks(null);
       return;
     }
@@ -66,6 +73,9 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           j: {
             vercelEnv?: string | null;
             gitSha?: string | null;
+            deploymentAbsoluteUrl?: string | null;
+            rateLimit?: "off" | "memory";
+            cronOrderRemindersConfigured?: boolean;
             seo?: { publicSiteUrl: string; sitemapUrl: string; robotsUrl: string };
           } | null,
         ) => {
@@ -79,6 +89,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 .replace("{sha}", j.gitSha ?? "—")
             );
           }
+          setDeployMeta({
+            deploymentAbsoluteUrl: j.deploymentAbsoluteUrl ?? null,
+            rateLimit: j.rateLimit === "off" ? "off" : "memory",
+            cronOrderRemindersConfigured: Boolean(j.cronOrderRemindersConfigured),
+          });
           if (j.seo?.publicSiteUrl && j.seo.sitemapUrl && j.seo.robotsUrl) {
             setSeoLinks({
               publicSiteUrl: j.seo.publicSiteUrl,
@@ -93,6 +108,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       .catch(() => {
         if (!cancelled) {
           setDeployLine(null);
+          setDeployMeta(null);
           setSeoLinks(null);
         }
       });
@@ -231,6 +247,27 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           ) : null}
           {deployLine ? (
             <p className="mt-0.5 text-[10px] leading-snug text-[#0d2137]/45">{deployLine}</p>
+          ) : null}
+          {deployMeta?.deploymentAbsoluteUrl ? (
+            <p className="mt-0.5 text-[10px] leading-snug text-[#0d2137]/44">
+              <a
+                href={deployMeta.deploymentAbsoluteUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="break-all underline hover:text-[#0d2137]"
+              >
+                {t("shell.footerVercelDeployment")}
+              </a>
+            </p>
+          ) : null}
+          {deployMeta ? (
+            <p className="mt-0.5 text-[10px] leading-snug text-[#0d2137]/42">
+              {t("shell.footerRateLimit").replace("{mode}", deployMeta.rateLimit)}
+              {" · "}
+              {deployMeta.cronOrderRemindersConfigured
+                ? t("shell.footerCronOn")
+                : t("shell.footerCronOff")}
+            </p>
           ) : null}
         </footer>
       </main>

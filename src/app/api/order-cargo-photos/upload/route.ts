@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { rateLimitResponse } from "@/lib/rate-limit";
 import { getBookingsSettings } from "@/lib/bookings-settings";
 import { createServerSupabase } from "@/lib/supabase";
 
@@ -9,6 +10,8 @@ const MAX_SIZE = 4 * 1024 * 1024; // 4MB
 
 export async function POST(req: Request) {
   try {
+    const limited = rateLimitResponse(req, "upload");
+    if (limited) return limited;
     const { paused } = await getBookingsSettings();
     if (paused) {
       return NextResponse.json({ error: "BOOKINGS_PAUSED" }, { status: 503 });

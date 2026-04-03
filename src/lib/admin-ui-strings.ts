@@ -12,6 +12,10 @@ const DE: Record<string, string> = {
     "Geschützte Admin-Sitzung · HttpOnly-Cookie · Sicherheits-Header (Frame, MIME, Referrer)",
   "shell.footerDeploy": "Deployment: {env} · Commit {sha}",
   "shell.footerDeployLocal": "Lokal / Vorschau — keine Vercel-Metadaten",
+  "shell.footerVercelDeployment": "Aktuelle Vercel-Host-URL (Vorschau)",
+  "shell.footerRateLimit": "Öffentliche API: Begrenzung {mode} (pro Instanz; RATE_LIMIT_DISABLED=1 schaltet ab)",
+  "shell.footerCronOn": "Cron Auftrags-Erinnerung: CRON_SECRET gesetzt",
+  "shell.footerCronOff": "Cron Auftrags-Erinnerung: CRON_SECRET fehlt",
   "shell.footerCookieBanner":
     "Öffentliche Website: Cookie-Einwilligung erzwungen bis zur Auswahl (v1, localStorage).",
   "shell.footerLegal":
@@ -30,6 +34,7 @@ const DE: Record<string, string> = {
   "nav.settings": "Einstellungen",
   "nav.support": "Support-Nachrichten",
   "orders.title": "Aufträge",
+  "orders.exportCsv": "CSV exportieren",
   "orders.jumpToOps": "In Bearbeitung & geliefert (Fotos) — nach unten",
   "orders.searchPlaceholder":
     "Suche: Auftragsnr., Firma, E-Mail, Adresse, Status …",
@@ -116,6 +121,10 @@ const AR: Record<string, string> = {
     "جلسة إدارة محمية · كوكي HttpOnly · رؤوس أمان (إطار، MIME، Referrer)",
   "shell.footerDeploy": "النشر: {env} · الالتزام {sha}",
   "shell.footerDeployLocal": "محلي / معاينة — لا بيانات Vercel",
+  "shell.footerVercelDeployment": "رابط استضافة Vercel الحالي (معاينة)",
+  "shell.footerRateLimit": "واجهة عامة: حد الطلبات {mode} (لكل instance؛ RATE_LIMIT_DISABLED=1 يعطّل)",
+  "shell.footerCronOn": "جدولة تذكير الطلبات: CRON_SECRET مضبوط",
+  "shell.footerCronOff": "جدولة تذكير الطلبات: لا يوجد CRON_SECRET",
   "shell.footerCookieBanner":
     "الموقع العام: بانر موافقة الكوكيز إجباري حتى الاختيار (v1، localStorage).",
   "shell.footerLegal":
@@ -134,6 +143,7 @@ const AR: Record<string, string> = {
   "nav.settings": "إعدادات",
   "nav.support": "رسائل الدعم",
   "orders.title": "طلبات",
+  "orders.exportCsv": "تصدير CSV",
   "orders.jumpToOps": "قيد التنفيذ وتم التوصيل (صور) — انتقل للأسفل",
   "orders.searchPlaceholder":
     "بحث: رقم الطلب، شركة، بريد، عنوان، حالة …",

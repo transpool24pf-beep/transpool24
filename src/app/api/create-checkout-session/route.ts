@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createServerSupabase } from "@/lib/supabase";
+import { rateLimitResponse } from "@/lib/rate-limit";
 import { getBookingsSettings } from "@/lib/bookings-settings";
 import { calculatePriceBreakdown } from "@/lib/pricing";
 import { getPricingSettings } from "@/lib/settings";
@@ -16,6 +17,8 @@ function getStripe(): Stripe {
 
 export async function POST(req: Request) {
   try {
+    const limited = rateLimitResponse(req, "checkout");
+    if (limited) return limited;
     const body = await req.json();
     const { jobId, token, locale: localeParam } = body;
 

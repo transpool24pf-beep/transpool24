@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import { rateLimitResponse } from "@/lib/rate-limit";
 import { buildEmailHeaderBannerHtml } from "@/lib/email";
 import { createServerSupabase } from "@/lib/supabase";
 import { buildPhoneE164 } from "@/lib/country-dial-codes";
@@ -20,6 +21,8 @@ function getToEmail(): string {
 
 export async function POST(req: Request) {
   try {
+    const limited = rateLimitResponse(req, "support");
+    if (limited) return limited;
     const body = await req.json();
     const requesterType = body?.requester_type === "driver" ? "driver" : "customer";
 

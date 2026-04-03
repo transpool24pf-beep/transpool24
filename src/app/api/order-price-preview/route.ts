@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { rateLimitResponse } from "@/lib/rate-limit";
 import { getBookingsSettings } from "@/lib/bookings-settings";
 import { getPricingSettings } from "@/lib/settings";
 import { computeOrderPricingFromAddresses } from "@/lib/order-pricing-compute";
@@ -12,6 +13,8 @@ const VALID_SERVICE = ["driver_only", "driver_car", "driver_car_assistant"] as c
  */
 export async function POST(req: Request) {
   try {
+    const limited = rateLimitResponse(req, "pricePreview");
+    if (limited) return limited;
     const bookings = await getBookingsSettings();
     if (bookings.paused) {
       return NextResponse.json({ error: "BOOKINGS_PAUSED" }, { status: 503 });
