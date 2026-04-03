@@ -39,14 +39,14 @@ export function Header({ hideLogo }: HeaderProps) {
             className="flex justify-center justify-self-center py-0.5"
             aria-label="TransPool24"
           >
-            <span className="relative block h-[3.25rem] w-[min(88vw,17.5rem)] overflow-hidden sm:h-[3.875rem] sm:w-[min(88vw,20rem)] md:h-[4.5rem] md:w-[min(90vw,22rem)] lg:h-[5rem] lg:w-[min(92vw,24rem)]">
+            <span className="relative block h-[3.25rem] w-[min(88vw,17.5rem)] sm:h-[3.875rem] sm:w-[min(88vw,20rem)] md:h-[4.5rem] md:w-[min(90vw,22rem)] lg:h-[5rem] lg:w-[min(92vw,24rem)]">
               <Image
                 src="/5439.png"
                 alt="TransPool24"
-                width={1600}
-                height={600}
+                width={1024}
+                height={558}
                 quality={100}
-                className="h-full w-full object-cover object-center"
+                className="h-full w-full object-contain object-center"
                 priority
                 sizes="(max-width: 640px) 88vw, (max-width: 1024px) 20rem, 24rem"
               />
