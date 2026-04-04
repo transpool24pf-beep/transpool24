@@ -15,6 +15,7 @@ const NAV_DEF: { href: string; msgKey: string; badge: AdminNavItem["badge"] }[] 
   { href: "/admin/driver-applications", msgKey: "nav.driverApplications", badge: "drivers" },
   { href: "/admin/drivers", msgKey: "nav.drivers", badge: null },
   { href: "/admin/blog", msgKey: "nav.blog", badge: null },
+  { href: "/admin/email-social", msgKey: "nav.emailSocial", badge: null },
   { href: "/admin/settings", msgKey: "nav.settings", badge: null },
   { href: "/admin/support", msgKey: "nav.support", badge: "support" },
 ];

@@ -5,6 +5,13 @@ import type { Attachment } from "resend";
 import type { Job } from "./supabase";
 import { generateInvoicePdf } from "./invoice-pdf";
 import { cargoCategoryLabelDe } from "./cargo";
+import {
+  loadEmailFooterSocial,
+  buildEmailFooterOrderBlock,
+  buildEmailFooterApprovalBlock,
+  buildEmailFooterInvoiceBlock,
+  type ResolvedEmailFooter,
+} from "@/lib/email-footer";
 
 const DEFAULT_FROM = "TransPool24 <onboarding@resend.dev>";
 
@@ -48,7 +55,8 @@ function buildConfirmationHtml(
     rateDriverUrl?: string | null;
     driver?: OrderEmailDriverInfo | null;
   } = {},
-  branding: TransactionalEmailBranding
+  branding: TransactionalEmailBranding,
+  footer: ResolvedEmailFooter
 ): string {
   const { confirmPaymentUrl, trackOrderUrl, rateDriverUrl, driver } = options;
   const totalEur = (job.price_cents / 100).toFixed(2);
@@ -153,19 +161,7 @@ function buildConfirmationHtml(
         ${trackBlock}
         ${rateBlock}
         <p style="margin-top: 24px; font-size: 13px; color: #94a3b8;">— TransPool24</p>
-        <div style="margin-top: 28px; padding: 24px; background: #0d2137; border-radius: 0 0 12px 12px; text-align: center;">
-          <p style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600; color: #fff;">Folgen Sie uns</p>
-          <table cellpadding="0" cellspacing="0" align="center" style="margin: 0 auto;">
-            <tr>
-              <td style="padding: 0 10px;"><a href="https://www.instagram.com/transpool24/" target="_blank" rel="noopener" style="display:inline-block;"><img src="${SITE_URL}/icons/instagram.png" alt="Instagram" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
-              <td style="padding: 0 10px;"><a href="https://www.linkedin.com/in/trans-pool-1235803b8" target="_blank" rel="noopener" style="display:inline-block;"><img src="${SITE_URL}/icons/linkedin.png" alt="LinkedIn" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
-              <td style="padding: 0 10px;"><a href="https://www.tiktok.com/@transpool24" target="_blank" rel="noopener" style="display:inline-block;"><img src="${SITE_URL}/icons/tiktok.png" alt="TikTok" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
-              <td style="padding: 0 10px;"><a href="mailto:transpool24pf@gmail.com" style="display:inline-block;"><img src="${SITE_URL}/icons/gmail.svg" alt="Gmail" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
-              <td style="padding: 0 10px;"><a href="mailto:transpool24@hotmail.com" style="display:inline-block;"><img src="${SITE_URL}/icons/email.svg" alt="Email" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
-            </tr>
-          </table>
-          <p style="margin: 12px 0 0 0; font-size: 12px; color: rgba(255,255,255,0.8);">transpool24pf@gmail.com · transpool24@hotmail.com</p>
-        </div>
+        ${buildEmailFooterOrderBlock(footer)}
       </div>
     </td></tr>
   </table>
@@ -231,7 +227,7 @@ export async function sendOrderConfirmationEmail(
   const resend = new Resend(apiKey);
   const hasPdf = pdfBuffer != null && pdfBuffer.byteLength > 0;
   try {
-    const branding = await loadTransactionalEmailBranding();
+    const [branding, footer] = await Promise.all([loadTransactionalEmailBranding(), loadEmailFooterSocial()]);
     const pdfAtt: Attachment[] | undefined = hasPdf
       ? [
           {
@@ -250,7 +246,7 @@ export async function sendOrderConfirmationEmail(
         trackOrderUrl: options.trackOrderUrl,
         rateDriverUrl: options.rateDriverUrl,
         driver: options.driver,
-      }, branding),
+      }, branding, footer),
       ...(mergedAtt?.length ? { attachments: mergedAtt } : {}),
     });
     if (error) {
@@ -787,7 +783,8 @@ export type DriverApprovalData = {
 function buildDriverApprovalHtml(
   data: DriverApprovalData,
   whatsAppLink: string | null | undefined,
-  branding: TransactionalEmailBranding
+  branding: TransactionalEmailBranding,
+  footer: ResolvedEmailFooter
 ): string {
   const driverNum = data.driver_number != null ? String(data.driver_number).padStart(5, "0") : "—";
   const dateStr = new Date(data.approved_at).toLocaleDateString("de-DE", {
@@ -872,12 +869,7 @@ function buildDriverApprovalHtml(
         </tr>
         <tr>
           <td style="background:#0d2137; padding: 16px 24px 28px; text-align: center;">
-            <p style="margin:0 0 12px 0; font-size:12px; color:rgba(255,255,255,0.8);">Folgen Sie uns</p>
-            <p style="margin:0; font-size:0; line-height:0;">
-              <a href="https://www.instagram.com/transpool24/" target="_blank" rel="noopener" style="display:inline-block; margin:0 14px; vertical-align:middle;"><img src="${SITE_URL}/icons/instagram.png" alt="Instagram" width="32" height="32" style="display:block; width:32px; height:32px;" /></a>
-              <a href="https://www.linkedin.com/in/trans-pool-1235803b8" target="_blank" rel="noopener" style="display:inline-block; margin:0 14px; vertical-align:middle;"><img src="${SITE_URL}/icons/linkedin.png" alt="LinkedIn" width="32" height="32" style="display:block; width:32px; height:32px;" /></a>
-              <a href="https://www.tiktok.com/@transpool24" target="_blank" rel="noopener" style="display:inline-block; margin:0 14px; vertical-align:middle;"><img src="${SITE_URL}/icons/tiktok.png" alt="TikTok" width="32" height="32" style="display:block; width:32px; height:32px;" /></a>
-            </p>
+            ${buildEmailFooterApprovalBlock(footer)}
           </td>
         </tr>
       </table>
@@ -899,14 +891,16 @@ export type DriverPaymentInvoiceEmailData = {
   total_eur: string;
 };
 
-function buildDriverPaymentInvoiceEmailHtml(data: DriverPaymentInvoiceEmailData, branding: TransactionalEmailBranding): string {
+function buildDriverPaymentInvoiceEmailHtml(
+  data: DriverPaymentInvoiceEmailData,
+  branding: TransactionalEmailBranding,
+  footer: ResolvedEmailFooter
+): string {
   const headerBlue = "#0d2137";
   const cardBg = "#ffffff";
   const summaryBg = "#f0f4f8";
   const supportUrl = `${SITE_URL}/de/support`;
-  const instagramUrl = `${SITE_URL}/icons/instagram.png`;
-  const linkedinUrl = `${SITE_URL}/icons/linkedin.png`;
-  const tiktokUrl = `${SITE_URL}/icons/tiktok.png`;
+  const invoiceFooter = buildEmailFooterInvoiceBlock(footer);
   return `
 <!DOCTYPE html>
 <html dir="ltr" lang="de">
@@ -938,8 +932,8 @@ function buildDriverPaymentInvoiceEmailHtml(data: DriverPaymentInvoiceEmailData,
             <tr><td style="color:#0d2137; padding-top:8px;"><strong>Gesamtbetrag:</strong></td><td style="text-align:left; padding-top:8px;"><strong>${data.total_eur} EUR</strong></td></tr>
           </table>
         </div>
-        <p style="margin: 20px 0 0 0; font-size: 14px; color: #666;">Benötigen Sie Unterstützung? TransPool24 Kundenservice – Telefonnummer: +49 176 29767442 – E-Mail: transpool24@hotmail.com</p>
-        <p style="margin: 12px 0 0 0; font-size: 13px;"><a href="https://www.linkedin.com/in/trans-pool-1235803b8" style="color:#0d2137;">LinkedIn</a> · Servicezeiten: rund um die Uhr</p>
+        ${invoiceFooter.supportLineHtml}
+        ${invoiceFooter.linkedinLineHtml}
       </div>
     </td></tr>
   </table>
@@ -950,13 +944,7 @@ function buildDriverPaymentInvoiceEmailHtml(data: DriverPaymentInvoiceEmailData,
         <p style="margin: 0 0 20px 0; font-size: 18px; font-weight: bold; color: #ffffff;">Ihr Weg ist sicher – und unser Team steht immer hinter Ihnen.</p>
         <a href="${supportUrl}" style="display: inline-block; margin: 0 0 24px 0; padding: 14px 28px; background: #00BFFF; color: #fff; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 15px;">Wir sind an Ihrer Seite bei jedem Kilometer.</a>
         <p style="margin: 0 0 12px 0; font-size: 13px; color: rgba(255,255,255,0.9);">Folgen Sie uns</p>
-        <table cellpadding="0" cellspacing="0" align="center" style="margin: 0 auto;">
-          <tr>
-            <td style="padding: 0 10px;"><a href="https://www.tiktok.com/@transpool24" target="_blank" rel="noopener"><img src="${tiktokUrl}" alt="TikTok" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
-            <td style="padding: 0 10px;"><a href="https://www.linkedin.com/in/trans-pool-1235803b8" target="_blank" rel="noopener"><img src="${linkedinUrl}" alt="LinkedIn" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
-            <td style="padding: 0 10px;"><a href="https://www.instagram.com/transpool24/" target="_blank" rel="noopener"><img src="${instagramUrl}" alt="Instagram" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
-          </tr>
-        </table>
+        ${invoiceFooter.followUsTableHtml}
       </div>
     </td></tr>
   </table>
@@ -978,7 +966,7 @@ export async function sendDriverPaymentInvoiceEmail(
   }
   const resend = new Resend(apiKey);
   try {
-    const branding = await loadTransactionalEmailBranding();
+    const [branding, footer] = await Promise.all([loadTransactionalEmailBranding(), loadEmailFooterSocial()]);
     const attachmentContent = Buffer.from(pdfBuffer).toString("base64");
     const mergedAtt = mergeAttachmentsWithLogo(branding.logoAttachment, [
       { filename: pdfFilename, content: attachmentContent },
@@ -987,7 +975,7 @@ export async function sendDriverPaymentInvoiceEmail(
       from: FROM_EMAIL,
       to: [to],
       subject: `TransPool24 – Zahlungsnachweis ${data.invoice_number}`,
-      html: buildDriverPaymentInvoiceEmailHtml(data, branding),
+      html: buildDriverPaymentInvoiceEmailHtml(data, branding, footer),
       ...(mergedAtt?.length ? { attachments: mergedAtt } : {}),
     });
     if (error) {
@@ -1019,8 +1007,8 @@ export async function sendDriverApprovalEmail(
     return { success: false, error: "RESEND_API_KEY not set" };
   }
   const resend = new Resend(apiKey);
-  const branding = await loadTransactionalEmailBranding();
-  const html = buildDriverApprovalHtml(data, options?.whatsAppLink ?? null, branding);
+  const [branding, footer] = await Promise.all([loadTransactionalEmailBranding(), loadEmailFooterSocial()]);
+  const html = buildDriverApprovalHtml(data, options?.whatsAppLink ?? null, branding, footer);
   const pdfAtt: Attachment[] | undefined = options?.pdfBuffer
     ? [
         {
