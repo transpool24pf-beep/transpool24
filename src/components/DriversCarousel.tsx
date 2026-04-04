@@ -14,13 +14,23 @@ interface Driver {
   customerName: string;
 }
 
-function StarRating({ rating, className }: { rating: number; className?: string }) {
+function StarRating({
+  rating,
+  className,
+  starClassName,
+}: {
+  rating: number;
+  className?: string;
+  /** e.g. main card: larger stars on phones */
+  starClassName?: string;
+}) {
+  const starSz = starClassName ?? "h-3.5 w-3.5 sm:h-4 sm:w-4";
   return (
     <div className={`flex shrink-0 items-center gap-0.5 ${className ?? ""}`} aria-hidden>
       {[1, 2, 3, 4, 5].map((star) => (
         <svg
           key={star}
-          className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${star <= rating ? "text-amber-400" : "text-gray-200"}`}
+          className={`${starSz} ${star <= rating ? "text-amber-400" : "text-gray-200"}`}
           fill="currentColor"
           viewBox="0 0 20 20"
         >
@@ -116,15 +126,15 @@ function MainDriverBubble({
   return (
     <article
       dir={isRtl ? "rtl" : "ltr"}
-      className="relative z-10 mx-auto w-full max-w-[min(100%,22rem)] sm:max-w-md md:max-w-lg"
+      className="relative z-10 mx-auto w-full max-w-lg sm:max-w-md md:max-w-lg"
     >
       <div className="relative pb-3 sm:pb-4">
-        <div className="relative rounded-2xl border border-white/20 bg-white px-5 py-5 shadow-2xl shadow-black/25 sm:px-7 sm:py-6 md:px-8 md:py-7">
-          <p className="text-center text-[11px] font-medium leading-snug text-[var(--foreground)]/45 sm:text-xs">
+        <div className="relative rounded-2xl border border-white/20 bg-white px-5 py-6 shadow-2xl shadow-black/25 sm:px-7 sm:py-6 md:px-8 md:py-7">
+          <p className="text-center text-xs font-medium leading-snug text-[var(--foreground)]/45 sm:text-xs">
             {reviewLead}
           </p>
           <div className="mt-3 flex items-center justify-center gap-3 sm:mt-4 sm:gap-4">
-            <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-gray-100 ring-2 ring-[var(--accent)]/25 sm:h-14 sm:w-14">
+            <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full bg-gray-100 ring-2 ring-[var(--accent)]/30 sm:h-14 sm:w-14">
               <Image
                 src={driver.photo}
                 alt=""
@@ -138,18 +148,22 @@ function MainDriverBubble({
               />
             </div>
             <div className="min-w-0 flex-1 text-start">
-              <h3 className="truncate text-base font-bold text-[var(--primary)] sm:text-lg">{driver.name}</h3>
-              <StarRating rating={driver.rating} className="mt-1" />
+              <h3 className="truncate text-lg font-bold text-[var(--primary)] sm:text-lg">{driver.name}</h3>
+              <StarRating
+                rating={driver.rating}
+                className="mt-1"
+                starClassName="h-4 w-4 sm:h-4 sm:w-4"
+              />
             </div>
           </div>
-          <p className="mt-4 text-start text-sm leading-relaxed text-[var(--foreground)]/80 sm:mt-5 sm:text-[0.9375rem]">
+          <p className="mt-4 text-start text-[0.9375rem] leading-relaxed text-[var(--foreground)]/85 sm:mt-5 sm:text-[0.9375rem]">
             {driver.comment?.trim() ? (
               <span>&ldquo;{driver.comment}&rdquo;</span>
             ) : (
               t("reviewNoComment", { rating: driver.rating })
             )}
           </p>
-          <p className="mt-4 text-start text-xs font-semibold text-[var(--foreground)]/45 sm:text-sm">
+          <p className="mt-4 text-start text-sm font-semibold text-[var(--foreground)]/50 sm:text-sm">
             {driver.customerName}
           </p>
         </div>
@@ -379,7 +393,7 @@ export function DriversCarousel() {
 
         <div
           ref={trackRef}
-          className="mt-12 flex touch-manipulation items-center justify-center gap-2 sm:mt-14 md:gap-4 lg:mt-16"
+          className="mt-10 flex touch-manipulation items-center justify-center gap-3 sm:mt-14 sm:gap-2 md:gap-4 lg:mt-16"
           onPointerDown={onPointerDown}
           onPointerUp={onPointerUp}
           onPointerCancel={() => {
@@ -390,10 +404,10 @@ export function DriversCarousel() {
             <button
               type="button"
               onClick={userPrev}
-              className="z-20 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white shadow-md backdrop-blur-sm transition hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 sm:h-11 sm:w-11"
+              className="z-20 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/15 text-white shadow-md backdrop-blur-sm transition hover:bg-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] sm:h-11 sm:w-11"
               aria-label={t("carouselPrev")}
             >
-              <span className="text-lg leading-none rtl:rotate-180 sm:text-xl" aria-hidden>
+              <span className="text-xl leading-none rtl:rotate-180 sm:text-xl" aria-hidden>
                 ‹
               </span>
             </button>
@@ -401,23 +415,27 @@ export function DriversCarousel() {
 
           <div className="flex min-w-0 flex-1 items-center justify-center gap-2 sm:gap-3 md:gap-6">
             {n > 1 && (
-              <SideDriverCard
-                driver={leftDriver}
-                onSelect={userPrev}
-                isRtl={isRtl}
-                ariaLabel={t("carouselPrev")}
-              />
+              <div className="hidden shrink-0 sm:block">
+                <SideDriverCard
+                  driver={leftDriver}
+                  onSelect={userPrev}
+                  isRtl={isRtl}
+                  ariaLabel={t("carouselPrev")}
+                />
+              </div>
             )}
-            <div className={`min-w-0 max-w-full flex-1 ${enterClass}`} key={index}>
+            <div className={`min-w-0 w-full max-w-lg flex-1 sm:max-w-none ${enterClass}`} key={index}>
               <MainDriverBubble driver={active} isRtl={isRtl} reviewLead={reviewLead} />
             </div>
             {n > 1 && (
-              <SideDriverCard
-                driver={rightDriver}
-                onSelect={userNext}
-                isRtl={isRtl}
-                ariaLabel={t("carouselNext")}
-              />
+              <div className="hidden shrink-0 sm:block">
+                <SideDriverCard
+                  driver={rightDriver}
+                  onSelect={userNext}
+                  isRtl={isRtl}
+                  ariaLabel={t("carouselNext")}
+                />
+              </div>
             )}
           </div>
 
@@ -425,10 +443,10 @@ export function DriversCarousel() {
             <button
               type="button"
               onClick={userNext}
-              className="z-20 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white shadow-md backdrop-blur-sm transition hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 sm:h-11 sm:w-11"
+              className="z-20 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/15 text-white shadow-md backdrop-blur-sm transition hover:bg-white/25 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] sm:h-11 sm:w-11"
               aria-label={t("carouselNext")}
             >
-              <span className="text-lg leading-none rtl:rotate-180 sm:text-xl" aria-hidden>
+              <span className="text-xl leading-none rtl:rotate-180 sm:text-xl" aria-hidden>
                 ›
               </span>
             </button>
@@ -446,7 +464,9 @@ export function DriversCarousel() {
                 aria-label={t("carouselGoTo", { index: i + 1 })}
                 onClick={() => goToIndex(i)}
                 className={`h-1.5 rounded-full transition-all duration-300 ${
-                  i === index ? "w-8 bg-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.45)]" : "w-5 bg-white/25 hover:bg-white/40"
+                  i === index
+                    ? "w-8 bg-[var(--accent)] shadow-[0_0_14px_rgba(232,93,4,0.5)]"
+                    : "w-5 bg-white/25 hover:bg-white/40"
                 }`}
               />
             ))}

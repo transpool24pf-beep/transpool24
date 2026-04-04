@@ -70,6 +70,8 @@ const DE: Record<string, string> = {
   "ratings.title": "Kundenbewertungen (Fahrer)",
   "ratings.subtitle":
     "Sterne und Kommentare von der Seite „Fahrer bewerten“. Nur aktivierte Einträge erscheinen zusätzlich im Homepage-Karussell.",
+  "ratings.homepageHint":
+    "Veröffentlichte Einträge erscheinen auf der Startseite im Bereich „Unsere Fahrer“ (Karussell, inkl. Mobilansicht).",
   "ratings.loading": "Laden…",
   "ratings.none": "Noch keine Bewertungen.",
   "ratings.dbHint":
@@ -230,6 +232,8 @@ const AR: Record<string, string> = {
   "ratings.title": "تقييمات العملاء (السائق)",
   "ratings.subtitle":
     "النجوم والتعليقات من صفحة «تقييم السائق». ما يُفعّل فقط يظهر أيضاً في شريط آراء العملاء بالصفحة الرئيسية.",
+  "ratings.homepageHint":
+    "التقييمات المفعّلة تظهر في الصفحة الرئيسية ضمن قسم «سائقونا» (سلايدر، بما في ذلك عرض الهاتف).",
   "ratings.loading": "جاري التحميل…",
   "ratings.none": "لا توجد تقييمات بعد.",
   "ratings.dbHint":

@@ -63,7 +63,8 @@ export default function AdminRatingsPage() {
   return (
     <div dir={isRtl ? "rtl" : "ltr"} lang={isRtl ? "ar" : "de"} className="text-start">
       <h1 className="mb-2 text-2xl font-bold text-[#0d2137]">{t("ratings.title")}</h1>
-      <p className="mb-6 max-w-3xl text-sm text-[#0d2137]/75">{t("ratings.subtitle")}</p>
+      <p className="mb-2 max-w-3xl text-sm text-[#0d2137]/75">{t("ratings.subtitle")}</p>
+      <p className="mb-6 max-w-3xl text-xs text-[#0d2137]/60">{t("ratings.homepageHint")}</p>
 
       {apiError && (
         <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
