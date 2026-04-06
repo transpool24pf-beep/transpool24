@@ -19,8 +19,8 @@ const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
   title: {
-    default: "TransPool24",
-    template: "%s | TransPool24",
+    default: "TransPool24 | Logistik & Transportunternehmen Pforzheim",
+    template: "TransPool24 | %s",
   },
   description:
     "Digital logistics & road transport in Pforzheim, Germany — book online, real-time tracking, secure payments.",

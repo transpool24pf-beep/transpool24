@@ -68,6 +68,25 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      // Legacy blog URL reported by Search Console as 404.
+      {
+        source: "/de/blog/willkommen-transpool24-magazin",
+        destination: "/de/blog",
+        permanent: true,
+      },
+      // Keep non-locale public paths on a stable canonical locale URL.
+      { source: "/", destination: "/de", permanent: true },
+      { source: "/order", destination: "/de/order", permanent: true },
+      { source: "/why", destination: "/de/why", permanent: true },
+      { source: "/support", destination: "/de/support", permanent: true },
+      { source: "/privacy", destination: "/de/privacy", permanent: true },
+      { source: "/terms", destination: "/de/terms", permanent: true },
+      { source: "/driver", destination: "/de/driver", permanent: true },
+      { source: "/blog", destination: "/de/blog", permanent: true },
+    ];
+  },
 };
 
 export default withNextIntl(nextConfig);

@@ -44,32 +44,41 @@ export async function generateInvoicePdf(
   const margin = 50;
   let y = height - margin;
 
-  // Header: Logo oben rechts + Kontaktblock (IONOS-Stil)
+  // Header: Logo über Firmenname, zentriert im rechten Branding-Block
+  const brandColW = 200;
+  const brandRight = width - margin;
+  const brandCenterX = brandRight - brandColW / 2;
+
   const logoBytes = await getPdfLogoBytes();
+  let logoImgH = 0;
   let logoDrawn = false;
   if (logoBytes && logoBytes.length > 0) {
     try {
       const img = await doc.embedPng(logoBytes);
-      const imgW = 100;
-      const imgH = Math.min(45, (img.height / img.width) * imgW);
+      const imgW = 118;
+      const imgH = Math.min(54, (img.height / img.width) * imgW);
+      const logoX = brandCenterX - imgW / 2;
       page.drawImage(img, {
-        x: width - margin - imgW,
+        x: logoX,
         y: height - margin - imgH,
         width: imgW,
         height: imgH,
       });
+      logoImgH = imgH;
       logoDrawn = true;
     } catch {
       try {
         const img = await doc.embedJpg(logoBytes);
-        const imgW = 100;
-        const imgH = Math.min(45, (img.height / img.width) * imgW);
+        const imgW = 118;
+        const imgH = Math.min(54, (img.height / img.width) * imgW);
+        const logoX = brandCenterX - imgW / 2;
         page.drawImage(img, {
-          x: width - margin - imgW,
+          x: logoX,
           y: height - margin - imgH,
           width: imgW,
           height: imgH,
         });
+        logoImgH = imgH;
         logoDrawn = true;
       } catch {
         // skip logo
@@ -77,12 +86,11 @@ export async function generateInvoicePdf(
     }
   }
 
-  let contactY = logoDrawn ? height - margin - 55 : height - margin - 10;
-  const rightX = width - margin - 180;
-  contactY = drawText(page, font, fontBold, PDF_COMPANY.name, { x: rightX, y: contactY, size: 10, bold: true });
-  contactY = drawText(page, font, fontBold, `E-Mail: ${PDF_COMPANY.email}`, { x: rightX, y: contactY, size: 9 });
-  contactY = drawText(page, font, fontBold, `Tel: ${PDF_COMPANY.phone}`, { x: rightX, y: contactY, size: 9 });
-  drawText(page, font, fontBold, PDF_COMPANY.website, { x: rightX, y: contactY, size: 9 });
+  let contactY = logoDrawn ? height - margin - logoImgH - 12 : height - margin - 10;
+  contactY = drawTextCentered(PDF_COMPANY.name, { centerX: brandCenterX, y: contactY, size: 10, bold: true });
+  contactY = drawTextCentered(`E-Mail: ${PDF_COMPANY.email}`, { centerX: brandCenterX, y: contactY, size: 9 });
+  contactY = drawTextCentered(`Tel: ${PDF_COMPANY.phone}`, { centerX: brandCenterX, y: contactY, size: 9 });
+  drawTextCentered(PDF_COMPANY.website, { centerX: brandCenterX, y: contactY, size: 9 });
 
   function drawText(
     p: ReturnType<PDFDocument["addPage"]>,
@@ -94,6 +102,24 @@ export async function generateInvoicePdf(
     const { x, y, size = 10, bold = false } = opts;
     const safe = sanitizeTextForStandardPdfFont(text);
     p.drawText(safe, { x, y, size, font: bold ? fB : f, color: rgb(0.1, 0.1, 0.1) });
+    return y - size - 4;
+  }
+
+  function drawTextCentered(
+    text: string,
+    opts: { centerX: number; y: number; size?: number; bold?: boolean }
+  ): number {
+    const { centerX, y, size = 10, bold = false } = opts;
+    const safe = sanitizeTextForStandardPdfFont(text);
+    const f = bold ? fontBold : font;
+    const tw = f.widthOfTextAtSize(safe, size);
+    page.drawText(safe, {
+      x: centerX - tw / 2,
+      y,
+      size,
+      font: f,
+      color: rgb(0.1, 0.1, 0.1),
+    });
     return y - size - 4;
   }
 

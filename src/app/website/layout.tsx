@@ -1,7 +1,7 @@
 import { WebsiteShell } from "./WebsiteShell";
 
 export const metadata = {
-  title: "TransPool24 – Website CMS",
+  title: { absolute: "TransPool24 | Website CMS" },
   description: "Verwaltung von Inhalten auf transpool24.com (ohne Aufträge)",
   robots: "noindex, nofollow",
 };

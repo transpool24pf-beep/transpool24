@@ -2,7 +2,7 @@ import { AdminLocaleProvider } from "@/contexts/AdminLocaleContext";
 import { AdminShell } from "./AdminShell";
 
 export const metadata = {
-  title: "TransPool24 – Admin",
+  title: { absolute: "TransPool24 | Admin" },
   description: "Admin dashboard",
   robots: "noindex, nofollow",
 };

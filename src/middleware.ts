@@ -22,6 +22,13 @@ function safeAdminNextPath(next: string | null): string {
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  if (pathname === "/de/blog/willkommen-transpool24-magazin") {
+    const to = request.nextUrl.clone();
+    to.pathname = "/de/blog";
+    to.search = "";
+    return NextResponse.redirect(to, 308);
+  }
+
   if (pathname.startsWith("/admin")) {
     if (pathname === "/admin/login") {
       const token = request.cookies.get(COOKIE_NAME)?.value;

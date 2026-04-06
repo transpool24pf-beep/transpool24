@@ -7,6 +7,7 @@ import { getPublishedPageBySlug } from "@/lib/blog";
 import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
 import { localeAlternatesAndSocial } from "@/lib/locale-seo-metadata";
+import { seoDocumentTitle } from "@/lib/seo-document-title";
 
 export const revalidate = 60;
 
@@ -18,7 +19,7 @@ export async function generateMetadata({ params }: Props) {
   const page = await getPublishedPageBySlug(locale, slug);
   const t = await getTranslations({ locale, namespace: "blog" });
   if (!page) {
-    return { title: t("notFoundTitle") };
+    return { title: seoDocumentTitle(t("notFoundTitle")) };
   }
   const title = page.meta_title?.trim() || page.title;
   const description = page.meta_description?.trim() || t("metaIndexDescription");

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { defaultLocale, locales, type Locale } from "@/i18n/routing";
 import { getPublicSiteUrl } from "@/lib/public-site-url";
+import { plainSeoTitle, seoDocumentTitle } from "@/lib/seo-document-title";
 
 const OG_LOCALE: Record<string, string> = {
   de: "de_DE",
@@ -45,11 +46,14 @@ export function localeAlternatesAndSocial(
   const site = getPublicSiteUrl();
 
   if (!isLocale(locale)) {
+    const docTitle = plainSeoTitle(opts.title);
     return {
-      title: opts.title,
+      title: seoDocumentTitle(opts.title),
       description: opts.description,
       keywords: opts.keywords,
       robots: opts.robots,
+      openGraph: { title: docTitle, description: opts.description },
+      twitter: { card: "summary_large_image", title: docTitle, description: opts.description },
     };
   }
 
@@ -69,26 +73,28 @@ export function localeAlternatesAndSocial(
     languages[l] = `${site}/${l}${normalizedSuffix}`;
   }
 
+  const docTitle = plainSeoTitle(opts.title);
+
   const openGraph: NonNullable<Metadata["openGraph"]> = {
     type: opts.ogType ?? "website",
     locale: OG_LOCALE[locale] ?? locale,
     url: `${site}${path}`,
     siteName: "TransPool24",
-    title: opts.title,
+    title: docTitle,
     description: opts.description,
     ...(opts.publishedTime ? { publishedTime: opts.publishedTime } : {}),
     ...(opts.ogImage ? { images: [{ url: opts.ogImage }] } : {}),
   };
 
   return {
-    title: opts.title,
+    title: seoDocumentTitle(opts.title),
     description: opts.description,
     keywords: opts.keywords,
     robots: opts.robots,
     openGraph,
     twitter: {
       card: "summary_large_image",
-      title: opts.title,
+      title: docTitle,
       description: opts.description,
     },
     alternates: {
