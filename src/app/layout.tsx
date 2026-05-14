@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import { Suspense } from "react";
 import { GlobalPageLoadingOverlay } from "@/components/GlobalPageLoadingOverlay";
 import "./globals.css";
@@ -58,6 +59,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9998186124580672"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
         <Suspense fallback={null}>
           <GlobalPageLoadingOverlay />
         </Suspense>
