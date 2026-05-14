@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script";
 import { Suspense } from "react";
 import { GlobalPageLoadingOverlay } from "@/components/GlobalPageLoadingOverlay";
 import "./globals.css";
@@ -55,16 +54,16 @@ export default function RootLayout({
         <link rel="icon" href={`${SITE}/favicon-32.png`} type="image/png" sizes="32x32" />
         <link rel="icon" href={`${SITE}/favicon-48.png`} type="image/png" sizes="48x48" />
         <link rel="apple-touch-icon" href={`${SITE}/apple-touch-icon.png`} sizes="180x180" />
+        {/* Google AdSense: must appear in initial HTML for crawler verification */}
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9998186124580672"
+          crossOrigin="anonymous"
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9998186124580672"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
         <Suspense fallback={null}>
           <GlobalPageLoadingOverlay />
         </Suspense>
