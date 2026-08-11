@@ -6,9 +6,9 @@ export const ADSENSE_CLIENT =
 export const ADSENSE_SLOT_SIDEBAR_LEFT =
   process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR_LEFT?.trim() ?? "6424372308";
 export const ADSENSE_SLOT_SIDEBAR_RIGHT =
-  process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR_RIGHT?.trim() ?? "";
+  process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR_RIGHT?.trim() ?? "1367340953";
 export const ADSENSE_SLOT_BANNER =
-  process.env.NEXT_PUBLIC_ADSENSE_SLOT_BANNER?.trim() ?? "";
+  process.env.NEXT_PUBLIC_ADSENSE_SLOT_BANNER?.trim() ?? "6428095944";
 
 export function adsenseManualUnitsConfigured(): boolean {
   return Boolean(
