@@ -8,9 +8,8 @@ import {
   adsAllowedForPath,
   adsenseManualUnitsConfigured,
 } from "@/lib/adsense-config";
-import { AdFrame } from "@/components/ads/AdFrame";
+import { AdRailPageGutter, AdSidebarRail } from "@/components/ads/AdSidebarRail";
 import { AdSenseScript } from "@/components/ads/AdSenseScript";
-import { AdSenseUnit } from "@/components/ads/AdSenseUnit";
 import { useMarketingConsent } from "@/components/ads/useMarketingConsent";
 
 const AD_LABEL: Record<string, string> = {
@@ -33,8 +32,7 @@ function adLabel(locale: string): string {
 }
 
 /**
- * Fixed side rails (wide desktop) + optional in-flow banner on blog.
- * Replaces intrusive Auto ads with predictable slots.
+ * Fixed-size side rails (stay on screen while scrolling) on wide viewports.
  */
 export function AdSensePlacements() {
   const pathname = usePathname();
@@ -44,6 +42,8 @@ export function AdSensePlacements() {
   const allowed = adsAllowedForPath(pathname);
   const configured = adsenseManualUnitsConfigured();
   const enabled = allowed && marketing && configured;
+  const showRails =
+    marketing && Boolean(ADSENSE_SLOT_SIDEBAR_LEFT || ADSENSE_SLOT_SIDEBAR_RIGHT);
 
   if (!allowed) return null;
 
@@ -52,50 +52,24 @@ export function AdSensePlacements() {
   return (
     <>
       <AdSenseScript enabled={enabled} />
+      <AdRailPageGutter active={enabled && showRails} />
 
-      {marketing && (ADSENSE_SLOT_SIDEBAR_LEFT || ADSENSE_SLOT_SIDEBAR_RIGHT) ? (
-        <div
-          className="pointer-events-none fixed inset-x-0 top-0 z-[14] hidden min-[1400px]:block"
-          aria-hidden={!enabled}
-        >
-          <div className="mx-auto flex max-w-[1920px] justify-between px-3">
-            {ADSENSE_SLOT_SIDEBAR_LEFT ? (
-              <div
-                className="pointer-events-auto w-[168px] pt-28"
-                data-tp24-ad-region="sidebar-left"
-              >
-                <AdFrame label={label}>
-                  <AdSenseUnit
-                    slot={ADSENSE_SLOT_SIDEBAR_LEFT}
-                    variant="sidebar"
-                    enabled={enabled}
-                  />
-                </AdFrame>
-              </div>
-            ) : (
-              <div className="w-[168px]" />
-            )}
+      {showRails && ADSENSE_SLOT_SIDEBAR_LEFT ? (
+        <AdSidebarRail
+          side="left"
+          slot={ADSENSE_SLOT_SIDEBAR_LEFT}
+          label={label}
+          enabled={enabled}
+        />
+      ) : null}
 
-            <div className="min-w-0 flex-1" />
-
-            {ADSENSE_SLOT_SIDEBAR_RIGHT ? (
-              <div
-                className="pointer-events-auto w-[168px] pt-28"
-                data-tp24-ad-region="sidebar-right"
-              >
-                <AdFrame label={label}>
-                  <AdSenseUnit
-                    slot={ADSENSE_SLOT_SIDEBAR_RIGHT}
-                    variant="sidebar"
-                    enabled={enabled}
-                  />
-                </AdFrame>
-              </div>
-            ) : (
-              <div className="w-[168px]" />
-            )}
-          </div>
-        </div>
+      {showRails && ADSENSE_SLOT_SIDEBAR_RIGHT ? (
+        <AdSidebarRail
+          side="right"
+          slot={ADSENSE_SLOT_SIDEBAR_RIGHT}
+          label={label}
+          enabled={enabled}
+        />
       ) : null}
     </>
   );

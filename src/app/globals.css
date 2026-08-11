@@ -24,6 +24,14 @@ body {
   font-family: var(--font-sans), system-ui, sans-serif;
 }
 
+/* Side ad rails: keep main content centered between fixed units (≥1400px). */
+@media (min-width: 1400px) {
+  html.tp24-ad-rails-active body {
+    padding-left: var(--tp24-ad-gutter, 0);
+    padding-right: var(--tp24-ad-gutter, 0);
+  }
+}
+
 /* Stepped dash = “hopping” motion along inter–Bundesland routes */
 @keyframes germany-map-dash-flow {
   to {

@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { ADSENSE_CLIENT } from "@/lib/adsense-config";
+import {
+  ADSENSE_CLIENT,
+  ADSENSE_SIDEBAR_HEIGHT,
+  ADSENSE_SIDEBAR_WIDTH,
+} from "@/lib/adsense-config";
 
 type Variant = "sidebar" | "banner";
-
-const VARIANT_CLASS: Record<Variant, string> = {
-  sidebar: "adsense-unit--sidebar min-h-[600px] w-full max-w-[160px]",
-  banner: "adsense-unit--banner min-h-[90px] w-full max-w-[728px]",
-};
 
 type Props = {
   slot: string;
@@ -34,14 +33,36 @@ export function AdSenseUnit({ slot, variant, enabled }: Props) {
 
   if (!slot) return null;
 
+  if (variant === "sidebar") {
+    return (
+      <ins
+        className="adsbygoogle block overflow-hidden"
+        style={{
+          display: "inline-block",
+          width: ADSENSE_SIDEBAR_WIDTH,
+          height: ADSENSE_SIDEBAR_HEIGHT,
+          maxHeight: ADSENSE_SIDEBAR_HEIGHT,
+        }}
+        data-ad-client={ADSENSE_CLIENT}
+        data-ad-slot={slot}
+      />
+    );
+  }
+
   return (
     <ins
-      className={`adsbygoogle block overflow-hidden ${VARIANT_CLASS[variant]}`}
+      className="adsbygoogle adsense-unit--banner block min-h-[90px] w-full max-w-[728px] overflow-hidden"
       style={{ display: "block" }}
       data-ad-client={ADSENSE_CLIENT}
       data-ad-slot={slot}
-      data-ad-format="auto"
+      data-ad-format="horizontal"
       data-full-width-responsive="true"
     />
   );
+}
+
+declare global {
+  interface Window {
+    adsbygoogle?: unknown[];
+  }
 }
