@@ -1,6 +1,7 @@
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { AdSensePlacements } from "@/components/ads/AdSensePlacements";
 import { CookieConsentBarrier } from "@/components/CookieConsentBarrier";
 import { LocaleDocumentLang } from "@/components/LocaleDocumentLang";
 import { OrderDraftLifecycle } from "@/components/OrderDraftLifecycle";
@@ -25,6 +26,7 @@ export default async function LocaleLayout({ children, params }: Props) {
       <LocaleDocumentLang locale={locale} />
       <OrderDraftLifecycle />
       <CookieConsentBarrier />
+      <AdSensePlacements />
       {children}
     </NextIntlClientProvider>
   );
