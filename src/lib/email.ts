@@ -12,22 +12,7 @@ import {
   buildEmailFooterInvoiceBlock,
   type ResolvedEmailFooter,
 } from "@/lib/email-footer";
-
-const DEFAULT_FROM = "TransPool24 <onboarding@resend.dev>";
-
-function getValidFromEmail(): string {
-  let raw = process.env.RESEND_FROM_EMAIL ?? "";
-  raw = raw.trim().replace(/^["']|["']$/g, "");
-  if (!raw) return DEFAULT_FROM;
-  let email = "";
-  const angleMatch = raw.match(/\s*<\s*([^\s@]+@[^\s@]+\.[^\s@]+)\s*>$/);
-  if (angleMatch) email = angleMatch[1];
-  else if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw)) email = raw;
-  if (!email) return DEFAULT_FROM;
-  return `TransPool24 <${email}>`;
-}
-
-const FROM_EMAIL = getValidFromEmail();
+import { customerEmailSendOptions } from "@/lib/email-addresses";
 
 /** Driver info for order confirmation email (from driver_applications) */
 export type OrderEmailDriverInfo = {
@@ -238,7 +223,7 @@ export async function sendOrderConfirmationEmail(
       : undefined;
     const mergedAtt = mergeAttachmentsWithLogo(branding.logoAttachment, pdfAtt);
     const { error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      ...customerEmailSendOptions(),
       to: [to],
       subject: `TransPool24 – Auftragsbestätigung #${orderRef}`,
       html: buildConfirmationHtml(job, {
@@ -455,7 +440,7 @@ export async function sendDeliveryConfirmationEmail(
         : undefined;
     const mergedAtt = mergeAttachmentsWithLogo(branding.logoAttachment, podAtt);
     const { error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      ...customerEmailSendOptions(),
       to: [to],
       subject: `TransPool24 – Zustellung bestätigt #${orderRef}`,
       html: buildDeliveryConfirmationHtml(job, {
@@ -596,7 +581,7 @@ export async function sendThankYouDeliveryEmail(
         : undefined;
     const mergedAtt = mergeAttachmentsWithLogo(branding.logoAttachment, photoAtt);
     const { error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      ...customerEmailSendOptions(),
       to: [to],
       subject: "Vielen Dank für Ihr Vertrauen in TransPool24",
       html: buildThankYouDeliveryHtml(job, {
@@ -747,7 +732,7 @@ export async function sendTrackingUpdateEmail(
     const branding = await loadTransactionalEmailBranding();
     const mergedAtt = mergeAttachmentsWithLogo(branding.logoAttachment);
     const { error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      ...customerEmailSendOptions(),
       to: [to],
       subject: `TransPool24 – Live-Tracking Auftrag #${orderRef}`,
       html: buildTrackingUpdateHtml(job, options, branding),
@@ -972,7 +957,7 @@ export async function sendDriverPaymentInvoiceEmail(
       { filename: pdfFilename, content: attachmentContent },
     ]);
     const { error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      ...customerEmailSendOptions(),
       to: [to],
       subject: `TransPool24 – Zahlungsnachweis ${data.invoice_number}`,
       html: buildDriverPaymentInvoiceEmailHtml(data, branding, footer),
@@ -1020,7 +1005,7 @@ export async function sendDriverApprovalEmail(
   const mergedAtt = mergeAttachmentsWithLogo(branding.logoAttachment, pdfAtt);
   try {
     const { error } = await resend.emails.send({
-      from: FROM_EMAIL,
+      ...customerEmailSendOptions(),
       to: [to],
       subject: `TransPool24 – Ihre Fahrer-Anfrage wurde genehmigt #${data.driver_number != null ? String(data.driver_number).padStart(5, "0") : ""}`,
       html,
@@ -1048,5 +1033,75 @@ export async function sendDriverApprovalEmail(
         ? "Resend-Konto befindet sich im Testmodus oder die Domain ist nicht verifiziert. Verifizieren Sie die Domain auf resend.com/domains."
         : msg;
     return { success: false, error: errMsg };
+  }
+}
+
+function buildCustomCustomerEmailHtml(bodyPlain: string, branding: TransactionalEmailBranding): string {
+  const bodyHtml = escapeHtml(bodyPlain).replace(/\n/g, "<br />");
+  return `<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8" />
+${emailDeHeadMeta()}
+</head>
+<body style="margin:0;font-family:'Segoe UI',Tahoma,sans-serif;background:#f4f4f4;">
+${branding.headerHtml}
+<div style="max-width:600px;margin:0 auto;padding:24px 20px;">
+  <div style="background:#fff;border-radius:12px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+    <p style="margin:0;font-size:15px;line-height:1.6;color:#334155;">${bodyHtml}</p>
+    <p style="margin:24px 0 0;font-size:13px;color:#64748b;">TransPool24 · Pforzheim &amp; Region</p>
+  </div>
+</div>
+</body>
+</html>`;
+}
+
+/** Free-form email to a customer from Admin (From support@, Reply-To Gmail). */
+export async function sendCustomCustomerEmail(
+  to: string,
+  subject: string,
+  bodyPlain: string,
+): Promise<{ success: boolean; error?: string }> {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) return { success: false, error: "RESEND_API_KEY not set" };
+  const trimmedTo = to.trim();
+  const trimmedSubject = subject.trim().slice(0, 200);
+  const trimmedBody = bodyPlain.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedTo)) {
+    return { success: false, error: "Invalid recipient email" };
+  }
+  if (!trimmedSubject || !trimmedBody) {
+    return { success: false, error: "Subject and message required" };
+  }
+  if (trimmedBody.length > 12000) {
+    return { success: false, error: "Message too long" };
+  }
+
+  const resend = new Resend(apiKey);
+  try {
+    const branding = await loadTransactionalEmailBranding();
+    const mergedAtt = mergeAttachmentsWithLogo(branding.logoAttachment);
+    const { error } = await resend.emails.send({
+      ...customerEmailSendOptions(),
+      to: [trimmedTo],
+      subject: trimmedSubject.startsWith("TransPool24") ? trimmedSubject : `TransPool24 – ${trimmedSubject}`,
+      html: buildCustomCustomerEmailHtml(trimmedBody, branding),
+      ...(mergedAtt?.length ? { attachments: mergedAtt } : {}),
+    });
+    if (error) {
+      const raw =
+        typeof error === "string"
+          ? error
+          : error && typeof error === "object" && "message" in error
+            ? String((error as { message: unknown }).message)
+            : JSON.stringify(error);
+      const errMsg = /only send testing emails|verify a domain|resend\.com\/domains/i.test(raw)
+        ? "Resend: Domain nicht verifiziert oder Testmodus."
+        : raw;
+      return { success: false, error: errMsg };
+    }
+    return { success: true };
+  } catch (e) {
+    return { success: false, error: e instanceof Error ? e.message : "Unknown error" };
   }
 }
