@@ -1,3 +1,5 @@
+import { ADMIN_PAGES_AR, ADMIN_PAGES_DE } from "./admin-pages-i18n";
+
 export type AdminLocale = "de" | "ar";
 
 const DE: Record<string, string> = {
@@ -175,6 +177,7 @@ const DE: Record<string, string> = {
   "service.driver_only": "Nur Fahrer",
   "service.driver_car": "Fahrer mit Fahrzeug",
   "service.driver_car_assistant": "Fahrer mit Fahrzeug + Helfer",
+  ...ADMIN_PAGES_DE,
 };
 
 const AR: Record<string, string> = {
@@ -223,7 +226,7 @@ const AR: Record<string, string> = {
   "inProgress.whatsappMissing": "لا يوجد هاتف للسائق (عيّن طلب التسجيل).",
   "nav.reports": "التقارير",
   "nav.driverApplications": "تطبيقات السائقين",
-  "nav.drivers": "سائق",
+  "nav.drivers": "السائقون",
   "nav.blog": "مدونة / مجلة",
   "nav.emailSocial": "البريد · التواصل (تذييل)",
   "emailSocial.title": "البريد: روابط التواصل وتذييل الرسائل",
@@ -288,7 +291,7 @@ const AR: Record<string, string> = {
   "orders.colStatus": "الحالة",
   "orders.colDate": "التاريخ",
   "orders.colCompany": "الشركة",
-  "orders.colService": "طلب شركة",
+  "orders.colService": "الخدمة",
   "orders.colCustomerEur": "العميل €",
   "orders.colDriverEur": "السائق €",
   "orders.colAssistantEur": "معاون €",
@@ -351,6 +354,7 @@ const AR: Record<string, string> = {
   "service.driver_only": "شوفير من دون سيارة",
   "service.driver_car": "شوفير مع سيارة",
   "service.driver_car_assistant": "شوفير مع سيارة ومعاون",
+  ...ADMIN_PAGES_AR,
 };
 
 const MAP: Record<AdminLocale, Record<string, string>> = { de: DE, ar: AR };

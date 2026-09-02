@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useAdminLocale } from "@/contexts/AdminLocaleContext";
 import { whatsappHrefFromE164 } from "@/lib/country-dial-codes";
 
 type SupportRequest = {
@@ -28,23 +29,6 @@ type SupportRequest = {
   driver_info: { full_name: string; phone: string; city: string; id: string } | null;
 };
 
-const INQUIRY_DE: Record<string, string> = {
-  booking: "Buchung / Auftrag",
-  driver: "Fahrer / Bewerbung",
-  press: "Presse",
-  partnership: "Partnerschaft",
-  other: "Sonstiges",
-};
-
-const COMM_DE: Record<string, string> = {
-  de: "Deutsch",
-  en: "Englisch",
-  ar: "Arabisch",
-  tr: "Türkisch",
-  fr: "Französisch",
-  es: "Spanisch",
-};
-
 function waDigits(phone: string): string {
   return phone.replace(/\D/g, "");
 }
@@ -62,7 +46,17 @@ function resolveWhatsAppHref(req: SupportRequest): { href: string; label: string
   return null;
 }
 
-function SupportRequestCard({ req, onReplySaved }: { req: SupportRequest; onReplySaved: (id: string, text: string) => void }) {
+function SupportRequestCard({
+  req,
+  onReplySaved,
+  dateLocale,
+  t,
+}: {
+  req: SupportRequest;
+  onReplySaved: (id: string, text: string) => void;
+  dateLocale: string;
+  t: (key: string) => string;
+}) {
   const [reply, setReply] = useState(req.admin_reply ?? "");
   const [saving, setSaving] = useState(false);
   const [saveErr, setSaveErr] = useState("");
@@ -74,6 +68,9 @@ function SupportRequestCard({ req, onReplySaved }: { req: SupportRequest; onRepl
   const isDriver = req.requester_type === "driver" && req.driver_number != null;
   const wa = resolveWhatsAppHref(req);
 
+  const inquiryLabel = (key: string) => t(`support.inquiry.${key}`) || key;
+  const commLabel = (key: string) => t(`support.comm.${key}`) || key;
+
   const saveReply = async () => {
     setSaveErr("");
     setSaving(true);
@@ -84,10 +81,10 @@ function SupportRequestCard({ req, onReplySaved }: { req: SupportRequest; onRepl
         body: JSON.stringify({ admin_reply: reply }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || "Speichern fehlgeschlagen");
+      if (!res.ok) throw new Error(data?.error || t("common.saveFailed"));
       onReplySaved(req.id, reply);
     } catch (e) {
-      setSaveErr(e instanceof Error ? e.message : "Fehler");
+      setSaveErr(e instanceof Error ? e.message : t("common.error"));
     } finally {
       setSaving(false);
     }
@@ -97,7 +94,7 @@ function SupportRequestCard({ req, onReplySaved }: { req: SupportRequest; onRepl
     <div className="rounded-xl border border-[#0d2137]/10 bg-white p-5 shadow-sm">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs font-semibold uppercase tracking-wide text-[#0d2137]/50">
-          {new Date(req.created_at).toLocaleString("de-DE", {
+          {new Date(req.created_at).toLocaleString(dateLocale, {
             day: "2-digit",
             month: "2-digit",
             year: "numeric",
@@ -110,31 +107,34 @@ function SupportRequestCard({ req, onReplySaved }: { req: SupportRequest; onRepl
             isDriver ? "bg-[#e85d04]/15 text-[#c2410c]" : "bg-slate-100 text-slate-700"
           }`}
         >
-          {isDriver ? "Fahrer" : "Kunde / Kontakt"}
+          {isDriver ? t("support.badgeDriver") : t("support.badgeCustomer")}
         </span>
       </div>
 
       <div className="mb-4 rounded-lg border border-[#0d2137]/10 bg-[#f8fafc] p-4">
-        <h3 className="mb-2 text-sm font-bold text-[#0d2137]">Absender</h3>
+        <h3 className="mb-2 text-sm font-bold text-[#0d2137]">{t("support.sender")}</h3>
         <ul className="space-y-1 text-sm text-[#0d2137]/90">
           {isDriver && req.driver_number != null && (
             <li>
-              <strong>Fahrernr.:</strong> #{String(req.driver_number).padStart(5, "0")}
+              <strong>{t("support.driverNo")}:</strong> #{String(req.driver_number).padStart(5, "0")}
             </li>
           )}
           <li>
-            <strong>Name:</strong> {req.name}
+            <strong>{t("common.name")}:</strong> {req.name}
           </li>
           <li>
-            <strong>E-Mail:</strong>{" "}
-            <a href={`mailto:${req.email}`} className="text-[#e85d04] hover:underline">
+            <strong>{t("common.email")}:</strong>{" "}
+            <a href={`mailto:${req.email}`} className="text-[#e85d04] hover:underline" dir="ltr">
               {req.email}
             </a>
           </li>
           {wa && (
             <li className="!mt-3 list-none">
               <p className="text-sm text-[#0d2137]/80">
-                <strong>WhatsApp:</strong> <span className="font-mono tabular-nums">{wa.label}</span>
+                <strong>{t("support.whatsapp")}:</strong>{" "}
+                <span className="font-mono tabular-nums" dir="ltr">
+                  {wa.label}
+                </span>
               </p>
               <a
                 href={wa.href}
@@ -145,42 +145,43 @@ function SupportRequestCard({ req, onReplySaved }: { req: SupportRequest; onRepl
                 <svg className="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                   <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                 </svg>
-                WhatsApp öffnen
+                {t("support.openWhatsapp")}
               </a>
             </li>
           )}
           {req.company && (
             <li>
-              <strong>Firma:</strong> {req.company}
+              <strong>{t("common.company")}:</strong> {req.company}
             </li>
           )}
           {req.country && (
             <li>
-              <strong>Land:</strong> {req.country}
+              <strong>{t("common.country")}:</strong> {req.country}
             </li>
           )}
           {req.inquiry_type && (
             <li>
-              <strong>Anfrage:</strong> {INQUIRY_DE[req.inquiry_type] ?? req.inquiry_type}
+              <strong>{t("support.inquiry")}:</strong> {inquiryLabel(req.inquiry_type)}
             </li>
           )}
           {req.comm_language && (
             <li>
-              <strong>Sprache:</strong> {COMM_DE[req.comm_language] ?? req.comm_language}
+              <strong>{t("support.language")}:</strong> {commLabel(req.comm_language)}
             </li>
           )}
           {req.page_locale && (
             <li>
-              <strong>Formular-Sprache:</strong> {req.page_locale}
+              <strong>{t("support.formLanguage")}:</strong> {req.page_locale}
             </li>
           )}
           {req.driver_info?.city && (
             <li>
-              <strong>Stadt (Fahrerakte):</strong> {req.driver_info.city}
+              <strong>{t("support.driverCity")}:</strong> {req.driver_info.city}
             </li>
           )}
           <li className="text-xs text-[#0d2137]/60">
-            Marketing OK: {req.marketing_opt_in ? "Ja" : "Nein"} · Datenschutz: {req.privacy_accepted ? "Ja" : "—"}
+            {t("support.marketing")}: {req.marketing_opt_in ? t("common.yes") : t("common.no")} ·{" "}
+            {t("support.privacy")}: {req.privacy_accepted ? t("common.yes") : t("common.none")}
           </li>
         </ul>
         {req.driver_info?.id && (
@@ -188,25 +189,27 @@ function SupportRequestCard({ req, onReplySaved }: { req: SupportRequest; onRepl
             href={`/admin/driver-applications/${req.driver_info.id}`}
             className="mt-2 inline-block text-sm font-medium text-[#e85d04] hover:underline"
           >
-            Fahrerakte öffnen →
+            {t("support.openDriverFile")}
           </Link>
         )}
       </div>
 
       <div className="mb-4">
-        <h3 className="mb-2 text-sm font-bold text-[#0d2137]">Nachricht</h3>
-        <p className="whitespace-pre-wrap rounded-lg border border-[#0d2137]/10 bg-white p-4 text-[#0d2137]/90">{req.message}</p>
+        <h3 className="mb-2 text-sm font-bold text-[#0d2137]">{t("support.message")}</h3>
+        <p className="whitespace-pre-wrap rounded-lg border border-[#0d2137]/10 bg-white p-4 text-[#0d2137]/90">
+          {req.message}
+        </p>
       </div>
 
       <div className="rounded-lg border border-[#0d2137]/10 bg-white p-4">
-        <h3 className="mb-2 text-sm font-bold text-[#0d2137]">Interne Antwort / Notiz</h3>
-        <p className="mb-2 text-xs text-[#0d2137]/55">Sichtbar im Admin; optional für Ihr Team (kein Auto-Versand an Kunden).</p>
+        <h3 className="mb-2 text-sm font-bold text-[#0d2137]">{t("support.internalReply")}</h3>
+        <p className="mb-2 text-xs text-[#0d2137]/55">{t("support.internalReplyHint")}</p>
         <textarea
           value={reply}
           onChange={(e) => setReply(e.target.value)}
           rows={4}
           className="w-full resize-y rounded-lg border border-[#0d2137]/15 px-3 py-2 text-sm text-[#0d2137] focus:border-[#e85d04] focus:outline-none focus:ring-1 focus:ring-[#e85d04]"
-          placeholder="Antwort oder Status notieren…"
+          placeholder={t("support.replyPlaceholder")}
         />
         {saveErr && <p className="mt-2 text-sm text-red-600">{saveErr}</p>}
         <button
@@ -215,7 +218,7 @@ function SupportRequestCard({ req, onReplySaved }: { req: SupportRequest; onRepl
           disabled={saving}
           className="mt-3 rounded-lg bg-[#0d2137] px-4 py-2 text-sm font-medium text-white hover:bg-[#0d2137]/90 disabled:opacity-50"
         >
-          {saving ? "Speichern…" : "Antwort speichern"}
+          {saving ? t("common.saving") : t("support.saveReply")}
         </button>
       </div>
     </div>
@@ -223,6 +226,8 @@ function SupportRequestCard({ req, onReplySaved }: { req: SupportRequest; onRepl
 }
 
 export default function AdminSupportPage() {
+  const { locale, t } = useAdminLocale();
+  const dateLocale = locale === "ar" ? "ar-SA" : "de-DE";
   const [list, setList] = useState<SupportRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -233,21 +238,17 @@ export default function AdminSupportPage() {
     fetch("/api/admin/support-requests")
       .then(async (r) => {
         const data = await r.json();
-        if (!r.ok) throw new Error(data?.error || "Fehler beim Laden");
+        if (!r.ok) throw new Error(data?.error || t("blog.loadFailed"));
         if (Array.isArray(data)) return data;
         if (data?.error) throw new Error(data.error);
         return [];
       })
       .then(setList)
       .catch((e) =>
-        setError(
-          e instanceof Error
-            ? e.message
-            : "Tabelle support_requests fehlt oder Spalten nicht migriert. supabase/support_requests.sql und support_requests_contact_enhancement.sql ausführen.",
-        ),
+        setError(e instanceof Error ? e.message : t("support.loadErrorDb")),
       )
       .finally(() => setLoading(false));
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     load();
@@ -261,10 +262,8 @@ export default function AdminSupportPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#0d2137]">Support-Nachrichten</h1>
-          <p className="mt-1 text-sm text-[#0d2137]/60">
-            Kontaktformular (Kunden) und Fahrer-Support. WhatsApp öffnen, interne Antwort speichern.
-          </p>
+          <h1 className="text-2xl font-bold text-[#0d2137]">{t("support.title")}</h1>
+          <p className="mt-1 text-sm text-[#0d2137]/60">{t("support.subtitle")}</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Link
@@ -273,35 +272,41 @@ export default function AdminSupportPage() {
             rel="noopener noreferrer"
             className="rounded-lg bg-[#e85d04] px-4 py-2 text-sm font-medium text-white hover:opacity-95"
           >
-            Kontaktformular (Website)
+            {t("support.contactForm")}
           </Link>
           <button
             type="button"
             onClick={load}
             className="rounded-lg border border-[#0d2137]/20 bg-white px-4 py-2 text-sm font-medium text-[#0d2137] hover:bg-[#f8fafc]"
           >
-            Aktualisieren
+            {t("common.refresh")}
           </button>
         </div>
       </div>
 
-      {loading && <p className="text-[#0d2137]/70">Laden…</p>}
+      {loading && <p className="text-[#0d2137]/70">{t("common.loading")}</p>}
       {error && (
         <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-amber-800">
-          <p className="font-medium">Nachrichten konnten nicht geladen werden</p>
+          <p className="font-medium">{t("support.loadErrorTitle")}</p>
           <p className="mt-1 text-sm">{error}</p>
         </div>
       )}
       {!loading && !error && list.length === 0 && (
         <div className="rounded-xl border border-[#0d2137]/10 bg-white p-6 text-center">
-          <p className="text-[#0d2137]/80">Noch keine Nachrichten.</p>
-          <p className="mt-2 text-sm text-[#0d2137]/60">Einsendungen aus dem Kontaktformular erscheinen hier.</p>
+          <p className="text-[#0d2137]/80">{t("support.empty")}</p>
+          <p className="mt-2 text-sm text-[#0d2137]/60">{t("support.emptyHint")}</p>
         </div>
       )}
       {!loading && !error && list.length > 0 && (
         <div className="space-y-4">
           {list.map((req) => (
-            <SupportRequestCard key={req.id} req={req} onReplySaved={onReplySaved} />
+            <SupportRequestCard
+              key={req.id}
+              req={req}
+              onReplySaved={onReplySaved}
+              dateLocale={dateLocale}
+              t={t}
+            />
           ))}
         </div>
       )}

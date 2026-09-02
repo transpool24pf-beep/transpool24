@@ -146,13 +146,15 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     );
   }
 
+  const isRtl = locale === "ar";
+
   return (
     <div
       className="flex min-h-screen bg-[#e8eaed]"
-      dir={locale === "ar" ? "rtl" : "ltr"}
-      lang={locale === "ar" ? "ar" : "de"}
+      dir={isRtl ? "rtl" : "ltr"}
+      lang={isRtl ? "ar" : "de"}
     >
-      <header className="fixed left-0 right-0 top-0 z-10 border-b border-[#0d2137]/10 bg-[#0d2137] px-4 py-3 text-white shadow-sm">
+      <header className="fixed inset-x-0 top-0 z-10 border-b border-[#0d2137]/10 bg-[#0d2137] px-4 py-3 text-white shadow-sm">
         <div className="flex items-center justify-between gap-3">
           <Link href="/admin/orders" className="min-w-0 shrink text-lg font-semibold tracking-tight">
             {t("shell.headerTitle")}
@@ -187,16 +189,30 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 src="/logo.png"
                 alt="TransPool24"
                 fill
-                className="object-contain object-right"
+                className="object-contain object-start"
                 priority
               />
-              <div className="absolute left-2 top-1/2 h-5 w-5 -translate-y-1/2 rounded-sm bg-[#0d2137]" aria-hidden />
-              <div className="absolute right-2 top-1/2 h-5 w-5 -translate-y-1/2 rounded-sm bg-[#0d2137]" aria-hidden />
             </div>
           </div>
         </div>
       </header>
-      <main className="flex min-h-screen flex-1 flex-col pt-14">
+      <aside className="sticky top-14 order-first h-[calc(100vh-3.5rem)] w-56 shrink-0 border-e border-[#0d2137]/10 bg-white shadow-sm">
+        <nav className="flex flex-col gap-1 p-4">
+          <AdminNavBadges
+            items={navItems}
+            unreadBadgeAriaLabel={(n) => `${n} ${t("nav.unread")}`}
+          />
+          <div className="my-2 border-t border-[#0d2137]/10" />
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="rounded-lg px-4 py-3 text-start text-sm font-medium text-[#0d2137]/70 hover:bg-red-50 hover:text-red-700"
+          >
+            {t("shell.logout")}
+          </button>
+        </nav>
+      </aside>
+      <main className="order-last flex min-h-screen flex-1 flex-col pt-14">
         <div
           className={`mx-auto flex-1 px-4 py-8 ${
             pathname === "/admin/orders" ||
@@ -276,24 +292,6 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           ) : null}
         </footer>
       </main>
-      <aside className="sticky top-14 h-[calc(100vh-3.5rem)] w-56 shrink-0 border-l border-[#0d2137]/10 bg-white shadow-sm">
-        <nav className="flex flex-col gap-1 p-4">
-          <AdminNavBadges
-            items={navItems}
-            unreadBadgeAriaLabel={(n) => `${n} ${t("nav.unread")}`}
-          />
-          <div className="my-2 border-t border-[#0d2137]/10" />
-          <button
-            type="button"
-            onClick={handleLogout}
-            className={`rounded-lg px-4 py-3 text-sm font-medium text-[#0d2137]/70 hover:bg-red-50 hover:text-red-700 ${
-              locale === "ar" ? "text-right" : "text-left"
-            }`}
-          >
-            {t("shell.logout")}
-          </button>
-        </nav>
-      </aside>
     </div>
   );
 }

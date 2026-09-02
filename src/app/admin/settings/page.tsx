@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { CARGO_CATEGORIES, CARGO_CATEGORY_LABEL_DE } from "@/lib/cargo";
 import { PRICING_DEFAULTS } from "@/lib/settings";
+import { useAdminLocale } from "@/contexts/AdminLocaleContext";
 
 type Pricing = {
   price_per_km_cents?: Record<string, number>;
@@ -19,10 +20,10 @@ const DEFAULT_PRICE_PER_KM_CENTS: Record<"XS" | "M" | "L", number> = {
   L: 200,
 };
 
-const SIZE_LABELS: Record<string, string> = {
-  XS: "Klein (XS)",
-  M: "Mittel (M)",
-  L: "Groß (L)",
+const SIZE_LABEL_KEYS: Record<"XS" | "M" | "L", string> = {
+  XS: "settings.sizeXS",
+  M: "settings.sizeM",
+  L: "settings.sizeL",
 };
 
 function formatEur(cents: number): string {
@@ -38,6 +39,7 @@ function parseEur(value: string): number {
 }
 
 export default function AdminSettingsPage() {
+  const { t } = useAdminLocale();
   const [pricing, setPricing] = useState<Pricing>({
     price_per_km_cents: { ...DEFAULT_PRICE_PER_KM_CENTS },
     driver_hourly_rate_cents: 2500,
@@ -144,10 +146,10 @@ export default function AdminSettingsPage() {
       body: JSON.stringify(toSave),
     })
       .then((r) => {
-        if (r.ok) alert("Gespeichert.");
-        else alert("Speichern fehlgeschlagen.");
+        if (r.ok) alert(t("common.saved"));
+        else alert(t("common.saveFailed"));
       })
-      .catch(() => alert("Anfrage fehlgeschlagen"))
+      .catch(() => alert(t("common.requestFailed")))
       .finally(() => setSaving(false));
   };
 
@@ -161,41 +163,29 @@ export default function AdminSettingsPage() {
       .then((r) => r.json())
       .then((d: { paused?: boolean }) => {
         if (typeof d.paused === "boolean") setBookingsPaused(d.paused);
-        else alert("Speichern fehlgeschlagen.");
+        else alert(t("common.saveFailed"));
       })
-      .catch(() => alert("Anfrage fehlgeschlagen"))
+      .catch(() => alert(t("common.requestFailed")))
       .finally(() => setBookingsToggleLoading(false));
   };
 
   if (loading) {
     return (
       <div className="rounded-xl bg-white p-8 shadow-sm">
-        <p className="text-[#0d2137]/70">Laden…</p>
+        <p className="text-[#0d2137]/70">{t("common.loading")}</p>
       </div>
     );
   }
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-semibold text-[#0d2137]">Einstellungen</h1>
+      <h1 className="mb-6 text-2xl font-semibold text-[#0d2137]">{t("settings.title")}</h1>
 
       <section className="mb-8 rounded-xl border-2 border-amber-300/80 bg-amber-50/40 p-6 shadow-sm ring-1 ring-amber-200/60">
-        <h2 className="mb-1 text-lg font-medium text-[#0d2137]">
-          Online-Buchungen ·{" "}
-          <span className="text-[#0d2137]/85" dir="rtl">
-            حجز الطلبات (الموقع)
-          </span>
-        </h2>
-        <p className="mb-4 text-sm text-[#0d2137]/65" dir="rtl">
-          عند الإيقاف المؤقت لا يمكن بدء طلبات جديدة من صفحة <code className="rounded bg-[#0d2137]/10 px-1">/order</code>.
-          روابط التأكيد والدفع لطلبات موجودة مسبقاً تبقى تعمل.
-        </p>
-        <p className="mb-4 text-sm text-[#0d2137]/60">
-          Wenn pausiert, können auf <code className="rounded bg-[#0d2137]/10 px-1">/order</code> keine neuen Aufträge
-          gestartet werden. Bestehende Bestätigungslinks und Stripe-Checkout bleiben möglich.
-        </p>
+        <h2 className="mb-1 text-lg font-medium text-[#0d2137]">{t("settings.bookingsTitle")}</h2>
+        <p className="mb-4 text-sm text-[#0d2137]/65">{t("settings.bookingsDesc")}</p>
         {bookingsLoading ? (
-          <p className="text-sm text-[#0d2137]/55">Laden…</p>
+          <p className="text-sm text-[#0d2137]/55">{t("common.loading")}</p>
         ) : (
           <div className="flex flex-wrap items-center gap-4">
             <button
@@ -209,13 +199,14 @@ export default function AdminSettingsPage() {
               {bookingsToggleLoading
                 ? "…"
                 : bookingsPaused
-                  ? "Buchungen aktivieren · تفعيل الحجز"
-                  : "Buchungen pausieren · إيقاف الحجز"}
+                  ? t("settings.bookingsActivate")
+                  : t("settings.bookingsPause")}
             </button>
             <span
               className={`text-sm font-medium ${bookingsPaused ? "text-amber-800" : "text-emerald-800"}`}
             >
-              Status: {bookingsPaused ? "pausiert" : "aktiv"}
+              {t("settings.bookingsStatus")}:{" "}
+              {bookingsPaused ? t("settings.bookingsPaused") : t("settings.bookingsActive")}
             </span>
           </div>
         )}
@@ -223,15 +214,12 @@ export default function AdminSettingsPage() {
 
       <form onSubmit={handleSubmit} className="space-y-8">
         <section className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
-          <h2 className="mb-1 text-lg font-medium text-[#0d2137]">Preis pro km nach Ladungsgröße</h2>
-          <p className="mb-4 text-sm text-[#0d2137]/60">
-            Abhängig von Strecke und Größe (XS / M / L). Euro pro Kilometer mit Komma (z. B.{" "}
-            <span className="whitespace-nowrap">2,30</span>); intern als Cent/km gespeichert.
-          </p>
+          <h2 className="mb-1 text-lg font-medium text-[#0d2137]">{t("settings.pricePerKmTitle")}</h2>
+          <p className="mb-4 text-sm text-[#0d2137]/60">{t("settings.pricePerKmDesc")}</p>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {(["XS", "M", "L"] as const).map((size) => (
               <div key={size}>
-                <label className="mb-2 block text-sm font-medium text-[#0d2137]/80">{SIZE_LABELS[size]}</label>
+                <label className="mb-2 block text-sm font-medium text-[#0d2137]/80">{t(SIZE_LABEL_KEYS[size])}</label>
                 <input
                   type="text"
                   inputMode="decimal"
@@ -242,17 +230,15 @@ export default function AdminSettingsPage() {
                   placeholder="1,20"
                   className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2.5 text-lg focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
                 />
-                <p className="mt-1 text-xs text-[#0d2137]/50">€ / km</p>
+                <p className="mt-1 text-xs text-[#0d2137]/50">{t("settings.perKm")}</p>
               </div>
             ))}
           </div>
         </section>
 
         <section className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
-          <h2 className="mb-1 text-lg font-medium text-[#0d2137]">Stundenlohn: Fahrer mit Fahrzeug</h2>
-          <p className="mb-4 text-sm text-[#0d2137]/60">
-            Für die Zeitberechnung bei „Fahrer mit Auto“ (zusätzlich zum km-Preis). Z. B. 25,00 €/h.
-          </p>
+          <h2 className="mb-1 text-lg font-medium text-[#0d2137]">{t("settings.driverWithCarTitle")}</h2>
+          <p className="mb-4 text-sm text-[#0d2137]/60">{t("settings.driverWithCarDesc")}</p>
           <div className="max-w-xs">
             <input
               type="text"
@@ -262,15 +248,13 @@ export default function AdminSettingsPage() {
               placeholder="25,00"
               className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2.5 text-lg focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
             />
-            <p className="mt-1 text-xs text-[#0d2137]/50">Euro pro Stunde</p>
+            <p className="mt-1 text-xs text-[#0d2137]/50">{t("settings.perHour")}</p>
           </div>
         </section>
 
         <section className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
-          <h2 className="mb-1 text-lg font-medium text-[#0d2137]">Stundenlohn: Nur Fahrer (ohne Fahrzeug)</h2>
-          <p className="mb-4 text-sm text-[#0d2137]/60">
-            Gilt für „Nur Fahrer“ – der Preis wird nur nach Fahrzeit berechnet (kein km-Anteil in der Formel).
-          </p>
+          <h2 className="mb-1 text-lg font-medium text-[#0d2137]">{t("settings.driverOnlyTitle")}</h2>
+          <p className="mb-4 text-sm text-[#0d2137]/60">{t("settings.driverOnlyDesc")}</p>
           <div className="max-w-xs">
             <input
               type="text"
@@ -280,16 +264,13 @@ export default function AdminSettingsPage() {
               placeholder="45,00"
               className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2.5 text-lg focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
             />
-            <p className="mt-1 text-xs text-[#0d2137]/50">Euro pro Stunde</p>
+            <p className="mt-1 text-xs text-[#0d2137]/50">{t("settings.perHour")}</p>
           </div>
         </section>
 
         <section className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
-          <h2 className="mb-1 text-lg font-medium text-[#0d2137]">Gewicht: Aufschlag je 10 kg</h2>
-          <p className="mb-4 text-sm text-[#0d2137]/60">
-            Wird pro angefangener 10 kg der angegebenen Ladungsmasse berechnet (z. B. 0,50 € = 50 Cent
-            pro 10 kg). Gilt sofort für neue Preisberechnungen nach Speichern.
-          </p>
+          <h2 className="mb-1 text-lg font-medium text-[#0d2137]">{t("settings.weightTitle")}</h2>
+          <p className="mb-4 text-sm text-[#0d2137]/60">{t("settings.weightDesc")}</p>
           <div className="max-w-xs">
             <input
               type="text"
@@ -299,16 +280,13 @@ export default function AdminSettingsPage() {
               placeholder="0,50"
               className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2.5 text-lg focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
             />
-            <p className="mt-1 text-xs text-[#0d2137]/50">Euro je 10 kg (Standard 0,50)</p>
+            <p className="mt-1 text-xs text-[#0d2137]/50">{t("settings.weightHint")}</p>
           </div>
         </section>
 
         <section className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
-          <h2 className="mb-1 text-lg font-medium text-[#0d2137]">Warenkategorie: Aufschlag pro Auftrag</h2>
-          <p className="mb-4 text-sm text-[#0d2137]/60">
-            Einmaliger Betrag pro Bestellung je Kategorie („Was transportieren Sie?“). Mit 0,00 € überall
-            erhalten alle Kategorien denselben Basispreis; kleine Differenzen sind optional.
-          </p>
+          <h2 className="mb-1 text-lg font-medium text-[#0d2137]">{t("settings.categoryTitle")}</h2>
+          <p className="mb-4 text-sm text-[#0d2137]/60">{t("settings.categoryDesc")}</p>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {CARGO_CATEGORIES.map((c) => (
               <div key={c.id}>
@@ -325,18 +303,15 @@ export default function AdminSettingsPage() {
                   placeholder="0,00"
                   className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2.5 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
                 />
-                <p className="mt-1 text-xs text-[#0d2137]/50">Einmalig pro Auftrag (€)</p>
+                <p className="mt-1 text-xs text-[#0d2137]/50">{t("settings.perOrder")}</p>
               </div>
             ))}
           </div>
         </section>
 
         <section className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
-          <h2 className="mb-1 text-lg font-medium text-[#0d2137]">Helfer: Stundensatz</h2>
-          <p className="mb-4 text-sm text-[#0d2137]/60">
-            Bei „Fahrer mit Auto + Helfer“: wird mit der gleichen Gesamtfahrerzeit multipliziert wie der
-            Fahrzeit-Anteil (Hin- und Rückfahrt + Be- und Entladezeit), z. B. 16,30 €/h.
-          </p>
+          <h2 className="mb-1 text-lg font-medium text-[#0d2137]">{t("settings.assistantTitle")}</h2>
+          <p className="mb-4 text-sm text-[#0d2137]/60">{t("settings.assistantDesc")}</p>
           <div className="max-w-xs">
             <input
               type="text"
@@ -346,7 +321,7 @@ export default function AdminSettingsPage() {
               placeholder="16,30"
               className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2.5 text-lg focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
             />
-            <p className="mt-1 text-xs text-[#0d2137]/50">Euro pro Stunde</p>
+            <p className="mt-1 text-xs text-[#0d2137]/50">{t("settings.perHour")}</p>
           </div>
         </section>
 
@@ -356,7 +331,7 @@ export default function AdminSettingsPage() {
             disabled={saving}
             className="rounded-lg bg-[var(--accent)] px-6 py-2.5 font-medium text-white hover:opacity-95 disabled:opacity-60"
           >
-            {saving ? "Speichern…" : "Speichern · حفظ الأسعار"}
+            {saving ? t("common.saving") : t("settings.savePrices")}
           </button>
         </div>
       </form>

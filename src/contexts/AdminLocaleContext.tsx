@@ -22,17 +22,19 @@ type Ctx = {
 const AdminLocaleContext = createContext<Ctx | null>(null);
 
 function readStoredLocale(): AdminLocale {
-  if (typeof window === "undefined") return "de";
+  if (typeof window === "undefined") return "ar";
   try {
     const s = localStorage.getItem(STORAGE_KEY);
-    return s === "ar" ? "ar" : "de";
+    if (s === "de") return "de";
+    if (s === "ar") return "ar";
+    return "ar";
   } catch {
-    return "de";
+    return "ar";
   }
 }
 
 export function AdminLocaleProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<AdminLocale>("de");
+  const [locale, setLocaleState] = useState<AdminLocale>("ar");
 
   useEffect(() => {
     setLocaleState(readStoredLocale());

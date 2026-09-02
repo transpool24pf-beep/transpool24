@@ -55,6 +55,7 @@ export default function AdminCustomerEmailPage() {
             placeholder="kunde@firma.de"
             className="w-full rounded-lg border border-[#0d2137]/15 px-3 py-2.5 text-sm outline-none focus:border-[#e85d04]/50 focus:ring-2 focus:ring-[#e85d04]/20"
             autoComplete="off"
+            dir="ltr"
           />
         </label>
 
