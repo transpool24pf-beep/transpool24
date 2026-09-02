@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminSession, COOKIE_NAME, passwordMatchesConstantTime } from "@/lib/admin-auth";
 import { ADMIN_SESSION_MAX_AGE_SEC } from "@/lib/admin-auth-constants";
+import { adminEmailGateEnabled, isAllowedAdminEmail, normalizeAdminEmail } from "@/lib/admin-allowed-emails";
 
 function cookieSecure(): boolean {
   return process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
@@ -10,9 +11,18 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const password = typeof body?.password === "string" ? body.password : "";
+    const email = typeof body?.email === "string" ? normalizeAdminEmail(body.email) : "";
     const expected = process.env.ADMIN_PASSWORD;
     if (!expected) {
       return NextResponse.json({ error: "Admin not configured" }, { status: 500 });
+    }
+    if (adminEmailGateEnabled()) {
+      if (!email) {
+        return NextResponse.json({ error: "Email required" }, { status: 400 });
+      }
+      if (!isAllowedAdminEmail(email)) {
+        return NextResponse.json({ error: "Email not authorized for admin" }, { status: 403 });
+      }
     }
     if (!passwordMatchesConstantTime(password, expected)) {
       return NextResponse.json({ error: "Invalid password" }, { status: 401 });

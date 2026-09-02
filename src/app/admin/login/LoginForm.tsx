@@ -19,6 +19,7 @@ function safeNextParam(raw: string | null): string {
 
 export function AdminLoginForm() {
   const { locale, t } = useAdminLocale();
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -34,13 +35,19 @@ export function AdminLoginForm() {
       const res = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ email: email.trim(), password }),
       });
       const data = (await res.json()) as { error?: string };
       if (res.ok) {
         const dest = safeNextParam(searchParams.get("next"));
         router.push(dest);
         router.refresh();
+      } else if (res.status === 400 && data.error === "Email required") {
+        setError(t("login.emailRequired"));
+      } else if (res.status === 403 && data.error === "Email not authorized for admin") {
+        setError(t("login.emailNotAllowed"));
+      } else if (res.status === 401) {
+        setError(data.error || t("login.invalidPassword"));
       } else {
         setError(data.error || t("login.invalidPassword"));
       }
@@ -64,6 +71,15 @@ export function AdminLoginForm() {
         <h1 className="mb-4 text-center text-xl font-semibold text-white">{t("login.title")}</h1>
         <p className="mb-4 text-center text-sm text-white/80">{t("login.subtitle")}</p>
         <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder={t("login.emailPlaceholder")}
+          className="mb-4 w-full rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-white placeholder:text-white/50 focus:border-[var(--accent)] focus:outline-none"
+          autoComplete="username"
+          dir="ltr"
+        />
+        <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -71,6 +87,7 @@ export function AdminLoginForm() {
           className="mb-4 w-full rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-white placeholder:text-white/50 focus:border-[var(--accent)] focus:outline-none"
           autoFocus
           required
+          autoComplete="current-password"
           dir="ltr"
         />
         {error && <p className="mb-4 text-sm text-red-300">{error}</p>}
