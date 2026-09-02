@@ -1,14 +1,7 @@
 import { Resend } from "resend";
 import { loadTransactionalEmailBranding } from "@/lib/email";
+import { customerEmailSendOptions } from "@/lib/email-addresses";
 import { getPublicSiteUrl } from "@/lib/public-site-url";
-
-function getFromEmail(): string {
-  let raw = (process.env.RESEND_FROM_EMAIL ?? "").trim().replace(/^["']|["']$/g, "");
-  if (!raw) return "TransPool24 <onboarding@resend.dev>";
-  const angleMatch = raw.match(/\s*<\s*([^\s@]+@[^\s@]+\.[^\s@]+)\s*>$/);
-  const email = angleMatch ? angleMatch[1] : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw) ? raw : "";
-  return email ? `TransPool24 <${email}>` : "TransPool24 <onboarding@resend.dev>";
-}
 
 export async function sendOpsStatusReminderEmail(
   to: string,
@@ -45,7 +38,7 @@ ${branding.headerHtml}
 </body></html>`;
   const logoAtt = branding.logoAttachment ? [branding.logoAttachment] : undefined;
   const { error } = await resend.emails.send({
-    from: getFromEmail(),
+    ...customerEmailSendOptions(),
     to: [to],
     subject: `TransPool24 – Ihr Auftrag #${orderRef} wird bearbeitet`,
     html,

@@ -2,22 +2,9 @@ import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { rateLimitResponse } from "@/lib/rate-limit";
 import { loadTransactionalEmailBranding } from "@/lib/email";
+import { getResendFromEmail, getSupportInboxEmail } from "@/lib/email-addresses";
 import { createServerSupabase } from "@/lib/supabase";
 import { buildPhoneE164 } from "@/lib/country-dial-codes";
-
-function getFromEmail(): string {
-  let raw = (process.env.RESEND_FROM_EMAIL ?? "").trim().replace(/^["']|["']$/g, "");
-  if (!raw) return "TransPool24 <onboarding@resend.dev>";
-  const angleMatch = raw.match(/\s*<\s*([^\s@]+@[^\s@]+\.[^\s@]+)\s*>$/);
-  const email = angleMatch ? angleMatch[1] : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw) ? raw : "";
-  return email ? `TransPool24 <${email}>` : "TransPool24 <onboarding@resend.dev>";
-}
-
-function getToEmail(): string {
-  const s = process.env.SUPPORT_EMAIL ?? process.env.RESEND_FROM_EMAIL ?? "info@transpool24.com";
-  const match = s.match(/<([^>]+)>/) || s.match(/([^\s@]+@[^\s@]+\.[^\s@]+)/);
-  return match ? (match[1] || match[0]).trim() : s.trim();
-}
 
 export async function POST(req: Request) {
   try {
@@ -129,7 +116,7 @@ export async function POST(req: Request) {
     const apiKey = process.env.RESEND_API_KEY;
     if (apiKey) {
       const resend = new Resend(apiKey);
-      const to = getToEmail();
+      const to = getSupportInboxEmail();
       const branding = await loadTransactionalEmailBranding();
       const subject =
         requesterType === "customer"
@@ -163,7 +150,7 @@ ${branding.headerHtml}
 </html>`;
       const logoAtt = branding.logoAttachment ? [branding.logoAttachment] : undefined;
       const { error } = await resend.emails.send({
-        from: getFromEmail(),
+        from: getResendFromEmail(),
         to: [to],
         replyTo: email,
         subject,
