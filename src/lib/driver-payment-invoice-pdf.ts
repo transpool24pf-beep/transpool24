@@ -1,5 +1,5 @@
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
-import { PDF_COMPANY, getPdfLogoBytes } from "./pdf-company";
+import { PDF_COMPANY, getPdfLogoBytes, pdfCompanyBrandingLines, pdfCompanyFooterLine } from "./pdf-company";
 
 /** WinAnsi-safe for Helvetica */
 function toWinAnsiSafe(s: string): string {
@@ -70,10 +70,16 @@ export async function generateDriverPaymentInvoicePdf(data: DriverPaymentInvoice
     }
   }
   const rightX = width - MARGIN - 200;
-  drawText(page, font, fontBold, PDF_COMPANY.name, { x: rightX, y: y - 0, size: 11, bold: true });
-  drawText(page, font, fontBold, PDF_COMPANY.website, { x: rightX, y: y - SMALL - 2, size: 9 });
-  drawText(page, font, fontBold, `E-Mail: ${PDF_COMPANY.email}`, { x: rightX, y: y - (SMALL + 2) * 2, size: 9 });
-  drawText(page, font, fontBold, `Tel: ${PDF_COMPANY.phone}`, { x: rightX, y: y - (SMALL + 2) * 3, size: 9 });
+  const brandingLines = pdfCompanyBrandingLines();
+  let brandY = y;
+  for (let i = 0; i < brandingLines.length; i++) {
+    drawText(page, font, fontBold, brandingLines[i], {
+      x: rightX,
+      y: brandY - (SMALL + 2) * i,
+      size: i === 0 ? 11 : 9,
+      bold: i === 0,
+    });
+  }
   y -= Math.max(58, logoHeight + 20);
 
   // —— Zone 2: Recipient (left) + Invoice meta (right) ——
@@ -157,7 +163,7 @@ export async function generateDriverPaymentInvoicePdf(data: DriverPaymentInvoice
   drawText(page, font, fontBold, "Mit freundlichen Grüssen,", { x: leftX, y, size: 10 });
   drawText(page, font, fontBold, `Rechnungsservice ${PDF_COMPANY.name}`, { x: leftX, y: y - LINE, size: 10 });
   y -= LINE * 2 + 8;
-  drawText(page, font, fontBold, `${PDF_COMPANY.website}  |  E-Mail: ${PDF_COMPANY.email}  |  Tel: ${PDF_COMPANY.phone}`, { x: leftX, y, size: 8 });
+  drawText(page, font, fontBold, pdfCompanyFooterLine(), { x: leftX, y, size: 8 });
 
   return doc.save();
 }

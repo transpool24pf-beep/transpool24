@@ -1,6 +1,6 @@
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import { DRIVER_POLICY_LEGAL_REF } from "./driver-policy";
-import { PDF_COMPANY, getPdfLogoBytes } from "./pdf-company";
+import { PDF_COMPANY, getPdfLogoBytes, pdfCompanyBrandingLines, pdfCompanyFooterLine } from "./pdf-company";
 
 /** Helvetica uses WinAnsi; strip non-ASCII to avoid "WinAnsi cannot encode" */
 function toWinAnsiSafe(s: string): string {
@@ -126,27 +126,15 @@ export async function generateDriverApprovalPdf(app: DriverAppForPdf): Promise<U
   }
 
   let contactY = logoDrawn ? height - margin - logoImgH - 12 : height - margin - 10;
-  contactY = drawTextCentered(PDF_COMPANY.name, {
-    centerX: brandCenterX,
-    y: contactY,
-    size: 10,
-    bold: true,
-  });
-  contactY = drawTextCentered(`E-Mail: ${PDF_COMPANY.email}`, {
-    centerX: brandCenterX,
-    y: contactY,
-    size: 9,
-  });
-  contactY = drawTextCentered(`Tel: ${PDF_COMPANY.phone}`, {
-    centerX: brandCenterX,
-    y: contactY,
-    size: 9,
-  });
-  drawTextCentered(PDF_COMPANY.website, {
-    centerX: brandCenterX,
-    y: contactY,
-    size: 9,
-  });
+  const brandingLines = pdfCompanyBrandingLines();
+  for (let i = 0; i < brandingLines.length; i++) {
+    contactY = drawTextCentered(brandingLines[i], {
+      centerX: brandCenterX,
+      y: contactY,
+      size: i === 0 ? 10 : 9,
+      bold: i === 0,
+    });
+  }
 
   // Body: start below header
   y -= 28;
@@ -246,7 +234,7 @@ export async function generateDriverApprovalPdf(app: DriverAppForPdf): Promise<U
 
   // Footer
   y = drawText(page, font, fontBold, "Vielen Dank für Ihre Teilnahme bei TransPool24.", { y, size: 9, x: margin });
-  y = drawText(page, font, fontBold, `${PDF_COMPANY.website}  |  E-Mail: ${PDF_COMPANY.email}  |  Tel: ${PDF_COMPANY.phone}`, { y, size: 8, x: margin });
+  y = drawText(page, font, fontBold, pdfCompanyFooterLine(), { y, size: 8, x: margin });
 
   return doc.save();
 }

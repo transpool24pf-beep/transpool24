@@ -1,6 +1,6 @@
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import type { Job } from "./supabase";
-import { PDF_COMPANY, getPdfLogoBytes } from "./pdf-company";
+import { getPdfLogoBytes, pdfCompanyBrandingLines, pdfCompanyFooterLine } from "./pdf-company";
 import { cargoCategoryLabelDe } from "./cargo";
 
 export type InvoiceType = "customer" | "driver";
@@ -87,10 +87,15 @@ export async function generateInvoicePdf(
   }
 
   let contactY = logoDrawn ? height - margin - logoImgH - 12 : height - margin - 10;
-  contactY = drawTextCentered(PDF_COMPANY.name, { centerX: brandCenterX, y: contactY, size: 10, bold: true });
-  contactY = drawTextCentered(`E-Mail: ${PDF_COMPANY.email}`, { centerX: brandCenterX, y: contactY, size: 9 });
-  contactY = drawTextCentered(`Tel: ${PDF_COMPANY.phone}`, { centerX: brandCenterX, y: contactY, size: 9 });
-  drawTextCentered(PDF_COMPANY.website, { centerX: brandCenterX, y: contactY, size: 9 });
+  const brandingLines = pdfCompanyBrandingLines();
+  for (let i = 0; i < brandingLines.length; i++) {
+    contactY = drawTextCentered(brandingLines[i], {
+      centerX: brandCenterX,
+      y: contactY,
+      size: i === 0 ? 10 : 9,
+      bold: i === 0,
+    });
+  }
 
   function drawText(
     p: ReturnType<PDFDocument["addPage"]>,
@@ -235,7 +240,7 @@ export async function generateInvoicePdf(
 
   draw("Vielen Dank für Ihren Auftrag.", { size: 9 });
   y -= 8;
-  draw(`${PDF_COMPANY.website}  |  E-Mail: ${PDF_COMPANY.email}  |  Tel: ${PDF_COMPANY.phone}`, { size: 8 });
+  draw(pdfCompanyFooterLine(), { size: 8 });
 
   return doc.save();
 }
