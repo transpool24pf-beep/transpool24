@@ -500,11 +500,9 @@ export function OrderForm({
   const oneWayBaseMinutes = Math.round(routeDurationMinutes ?? (data.distanceKm / 50) * 60);
   const baseRoundTripMinutes = oneWayBaseMinutes * 2;
   const { loadingMinutes, unloadingMinutes } = getLoadUnloadMinutes();
-  const roundTripMinutesDisplay = pricePreview?.roundTripMinutes ?? baseRoundTripMinutes;
   const totalDriverMinutesDisplay =
     pricePreview?.totalDriverMinutes ??
     Math.round(baseRoundTripMinutes + loadingMinutes + unloadingMinutes);
-  const roundTripParts = splitHoursMinutesParts(roundTripMinutesDisplay);
   const totalTimeParts = splitHoursMinutesParts(totalDriverMinutesDisplay);
   const priceBreakdown = pricePreview?.breakdown ?? null;
   const priceCents = pricePreview?.breakdown?.totalCents ?? 0;
@@ -516,7 +514,7 @@ export function OrderForm({
       setPricePreviewLoading(false);
       return;
     }
-    if (step !== 3 || !step3Complete) {
+    if ((step !== 3 && step !== 4) || !step3Complete) {
       setPricePreview(null);
       setPricePreviewError(null);
       setPricePreviewLoading(false);
@@ -1459,26 +1457,10 @@ export function OrderForm({
             ) : step3Complete && pricePreviewLoading ? (
               <p className="text-sm text-[var(--foreground)]/75">{t("pricePreviewLoading")}</p>
             ) : (
-              <>
-                <p className="text-sm text-[var(--foreground)]/90">
-                  {t("roundTripTime")}: {roundTripParts.hours} {t("hours")}{" "}
-                  {roundTripParts.minutes} {t("minutes")}
-                  {routeDurationMinutes != null && (
-                    <span className="ml-1 text-green-700">({t("fromRoute")})</span>
-                  )}
-                  {pricePreview && (
-                    <span className="ml-1 block text-xs text-[var(--foreground)]/60 sm:ml-1 sm:inline">
-                      {t("routePricingAutoHint")}
-                    </span>
-                  )}
-                </p>
-                <p className="text-sm text-[var(--foreground)]/90">
-                  {t("loadingUnloadingTime")}: {loadingMinutes} + {unloadingMinutes} {t("minutes")}
-                </p>
-                <p className="mt-2 text-sm font-semibold text-[var(--accent)]">
-                  {t("totalDriverTime")}: {totalTimeParts.hours} {t("hours")} {totalTimeParts.minutes} {t("minutes")}
-                </p>
-              </>
+              <p className="text-sm font-semibold text-[var(--accent)]">
+                {t("totalDriverTime")}: {totalTimeParts.hours} {t("hours")} {totalTimeParts.minutes}{" "}
+                {t("minutes")}
+              </p>
             )}
           </div>
           <div>
