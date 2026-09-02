@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 import { loadTransactionalEmailBranding } from "@/lib/email";
-import { customerEmailSendOptions } from "@/lib/email-addresses";
+import { transactionalEmailSendOptions } from "@/lib/email-addresses";
 import { getPublicSiteUrl } from "@/lib/public-site-url";
 
 export async function sendOpsStatusReminderEmail(
@@ -38,7 +38,7 @@ ${branding.headerHtml}
 </body></html>`;
   const logoAtt = branding.logoAttachment ? [branding.logoAttachment] : undefined;
   const { error } = await resend.emails.send({
-    ...customerEmailSendOptions(),
+    ...transactionalEmailSendOptions(),
     to: [to],
     subject: `TransPool24 – Ihr Auftrag #${orderRef} wird bearbeitet`,
     html,

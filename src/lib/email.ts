@@ -12,7 +12,7 @@ import {
   buildEmailFooterInvoiceBlock,
   type ResolvedEmailFooter,
 } from "@/lib/email-footer";
-import { customerEmailSendOptions } from "@/lib/email-addresses";
+import { manualCustomerEmailSendOptions, transactionalEmailSendOptions } from "@/lib/email-addresses";
 
 /** Driver info for order confirmation email (from driver_applications) */
 export type OrderEmailDriverInfo = {
@@ -223,7 +223,7 @@ export async function sendOrderConfirmationEmail(
       : undefined;
     const mergedAtt = mergeAttachmentsWithLogo(branding.logoAttachment, pdfAtt);
     const { error } = await resend.emails.send({
-      ...customerEmailSendOptions(),
+      ...transactionalEmailSendOptions(),
       to: [to],
       subject: `TransPool24 – Auftragsbestätigung #${orderRef}`,
       html: buildConfirmationHtml(job, {
@@ -440,7 +440,7 @@ export async function sendDeliveryConfirmationEmail(
         : undefined;
     const mergedAtt = mergeAttachmentsWithLogo(branding.logoAttachment, podAtt);
     const { error } = await resend.emails.send({
-      ...customerEmailSendOptions(),
+      ...transactionalEmailSendOptions(),
       to: [to],
       subject: `TransPool24 – Zustellung bestätigt #${orderRef}`,
       html: buildDeliveryConfirmationHtml(job, {
@@ -581,7 +581,7 @@ export async function sendThankYouDeliveryEmail(
         : undefined;
     const mergedAtt = mergeAttachmentsWithLogo(branding.logoAttachment, photoAtt);
     const { error } = await resend.emails.send({
-      ...customerEmailSendOptions(),
+      ...transactionalEmailSendOptions(),
       to: [to],
       subject: "Vielen Dank für Ihr Vertrauen in TransPool24",
       html: buildThankYouDeliveryHtml(job, {
@@ -732,7 +732,7 @@ export async function sendTrackingUpdateEmail(
     const branding = await loadTransactionalEmailBranding();
     const mergedAtt = mergeAttachmentsWithLogo(branding.logoAttachment);
     const { error } = await resend.emails.send({
-      ...customerEmailSendOptions(),
+      ...transactionalEmailSendOptions(),
       to: [to],
       subject: `TransPool24 – Live-Tracking Auftrag #${orderRef}`,
       html: buildTrackingUpdateHtml(job, options, branding),
@@ -957,7 +957,7 @@ export async function sendDriverPaymentInvoiceEmail(
       { filename: pdfFilename, content: attachmentContent },
     ]);
     const { error } = await resend.emails.send({
-      ...customerEmailSendOptions(),
+      ...transactionalEmailSendOptions(),
       to: [to],
       subject: `TransPool24 – Zahlungsnachweis ${data.invoice_number}`,
       html: buildDriverPaymentInvoiceEmailHtml(data, branding, footer),
@@ -1005,7 +1005,7 @@ export async function sendDriverApprovalEmail(
   const mergedAtt = mergeAttachmentsWithLogo(branding.logoAttachment, pdfAtt);
   try {
     const { error } = await resend.emails.send({
-      ...customerEmailSendOptions(),
+      ...transactionalEmailSendOptions(),
       to: [to],
       subject: `TransPool24 – Ihre Fahrer-Anfrage wurde genehmigt #${data.driver_number != null ? String(data.driver_number).padStart(5, "0") : ""}`,
       html,
@@ -1082,7 +1082,7 @@ export async function sendCustomCustomerEmail(
     const branding = await loadTransactionalEmailBranding();
     const mergedAtt = mergeAttachmentsWithLogo(branding.logoAttachment);
     const { error } = await resend.emails.send({
-      ...customerEmailSendOptions(),
+      ...manualCustomerEmailSendOptions(),
       to: [trimmedTo],
       subject: trimmedSubject.startsWith("TransPool24") ? trimmedSubject : `TransPool24 – ${trimmedSubject}`,
       html: buildCustomCustomerEmailHtml(trimmedBody, branding),

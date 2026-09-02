@@ -1,9 +1,11 @@
 import { afterEach, describe, expect, it } from "vitest";
 import {
-  customerEmailSendOptions,
+  getInfoFromEmail,
+  getSupportFromEmail,
   getCustomerReplyToEmail,
-  getResendFromEmail,
   getSupportInboxEmail,
+  manualCustomerEmailSendOptions,
+  transactionalEmailSendOptions,
 } from "./email-addresses";
 
 describe("email-addresses", () => {
@@ -13,15 +15,21 @@ describe("email-addresses", () => {
     process.env = { ...env };
   });
 
-  it("uses support@ as From and Gmail as Reply-To when configured", () => {
-    process.env.RESEND_FROM_EMAIL = "TransPool24 Support <support@transpool24.com>";
+  it("splits info@ transactional vs support@ manual compose", () => {
+    process.env.RESEND_FROM_EMAIL = "TransPool24 <info@transpool24.com>";
+    process.env.RESEND_SUPPORT_FROM_EMAIL = "TransPool24 Support <support@transpool24.com>";
     process.env.REPLY_TO_EMAIL = "transpool24pf@gmail.com";
     process.env.SUPPORT_EMAIL = "transpool24pf@gmail.com";
 
-    expect(getResendFromEmail()).toBe("TransPool24 Support <support@transpool24.com>");
+    expect(getInfoFromEmail()).toBe("TransPool24 <info@transpool24.com>");
+    expect(getSupportFromEmail()).toBe("TransPool24 Support <support@transpool24.com>");
     expect(getCustomerReplyToEmail()).toBe("transpool24pf@gmail.com");
     expect(getSupportInboxEmail()).toBe("transpool24pf@gmail.com");
-    expect(customerEmailSendOptions()).toEqual({
+    expect(transactionalEmailSendOptions()).toEqual({
+      from: "TransPool24 <info@transpool24.com>",
+      replyTo: "transpool24pf@gmail.com",
+    });
+    expect(manualCustomerEmailSendOptions()).toEqual({
       from: "TransPool24 Support <support@transpool24.com>",
       replyTo: "transpool24pf@gmail.com",
     });

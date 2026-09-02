@@ -71,7 +71,7 @@ const DE: Record<string, string> = {
   "customerEmail.subtitle":
     "Freie Nachricht an eine Kunden-E-Mail-Adresse — mit TransPool24-Layout und Logo.",
   "customerEmail.fromHint":
-    "Absender: support@transpool24.com · Antworten des Kunden gehen an Ihre Gmail (REPLY_TO_EMAIL in Vercel), nicht in dieses Admin-Panel.",
+    "Absender dieser Seite: support@transpool24.com · Automatische Auftrags-Mails nutzen info@transpool24.com · Kundenantworten → Gmail (REPLY_TO_EMAIL).",
   "customerEmail.to": "E-Mail des Kunden",
   "customerEmail.subject": "Betreff",
   "customerEmail.subjectPlaceholder": "z. B. Rückfrage zu Ihrem Auftrag",
@@ -247,7 +247,7 @@ const AR: Record<string, string> = {
   "customerEmail.title": "إيميل إلى عملاء",
   "customerEmail.subtitle": "رسالة حرة إلى بريد العميل — بتنسيق TransPool24 والشعار.",
   "customerEmail.fromHint":
-    "المرسل: support@transpool24.com · رد العميل يصل إلى Gmail (REPLY_TO_EMAIL في Vercel)، وليس إلى لوحة التحكم.",
+    "مرسل هذه الصفحة: support@transpool24.com · إيميلات الطلبات التلقائية: info@transpool24.com · رد العميل → Gmail (REPLY_TO_EMAIL).",
   "customerEmail.to": "بريد العميل",
   "customerEmail.subject": "الموضوع",
   "customerEmail.subjectPlaceholder": "مثال: استفسار عن طلبكم",
