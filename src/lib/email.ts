@@ -1036,24 +1036,29 @@ export async function sendDriverApprovalEmail(
   }
 }
 
-function buildCustomCustomerEmailHtml(bodyPlain: string, branding: TransactionalEmailBranding): string {
+function buildCustomCustomerEmailHtml(
+  bodyPlain: string,
+  branding: TransactionalEmailBranding,
+  footer: ResolvedEmailFooter,
+): string {
   const bodyHtml = escapeHtml(bodyPlain).replace(/\n/g, "<br />");
-  return `<!DOCTYPE html>
-<html lang="de">
-<head>
-<meta charset="utf-8" />
-${emailDeHeadMeta()}
-</head>
-<body style="margin:0;font-family:'Segoe UI',Tahoma,sans-serif;background:#f4f4f4;">
-${branding.headerHtml}
-<div style="max-width:600px;margin:0 auto;padding:24px 20px;">
-  <div style="background:#fff;border-radius:12px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
-    <p style="margin:0;font-size:15px;line-height:1.6;color:#334155;">${bodyHtml}</p>
-    <p style="margin:24px 0 0;font-size:13px;color:#64748b;">TransPool24 · Pforzheim &amp; Region</p>
-  </div>
-</div>
+  return `
+<!DOCTYPE html>
+<html dir="ltr" lang="de">
+<head><meta charset="utf-8">${emailDeHeadMeta()}<title>TransPool24</title></head>
+<body style="margin:0; font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f4f4; direction:ltr; text-align:left;">
+  ${branding.headerHtml}
+  <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; padding: 32px 20px; direction:ltr;">
+    <tr><td style="text-align:left;">
+      <div style="background: #fff; border-radius: 12px; padding: 28px 28px 0 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); direction:ltr; text-align:left;">
+        <p style="margin: 0; font-size: 16px; line-height: 1.65; color: #334155;">${bodyHtml}</p>
+        <p style="margin-top: 24px; font-size: 13px; color: #94a3b8;">— TransPool24</p>
+        ${buildEmailFooterOrderBlock(footer)}
+      </div>
+    </td></tr>
+  </table>
 </body>
-</html>`;
+</html>`.trim();
 }
 
 /** Free-form email to a customer from Admin (From support@, Reply-To Gmail). */
@@ -1079,13 +1084,16 @@ export async function sendCustomCustomerEmail(
 
   const resend = new Resend(apiKey);
   try {
-    const branding = await loadTransactionalEmailBranding();
+    const [branding, footer] = await Promise.all([
+      loadTransactionalEmailBranding(),
+      loadEmailFooterSocial(),
+    ]);
     const mergedAtt = mergeAttachmentsWithLogo(branding.logoAttachment);
     const { error } = await resend.emails.send({
       ...manualCustomerEmailSendOptions(),
       to: [trimmedTo],
       subject: trimmedSubject.startsWith("TransPool24") ? trimmedSubject : `TransPool24 – ${trimmedSubject}`,
-      html: buildCustomCustomerEmailHtml(trimmedBody, branding),
+      html: buildCustomCustomerEmailHtml(trimmedBody, branding, footer),
       ...(mergedAtt?.length ? { attachments: mergedAtt } : {}),
     });
     if (error) {
