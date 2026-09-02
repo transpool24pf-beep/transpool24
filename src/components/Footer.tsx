@@ -9,6 +9,7 @@ import { locales, type Locale } from "@/i18n/routing";
 import type { SiteSocialMediaPayload } from "@/lib/site-social-media";
 import { LOCALE_NATIVE_LABEL } from "@/lib/locale-display";
 import { LocaleFlagIcon } from "@/components/LocaleFlagIcon";
+import { getPublicContactEmail, getPublicContactMailto } from "@/lib/site-contact";
 
 const FALLBACK_LINKEDIN = "https://www.linkedin.com/in/trans-pool-1235803b8";
 const FALLBACK_INSTAGRAM = "https://www.instagram.com/transpool24/";
@@ -235,6 +236,12 @@ export function Footer() {
                 />
               </Link>
               <p className="mt-5 max-w-xs text-center text-sm text-white/65 lg:text-start">{t("brandTagline")}</p>
+              <a
+                href={getPublicContactMailto()}
+                className="mt-3 inline-block text-sm font-semibold text-white/90 transition hover:text-white hover:underline lg:text-start"
+              >
+                {getPublicContactEmail()}
+              </a>
             </div>
 
             <nav className="grid gap-10 sm:grid-cols-3 lg:col-span-8" aria-label={t("navAria")}>

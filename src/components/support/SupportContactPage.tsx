@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 import { DIAL_CODES, buildPhoneE164 } from "@/lib/country-dial-codes";
+import { getPublicContactEmail, getPublicContactMailto } from "@/lib/site-contact";
 
 const INQUIRY_KEYS = ["booking", "driver", "press", "partnership", "other"] as const;
 const COMM_KEYS = ["de", "en", "ar", "tr", "fr", "es", "ru", "pl", "ro", "ku", "it", "uk"] as const;
@@ -374,10 +375,10 @@ export function SupportContactPage() {
                 <h3 className="text-lg font-bold text-[#0d2137]">{t("officesTitle")}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-[#0d2137]/70">{t("officesLead")}</p>
                 <a
-                  href="mailto:transpool24@hotmail.com"
+                  href={getPublicContactMailto()}
                   className="mt-4 inline-block text-sm font-semibold text-[var(--accent)] hover:underline"
                 >
-                  transpool24@hotmail.com
+                  {getPublicContactEmail()}
                 </a>
               </div>
             </div>

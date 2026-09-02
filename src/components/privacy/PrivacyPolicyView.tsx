@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { getPublicContactEmail, getPublicContactMailto } from "@/lib/site-contact";
 
 const SECTION_IDS = [
   "scope",
@@ -188,8 +189,8 @@ export function PrivacyPolicyView({ locale }: Props) {
                 {t("contactCta")}
               </Link>
               <p className="mt-4 text-xs text-[var(--foreground)]/55">{t("contactEmailLabel")}</p>
-              <a href={`mailto:${t("privacyEmail")}`} className="mt-1 block text-sm font-semibold text-[var(--accent)] hover:underline">
-                {t("privacyEmail")}
+              <a href={getPublicContactMailto()} className="mt-1 block text-sm font-semibold text-[var(--accent)] hover:underline">
+                {getPublicContactEmail()}
               </a>
             </div>
           </aside>

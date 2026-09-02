@@ -1,3 +1,4 @@
+import { DEFAULT_PUBLIC_CONTACT_EMAIL, getPublicContactEmail } from "@/lib/site-contact";
 import { createServerSupabase } from "@/lib/supabase";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com";
@@ -16,10 +17,10 @@ const DEFAULT: ResolvedEmailFooter = {
   instagramHref: "https://www.instagram.com/transpool24/",
   linkedinHref: "https://www.linkedin.com/in/trans-pool-1235803b8",
   tiktokHref: "https://www.tiktok.com/@transpool24",
-  mailtoPrimary: "mailto:transpool24pf@gmail.com",
-  mailtoSecondary: "mailto:transpool24@hotmail.com",
-  emailDisplayPrimary: "transpool24pf@gmail.com",
-  emailDisplaySecondary: "transpool24@hotmail.com",
+  mailtoPrimary: `mailto:${DEFAULT_PUBLIC_CONTACT_EMAIL}`,
+  mailtoSecondary: "mailto:transpool24pf@gmail.com",
+  emailDisplayPrimary: DEFAULT_PUBLIC_CONTACT_EMAIL,
+  emailDisplaySecondary: "transpool24pf@gmail.com",
 };
 
 function escapeHtml(s: string): string {
@@ -70,7 +71,11 @@ export async function loadEmailFooterSocial(): Promise<ResolvedEmailFooter> {
       .maybeSingle();
     if (error || !data) return DEFAULT;
     const row = data as SocialRow;
-    const p = normalizeEmail(row.email_footer_email_primary, DEFAULT.emailDisplayPrimary, DEFAULT.mailtoPrimary);
+    const p = normalizeEmail(
+      row.email_footer_email_primary,
+      getPublicContactEmail(),
+      `mailto:${getPublicContactEmail()}`,
+    );
     const s = normalizeEmail(row.email_footer_email_secondary, DEFAULT.emailDisplaySecondary, DEFAULT.mailtoSecondary);
     return {
       instagramHref: normalizeHttpUrl(row.instagram_url, DEFAULT.instagramHref),

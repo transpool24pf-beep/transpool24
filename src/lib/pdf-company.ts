@@ -15,7 +15,7 @@ export const PDF_COMPANY = {
   /** Steuerliche Identifikationsnummer (IdNr.) */
   taxIdentificationNumber: "28 087 154 391",
   website: "www.transpool24.com",
-  email: "transpool24@hotmail.com",
+  email: "transpool24pf@gmail.com",
   phone: "+49 176 29767442",
 } as const;
 

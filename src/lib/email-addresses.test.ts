@@ -34,4 +34,14 @@ describe("email-addresses", () => {
       replyTo: "transpool24pf@gmail.com",
     });
   });
+
+  it("falls back to public contact email when env is unset", () => {
+    delete process.env.REPLY_TO_EMAIL;
+    delete process.env.SUPPORT_EMAIL;
+    delete process.env.SUPPORT_INBOX_EMAIL;
+    delete process.env.PUBLIC_CONTACT_EMAIL;
+    delete process.env.NEXT_PUBLIC_CONTACT_EMAIL;
+    expect(getCustomerReplyToEmail()).toBe("hello@transpool24.com");
+    expect(getSupportInboxEmail()).toBe("hello@transpool24.com");
+  });
 });

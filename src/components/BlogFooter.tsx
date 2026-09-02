@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
+import { getPublicContactEmail, getPublicContactMailto } from "@/lib/site-contact";
 
 function SocialRow({ className }: { className?: string }) {
   return (
@@ -111,8 +112,8 @@ export function BlogFooter() {
                 </a>
               </li>
               <li>
-                <a href={`mailto:${t("template.touchEmail")}`} className="hover:text-[var(--accent)] hover:underline">
-                  {t("template.touchEmail")}
+                <a href={getPublicContactMailto()} className="hover:text-[var(--accent)] hover:underline">
+                  {getPublicContactEmail()}
                 </a>
               </li>
             </ul>

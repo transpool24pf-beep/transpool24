@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin-api";
 import { createServerSupabase } from "@/lib/supabase";
+import { DEFAULT_PUBLIC_CONTACT_EMAIL } from "@/lib/site-contact";
 
 function normalizeUrl(s: unknown): string {
   if (typeof s !== "string") return "";
@@ -17,8 +18,8 @@ function normalizeEmailField(s: unknown, fallback: string): string {
   return t;
 }
 
-const DEFAULT_PRIMARY = "transpool24pf@gmail.com";
-const DEFAULT_SECONDARY = "transpool24@hotmail.com";
+const DEFAULT_PRIMARY = DEFAULT_PUBLIC_CONTACT_EMAIL;
+const DEFAULT_SECONDARY = "transpool24pf@gmail.com";
 
 export async function GET() {
   const err = await requireAdmin();

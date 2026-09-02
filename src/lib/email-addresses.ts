@@ -1,4 +1,6 @@
-/** Parse "Name <a@b.com>" or bare email from env. */
+import { getPublicContactEmail } from "./site-contact";
+
+export { getPublicContactEmail, DEFAULT_PUBLIC_CONTACT_EMAIL } from "./site-contact";
 export function parseEnvEmail(raw: string | undefined): string | null {
   const s = (raw ?? "").trim().replace(/^["']|["']$/g, "");
   if (!s) return null;
@@ -63,17 +65,19 @@ export function getCustomerReplyToEmail(): string | undefined {
   const email =
     parseEnvEmail(process.env.REPLY_TO_EMAIL) ??
     parseEnvEmail(process.env.SUPPORT_INBOX_EMAIL) ??
-    parseEnvEmail(process.env.SUPPORT_EMAIL);
+    parseEnvEmail(process.env.SUPPORT_EMAIL) ??
+    parseEnvEmail(process.env.PUBLIC_CONTACT_EMAIL) ??
+    getPublicContactEmail();
   return email ?? undefined;
 }
 
-/** Inbox for support-form notifications (TO admin). */
+/** Inbox for support-form notifications (TO admin). Set SUPPORT_EMAIL after hello@ forwarding is live. */
 export function getSupportInboxEmail(): string {
   return (
     parseEnvEmail(process.env.SUPPORT_EMAIL) ??
     parseEnvEmail(process.env.REPLY_TO_EMAIL) ??
-    parseEnvEmail(process.env.RESEND_SUPPORT_FROM_EMAIL) ??
-    "transpool24pf@gmail.com"
+    parseEnvEmail(process.env.PUBLIC_CONTACT_EMAIL) ??
+    getPublicContactEmail()
   );
 }
 

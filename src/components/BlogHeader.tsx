@@ -8,6 +8,7 @@ import type { Locale } from "@/i18n/routing";
 import { locales } from "@/i18n/routing";
 import { LOCALE_NATIVE_LABEL, LOCALE_SHORT_CODE } from "@/lib/locale-display";
 import { LocaleFlagIcon } from "@/components/LocaleFlagIcon";
+import { getPublicContactEmail, getPublicContactMailto } from "@/lib/site-contact";
 
 type NavPage = { slug: string; title: string; nav_order: number };
 
@@ -107,9 +108,9 @@ export function BlogHeader() {
       <div className="bg-[#222] text-[11px] text-white/90 sm:text-xs">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-2 sm:px-6">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-            <a href={`mailto:${t("template.topEmail")}`} className="inline-flex items-center gap-1.5 hover:text-white">
+            <a href={getPublicContactMailto()} className="inline-flex items-center gap-1.5 hover:text-white">
               <span aria-hidden>✉</span>
-              <span className="break-all">{t("template.topEmail")}</span>
+              <span className="break-all">{getPublicContactEmail()}</span>
             </a>
             <a href={`tel:${t("template.topPhone").replace(/\s/g, "")}`} className="inline-flex items-center gap-1.5 hover:text-white">
               <span aria-hidden>☎</span>
