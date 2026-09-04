@@ -230,6 +230,17 @@ export function OrderForm({
   const isRtlLocale = locale === "ar" || locale === "ku";
   const cargoPhotoInputId = useId();
   const cargoPhotoInputRef = useRef<HTMLInputElement>(null);
+  const companyNameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
+  const pickupAddressRef = useRef<HTMLInputElement>(null);
+  const deliveryAddressRef = useRef<HTMLInputElement>(null);
+  const categoryRef = useRef<HTMLSelectElement>(null);
+  const serviceTypeRef = useRef<HTMLDivElement>(null);
+  const weightInputRef = useRef<HTMLInputElement>(null);
+  const packageCountInputRef = useRef<HTMLInputElement>(null);
+  const photosRef = useRef<HTMLDivElement>(null);
+  const [step3Attempted, setStep3Attempted] = useState(false);
   const [step, setStep] = useState(1);
   const [data, setData] = useState<OrderFormData>(initial);
   const [pickupDateField, setPickupDateField] = useState("");
@@ -511,6 +522,76 @@ export function OrderForm({
     data.packageCount,
     data.serviceType,
     distanceFromRoute,
+    t,
+  ]);
+
+  const step3FieldWarn = useCallback(
+    (needsAttention: boolean) =>
+      step3Attempted && needsAttention
+        ? "border-amber-500 ring-2 ring-amber-400/60"
+        : "border-[#0d2137]/20",
+    [step3Attempted],
+  );
+
+  const readPackageCountFromField = useCallback((): number => {
+    const raw = packageCountInputRef.current?.value?.trim();
+    if (raw) {
+      const parsed = Math.floor(Number(raw));
+      if (parsed >= 1) return parsed;
+    }
+    return data.packageCount;
+  }, [data.packageCount]);
+
+  const focusStep3FirstMissing = useCallback((): boolean => {
+    setStep3Attempted(true);
+    const packageCount = readPackageCountFromField();
+    if (packageCount >= 1 && packageCount !== data.packageCount) {
+      setData((prev) => ({ ...prev, packageCount }));
+    }
+    if (!data.cargoCategory) {
+      setError(t("step3Incomplete"));
+      categoryRef.current?.focus();
+      categoryRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return false;
+    }
+    if (!data.serviceType) {
+      setError(t("step3Incomplete"));
+      serviceTypeRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return false;
+    }
+    if (data.cargoWeightKg <= 0) {
+      setError(t("step3Incomplete"));
+      weightInputRef.current?.focus();
+      weightInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return false;
+    }
+    if (packageCount < 1) {
+      setError(t("step3Incomplete"));
+      packageCountInputRef.current?.focus();
+      packageCountInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return false;
+    }
+    if (cargoPhotoUrls.length < 1) {
+      setError(t("step3Incomplete"));
+      photosRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      cargoPhotoInputRef.current?.focus();
+      return false;
+    }
+    if (!distanceFromRoute) {
+      setError(t("driverTimeRequiresAddress"));
+      setStep(2);
+      return false;
+    }
+    setError(null);
+    return true;
+  }, [
+    cargoPhotoUrls.length,
+    data.cargoCategory,
+    data.cargoWeightKg,
+    data.packageCount,
+    data.serviceType,
+    distanceFromRoute,
+    readPackageCountFromField,
     t,
   ]);
 
@@ -813,42 +894,83 @@ export function OrderForm({
   };
 
   const next = () => {
-    if (step < 4) {
-      if (step === 1 && step1Complete) {
-        setContactHistory((prev) =>
-          mergePersistedContact(prev, {
-            companyName: data.companyName.trim(),
-            email: data.email.trim(),
-            phoneCountryCode,
-            phone: data.phone.trim(),
-          })
-        );
-        setStep((s) => s + 1);
+    if (step >= 4) return;
+
+    if (step === 1) {
+      if (!step1Complete) {
+        setError(t("step1Incomplete"));
+        if (!data.companyName.trim()) {
+          companyNameRef.current?.focus();
+          companyNameRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+        } else if (!data.email.trim()) {
+          emailRef.current?.focus();
+          emailRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+        } else {
+          phoneRef.current?.focus();
+          phoneRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
         return;
       }
-      if (step === 2 && step2Complete) {
-        const dateCommit = applyPickupDateCommit();
-        if (!dateCommit.ok) return;
-        setAddressHistory((prev) =>
-          mergePersistedAddresses(prev, data.pickupAddressLine, data.deliveryAddressLine)
-        );
-        setDistanceLoading(true);
-        const dep =
-          dateCommit.iso && data.pickupTime
-            ? { pickupDate: dateCommit.iso, pickupTime: data.pickupTime }
-            : undefined;
-        fetchRealDistance(dep).finally(() => {
-          setDistanceLoading(false);
-          setStep((s) => s + 1);
-        });
-      } else if (step !== 1) {
-        setStep((s) => s + 1);
+      setError(null);
+      setContactHistory((prev) =>
+        mergePersistedContact(prev, {
+          companyName: data.companyName.trim(),
+          email: data.email.trim(),
+          phoneCountryCode,
+          phone: data.phone.trim(),
+        }),
+      );
+      setStep(2);
+      return;
+    }
+
+    if (step === 2) {
+      if (!step2Complete) {
+        setError(t("step2Incomplete"));
+        if (!addressCompleteEnoughForOrder(data.pickupAddressLine)) {
+          pickupAddressRef.current?.focus();
+          pickupAddressRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+        } else {
+          deliveryAddressRef.current?.focus();
+          deliveryAddressRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+        return;
       }
+      setError(null);
+      const dateCommit = applyPickupDateCommit();
+      if (!dateCommit.ok) return;
+      setAddressHistory((prev) =>
+        mergePersistedAddresses(prev, data.pickupAddressLine, data.deliveryAddressLine),
+      );
+      setDistanceLoading(true);
+      const dep =
+        dateCommit.iso && data.pickupTime
+          ? { pickupDate: dateCommit.iso, pickupTime: data.pickupTime }
+          : undefined;
+      fetchRealDistance(dep).finally(() => {
+        setDistanceLoading(false);
+        setStep(3);
+      });
+      return;
+    }
+
+    if (step === 3) {
+      if (!focusStep3FirstMissing()) return;
+      if (pricePreviewLoading) return;
+      if (!pricePreview || pricePreviewError) {
+        setError(pricePreviewError || t("pricePreviewFailed"));
+        return;
+      }
+      setError(null);
+      setStep(4);
     }
   };
 
   const back = () => {
-    if (step > 1) setStep((s) => s - 1);
+    if (step > 1) {
+      if (step === 4) setStep3Attempted(false);
+      setStep((s) => s - 1);
+    }
   };
 
   const handleConfirmOrder = async () => {
@@ -956,6 +1078,7 @@ export function OrderForm({
               {t("companyName")}
             </label>
             <input
+              ref={companyNameRef}
               type="text"
               value={data.companyName}
               onChange={(e) => update({ companyName: e.target.value })}
@@ -970,6 +1093,7 @@ export function OrderForm({
               {t("email")}
             </label>
             <input
+              ref={emailRef}
               type="email"
               value={data.email}
               onChange={(e) => update({ email: e.target.value })}
@@ -1028,6 +1152,7 @@ export function OrderForm({
                 )}
               </div>
               <input
+                ref={phoneRef}
                 type="tel"
                 value={data.phone}
                 onChange={(e) => update({ phone: e.target.value })}
@@ -1080,6 +1205,7 @@ export function OrderForm({
             </label>
             <div className="relative">
               <input
+                ref={pickupAddressRef}
                 type="text"
                 autoComplete="off"
                 name={addressLineInputNamesRef.current.pickup}
@@ -1150,6 +1276,7 @@ export function OrderForm({
             </label>
             <div className="relative">
               <input
+                ref={deliveryAddressRef}
                 type="text"
                 autoComplete="off"
                 name={addressLineInputNamesRef.current.delivery}
@@ -1308,12 +1435,13 @@ export function OrderForm({
               {t("cargoWhatToTransport")}
             </label>
             <select
+              ref={categoryRef}
               value={data.cargoCategory || ""}
               onChange={(e) => {
                 const id = (e.target.value || "") as CargoCategoryId | "";
                 update({ cargoCategory: id });
               }}
-              className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2.5 text-[var(--foreground)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+              className={`w-full rounded-lg border px-4 py-2.5 text-[var(--foreground)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] ${step3FieldWarn(!data.cargoCategory)}`}
             >
               <option value="">— {t("cargoSelectCategory")}</option>
               {CARGO_CATEGORIES.map((c) => (
@@ -1327,7 +1455,10 @@ export function OrderForm({
             <label className="mb-2 block text-sm font-medium text-[var(--foreground)]">
               {t("serviceType")}
             </label>
-            <div className="space-y-2">
+            <div
+              ref={serviceTypeRef}
+              className={`space-y-2 rounded-lg ${step3FieldWarn(!data.serviceType)}`}
+            >
               {SERVICE_OPTIONS.map(({ value, key }) => (
                 <button
                   key={value}
@@ -1361,29 +1492,44 @@ export function OrderForm({
               <div>
                 <label className="mb-1 block text-xs font-medium text-[var(--foreground)]/80">{t("cargoWeightKg")} *</label>
                 <input
+                  ref={weightInputRef}
                   type="number"
                   min={1}
                   step={1}
-                  value={data.cargoWeightKg || ""}
+                  inputMode="numeric"
+                  value={data.cargoWeightKg > 0 ? data.cargoWeightKg : ""}
                   onChange={(e) => update({ cargoWeightKg: Math.max(0, Number(e.target.value) || 0) })}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") e.preventDefault();
+                  }}
                   placeholder="250"
-                  className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
+                  className={`w-full rounded border px-2 py-1.5 text-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] ${step3FieldWarn(data.cargoWeightKg <= 0)}`}
                 />
               </div>
               <div>
                 <label className="mb-1 block text-xs font-medium text-[var(--foreground)]/80">{t("packageCount")} *</label>
                 <input
+                  ref={packageCountInputRef}
                   type="number"
                   min={1}
                   step={1}
-                  value={data.packageCount || ""}
-                  onChange={(e) => update({ packageCount: Math.max(0, Math.floor(Number(e.target.value) || 0)) })}
+                  inputMode="numeric"
+                  value={data.packageCount > 0 ? data.packageCount : ""}
+                  onChange={(e) =>
+                    update({ packageCount: Math.max(0, Math.floor(Number(e.target.value) || 0)) })
+                  }
+                  onBlur={() => {
+                    if (data.packageCount < 1) update({ packageCount: 1 });
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") e.preventDefault();
+                  }}
                   placeholder="1"
-                  className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
+                  className={`w-full rounded border px-2 py-1.5 text-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] ${step3FieldWarn(data.packageCount < 1)}`}
                 />
               </div>
             </div>
-            <div className="mt-4">
+            <div ref={photosRef} className="mt-4">
               <label
                 htmlFor={cargoPhotoInputId}
                 className="mb-1 block text-xs font-medium text-[var(--foreground)]/80"
@@ -1636,7 +1782,13 @@ export function OrderForm({
       )}
 
       {!orderConfirmed && (
-        <div className="mt-8 flex justify-between">
+        <div className="mt-8 space-y-3">
+          {error && step < 4 && (
+            <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700" role="alert">
+              {error}
+            </p>
+          )}
+          <div className="flex justify-between">
           <button
             type="button"
             onClick={back}
@@ -1649,17 +1801,7 @@ export function OrderForm({
             <button
               type="button"
               onClick={next}
-              disabled={
-                bookingsPaused ||
-                distanceLoading ||
-                (step === 1 && !step1Complete) ||
-                (step === 2 && !step2Complete) ||
-                (step === 3 &&
-                  (!step3Complete ||
-                    !pricePreview ||
-                    pricePreviewLoading ||
-                    !!pricePreviewError))
-              }
+              disabled={bookingsPaused || distanceLoading || (step === 3 && pricePreviewLoading)}
               className="rounded-lg bg-[var(--accent)] px-6 py-2 text-sm font-medium text-white hover:opacity-90 disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {distanceLoading ? "…" : t("next")}
@@ -1674,6 +1816,7 @@ export function OrderForm({
               {loading ? "…" : t("confirmOrder")}
             </button>
           )}
+          </div>
         </div>
       )}
     </div>
