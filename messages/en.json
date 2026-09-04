@@ -427,6 +427,7 @@
     "price": "Price",
     "priceShowsAfterWeightPackages": "Complete all fields below to see the price.",
     "priceCompleteAllFieldsHint": "The price appears after you select category, service type, cargo details (weight, parcels, photos), load size — and the route distance is calculated. Terrain and weather are applied automatically.",
+    "priceMissingFieldsTitle": "To show the price, complete:",
     "pricePreviewLoading": "Calculating price (route, elevation, weather)…",
     "pricePreviewFailed": "Could not calculate the price. Check addresses and try again.",
     "routePricingAutoHint": "Times include automatic terrain (Google elevation) and weather adjustment.",

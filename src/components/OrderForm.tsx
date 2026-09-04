@@ -495,6 +495,25 @@ export function OrderForm({
     data.packageCount >= 1 &&
     cargoPhotoUrls.length >= 1;
 
+  const step3MissingFields = useMemo(() => {
+    const missing: string[] = [];
+    if (!data.cargoCategory) missing.push(t("cargoWhatToTransport"));
+    if (!data.serviceType) missing.push(t("serviceType"));
+    if (data.cargoWeightKg <= 0) missing.push(t("cargoWeightKg"));
+    if (data.packageCount < 1) missing.push(t("packageCount"));
+    if (cargoPhotoUrls.length < 1) missing.push(t("cargoPhotosLabel"));
+    if (!distanceFromRoute) missing.push(t("distanceRoute"));
+    return missing;
+  }, [
+    cargoPhotoUrls.length,
+    data.cargoCategory,
+    data.cargoWeightKg,
+    data.packageCount,
+    data.serviceType,
+    distanceFromRoute,
+    t,
+  ]);
+
   const showStep3Price = step3Complete && !!pricePreview && !pricePreviewLoading && !pricePreviewError;
 
   const oneWayBaseMinutes = Math.round(routeDurationMinutes ?? (data.distanceKm / 50) * 60);
@@ -539,11 +558,14 @@ export function OrderForm({
               serviceType: data.serviceType || "driver_car",
               weightKg: data.cargoWeightKg,
               cargoCategory: data.cargoCategory,
+              distanceKm: distanceFromRoute ? data.distanceKm : undefined,
+              durationMinutes: distanceFromRoute ? routeDurationMinutes : undefined,
             }),
           });
           const json = (await res.json()) as { error?: string } & Partial<OrderPricePreview>;
           if (!res.ok) {
             if (json.error === "BOOKINGS_PAUSED") throw new Error(t("bookingsPausedShort"));
+            if (json.error === "ROUTE_FAILED") throw new Error(t("pricePreviewFailed"));
             throw new Error(json.error || "preview failed");
           }
           if (!json.breakdown || typeof json.roundTripMinutes !== "number") {
@@ -574,6 +596,9 @@ export function OrderForm({
     data.serviceType,
     data.cargoWeightKg,
     data.cargoCategory,
+    data.distanceKm,
+    distanceFromRoute,
+    routeDurationMinutes,
   ]);
 
   const fetchSuggestions = useCallback((query: string, setter: (s: Suggestion[]) => void) => {
@@ -1496,13 +1521,20 @@ export function OrderForm({
           ) : (
             <div className="rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/5 p-4 space-y-2">
               {step3Complete && pricePreviewError && (
-                <p className="text-sm text-red-700">{t("pricePreviewFailed")}</p>
+                <p className="text-sm text-red-700">{pricePreviewError}</p>
               )}
               {step3Complete && pricePreviewLoading && (
                 <p className="text-sm text-[var(--foreground)]/75">{t("pricePreviewLoading")}</p>
               )}
-              {!step3Complete && (
-                <p className="text-sm text-[var(--foreground)]/75">{t("priceCompleteAllFieldsHint")}</p>
+              {!step3Complete && step3MissingFields.length > 0 && (
+                <div className="text-sm text-[var(--foreground)]/75">
+                  <p className="font-medium text-amber-800">{t("priceMissingFieldsTitle")}</p>
+                  <ul className="mt-2 list-inside list-disc space-y-1">
+                    {step3MissingFields.map((field) => (
+                      <li key={field}>{field}</li>
+                    ))}
+                  </ul>
+                </div>
               )}
             </div>
           )}

@@ -31,6 +31,15 @@ export async function POST(req: Request) {
     const weightKg = body.weightKg != null ? Number(body.weightKg) : NaN;
     const cargoCategory =
       body.cargoCategory != null && typeof body.cargoCategory === "string" ? body.cargoCategory : "";
+    const distanceKmBody = body.distanceKm != null ? Number(body.distanceKm) : NaN;
+    const durationMinutesBody = body.durationMinutes != null ? Number(body.durationMinutes) : NaN;
+    const knownRoute =
+      Number.isFinite(distanceKmBody) && distanceKmBody > 0
+        ? {
+            distanceKm: distanceKmBody,
+            durationMinutes: Number.isFinite(durationMinutesBody) ? durationMinutesBody : null,
+          }
+        : undefined;
 
     if (!pickupAddress || !deliveryAddress) {
       return NextResponse.json({ error: "Missing addresses" }, { status: 400 });
@@ -64,6 +73,7 @@ export async function POST(req: Request) {
       cargoSize,
       serviceType,
       pricingOpts,
+      knownRoute,
     });
 
     if (!result.ok) {

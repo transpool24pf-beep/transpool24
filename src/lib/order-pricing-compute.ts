@@ -45,19 +45,34 @@ export async function computeOrderPricingFromAddresses(input: {
   serviceType: ServiceType;
   pricingOpts: PricingOptions;
   googleMapsApiKey?: string | null;
+  /** When the client already calculated route distance (step 2), reuse it for pricing. */
+  knownRoute?: { distanceKm: number; durationMinutes: number | null };
 }): Promise<{ ok: true; data: OrderPricingComputeOk } | { ok: false; error: "ROUTE_FAILED" }> {
   const key = input.googleMapsApiKey ?? process.env.GOOGLE_MAPS_API_KEY ?? null;
 
-  const route = await getRouteDistanceAndDuration(
-    input.pickupAddress.trim(),
-    input.deliveryAddress.trim(),
-    input.departureTime
-  );
-  if (!route || route.distanceKm <= 0) {
-    return { ok: false, error: "ROUTE_FAILED" };
+  let distanceKm: number;
+  let durationMinutes: number | null;
+
+  const knownKm = input.knownRoute?.distanceKm;
+  if (knownKm != null && Number.isFinite(knownKm) && knownKm > 0) {
+    distanceKm = knownKm;
+    durationMinutes =
+      input.knownRoute?.durationMinutes != null && Number.isFinite(input.knownRoute.durationMinutes)
+        ? input.knownRoute.durationMinutes
+        : null;
+  } else {
+    const route = await getRouteDistanceAndDuration(
+      input.pickupAddress.trim(),
+      input.deliveryAddress.trim(),
+      input.departureTime
+    );
+    if (!route || route.distanceKm <= 0) {
+      return { ok: false, error: "ROUTE_FAILED" };
+    }
+    distanceKm = route.distanceKm;
+    durationMinutes = route.durationMinutes;
   }
 
-  const { distanceKm, durationMinutes } = route;
   const oneWayBase = durationMinutes ?? Math.round((distanceKm / 50) * 60);
 
   const [from, to] = await Promise.all([

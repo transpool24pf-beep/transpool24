@@ -431,6 +431,7 @@
     "price": "Preis",
     "priceShowsAfterWeightPackages": "Füllen Sie alle Felder aus, um den Preis zu sehen.",
     "priceCompleteAllFieldsHint": "Der Preis erscheint, wenn Kategorie, Service, Sendungsdetails (Gewicht, Stückzahl, Fotos), Ladungsgröße gewählt sind und die Route berechnet wurde. Gelände und Wetter werden automatisch berücksichtigt.",
+    "priceMissingFieldsTitle": "Für den Preis fehlen noch:",
     "pricePreviewLoading": "Preis wird berechnet (Route, Höhenprofil, Wetter)…",
     "pricePreviewFailed": "Preisberechnung fehlgeschlagen. Adressen prüfen und erneut versuchen.",
     "routePricingAutoHint": "Zeiten enthalten automatische Anpassung für Gelände (Google Höhe) und Wetter.",
