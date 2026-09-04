@@ -8,6 +8,7 @@ import { HomeTransportOperations } from "@/components/HomeTransportOperations";
 import { GermanyConnectSection } from "@/components/GermanyConnectSection";
 import { HomepageDriverLogisticsLottie } from "@/components/HomepageDriverLogisticsLottie";
 import { HomeJsonLd } from "@/components/seo/HomeJsonLd";
+import { ContentAdBanner } from "@/components/ads/ContentAdBanner";
 import { getHomepageHero } from "@/lib/homepage-hero";
 import { localeAlternatesAndSocial } from "@/lib/locale-seo-metadata";
 
@@ -101,6 +102,8 @@ export default async function HomePage({
             </div>
           </div>
         </section>
+
+        <ContentAdBanner region="home-banner" className="bg-white" />
 
         {/* Features Section - تصميم احترافي */}
         <section className="bg-white py-20 sm:py-24">
@@ -240,6 +243,8 @@ export default async function HomePage({
         </section>
 
         <HomepageDriverLogisticsLottie />
+
+        <ContentAdBanner region="home-footer-banner" className="bg-[#f8f9fb]" />
       </main>
       <Footer />
     </>

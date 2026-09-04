@@ -22,19 +22,30 @@ export function adsenseManualUnitsConfigured(): boolean {
   );
 }
 
+/** Booking, driver, and legal flows stay ad-free. */
+const AD_FREE_SECTIONS = new Set([
+  "order",
+  "driver",
+  "privacy",
+  "terms",
+  "rate-driver",
+]);
+
 /**
- * Only show fixed, manual placements on editorial / marketing pages.
- * Order, legal, driver flows stay ad-free.
+ * Manual AdSense on marketing pages (home, blog, why, support, …).
+ * Order / driver / legal pages stay ad-free.
  */
 export function adsAllowedForPath(pathname: string | null): boolean {
   if (!pathname) return false;
 
   const parts = pathname.split("/").filter(Boolean);
+  // /de — homepage
+  if (parts.length === 1) return true;
   if (parts.length === 0) return false;
 
-  const section = parts[1]?.toLowerCase();
+  const section = parts[1]?.toLowerCase() ?? "";
   if (!section) return true;
-  if (section === "blog" || section === "why") return true;
+  if (AD_FREE_SECTIONS.has(section)) return false;
 
-  return false;
+  return true;
 }

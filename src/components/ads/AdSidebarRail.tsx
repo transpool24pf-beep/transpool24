@@ -23,7 +23,7 @@ export function AdSidebarRail({ side, slot, label, enabled }: Props) {
 
   return (
     <aside
-      className={`pointer-events-auto fixed top-[6.75rem] z-30 hidden min-[1400px]:block ${sideClass}`}
+      className={`pointer-events-auto fixed top-[6.75rem] z-30 hidden min-[1280px]:block ${sideClass}`}
       style={{ width: ADSENSE_SIDEBAR_WIDTH + 16 }}
       data-tp24-ad-region={`sidebar-${side}`}
     >

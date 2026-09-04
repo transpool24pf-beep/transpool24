@@ -3,6 +3,7 @@ import { getWhyPagePayload } from "@/lib/get-why-page-payload";
 import { WhyTranspool24Content } from "@/components/why-transpool24/WhyTranspool24Content";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { ContentAdBanner } from "@/components/ads/ContentAdBanner";
 import { localeAlternatesAndSocial } from "@/lib/locale-seo-metadata";
 
 /** Always read latest CMS/Supabase payload (not SSG snapshot). */
@@ -34,6 +35,7 @@ export default async function WhyTranspool24Page({
     <>
       <Header />
       <main>
+        <ContentAdBanner region="why-banner" className="bg-white" />
         <WhyTranspool24Content data={data} locale={locale} aboutNarrativeFirst />
       </main>
       <Footer />

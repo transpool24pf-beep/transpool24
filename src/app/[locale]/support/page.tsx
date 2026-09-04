@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { ContentAdBanner } from "@/components/ads/ContentAdBanner";
 import { SupportContactPage } from "@/components/support/SupportContactPage";
 import { localeAlternatesAndSocial } from "@/lib/locale-seo-metadata";
 
@@ -18,6 +19,7 @@ export default async function SupportPage({ params }: { params: Promise<{ locale
   return (
     <>
       <Header />
+      <ContentAdBanner region="support-banner" className="bg-white" />
       <SupportContactPage />
       <Footer />
     </>
