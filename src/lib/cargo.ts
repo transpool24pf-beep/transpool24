@@ -94,15 +94,24 @@ export function getCargoCategory(id: CargoCategoryId | string | null) {
   return CARGO_CATEGORIES.find((c) => c.id === id) ?? null;
 }
 
+/** Fixed loading + unloading block billed on every order (one-way km is billed separately). */
+export const LOAD_UNLOAD_TOTAL_MINUTES = 90;
+
 /**
- * Load/unload minutes for pricing: fixed for all categories and weights so
- * “what you transport” and shipment weight do not change this part of the price.
+ * Load/unload minutes for pricing: always 90 minutes total, independent of
+ * cargo category and weight.
  */
 export function getLoadUnloadMinutes(
   _categoryId?: CargoCategoryId | string | null,
   _weightKg?: number
 ): { loadingMinutes: number; unloadingMinutes: number } {
-  return { loadingMinutes: 30, unloadingMinutes: 30 };
+  const half = Math.round(LOAD_UNLOAD_TOTAL_MINUTES / 2);
+  return { loadingMinutes: half, unloadingMinutes: LOAD_UNLOAD_TOTAL_MINUTES - half };
+}
+
+export function loadUnloadTotalMinutes(): number {
+  const { loadingMinutes, unloadingMinutes } = getLoadUnloadMinutes();
+  return loadingMinutes + unloadingMinutes;
 }
 
 export function volumeM3(lengthCm: number, widthCm: number, heightCm: number): number {

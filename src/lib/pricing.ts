@@ -1,13 +1,10 @@
-// Defaults (overridden by DB settings when available)
+import { LOAD_UNLOAD_TOTAL_MINUTES } from "@/lib/cargo";
+
 const DEFAULT_PRICE_PER_KM_CENTS: Record<string, number> = {
   XS: 80,
   M: 120,
   L: 200,
 };
-const DEFAULT_DRIVER_HOURLY_RATE_CENTS =
-  typeof process !== "undefined" && process.env.DRIVER_HOURLY_RATE_CENTS
-    ? parseInt(process.env.DRIVER_HOURLY_RATE_CENTS, 10)
-    : 2500;
 
 export type PricingOptions = {
   price_per_km_cents?: Record<string, number>;
@@ -19,7 +16,11 @@ export type PricingOptions = {
   weight_surcharge_cents_per_10kg?: number;
   /** Flat cents added once per order by cargo category id. */
   cargo_category_adjustment_cents?: Record<string, number>;
+  /** Flat cents for 90 minutes loading + unloading (driver with vehicle). */
+  load_unload_90min_cents?: number;
 };
+
+const DEFAULT_LOAD_UNLOAD_90MIN_CENTS = 3750;
 
 export type ServiceType = "driver_only" | "driver_car" | "driver_car_assistant";
 
@@ -35,9 +36,17 @@ export type PriceBreakdown = {
   /** Optional flat surcharge from “what you transport” category (cents). */
   cargoCategorySurchargeCents: number;
   totalCents: number;
-  /** Minutes used for time-based charges (round-trip + load/unload) */
+  /** Minutes used for hourly charges (one-way drive + load/unload for driver-only / assistant) */
   billingMinutesUsed: number;
 };
+
+export function loadUnload90MinCentsFromOptions(options?: PricingOptions | null): number {
+  const raw = options?.load_unload_90min_cents;
+  if (raw != null && Number.isFinite(Number(raw))) {
+    return Math.max(0, Math.round(Number(raw)));
+  }
+  return DEFAULT_LOAD_UNLOAD_90MIN_CENTS;
+}
 
 /** Cents for weight: `floor(kg / 10) * centsPer10Kg` (default 50 = 0,50 € per 10 kg). */
 export function weightSurchargeCentsFromKg(weightKg: number, centsPer10Kg?: number | null): number {
@@ -54,10 +63,11 @@ function resolveBillingMinutes(
   if (totalDriverMinutes != null && Number.isFinite(totalDriverMinutes) && totalDriverMinutes > 0) {
     return totalDriverMinutes;
   }
-  if (durationMinutes != null && durationMinutes > 0) {
-    return durationMinutes * 2;
-  }
-  return (distanceKm / 50) * 60 * 2;
+  const oneWay =
+    durationMinutes != null && durationMinutes > 0
+      ? durationMinutes
+      : (distanceKm / 50) * 60;
+  return oneWay + LOAD_UNLOAD_TOTAL_MINUTES;
 }
 
 /** Assistant total for the job: hourly rate × (billing minutes / 60), rounded to cents */
@@ -71,8 +81,10 @@ export function assistantChargeCentsFromMinutes(
 }
 
 /**
- * Full price breakdown. Assistant (Helfer) = assistant_fee_cents per hour × total driver hours
- * (same total minutes as driver time billing: round trip + loading + unloading).
+ * Full price breakdown.
+ * Driver with vehicle: one-way km + flat 90-minute load/unload price.
+ * Driver only: hourly × (one-way drive + load/unload minutes).
+ * Assistant: hourly × those same minutes.
  */
 export function calculatePriceBreakdown(
   distanceKm: number,
@@ -107,10 +119,9 @@ export function calculatePriceBreakdown(
   }
 
   const perKmMap = options?.price_per_km_cents ?? DEFAULT_PRICE_PER_KM_CENTS;
-  const hourlyRate = options?.driver_hourly_rate_cents ?? DEFAULT_DRIVER_HOURLY_RATE_CENTS;
   const perKm = perKmMap[cargoSize] ?? 100;
   const distanceCents = Math.round(distanceKm * perKm);
-  const driverTimeCents = Math.round((timeMinutes / 60) * hourlyRate);
+  const driverTimeCents = loadUnload90MinCentsFromOptions(options);
   const assistantCents =
     serviceType === "driver_car_assistant"
       ? assistantChargeCentsFromMinutes(timeMinutes, assistantHourlyCents)

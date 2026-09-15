@@ -6,12 +6,11 @@ import { useTranslations } from "next-intl";
 import { OrderRouteLottie } from "@/components/OrderRouteLottie";
 import {
   formatPrice,
-  splitHoursMinutesParts,
   type ServiceType,
   type PricingOptions,
   type PriceBreakdown,
 } from "@/lib/pricing";
-import { getLoadUnloadMinutes, CARGO_CATEGORIES, type CargoCategoryId } from "@/lib/cargo";
+import { CARGO_CATEGORIES, type CargoCategoryId, LOAD_UNLOAD_TOTAL_MINUTES } from "@/lib/cargo";
 import {
   loadOrderAddressHistory,
   mergePersistedAddresses,
@@ -609,13 +608,7 @@ export function OrderForm({
 
   const showStep3Price = step3Complete && !!pricePreview && !pricePreviewLoading && !pricePreviewError;
 
-  const oneWayBaseMinutes = Math.round(routeDurationMinutes ?? (data.distanceKm / 50) * 60);
-  const baseRoundTripMinutes = oneWayBaseMinutes * 2;
-  const { loadingMinutes, unloadingMinutes } = getLoadUnloadMinutes();
-  const totalDriverMinutesDisplay =
-    pricePreview?.totalDriverMinutes ??
-    Math.round(baseRoundTripMinutes + loadingMinutes + unloadingMinutes);
-  const totalTimeParts = splitHoursMinutesParts(totalDriverMinutesDisplay);
+  const loadUnloadMinutes = LOAD_UNLOAD_TOTAL_MINUTES;
   const priceBreakdown = pricePreview?.breakdown ?? null;
   const priceCents = pricePreview?.breakdown?.totalCents ?? 0;
 
@@ -1651,13 +1644,15 @@ export function OrderForm({
               <p className="text-sm text-amber-700">
                 {t("driverTimeRequiresAddress")}
               </p>
-            ) : step3Complete && pricePreviewLoading ? (
-              <p className="text-sm text-[var(--foreground)]/75">{t("pricePreviewLoading")}</p>
             ) : (
-              <p className="text-sm font-semibold text-[var(--accent)]">
-                {t("totalDriverTime")}: {totalTimeParts.hours} {t("hours")} {totalTimeParts.minutes}{" "}
-                {t("minutes")}
-              </p>
+              <div className="space-y-1 text-sm font-semibold text-[var(--accent)]">
+                <p>
+                  {t("distanceOneWay")}: {data.distanceKm} km
+                </p>
+                <p>
+                  {t("loadingUnloadingTime")}: {loadUnloadMinutes} {t("minutes")}
+                </p>
+              </div>
             )}
           </div>
           <div>

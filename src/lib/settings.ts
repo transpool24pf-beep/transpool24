@@ -11,6 +11,8 @@ export type PricingSettings = {
   /** Cents charged per full 10 kg block (e.g. 50 = 0,50 € / 10 kg). */
   weight_surcharge_cents_per_10kg?: number;
   cargo_category_adjustment_cents?: CargoCategoryAdjustmentCents;
+  /** Flat cents for the 90-minute loading + unloading block (driver with vehicle). */
+  load_unload_90min_cents?: number;
 };
 
 const DEFAULT_CARGO_CATEGORY_ADJUSTMENTS: CargoCategoryAdjustmentCents = {
@@ -29,6 +31,7 @@ export const PRICING_DEFAULTS: PricingSettings = {
   assistant_fee_cents: 1630, // 16.30 EUR/h for assistant (× total driver billing minutes / 60)
   weight_surcharge_cents_per_10kg: 50, // 0,50 € per 10 kg
   cargo_category_adjustment_cents: { ...DEFAULT_CARGO_CATEGORY_ADJUSTMENTS },
+  load_unload_90min_cents: 3750, // 37,50 € for 90 minutes load/unload
 };
 
 export async function getPricingSettings(): Promise<PricingSettings> {

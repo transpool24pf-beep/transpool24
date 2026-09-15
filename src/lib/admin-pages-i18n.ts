@@ -178,6 +178,10 @@ export const ADMIN_PAGES_DE: Record<string, string> = {
   "settings.sizeM": "Mittel (M)",
   "settings.sizeL": "3,5 t",
   "settings.perKm": "€ / km",
+  "settings.loadUnloadTitle": "90 Minuten: Be- und Entladen",
+  "settings.loadUnloadDesc":
+    "Pauschale für 90 Minuten Be- und Entladen, zusätzlich zum km-Preis der Hinfahrt. Z. B. 37,50 €.",
+  "settings.per90Min": "€ / 90 Min.",
   "settings.driverWithCarTitle": "Stundenlohn: Fahrer mit Fahrzeug",
   "settings.driverWithCarDesc":
     "Für die Zeitberechnung bei „Fahrer mit Auto“ (zusätzlich zum km-Preis). Z. B. 25,00 €/h.",
@@ -376,6 +380,10 @@ export const ADMIN_PAGES_AR: Record<string, string> = {
   "settings.sizeM": "متوسط (M)",
   "settings.sizeL": "3,5 طن",
   "settings.perKm": "€ / كم",
+  "settings.loadUnloadTitle": "90 دقيقة: تحميل وتفريغ",
+  "settings.loadUnloadDesc":
+    "سعر ثابت لـ 90 دقيقة تحميل وتفريغ، يُضاف إلى سعر الكم للذهاب فقط. مثلاً 37,50 €.",
+  "settings.per90Min": "€ / 90 دقيقة",
   "settings.driverWithCarTitle": "أجر الساعة: سائق مع مركبة",
   "settings.driverWithCarDesc":
     "لحساب الوقت في «سائق مع سيارة» (بالإضافة لسعر الكم). مثلاً 25,00 €/س.",

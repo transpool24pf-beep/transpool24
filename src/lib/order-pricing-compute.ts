@@ -6,7 +6,7 @@ import {
   type ServiceType,
 } from "@/lib/pricing";
 import { getRouteDistanceAndDuration, geocodeAddressForMap } from "@/lib/route-distance-server";
-import { getLoadUnloadMinutes } from "@/lib/cargo";
+import { getLoadUnloadMinutes, loadUnloadTotalMinutes } from "@/lib/cargo";
 import { routeDriveTimeMultiplier, type RouteTerrainId, type RouteWeatherId } from "@/lib/route-pricing-factors";
 import { resolveWeatherForMidpoint, terrainFromGoogleElevation } from "@/lib/auto-route-factors";
 
@@ -100,7 +100,7 @@ export async function computeOrderPricingFromAddresses(input: {
   const roundTripMinutes = oneWayAdjusted * 2;
 
   const { loadingMinutes, unloadingMinutes } = getLoadUnloadMinutes();
-  const totalDriverMinutes = Math.round(roundTripMinutes + loadingMinutes + unloadingMinutes);
+  const totalDriverMinutes = Math.round(oneWayAdjusted + loadUnloadTotalMinutes());
   const weightKg = Math.max(0, Number(input.weightKg) || 0);
   const centsPer10 =
     input.pricingOpts.weight_surcharge_cents_per_10kg != null

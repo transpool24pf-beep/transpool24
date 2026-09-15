@@ -264,6 +264,7 @@
     "fromRoute": "ji rê",
     "loadingUnloadingTime": "Barkirin û barkirin",
     "totalDriverTime": "Dema ajokerê tevahî",
+    "distanceOneWay": "Dûrahî (çûn tenê)",
     "driverTimeRequiresAddress": "Ji bo hesabkirina dema ajokar û fatûreya demjimêrê, di gava berê de navnîşanên hilgirtin û radestkirinê binivîsin û \"Hesabkirina dûrahiya rastîn\" bikirtînin.",
     "cargoDetails": "Detayên barkirinê (pêwîst)",
     "cargoLengthCm": "Dirêjahî (cm)",

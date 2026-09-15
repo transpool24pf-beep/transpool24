@@ -263,6 +263,7 @@
     "fromRoute": "z trasy",
     "loadingUnloadingTime": "Załadunek i rozładunek",
     "totalDriverTime": "Całkowity czas pracy kierowcy",
+    "distanceOneWay": "Odległość (tylko w jedną stronę)",
     "driverTimeRequiresAddress": "Aby obliczyć czas pracy kierowcy i rozliczenie godzinowe, w poprzednim kroku wprowadź adresy odbioru i dostawy, a następnie kliknij „Oblicz rzeczywistą odległość”.",
     "cargoDetails": "Szczegóły ładunku (wymagane)",
     "cargoLengthCm": "Długość (cm)",

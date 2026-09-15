@@ -14,6 +14,7 @@ export async function GET() {
       assistant_fee_cents: p.assistant_fee_cents ?? 1630,
       weight_surcharge_cents_per_10kg: p.weight_surcharge_cents_per_10kg ?? 50,
       cargo_category_adjustment_cents: p.cargo_category_adjustment_cents ?? {},
+      load_unload_90min_cents: p.load_unload_90min_cents ?? 3750,
     });
   } catch (e) {
     console.error("[public/pricing]", e);

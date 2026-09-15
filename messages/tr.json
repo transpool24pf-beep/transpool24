@@ -263,6 +263,7 @@
     "fromRoute": "rota üzerinden",
     "loadingUnloadingTime": "Yükleme ve boşaltma",
     "totalDriverTime": "Toplam sürücü süresi",
+    "distanceOneWay": "Mesafe (sadece gidiş)",
     "driverTimeRequiresAddress": "Sürücü süresi ve saatlik faturalandırma için önceki adımda alış ve teslimat adreslerini girin ve \"Gerçek mesafeyi hesapla\"ya tıklayın.",
     "cargoDetails": "Yük detayları (zorunlu)",
     "cargoLengthCm": "Uzunluk (cm)",

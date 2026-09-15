@@ -91,6 +91,7 @@ export async function POST(req: Request) {
       assistant_fee_cents: pricing.assistant_fee_cents,
       weight_surcharge_cents_per_10kg: pricing.weight_surcharge_cents_per_10kg,
       cargo_category_adjustment_cents: pricing.cargo_category_adjustment_cents,
+      load_unload_90min_cents: pricing.load_unload_90min_cents,
     };
 
     const weightKg = weightKgRaw;

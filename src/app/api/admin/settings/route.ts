@@ -16,6 +16,8 @@ function mergePricing(
   const catStored = s.cargo_category_adjustment_cents as Record<string, number> | undefined;
   const weightPatch = patch.weight_surcharge_cents_per_10kg;
   const weightStored = s.weight_surcharge_cents_per_10kg;
+  const loadUnloadPatch = patch.load_unload_90min_cents;
+  const loadUnloadStored = s.load_unload_90min_cents;
   return {
     ...PRICING_DEFAULTS,
     ...(s as PricingSettings),
@@ -36,6 +38,12 @@ function mergePricing(
         : typeof weightStored === "number"
           ? Math.max(0, Math.round(weightStored))
           : PRICING_DEFAULTS.weight_surcharge_cents_per_10kg,
+    load_unload_90min_cents:
+      loadUnloadPatch != null
+        ? Math.max(0, Math.round(Number(loadUnloadPatch)))
+        : typeof loadUnloadStored === "number"
+          ? Math.max(0, Math.round(loadUnloadStored))
+          : PRICING_DEFAULTS.load_unload_90min_cents ?? 3750,
   };
 }
 

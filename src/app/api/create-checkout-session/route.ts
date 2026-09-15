@@ -77,8 +77,9 @@ export async function POST(req: Request) {
         driver_hourly_rate_cents: pricing.driver_hourly_rate_cents,
         driver_only_hourly_cents: pricing.driver_only_hourly_cents,
         assistant_fee_cents: pricing.assistant_fee_cents,
+        load_unload_90min_cents: pricing.load_unload_90min_cents,
       };
-      const estimatedMinutes = Math.round((distanceKm / 50) * 60 * 2 + 60);
+      const estimatedMinutes = Math.round((distanceKm / 50) * 60 + 90);
       const breakdown = calculatePriceBreakdown(
         distanceKm,
         cargoSize,

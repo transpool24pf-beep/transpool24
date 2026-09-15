@@ -12,6 +12,7 @@ type Pricing = {
   assistant_fee_cents?: number;
   weight_surcharge_cents_per_10kg?: number;
   cargo_category_adjustment_cents?: Record<string, number>;
+  load_unload_90min_cents?: number;
 };
 
 const DEFAULT_PRICE_PER_KM_CENTS: Record<"XS" | "M" | "L", number> = {
@@ -41,6 +42,7 @@ export default function AdminSettingsPage() {
     assistant_fee_cents: 1630,
     weight_surcharge_cents_per_10kg: 50,
     cargo_category_adjustment_cents: { ...PRICING_DEFAULTS.cargo_category_adjustment_cents },
+    load_unload_90min_cents: PRICING_DEFAULTS.load_unload_90min_cents,
   });
   const [perKmEur, setPerKmEur] = useState<Record<"XS" | "M" | "L", string>>(() => ({
     XS: formatEur(DEFAULT_PRICE_PER_KM_CENTS.XS),
@@ -51,6 +53,9 @@ export default function AdminSettingsPage() {
   const [driverOnlyEur, setDriverOnlyEur] = useState("45,00");
   const [assistantFeeEur, setAssistantFeeEur] = useState("16,30");
   const [weightPer10Eur, setWeightPer10Eur] = useState("0,50");
+  const [loadUnloadEur, setLoadUnloadEur] = useState(() =>
+    formatEur(PRICING_DEFAULTS.load_unload_90min_cents ?? 3750)
+  );
   const [categoryEur, setCategoryEur] = useState<Record<string, string>>(() =>
     Object.fromEntries(CARGO_CATEGORIES.map((c) => [c.id, "0,00"]))
   );
@@ -84,6 +89,7 @@ export default function AdminSettingsPage() {
         };
         const perKm = data.price_per_km_cents ?? DEFAULT_PRICE_PER_KM_CENTS;
         const km35 = perKm.L ?? perKm.M ?? perKm.XS ?? DEFAULT_PRICE_PER_KM_CENTS.L;
+        const loadUnload = data.load_unload_90min_cents ?? PRICING_DEFAULTS.load_unload_90min_cents ?? 3750;
         setPricing({
           price_per_km_cents: perKm,
           driver_hourly_rate_cents: withCar,
@@ -91,6 +97,7 @@ export default function AdminSettingsPage() {
           assistant_fee_cents: assistant,
           weight_surcharge_cents_per_10kg: w10,
           cargo_category_adjustment_cents: cats,
+          load_unload_90min_cents: loadUnload,
         });
         setPerKmEur({
           XS: formatEur(km35),
@@ -101,6 +108,7 @@ export default function AdminSettingsPage() {
         setDriverOnlyEur(formatEur(onlyDriver));
         setAssistantFeeEur(formatEur(assistant));
         setWeightPer10Eur(formatEur(w10));
+        setLoadUnloadEur(formatEur(loadUnload));
         setCategoryEur(
           Object.fromEntries(
             CARGO_CATEGORIES.map((c) => [c.id, formatEur(cats[c.id] ?? 0)])
@@ -132,6 +140,7 @@ export default function AdminSettingsPage() {
       driver_only_hourly_cents: parseEur(driverOnlyEur) || 4500,
       assistant_fee_cents: parseEur(assistantFeeEur) || 1630,
       weight_surcharge_cents_per_10kg: Math.max(0, parseEur(weightPer10Eur) || 50),
+      load_unload_90min_cents: Math.max(0, parseEur(loadUnloadEur) || 3750),
       cargo_category_adjustment_cents: categoryAdjust,
     };
     fetch("/api/admin/settings", {
@@ -223,6 +232,22 @@ export default function AdminSettingsPage() {
               className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2.5 text-lg focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
             />
             <p className="mt-1 text-xs text-[#0d2137]/50">{t("settings.perKm")}</p>
+          </div>
+        </section>
+
+        <section className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
+          <h2 className="mb-1 text-lg font-medium text-[#0d2137]">{t("settings.loadUnloadTitle")}</h2>
+          <p className="mb-4 text-sm text-[#0d2137]/60">{t("settings.loadUnloadDesc")}</p>
+          <div className="max-w-xs">
+            <input
+              type="text"
+              inputMode="decimal"
+              value={loadUnloadEur}
+              onChange={(e) => setLoadUnloadEur(e.target.value)}
+              placeholder="37,50"
+              className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2.5 text-lg focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+            />
+            <p className="mt-1 text-xs text-[#0d2137]/50">{t("settings.per90Min")}</p>
           </div>
         </section>
 

@@ -264,6 +264,7 @@
     "fromRoute": "din traseu",
     "loadingUnloadingTime": "Încărcare și descărcare",
     "totalDriverTime": "Durata totală a șoferului",
+    "distanceOneWay": "Distanță (doar dus)",
     "driverTimeRequiresAddress": "Pentru a calcula timpul șoferului și facturarea orară, introduceți adresele de ridicare și livrare în pasul anterior și faceți clic pe „Calculați distanța reală”.",
     "cargoDetails": "Detalii despre încărcătură (obligatoriu)",
     "cargoLengthCm": "lungime (cm)",

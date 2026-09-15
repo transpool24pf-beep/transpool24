@@ -264,6 +264,7 @@
     "fromRoute": "según ruta",
     "loadingUnloadingTime": "Carga y descarga",
     "totalDriverTime": "Tiempo total del conductor",
+    "distanceOneWay": "Distancia (solo ida)",
     "driverTimeRequiresAddress": "Para calcular el tiempo del conductor y la facturación por horas, introduzca las direcciones de recogida y entrega en el paso anterior y pulse \"Calcular distancia real\".",
     "cargoDetails": "Detalles de carga (obligatorio)",
     "cargoLengthCm": "Largo (cm)",
