@@ -2,6 +2,7 @@ import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import type { Job } from "./supabase";
 import { getPdfLogoBytes, pdfCompanyBrandingLines, pdfCompanyFooterLine } from "./pdf-company";
 import { cargoCategoryLabelDe } from "./cargo";
+import { splitGermanVatFromGross } from "./pricing";
 
 export type InvoiceType = "customer" | "driver";
 
@@ -210,8 +211,15 @@ export async function generateInvoicePdf(
   const totalCents = type === "driver" && hasAssistant
     ? amountCents + assistantCents
     : amountCents;
-  const totalEur = (totalCents / 100).toFixed(2);
-  draw(`Gesamtbetrag: € ${totalEur}`, { size: 12, bold: true });
+  if (type === "customer") {
+    const vat = splitGermanVatFromGross(totalCents);
+    draw(`Netto: EUR ${(vat.netCents / 100).toFixed(2)}`);
+    draw(`zzgl. 19 % MwSt.: EUR ${(vat.vatCents / 100).toFixed(2)}`);
+    draw(`Gesamtbetrag (brutto): EUR ${(vat.grossCents / 100).toFixed(2)}`, { size: 12, bold: true });
+  } else {
+    const totalEur = (totalCents / 100).toFixed(2);
+    draw(`Gesamtbetrag: EUR ${totalEur}`, { size: 12, bold: true });
+  }
   y -= 16;
 
   if (type === "customer") {

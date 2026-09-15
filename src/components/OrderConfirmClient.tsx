@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { formatPrice } from "@/lib/pricing";
+import { GermanVatPriceBlock } from "@/components/GermanVatPriceBlock";
 
 type Job = {
   id: string;
@@ -109,10 +109,9 @@ export function OrderConfirmClient({
         <p><strong>{t("delivery")}:</strong> {job.delivery_address}{job.delivery_city ? `, ${job.delivery_city}` : ""}</p>
         <p><strong>{t("cargoSize")}:</strong> {job.cargo_size}</p>
         <p><strong>{t("distance")}:</strong> {job.distance_km ?? "—"} km</p>
-        <p className="pt-2 text-lg font-bold text-[var(--accent)]">
-          {t("total")}: {formatPrice(job.price_cents)}
-        </p>
-        <p className="text-sm font-medium text-[var(--foreground)]/70">{t("pricePlusVat")}</p>
+        <div className="pt-2">
+          <GermanVatPriceBlock grossCents={job.price_cents} />
+        </div>
       </div>
 
       <div className="rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/5 p-4">

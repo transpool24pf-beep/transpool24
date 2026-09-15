@@ -167,6 +167,30 @@ export function formatPrice(cents: number): string {
   }).format(cents / 100);
 }
 
+/** German VAT on transport services (USt.). Applied on top of the net quote. */
+export const GERMAN_VAT_RATE = 0.19;
+
+export function addGermanVat19(netCents: number): {
+  netCents: number;
+  vatCents: number;
+  grossCents: number;
+} {
+  const net = Math.max(0, Math.round(Number(netCents) || 0));
+  const vatCents = Math.round(net * GERMAN_VAT_RATE);
+  return { netCents: net, vatCents, grossCents: net + vatCents };
+}
+
+/** Reverse a stored brutto amount into net + 19 % MwSt. (net + vat = gross). */
+export function splitGermanVatFromGross(grossCents: number): {
+  netCents: number;
+  vatCents: number;
+  grossCents: number;
+} {
+  const gross = Math.max(0, Math.round(Number(grossCents) || 0));
+  const netCents = Math.round(gross / (1 + GERMAN_VAT_RATE));
+  return { netCents, vatCents: gross - netCents, grossCents: gross };
+}
+
 /** Round minutes for display (avoids 44.6399999999 in UI) */
 export function roundBillingMinutesDisplay(minutes: number): number {
   return Math.round(Math.max(0, Number(minutes)));

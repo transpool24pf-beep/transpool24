@@ -3,7 +3,7 @@ import Stripe from "stripe";
 import { createServerSupabase } from "@/lib/supabase";
 import { rateLimitResponse } from "@/lib/rate-limit";
 import { getBookingsSettings } from "@/lib/bookings-settings";
-import { calculatePriceBreakdown } from "@/lib/pricing";
+import { calculatePriceBreakdown, addGermanVat19 } from "@/lib/pricing";
 import { getPricingSettings } from "@/lib/settings";
 import { getRouteDistanceKm } from "@/lib/route-distance-server";
 
@@ -88,7 +88,7 @@ export async function POST(req: Request) {
         serviceType as "driver_only" | "driver_car" | "driver_car_assistant",
         estimatedMinutes
       );
-      const priceCents = breakdown.totalCents;
+      const priceCents = addGermanVat19(breakdown.totalCents).grossCents;
       const { data, error: insertError } = await supabase
         .from("jobs")
         .insert({

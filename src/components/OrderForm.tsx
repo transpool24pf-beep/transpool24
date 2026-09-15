@@ -4,8 +4,8 @@ import { useState, useEffect, useRef, useCallback, useMemo, useId } from "react"
 import dynamic from "next/dynamic";
 import { useTranslations } from "next-intl";
 import { OrderRouteLottie } from "@/components/OrderRouteLottie";
+import { GermanVatPriceBlock } from "@/components/GermanVatPriceBlock";
 import {
-  formatPrice,
   type ServiceType,
   type PricingOptions,
   type PriceBreakdown,
@@ -1679,12 +1679,9 @@ export function OrderForm({
             )}
           </div>
           {showStep3Price && priceBreakdown ? (
-            <div className="rounded-lg bg-[#0d2137]/5 p-4 space-y-1">
+            <div className="space-y-2">
               <p className="text-sm text-[var(--foreground)]/80">{t("price")}</p>
-              <p className="text-2xl font-bold text-[var(--accent)]">
-                {formatPrice(priceCents)}
-              </p>
-              <p className="text-sm font-medium text-[var(--foreground)]/70">{t("pricePlusVat")}</p>
+              <GermanVatPriceBlock netCents={priceCents} />
             </div>
           ) : (
             <div className="rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/5 p-4 space-y-2">
@@ -1754,10 +1751,9 @@ export function OrderForm({
               {t("cargoPhotosLabel")}: {cargoPhotoUrls.length}
             </p>
             <p><strong>{t("distance")}:</strong> {data.distanceKm} km</p>
-            <p className="pt-2 text-lg font-bold text-[var(--accent)]">
-              {t("total")}: {formatPrice(priceCents)}
-            </p>
-            <p className="text-sm font-medium text-[var(--foreground)]/70">{t("pricePlusVat")}</p>
+            <div className="pt-2">
+              <GermanVatPriceBlock netCents={priceCents} />
+            </div>
             </div>
           </div>
           <div className="rounded-lg border border-[#0d2137]/15 bg-[#0d2137]/5 p-4">
