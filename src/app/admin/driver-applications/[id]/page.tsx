@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { DRIVER_POLICY_LEGAL_REF } from "@/lib/driver-policy";
+import { useAdminLocale } from "@/contexts/AdminLocaleContext";
 
 type DriverApp = {
   id: string;
@@ -60,6 +61,8 @@ export default function AdminDriverApplicationDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const [id, setId] = useState<string | null>(null);
+  const { locale, t } = useAdminLocale();
+  const dateLocale = locale === "ar" ? "ar-SA" : "de-DE";
   const [app, setApp] = useState<DriverApp | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
@@ -144,7 +147,7 @@ export default function AdminDriverApplicationDetailPage({
   };
 
   const handleApprove = () => {
-    if (!id || !window.confirm("Bewerbung wirklich genehmigen?")) return;
+    if (!id || !window.confirm(t("da.approveConfirm"))) return;
     setActionLoading(true);
     fetch(`/api/admin/driver-applications/${id}`, {
       method: "PATCH",
@@ -154,19 +157,19 @@ export default function AdminDriverApplicationDetailPage({
       .then(async (r) => {
         const data = await r.json();
         if (!r.ok) {
-          alert(data?.error || "Fehlgeschlagen");
+          alert(data?.error || t("da.failed"));
           return;
         }
         fetchApp();
       })
-      .catch(() => alert("Verbindungsfehler"))
+      .catch(() => alert(t("da.connection")))
       .finally(() => setActionLoading(false));
   };
 
   const handleRejectSubmit = async () => {
     const notes = rejectNotes.trim();
     if (!notes) {
-      alert("Bitte Ablehnungsgrund (Notizen) eingeben.");
+      alert(t("da.needRejectNotes"));
       return;
     }
     setActionLoading(true);
@@ -207,10 +210,10 @@ export default function AdminDriverApplicationDetailPage({
         setRejectFiles([]);
         fetchApp();
       } else {
-        alert(data?.error || "Ablehnung fehlgeschlagen");
+        alert(data?.error || t("da.failed"));
       }
     } catch {
-      alert("Verbindungsfehler");
+      alert(t("da.connection"));
     } finally {
       setActionLoading(false);
     }
@@ -228,15 +231,15 @@ export default function AdminDriverApplicationDetailPage({
 
   const statusLabel =
     app?.status === "new"
-      ? "Neu"
+      ? t("driverApps.status.new")
       : app?.status === "approved"
-        ? "Genehmigt"
+        ? t("driverApps.status.approved")
         : app?.status === "rejected"
-          ? "Abgelehnt"
+          ? t("driverApps.status.rejected")
           : app?.status || "";
 
-  if (!id || loading) return <p className="text-[#0d2137]/70">Laden…</p>;
-  if (!app) return <p className="text-[#0d2137]/70">Bewerbung nicht gefunden.</p>;
+  if (!id || loading) return <p className="text-[#0d2137]/70">{t("common.loading")}</p>;
+  if (!app) return <p className="text-[#0d2137]/70">{t("da.notFound")}</p>;
 
   const welcomeMessage =
     "Hallo, deine Bewerbung bei TransPool24 wurde genehmigt. Du wartest auf die erste Tour. Tritt der Fahrer-WhatsApp-Gruppe bei, um Aufträge zu erhalten.";
@@ -248,69 +251,69 @@ export default function AdminDriverApplicationDetailPage({
           href="/admin/driver-applications"
           className="text-sm font-medium text-[var(--accent)] hover:underline"
         >
-          ← Fahrerbewerbungen
+          {t("da.back")}
         </Link>
       </div>
 
       <div className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
-        <h1 className="text-xl font-bold text-[#0d2137]">Fahrerbewerbung: {app.full_name}</h1>
+        <h1 className="text-xl font-bold text-[#0d2137]">{t("da.title")}: {app.full_name}</h1>
         <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-[#0d2137]/60">
-          {new Date(app.created_at).toLocaleString("de-DE")} · Status: {statusLabel}
+          {new Date(app.created_at).toLocaleString(dateLocale)} · {t("da.status")}: {statusLabel}
           {app.driver_number != null && (
             <span className="rounded bg-[var(--accent)]/15 px-2 py-0.5 font-medium text-[var(--accent)]">
-              Fahrernr. #{String(app.driver_number).padStart(5, "0")}
+              {t("da.driverNo")} #{String(app.driver_number).padStart(5, "0")}
             </span>
           )}
           {app.suspended_at && (
-            <span className="rounded bg-red-100 px-2 py-0.5 font-medium text-red-700">Gesperrt bis auf Weiteres</span>
+            <span className="rounded bg-red-100 px-2 py-0.5 font-medium text-red-700">{t("da.suspended")}</span>
           )}
         </p>
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          <p><strong>E-Mail:</strong> {app.email}</p>
-          <p><strong>Telefon / WhatsApp:</strong> {app.phone}</p>
-          <p><strong>Stadt:</strong> {app.city}</p>
-          <p><strong>Steuer-/Handelsnr.:</strong> {app.tax_or_commercial_number || "—"}</p>
-          <p><strong>Sprachen:</strong> {app.languages_spoken || "—"}</p>
-          <p><strong>Kennzeichen:</strong> {app.vehicle_plate || "—"}</p>
+          <p><strong>{t("da.email")}:</strong> <span dir="ltr">{app.email}</span></p>
+          <p><strong>{t("da.phone")}:</strong> <span dir="ltr">{app.phone}</span></p>
+          <p><strong>{t("da.city")}:</strong> {app.city}</p>
+          <p><strong>{t("da.tax")}:</strong> {app.tax_or_commercial_number || "—"}</p>
+          <p><strong>{t("da.languages")}:</strong> {app.languages_spoken || "—"}</p>
+          <p><strong>{t("da.plate")}:</strong> {app.vehicle_plate || "—"}</p>
         </div>
 
         <div className="mt-6 rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/[0.03] p-4">
-          <p className="mb-2 text-sm font-semibold text-[#0d2137]/80">Zustimmungen bei Bewerbung</p>
+          <p className="mb-2 text-sm font-semibold text-[#0d2137]/80">{t("da.consents")}</p>
           <p className="mb-2 text-xs text-[#0d2137]/60">
-            Stand der Richtlinien-Referenz (PDF/Archiv):{" "}
+            {t("da.policyRef")}{" "}
             <code className="rounded bg-[#0d2137]/10 px-1.5 py-0.5 font-mono text-[11px]">{DRIVER_POLICY_LEGAL_REF}</code>
           </p>
           <ul className="space-y-1.5 text-sm text-[#0d2137]/85">
             <li>
-              <strong>WhatsApp-Kontakt (Schritt 1):</strong>{" "}
+              <strong>{t("da.waConsent")}:</strong>{" "}
               {app.service_policy_accepted ? (
-                <span className="text-emerald-700">Ja</span>
+                <span className="text-emerald-700">{t("da.yes")}</span>
               ) : (
-                <span className="text-amber-700">Nein / nicht erfasst</span>
+                <span className="text-amber-700">{t("da.no")}</span>
               )}
             </li>
             <li>
-              <strong>Arbeits-/Firmenrichtlinie (Schritt 4):</strong>{" "}
+              <strong>{t("da.workConsent")}:</strong>{" "}
               {app.work_policy_accepted ? (
-                <span className="text-emerald-700">Ja</span>
+                <span className="text-emerald-700">{t("da.yes")}</span>
               ) : (
-                <span className="text-amber-700">Nein / nicht erfasst</span>
+                <span className="text-amber-700">{t("da.no")}</span>
               )}
             </li>
             <li>
-              <strong>Einreichung (Zeitstempel):</strong> {new Date(app.created_at).toLocaleString("de-DE")}
+              <strong>{t("da.submitted")}:</strong> {new Date(app.created_at).toLocaleString(dateLocale)}
             </li>
           </ul>
         </div>
 
         {app.status === "approved" && app.stats && (
           <div className="mt-6 rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/[0.03] p-4">
-            <p className="mb-2 text-sm font-semibold text-[#0d2137]/80">Leistungsstatistik</p>
+            <p className="mb-2 text-sm font-semibold text-[#0d2137]/80">{t("da.stats")}</p>
             <div className="flex flex-wrap gap-4 text-sm">
-              <span><strong>Aufträge:</strong> {app.stats.jobs_count}</span>
-              <span><strong>Ausgezahlt gesamt:</strong> {(app.stats.total_paid_cents / 100).toFixed(2)} €</span>
+              <span><strong>{t("da.jobs")}:</strong> {app.stats.jobs_count}</span>
+              <span><strong>{t("da.paidOut")}:</strong> {(app.stats.total_paid_cents / 100).toFixed(2)} €</span>
               <span className="flex items-center gap-1">
-                <strong>Kundenbewertung:</strong>
+                <strong>{t("da.customerRating")}:</strong>
                 {(app.stats.customer_rating_avg ?? app.star_rating) != null ? (
                   <span className="text-amber-500">
                     {"★".repeat(Math.round(app.stats.customer_rating_avg ?? app.star_rating ?? 0))}
@@ -322,7 +325,7 @@ export default function AdminDriverApplicationDetailPage({
                 )}
               </span>
               <span className="flex items-center gap-1">
-                <strong>Manuell (Sterne):</strong>
+                <strong>{t("da.manualStars")}:</strong>
                 {[1, 2, 3, 4, 5].map((n) => (
                   <button
                     key={n}
@@ -347,22 +350,22 @@ export default function AdminDriverApplicationDetailPage({
 
         {app.status === "approved" && (
           <div className="mt-6 rounded-xl border-2 border-emerald-400/50 bg-gradient-to-br from-emerald-50/95 to-white p-5 shadow-sm">
-            <p className="text-sm font-semibold text-[#0d2137]/90">Offener Saldo (an Fahrer zu zahlen)</p>
+            <p className="text-sm font-semibold text-[#0d2137]/90">{t("da.balance")}</p>
             <p className="mt-1 text-3xl font-bold tabular-nums text-emerald-900">
               {((app.payable_balance_cents ?? 0) / 100).toFixed(2)} €
             </p>
             <p className="mt-2 text-xs text-[#0d2137]/55">
-              Bei Überweisung an den Fahrer den Betrag hier verbuchen — der Saldo sinkt automatisch.
+              {t("da.balanceHint")}
             </p>
             <div className="mt-4 flex flex-wrap items-end gap-3">
               <div>
-                <label className="block text-xs font-medium text-[#0d2137]/70">Zahlung verbuchen (€)</label>
+                <label className="block text-xs font-medium text-[#0d2137]/70">{t("da.recordPay")}</label>
                 <input
                   type="text"
                   inputMode="decimal"
                   value={balancePayEur}
                   onChange={(e) => setBalancePayEur(e.target.value)}
-                  placeholder="z. B. 128,95"
+                  placeholder={t("da.payExample")}
                   className="mt-1 w-36 rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm"
                 />
               </div>
@@ -370,10 +373,10 @@ export default function AdminDriverApplicationDetailPage({
                 type="button"
                 disabled={balanceLoading}
                 onClick={async () => {
-                  const t = balancePayEur.trim().replace(",", ".");
-                  const n = parseFloat(t);
+                  const raw = balancePayEur.trim().replace(",", ".");
+                  const n = parseFloat(raw);
                   if (!Number.isFinite(n) || n <= 0) {
-                    alert("Bitte einen positiven Betrag eingeben.");
+                    alert(t("da.needPositive"));
                     return;
                   }
                   setBalanceLoading(true);
@@ -388,22 +391,22 @@ export default function AdminDriverApplicationDetailPage({
                       setBalancePayEur("");
                       fetchApp();
                     } else {
-                      alert(data?.error ?? "Fehlgeschlagen");
+                      alert(data?.error ?? t("da.failed"));
                     }
                   } catch {
-                    alert("Verbindungsfehler");
+                    alert(t("da.connection"));
                   } finally {
                     setBalanceLoading(false);
                   }
                 }}
                 className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800 disabled:opacity-50"
               >
-                Abziehen
+                {t("da.subtract")}
               </button>
             </div>
             <div className="mt-4 flex flex-wrap items-end gap-3 border-t border-emerald-200/80 pt-4">
               <div>
-                <label className="block text-xs font-medium text-[#0d2137]/70">Gutschrift hinzufügen (€)</label>
+                <label className="block text-xs font-medium text-[#0d2137]/70">{t("da.addCredit")}</label>
                 <input
                   type="text"
                   inputMode="decimal"
@@ -417,10 +420,10 @@ export default function AdminDriverApplicationDetailPage({
                 type="button"
                 disabled={balanceLoading}
                 onClick={async () => {
-                  const t = balanceAddEur.trim().replace(",", ".");
-                  const n = parseFloat(t);
+                  const raw = balanceAddEur.trim().replace(",", ".");
+                  const n = parseFloat(raw);
                   if (!Number.isFinite(n) || n <= 0) {
-                    alert("Bitte einen positiven Betrag eingeben.");
+                    alert(t("da.needPositive"));
                     return;
                   }
                   setBalanceLoading(true);
@@ -435,17 +438,17 @@ export default function AdminDriverApplicationDetailPage({
                       setBalanceAddEur("");
                       fetchApp();
                     } else {
-                      alert(data?.error ?? "Fehlgeschlagen");
+                      alert(data?.error ?? t("da.failed"));
                     }
                   } catch {
-                    alert("Verbindungsfehler");
+                    alert(t("da.connection"));
                   } finally {
                     setBalanceLoading(false);
                   }
                 }}
                 className="rounded-lg border border-emerald-600/40 bg-white px-4 py-2 text-sm font-medium text-emerald-900 hover:bg-emerald-50 disabled:opacity-50"
               >
-                Gutschreiben
+                {t("da.credit")}
               </button>
               {app.stats != null && (
                 <button
@@ -455,7 +458,7 @@ export default function AdminDriverApplicationDetailPage({
                     const sum = app.stats!.total_paid_cents;
                     if (
                       !window.confirm(
-                        `Saldo komplett auf Summe Fahrerpreis aller Aufträge setzen: ${(sum / 100).toFixed(2)} €? Der bisherige Saldo wird ersetzt.`
+                        t("da.balanceEqualsJobsConfirm").replace("{eur}", (sum / 100).toFixed(2))
                       )
                     )
                       return;
@@ -468,22 +471,22 @@ export default function AdminDriverApplicationDetailPage({
                       });
                       const data = await res.json();
                       if (res.ok) fetchApp();
-                      else alert(data?.error ?? "Fehlgeschlagen");
+                      else alert(data?.error ?? t("da.failed"));
                     } catch {
-                      alert("Verbindungsfehler");
+                      alert(t("da.connection"));
                     } finally {
                       setBalanceLoading(false);
                     }
                   }}
                   className="rounded-lg bg-[#0d2137]/10 px-3 py-2 text-xs font-medium text-[#0d2137]/80 hover:bg-[#0d2137]/15 disabled:opacity-50"
                 >
-                  Saldo = Summe Aufträge
+                  {t("da.balanceEqualsJobs")}
                 </button>
               )}
             </div>
             <div className="mt-3 flex flex-wrap items-end gap-3">
               <div>
-                <label className="block text-xs font-medium text-[#0d2137]/70">Saldo manuell setzen (€)</label>
+                <label className="block text-xs font-medium text-[#0d2137]/70">{t("da.setBalance")}</label>
                 <input
                   type="text"
                   inputMode="decimal"
@@ -497,13 +500,13 @@ export default function AdminDriverApplicationDetailPage({
                 type="button"
                 disabled={balanceLoading}
                 onClick={async () => {
-                  const t = balanceSetEur.trim().replace(",", ".");
-                  const n = parseFloat(t);
+                  const raw = balanceSetEur.trim().replace(",", ".");
+                  const n = parseFloat(raw);
                   if (!Number.isFinite(n) || n < 0) {
-                    alert("Bitte einen gültigen Betrag ≥ 0 eingeben.");
+                    alert(t("da.needAmount"));
                     return;
                   }
-                  if (!window.confirm(`Saldo auf ${n.toFixed(2)} € setzen?`)) return;
+                  if (!window.confirm(t("da.setBalanceConfirm").replace("{eur}", n.toFixed(2)))) return;
                   setBalanceLoading(true);
                   try {
                     const res = await fetch(`/api/admin/driver-applications/${id}`, {
@@ -516,17 +519,17 @@ export default function AdminDriverApplicationDetailPage({
                       setBalanceSetEur("");
                       fetchApp();
                     } else {
-                      alert(data?.error ?? "Fehlgeschlagen");
+                      alert(data?.error ?? t("da.failed"));
                     }
                   } catch {
-                    alert("Verbindungsfehler");
+                    alert(t("da.connection"));
                   } finally {
                     setBalanceLoading(false);
                   }
                 }}
                 className="rounded-lg border border-[#0d2137]/25 px-3 py-2 text-xs font-medium text-[#0d2137]/80 hover:bg-[#0d2137]/5 disabled:opacity-50"
               >
-                Saldo überschreiben
+                {t("da.overwriteBalance")}
               </button>
             </div>
           </div>
@@ -534,7 +537,7 @@ export default function AdminDriverApplicationDetailPage({
 
         {app.status === "approved" && (
           <div className="mt-4">
-            <p className="mb-1 text-sm font-semibold text-[#0d2137]/80">Gewünschte Vergütung (Notiz)</p>
+            <p className="mb-1 text-sm font-semibold text-[#0d2137]/80">{t("da.desiredPay")}</p>
             {desiredNoteEdit !== "" ? (
               <div className="flex gap-2">
                 <input
@@ -542,7 +545,7 @@ export default function AdminDriverApplicationDetailPage({
                   value={desiredNoteEdit}
                   onChange={(e) => setDesiredNoteEdit(e.target.value)}
                   className="flex-1 rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm"
-                  placeholder="z. B. Stundenlohn oder Wunschbetrag…"
+                  placeholder={t("da.desiredPlaceholder")}
                 />
                 <button
                   type="button"
@@ -565,10 +568,10 @@ export default function AdminDriverApplicationDetailPage({
                   }}
                   className="rounded-lg bg-[var(--accent)] px-3 py-2 text-sm text-white"
                 >
-                  Speichern
+                  {t("da.save")}
                 </button>
                 <button type="button" onClick={() => setDesiredNoteEdit("")} className="rounded-lg border px-3 py-2 text-sm">
-                  Abbrechen
+                  {t("da.cancel")}
                 </button>
               </div>
             ) : (
@@ -579,7 +582,7 @@ export default function AdminDriverApplicationDetailPage({
                   onClick={() => setDesiredNoteEdit(app.desired_note ?? "")}
                   className="mr-2 text-[var(--accent)] hover:underline"
                 >
-                  Bearbeiten
+                  {t("da.edit")}
                 </button>
               </p>
             )}
@@ -588,13 +591,13 @@ export default function AdminDriverApplicationDetailPage({
 
         {app.status === "approved" && (
           <div className="mt-6 rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/[0.03] p-4">
-            <p className="mb-2 text-sm font-semibold text-[#0d2137]/80">Bankdaten (IBAN)</p>
-            <p className="mb-1 text-xs text-[#0d2137]/60">Für Überweisungen und Rechnungen. Kontoinhaber wie auf der Karte.</p>
+            <p className="mb-2 text-sm font-semibold text-[#0d2137]/80">{t("da.bank")}</p>
+            <p className="mb-1 text-xs text-[#0d2137]/60">{t("da.bankHint")}</p>
             {editingBank ? (
               <div className="space-y-3">
-                <p className="text-xs text-[#0d2137]/60">Speichert automatisch beim Tippen.</p>
+                <p className="text-xs text-[#0d2137]/60">{t("da.bankAutosave")}</p>
                 <div>
-                  <label className="block text-xs font-medium text-[#0d2137]/80">IBAN</label>
+                  <label className="block text-xs font-medium text-[#0d2137]/80">{t("da.iban")}</label>
                   <input
                     type="text"
                     value={bankIban}
@@ -604,7 +607,7 @@ export default function AdminDriverApplicationDetailPage({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-[#0d2137]/80">Kontoinhaber (wie auf der Karte)</label>
+                  <label className="block text-xs font-medium text-[#0d2137]/80">{t("da.holderCard")}</label>
                   <input
                     type="text"
                     value={bankHolderName}
@@ -614,13 +617,13 @@ export default function AdminDriverApplicationDetailPage({
                   />
                 </div>
                 <button type="button" onClick={() => setEditingBank(false)} className="rounded-lg border px-3 py-2 text-sm">
-                  Abbrechen
+                  {t("da.cancel")}
                 </button>
               </div>
             ) : (
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-sm text-[#0d2137]/80">
-                  IBAN: {app.iban || "—"} · Inhaber: {app.bank_account_holder_name || "—"}
+                  {t("da.iban")}: {app.iban || "—"} · {t("da.holder")}: {app.bank_account_holder_name || "—"}
                 </span>
                 <button
                   type="button"
@@ -631,7 +634,7 @@ export default function AdminDriverApplicationDetailPage({
                   }}
                   className="text-sm text-[var(--accent)] hover:underline"
                 >
-                  {app.iban || app.bank_account_holder_name ? "Bearbeiten" : "Bankdaten hinzufügen"}
+                  {app.iban || app.bank_account_holder_name ? t("da.edit") : t("da.addBank")}
                 </button>
               </div>
             )}
@@ -655,7 +658,7 @@ export default function AdminDriverApplicationDetailPage({
                 disabled={actionLoading}
                 className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
               >
-                Genehmigen
+                {t("da.approve")}
               </button>
               <button
                 type="button"
@@ -663,7 +666,7 @@ export default function AdminDriverApplicationDetailPage({
                 disabled={actionLoading}
                 className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
               >
-                Ablehnen
+                {t("da.reject")}
               </button>
             </>
           )}
@@ -685,10 +688,10 @@ export default function AdminDriverApplicationDetailPage({
                       if (res.ok) {
                         fetchApp();
                       } else {
-                        alert(data?.error || "Fehlgeschlagen");
+                        alert(data?.error || t("da.failed"));
                       }
                     } catch {
-                      alert("Verbindungsfehler");
+                      alert(t("da.connection"));
                     } finally {
                       setActionLoading(false);
                     }
@@ -696,7 +699,7 @@ export default function AdminDriverApplicationDetailPage({
                   disabled={actionLoading}
                   className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700 disabled:opacity-50"
                 >
-                  Fahrernummer vergeben
+                  {t("da.assignNumber")}
                 </button>
               )}
               <a
@@ -705,7 +708,7 @@ export default function AdminDriverApplicationDetailPage({
                 rel="noopener noreferrer"
                 className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
               >
-                Genehmigungs-PDF
+                {t("da.approvalPdf")}
               </a>
               <button
                 type="button"
@@ -719,14 +722,14 @@ export default function AdminDriverApplicationDetailPage({
                 }}
                 className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
               >
-                Überweisungsrechnung (Betrag + Trinkgeld)
+                {t("da.paymentInvoice")}
               </button>
               <button
                 type="button"
                 onClick={() => openWhatsApp(welcomeMessage)}
                 className="rounded-lg bg-[#25D366] px-4 py-2 text-sm font-medium text-white hover:bg-[#25D366]/90"
               >
-                Willkommen + Gruppe (WhatsApp)
+                {t("da.welcomeWa")}
               </button>
               <button
                 type="button"
@@ -741,33 +744,33 @@ export default function AdminDriverApplicationDetailPage({
                     });
                     const data = await res.json();
                     if (res.ok) {
-                      alert("Genehmigungs-E-Mail gesendet.");
+                      alert(t("da.approvalEmailSent"));
                     } else {
-                      alert(data?.error ?? "Versand fehlgeschlagen");
+                      alert(data?.error ?? t("da.sendFailed"));
                     }
                   } catch {
-                    alert("Verbindungsfehler");
+                    alert(t("da.connection"));
                   } finally {
                     setEmailSending(false);
                   }
                 }}
                 className="rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700 disabled:opacity-50"
               >
-                {emailSending ? "Senden…" : "Genehmigungs-E-Mail senden"}
+                {emailSending ? t("da.sending") : t("da.sendApprovalEmail")}
               </button>
               <p className="mt-1 text-xs text-gray-500">
-                Falls kein Versand: Domain bei{" "}
+                {t("da.resendHintBefore")}{" "}
                 <a href="https://resend.com/domains" target="_blank" rel="noopener noreferrer" className="text-sky-600 underline">
                   resend.com/domains
                 </a>{" "}
-                verifizieren und Absender aus eigener Domain nutzen (z. B. info@transpool24.com).
+                {t("da.resendHintAfter")}
               </p>
               {app.suspended_at ? (
                 <button
                   type="button"
                   disabled={actionLoading}
                   onClick={async () => {
-                    if (!window.confirm("Sperre für diesen Fahrer aufheben?")) return;
+                    if (!window.confirm(t("da.unsuspendConfirm"))) return;
                     setActionLoading(true);
                     try {
                       const res = await fetch(`/api/admin/driver-applications/${id}`, {
@@ -782,14 +785,14 @@ export default function AdminDriverApplicationDetailPage({
                   }}
                   className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-800"
                 >
-                  Sperre aufheben
+                  {t("da.unsuspend")}
                 </button>
               ) : (
                 <button
                   type="button"
                   disabled={actionLoading}
                   onClick={async () => {
-                    if (!window.confirm("Fahrer bis auf Weiteres sperren?")) return;
+                    if (!window.confirm(t("da.suspendConfirm"))) return;
                     setActionLoading(true);
                     try {
                       const res = await fetch(`/api/admin/driver-applications/${id}`, {
@@ -804,7 +807,7 @@ export default function AdminDriverApplicationDetailPage({
                   }}
                   className="rounded-lg bg-red-700 px-4 py-2 text-sm font-medium text-white hover:bg-red-800"
                 >
-                  Fahrer sperren
+                  {t("da.suspend")}
                 </button>
               )}
             </>
@@ -812,7 +815,7 @@ export default function AdminDriverApplicationDetailPage({
 
           {app.status === "rejected" && app.rejection_notes && (
             <div className="mt-4 w-full rounded-lg border border-amber-200 bg-amber-50 p-4">
-              <p className="text-sm font-semibold text-amber-900">Ablehnungsgrund:</p>
+              <p className="text-sm font-semibold text-amber-900">{t("da.rejectReason")}:</p>
               <p className="mt-1 text-sm text-amber-800 whitespace-pre-wrap">{app.rejection_notes}</p>
               {app.rejection_image_urls && app.rejection_image_urls.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-2">
@@ -829,11 +832,11 @@ export default function AdminDriverApplicationDetailPage({
       </div>
 
       <div className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-lg font-semibold text-[#0d2137]">Dokumente & Fotos</h2>
+        <h2 className="mb-4 text-lg font-semibold text-[#0d2137]">{t("da.docs")}</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {(app.id_document_front_url || app.id_document_url) && (
             <div>
-              <p className="mb-2 text-sm font-medium text-[#0d2137]/80">Ausweis / Aufenthalt – Vorderseite</p>
+              <p className="mb-2 text-sm font-medium text-[#0d2137]/80">{t("da.idFront")}</p>
               <a
                 href={app.id_document_front_url || app.id_document_url || "#"}
                 target="_blank"
@@ -850,7 +853,7 @@ export default function AdminDriverApplicationDetailPage({
           )}
           {app.id_document_back_url && (
             <div>
-              <p className="mb-2 text-sm font-medium text-[#0d2137]/80">Ausweis / Aufenthalt – Rückseite</p>
+              <p className="mb-2 text-sm font-medium text-[#0d2137]/80">{t("da.idBack")}</p>
               <a href={app.id_document_back_url} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-lg border">
                 <img src={app.id_document_back_url} alt="" className="h-32 w-full object-cover" />
               </a>
@@ -858,7 +861,7 @@ export default function AdminDriverApplicationDetailPage({
           )}
           {app.license_front_url && (
             <div>
-              <p className="mb-2 text-sm font-medium text-[#0d2137]/80">Führerschein – Vorderseite</p>
+              <p className="mb-2 text-sm font-medium text-[#0d2137]/80">{t("da.licenseFront")}</p>
               <a href={app.license_front_url} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-lg border">
                 <img src={app.license_front_url} alt="" className="h-32 w-full object-cover" />
               </a>
@@ -866,7 +869,7 @@ export default function AdminDriverApplicationDetailPage({
           )}
           {app.license_back_url && (
             <div>
-              <p className="mb-2 text-sm font-medium text-[#0d2137]/80">Führerschein – Rückseite</p>
+              <p className="mb-2 text-sm font-medium text-[#0d2137]/80">{t("da.licenseBack")}</p>
               <a href={app.license_back_url} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-lg border">
                 <img src={app.license_back_url} alt="" className="h-32 w-full object-cover" />
               </a>
@@ -874,7 +877,7 @@ export default function AdminDriverApplicationDetailPage({
           )}
           {app.personal_photo_url && (
             <div>
-              <p className="mb-2 text-sm font-medium text-[#0d2137]/80">Passfoto</p>
+              <p className="mb-2 text-sm font-medium text-[#0d2137]/80">{t("da.passportPhoto")}</p>
               <a href={app.personal_photo_url} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-lg border">
                 <img src={app.personal_photo_url} alt="" className="h-32 w-full object-cover" />
               </a>
@@ -882,7 +885,7 @@ export default function AdminDriverApplicationDetailPage({
           )}
           {app.vehicle_documents_url && (
             <div>
-              <p className="mb-2 text-sm font-medium text-[#0d2137]/80">Fahrzeugpapiere</p>
+              <p className="mb-2 text-sm font-medium text-[#0d2137]/80">{t("da.vehicleDocs")}</p>
               <a href={app.vehicle_documents_url} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-lg border">
                 {app.vehicle_documents_url.toLowerCase().endsWith(".pdf") ? (
                   <span className="flex h-32 items-center justify-center bg-[#0d2137]/5 text-sm">PDF</span>
@@ -894,7 +897,7 @@ export default function AdminDriverApplicationDetailPage({
           )}
           {app.vehicle_photo_url && (
             <div>
-              <p className="mb-2 text-sm font-medium text-[#0d2137]/80">Fahrzeugfoto</p>
+              <p className="mb-2 text-sm font-medium text-[#0d2137]/80">{t("da.vehiclePhoto")}</p>
               <a href={app.vehicle_photo_url} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-lg border">
                 <img src={app.vehicle_photo_url} alt="" className="h-32 w-full object-cover" />
               </a>
@@ -905,7 +908,7 @@ export default function AdminDriverApplicationDetailPage({
 
       {app.last_jobs && app.last_jobs.length > 0 && (
         <div className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-lg font-semibold text-[#0d2137]">Letzte Aufträge</h2>
+          <h2 className="mb-4 text-lg font-semibold text-[#0d2137]">{t("da.lastJobs")}</h2>
           <div className="space-y-3">
             {app.last_jobs.map((job) => (
               <Link
@@ -915,10 +918,10 @@ export default function AdminDriverApplicationDetailPage({
               >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="font-medium text-[#0d2137]">
-                    Auftrag #{job.order_number ?? job.id.slice(0, 8)}
+                    {t("da.order")} #{job.order_number ?? job.id.slice(0, 8)}
                   </span>
                   <span className="text-sm text-[#0d2137]/70">
-                    {new Date(job.created_at).toLocaleString("de-DE")}
+                    {new Date(job.created_at).toLocaleString(dateLocale)}
                   </span>
                 </div>
                 <p className="mt-1 text-sm text-[#0d2137]/80">
@@ -926,7 +929,7 @@ export default function AdminDriverApplicationDetailPage({
                 </p>
                 <div className="mt-2 flex flex-wrap gap-2 text-xs">
                   <span className="rounded bg-[#0d2137]/10 px-2 py-0.5">
-                    {job.logistics_status === "delivered" ? "Zugestellt" : job.logistics_status === "in_transit" ? "Unterwegs" : job.logistics_status === "assigned" ? "Zugewiesen" : job.logistics_status}
+                    {job.logistics_status === "delivered" ? t("da.st.delivered") : job.logistics_status === "in_transit" ? t("da.st.in_transit") : job.logistics_status === "assigned" ? t("da.st.assigned") : job.logistics_status}
                   </span>
                   {job.driver_price_cents != null && (
                     <span className="text-[var(--accent)]">{(job.driver_price_cents / 100).toFixed(2)} €</span>
@@ -946,19 +949,19 @@ export default function AdminDriverApplicationDetailPage({
 
       {app.last_jobs && app.last_jobs.length === 0 && app.status === "approved" && (
         <div className="rounded-xl border border-[#0d2137]/10 bg-[#0d2137]/[0.02] p-6">
-          <p className="text-sm text-[#0d2137]/70">Noch keine Aufträge für diesen Fahrer. Nach Zuweisung aus der Auftragsliste erscheinen sie hier.</p>
+          <p className="text-sm text-[#0d2137]/70">{t("da.noJobs")}</p>
         </div>
       )}
 
       {paymentInvoiceModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-md rounded-2xl border bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-bold text-[#0d2137]">Überweisungsrechnung an Fahrer</h3>
+            <h3 className="text-lg font-bold text-[#0d2137]">{t("da.invoiceTitle")}</h3>
             <p className="mt-1 text-sm text-[#0d2137]/70">
-              Betrag und optional Trinkgeld. PDF im IONOS-Stil mit IBAN und Kontoinhaber.
+              {t("da.invoiceHint")}
             </p>
             <div className="mt-4 rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/[0.03] p-3">
-              <p className="mb-1 text-xs font-semibold text-[#0d2137]/80">Bankdaten (im PDF)</p>
+              <p className="mb-1 text-xs font-semibold text-[#0d2137]/80">{t("da.bankInPdf")}</p>
               {editingBankInModal ? (
                 <div className="space-y-2">
                   <input
@@ -972,7 +975,7 @@ export default function AdminDriverApplicationDetailPage({
                     type="text"
                     value={modalHolderName}
                     onChange={(e) => setModalHolderName(e.target.value)}
-                    placeholder="Kontoinhaber"
+                    placeholder={t("da.holder")}
                     className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
                   />
                   <div className="flex gap-2">
@@ -997,7 +1000,7 @@ export default function AdminDriverApplicationDetailPage({
                             setEditingBankInModal(false);
                             fetchApp();
                           } else {
-                            alert(data?.error || "Speichern fehlgeschlagen");
+                            alert(data?.error || t("da.saveFailed"));
                           }
                         } finally {
                           setSavingBank(false);
@@ -1005,17 +1008,17 @@ export default function AdminDriverApplicationDetailPage({
                       }}
                       className="rounded bg-[var(--accent)] px-3 py-1.5 text-sm text-white"
                     >
-                      {savingBank ? "Speichern…" : "Speichern"}
+                      {savingBank ? t("da.saving") : t("da.save")}
                     </button>
                     <button type="button" onClick={() => setEditingBankInModal(false)} className="rounded border px-3 py-1.5 text-sm">
-                      Abbrechen
+                      {t("da.cancel")}
                     </button>
                   </div>
                 </div>
               ) : (
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="text-sm text-[#0d2137]/80">
-                    IBAN: {app?.iban || "—"} · Inhaber: {app?.bank_account_holder_name || "—"}
+                    {t("da.iban")}: {app?.iban || "—"} · {t("da.holder")}: {app?.bank_account_holder_name || "—"}
                   </span>
                   <button
                     type="button"
@@ -1026,14 +1029,14 @@ export default function AdminDriverApplicationDetailPage({
                     }}
                     className="text-sm text-[var(--accent)] hover:underline"
                   >
-                    Bearbeiten
+                    {t("da.edit")}
                   </button>
                 </div>
               )}
             </div>
             <div className="mt-4 space-y-3">
               <div>
-                <label className="block text-sm font-medium text-[#0d2137]">Betrag (€) *</label>
+                <label className="block text-sm font-medium text-[#0d2137]">{t("da.amount")}</label>
                 <input
                   type="number"
                   min="0"
@@ -1045,7 +1048,7 @@ export default function AdminDriverApplicationDetailPage({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-[#0d2137]">Trinkgeld (€), optional</label>
+                <label className="block text-sm font-medium text-[#0d2137]">{t("da.tip")}</label>
                 <input
                   type="number"
                   min="0"
@@ -1063,7 +1066,7 @@ export default function AdminDriverApplicationDetailPage({
                 onClick={() => setPaymentInvoiceModal(false)}
                 className="rounded-xl border border-[#0d2137]/20 px-4 py-2 text-sm font-medium"
               >
-                Abbrechen
+                {t("da.cancel")}
               </button>
               <button
                 type="button"
@@ -1078,7 +1081,7 @@ export default function AdminDriverApplicationDetailPage({
                 }}
                 className="text-sm text-[#0d2137]/70 hover:underline"
               >
-                PDF laden
+                {t("da.loadPdf")}
               </button>
               <button
                 type="button"
@@ -1092,7 +1095,7 @@ export default function AdminDriverApplicationDetailPage({
                 onClick={async () => {
                   const amount = parseFloat(paymentAmount);
                   if (Number.isNaN(amount) || amount < 0) {
-                    alert("Bitte gültigen Betrag (€) eingeben.");
+                    alert(t("da.needValidEur"));
                     return;
                   }
                   const tip = parseFloat(paymentTip) || 0;
@@ -1105,26 +1108,26 @@ export default function AdminDriverApplicationDetailPage({
                     });
                     const data = await res.json();
                     if (res.ok && data.ok) {
-                      const toEmail = data.sentTo ? ` an ${data.sentTo}` : "";
-                      alert(`Rechnung gesendet${toEmail}. Bei Nicht-Eingang Spam-Ordner prüfen.`);
+                      const toEmail = data.sentTo ? ` ${data.sentTo}` : "";
+                      alert(t("da.invoiceSent").replace("{to}", toEmail));
                       setPaymentInvoiceModal(false);
                     } else {
-                      alert(data?.error ?? "Versand fehlgeschlagen");
+                      alert(data?.error ?? t("da.sendFailed"));
                     }
                   } catch (e) {
-                    alert("Netzwerkfehler. Bitte später erneut versuchen.");
+                    alert(t("da.networkLater"));
                   } finally {
                     setSendingInvoiceEmail(false);
                   }
                 }}
                 className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
               >
-                {sendingInvoiceEmail ? "Senden…" : "An Fahrer-E-Mail senden"}
+                {sendingInvoiceEmail ? t("da.sending") : t("da.sendToDriverEmail")}
               </button>
-              <p className="mt-2 w-full text-left text-xs text-[#0d2137]/60">
-                Keine Mail? Spam prüfen; Domain unter{" "}
+              <p className="mt-2 w-full text-start text-xs text-[#0d2137]/60">
+                {t("da.noMailHintBefore")}{" "}
                 <a href="https://resend.com/domains" target="_blank" rel="noopener noreferrer" className="text-indigo-600 underline">resend.com/domains</a>{" "}
-                verifizieren.
+                {t("da.noMailHintAfter")}
               </p>
             </div>
           </div>
@@ -1134,22 +1137,22 @@ export default function AdminDriverApplicationDetailPage({
       {rejectModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-lg rounded-2xl border bg-white p-6 shadow-xl">
-            <h3 className="text-lg font-bold text-[#0d2137]">Bewerbung ablehnen – Notizen & Bilder</h3>
+            <h3 className="text-lg font-bold text-[#0d2137]">{t("da.rejectModalTitle")}</h3>
             <p className="mt-2 text-sm text-[#0d2137]/70">
-              Grund angeben (für den Fahrer). Optional Screenshots anhängen.
+              {t("da.rejectModalHint")}
             </p>
             <div className="mt-4">
-              <label className="block text-sm font-medium text-[#0d2137]">Ablehnungsgrund (Pflicht)</label>
+              <label className="block text-sm font-medium text-[#0d2137]">{t("da.rejectNotes")}</label>
               <textarea
                 value={rejectNotes}
                 onChange={(e) => setRejectNotes(e.target.value)}
-                placeholder="z. B. Dokumente unvollständig, Foto unscharf…"
+                placeholder={t("da.rejectNotesPh")}
                 className="mt-1 w-full rounded-xl border border-[#0d2137]/20 px-4 py-3 text-sm min-h-[100px]"
                 rows={4}
               />
             </div>
             <div className="mt-4">
-              <label className="block text-sm font-medium text-[#0d2137]">Bilder anhängen (optional)</label>
+              <label className="block text-sm font-medium text-[#0d2137]">{t("da.attachImages")}</label>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -1181,7 +1184,7 @@ export default function AdminDriverApplicationDetailPage({
                 }}
                 className="rounded-xl border border-[#0d2137]/20 px-4 py-2 text-sm font-medium"
               >
-                Abbrechen
+                {t("da.cancel")}
               </button>
               <button
                 type="button"
@@ -1189,7 +1192,7 @@ export default function AdminDriverApplicationDetailPage({
                 disabled={actionLoading || !rejectNotes.trim()}
                 className="rounded-xl bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
               >
-                {actionLoading ? "Speichern…" : "Ablehnung bestätigen"}
+                {actionLoading ? t("da.saving") : t("da.confirmReject")}
               </button>
             </div>
           </div>

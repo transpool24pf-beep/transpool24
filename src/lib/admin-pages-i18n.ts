@@ -1,5 +1,7 @@
 /** UI strings for admin pages not covered in admin-ui-strings core nav/orders. */
 
+import { DRIVER_DETAIL_AR, DRIVER_DETAIL_DE } from "./admin-driver-detail-i18n";
+
 export const ADMIN_PAGES_DE: Record<string, string> = {
   "common.loading": "Laden…",
   "common.save": "Speichern",
@@ -195,6 +197,7 @@ export const ADMIN_PAGES_DE: Record<string, string> = {
   "settings.assistantDesc":
     "Bei „Fahrer mit Auto + Helfer“: wird mit der gleichen Gesamtfahrerzeit multipliziert wie der Fahrzeit-Anteil.",
   "settings.savePrices": "Preise speichern",
+  ...DRIVER_DETAIL_DE,
 };
 
 export const ADMIN_PAGES_AR: Record<string, string> = {
@@ -392,4 +395,5 @@ export const ADMIN_PAGES_AR: Record<string, string> = {
   "settings.assistantDesc":
     "في «سائق + معاون»: يُضرب بنفس إجمالي وقت القيادة كجزء وقت السائق.",
   "settings.savePrices": "حفظ الأسعار",
+  ...DRIVER_DETAIL_AR,
 };
