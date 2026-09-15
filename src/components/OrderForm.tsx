@@ -19,6 +19,7 @@ import {
   saveOrderAddressHistory,
 } from "@/lib/order-address-history";
 import { localeToHtmlLang } from "@/lib/locale-html-lang";
+import { GOOGLE_WRITE_REVIEW_URL } from "@/lib/google-review";
 import {
   formatIsoDateForOrderInput,
   localTodayIso,
@@ -1792,10 +1793,17 @@ export function OrderForm({
             {t("orderRef")}: <code className="rounded bg-green-100 px-1.5 py-0.5 font-mono text-xs">{orderConfirmed.jobId}</code>
           </p>
           <div className="border-t border-green-200 pt-4 text-center">
-            <p className="mb-1 text-sm font-medium text-green-800">{t("rateUsOnGoogle")}</p>
-            <div className="flex justify-center gap-0.5 text-2xl text-amber-400" aria-hidden>
-              ★★★★★
-            </div>
+            <a
+              href={GOOGLE_WRITE_REVIEW_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block rounded-lg px-3 py-2 hover:bg-green-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700"
+            >
+              <p className="mb-1 text-sm font-medium text-green-800">{t("rateUsOnGoogle")}</p>
+              <div className="flex justify-center gap-0.5 text-2xl text-amber-400" aria-hidden>
+                ★★★★★
+              </div>
+            </a>
           </div>
         </div>
       )}
