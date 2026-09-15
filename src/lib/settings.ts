@@ -20,6 +20,11 @@ const DEFAULT_CARGO_CATEGORY_ADJUSTMENTS: CargoCategoryAdjustmentCents = {
   vehicle_parts_urgent: 0,
   wholesale_dry_food: 0,
   printing_packaging: 0,
+  furniture_household: 0,
+  light_mixed_transport: 0,
+  express_parcels: 0,
+  building_materials_equipment: 0,
+  industrial_pallets: 0,
   general_other: 0,
 };
 

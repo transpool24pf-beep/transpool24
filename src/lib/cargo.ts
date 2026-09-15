@@ -7,6 +7,11 @@ export type CargoCategoryId =
   | "vehicle_parts_urgent"
   | "wholesale_dry_food"
   | "printing_packaging"
+  | "furniture_household"
+  | "light_mixed_transport"
+  | "express_parcels"
+  | "building_materials_equipment"
+  | "industrial_pallets"
   | "general_other";
 
 export const CARGO_CATEGORIES: {
@@ -45,6 +50,41 @@ export const CARGO_CATEGORIES: {
     unloadingMinutes: 30,
   },
   {
+    id: "furniture_household",
+    labelKey: "cargoCatFurnitureHousehold",
+    suggestedSize: "L",
+    loadingMinutes: 45,
+    unloadingMinutes: 45,
+  },
+  {
+    id: "light_mixed_transport",
+    labelKey: "cargoCatLightMixed",
+    suggestedSize: "M",
+    loadingMinutes: 30,
+    unloadingMinutes: 30,
+  },
+  {
+    id: "express_parcels",
+    labelKey: "cargoCatExpressParcels",
+    suggestedSize: "XS",
+    loadingMinutes: 20,
+    unloadingMinutes: 20,
+  },
+  {
+    id: "building_materials_equipment",
+    labelKey: "cargoCatBuildingMaterials",
+    suggestedSize: "L",
+    loadingMinutes: 40,
+    unloadingMinutes: 40,
+  },
+  {
+    id: "industrial_pallets",
+    labelKey: "cargoCatIndustrialPallets",
+    suggestedSize: "L",
+    loadingMinutes: 35,
+    unloadingMinutes: 35,
+  },
+  {
     id: "general_other",
     labelKey: "cargoCatGeneralOther",
     suggestedSize: "M",
@@ -59,6 +99,11 @@ export const CARGO_CATEGORY_LABEL_DE: Record<CargoCategoryId, string> = {
   vehicle_parts_urgent: "Kfz-Ersatzteile (eilig)",
   wholesale_dry_food: "Großhandel & trockene Lebensmittel",
   printing_packaging: "Druckereien & Verpackungsmaterial",
+  furniture_household: "Möbel & Haushaltsgeräte",
+  light_mixed_transport: "Leicht- und Mischtransporte",
+  express_parcels: "Schnellsendungen & Pakete",
+  building_materials_equipment: "Baumaterial & Geräte",
+  industrial_pallets: "Industriegüter & Paletten",
   general_other: "Allgemeine Ware / Sonstiges",
 };
 
