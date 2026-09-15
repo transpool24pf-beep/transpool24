@@ -4,9 +4,30 @@ import { createServerSupabase } from "@/lib/supabase";
 import { randomUUID } from "crypto";
 
 const BUCKET = "driver-documents";
-const MAX_SIZE = 5 * 1024 * 1024; // 5 MB
+const MAX_SIZE = 8 * 1024 * 1024; // 8 MB (client also resizes to JPEG)
 
-const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp", "image/jpg"]);
+const MIME_MAP: Record<string, { store: string; ext: string }> = {
+  "image/jpeg": { store: "image/jpeg", ext: "jpg" },
+  "image/jpg": { store: "image/jpeg", ext: "jpg" },
+  "image/pjpeg": { store: "image/jpeg", ext: "jpg" },
+  "image/png": { store: "image/png", ext: "png" },
+  "image/webp": { store: "image/webp", ext: "webp" },
+  "image/heic": { store: "image/heic", ext: "heic" },
+  "image/heif": { store: "image/heif", ext: "heif" },
+};
+
+function parseImageDataUrl(raw: string): { mime: string; data: string } | null {
+  const s = raw.trim();
+  const m = s.match(/^data:([^;,]+)(?:;[^,]*)*;base64,([\s\S]+)$/i);
+  if (m) {
+    return { mime: m[1].trim().toLowerCase(), data: m[2].replace(/\s/g, "") };
+  }
+  const compact = s.replace(/\s/g, "");
+  if (compact.length > 100 && /^[A-Za-z0-9+/]+=*$/.test(compact.slice(0, 120))) {
+    return { mime: "image/jpeg", data: compact };
+  }
+  return null;
+}
 
 /**
  * Driver uploads delivery photo (POD) using job_id + driver_tracking_token.
@@ -20,9 +41,6 @@ export async function POST(req: Request) {
     const jobId = typeof body.job_id === "string" ? body.job_id : null;
     const token = typeof body.token === "string" ? body.token : null;
     const base64 = typeof body.base64 === "string" ? body.base64 : null;
-    const filename = typeof body.filename === "string" ? body.filename : "delivery.jpg";
-    const confirmationCode =
-      typeof body.confirmation_code === "string" ? body.confirmation_code.trim().slice(0, 64) : "";
 
     if (!jobId || !token || !base64) {
       return NextResponse.json({ error: "job_id, token and base64 required" }, { status: 400 });
@@ -77,24 +95,33 @@ export async function POST(req: Request) {
       );
     }
 
-    const match = base64.match(/^data:([^;]+);base64,(.+)$/);
-    const mime = match ? match[1].toLowerCase() : "image/jpeg";
-    const data = match ? match[2] : base64;
-    if (!ALLOWED_MIME.has(mime)) {
-      return NextResponse.json({ error: "Nur JPEG, PNG oder WebP erlaubt." }, { status: 400 });
+    const parsed = parseImageDataUrl(base64);
+    if (!parsed) {
+      return NextResponse.json({ error: "Ungültiges Bildformat." }, { status: 400 });
     }
-    const buf = Buffer.from(data, "base64");
+    const mapped = MIME_MAP[parsed.mime];
+    if (!mapped) {
+      return NextResponse.json({ error: "Nur JPEG, PNG, WebP oder HEIC erlaubt." }, { status: 400 });
+    }
+    const buf = Buffer.from(parsed.data, "base64");
+    if (!buf.length) {
+      return NextResponse.json({ error: "Ungültiges Bildformat." }, { status: 400 });
+    }
     if (buf.length > MAX_SIZE) {
-      return NextResponse.json({ error: "Datei zu groß (max. 5 MB)." }, { status: 400 });
+      return NextResponse.json({ error: "Datei zu groß (max. 8 MB)." }, { status: 400 });
     }
 
-    const ext = mime.includes("png") ? "png" : mime.includes("webp") ? "webp" : "jpg";
-    const safeName = (filename || "delivery").replace(/[^\w.\-]+/g, "_").slice(0, 80);
-    const path = `pod/${jobId}/${randomUUID()}-${safeName}.${ext}`;
+    const isJpegMagic = buf.length >= 3 && buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff;
+    const store = isJpegMagic ? { store: "image/jpeg", ext: "jpg" } : mapped;
+    const safeJob = jobId.replace(/[^a-zA-Z0-9-]/g, "");
+    if (safeJob.length < 8) {
+      return NextResponse.json({ error: "Ungültiger Auftrag." }, { status: 400 });
+    }
+    const path = `pod/${safeJob}/${randomUUID()}.${store.ext}`;
 
     const { data: up, error: upErr } = await supabase.storage
       .from(BUCKET)
-      .upload(path, buf, { contentType: mime, upsert: false });
+      .upload(path, buf, { contentType: store.store, upsert: false });
 
     if (upErr) {
       console.error("[driver-pod]", upErr);
@@ -114,15 +141,12 @@ export async function POST(req: Request) {
       logistics_status: "delivered",
       updated_at: now,
     };
-    if (confirmationCode) {
-      updates.pod_confirmation_code = confirmationCode;
-    }
 
     const { data: updated, error: updErr } = await supabase
       .from("jobs")
       .update(updates)
       .eq("id", jobId)
-      .select("id, pod_photo_url, pod_completed_at, logistics_status, pod_confirmation_code")
+      .select("id, pod_photo_url, pod_completed_at, logistics_status")
       .single();
 
     if (updErr) {

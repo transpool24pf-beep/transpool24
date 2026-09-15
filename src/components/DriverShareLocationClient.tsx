@@ -24,6 +24,45 @@ type ValidateResponse = {
 
 const MIN_INTERVAL_MS = 8_000;
 
+function fileToJpegDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const objectUrl = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const max = 1920;
+        let w = img.naturalWidth || img.width;
+        let h = img.naturalHeight || img.height;
+        if (w < 1 || h < 1) throw new Error("empty");
+        if (w > max || h > max) {
+          const scale = max / Math.max(w, h);
+          w = Math.round(w * scale);
+          h = Math.round(h * scale);
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) throw new Error("canvas");
+        ctx.drawImage(img, 0, 0, w, h);
+        URL.revokeObjectURL(objectUrl);
+        resolve(canvas.toDataURL("image/jpeg", 0.88));
+      } catch (e) {
+        URL.revokeObjectURL(objectUrl);
+        reject(e);
+      }
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result ?? ""));
+      reader.onerror = () => reject(new Error("read"));
+      reader.readAsDataURL(file);
+    };
+    img.src = objectUrl;
+  });
+}
+
 export function DriverShareLocationClient({
   jobId,
   token,
@@ -50,7 +89,6 @@ export function DriverShareLocationClient({
   const [podUploading, setPodUploading] = useState(false);
   const [podErr, setPodErr] = useState<string | null>(null);
   const [podOk, setPodOk] = useState<string | null>(null);
-  const [confirmCode, setConfirmCode] = useState("");
   /** Server already has ≥1 GPS ping (customer can see driver on track page) */
   const [hasLiveLocationFromServer, setHasLiveLocationFromServer] = useState(false);
   const watchId = useRef<number | null>(null);
@@ -171,51 +209,46 @@ export function DriverShareLocationClient({
       const file = e.target.files?.[0];
       e.target.value = "";
       if (!file || !jobId || !token) return;
-      if (!file.type.startsWith("image/")) {
+      if (file.type && !file.type.startsWith("image/") && file.type !== "application/octet-stream") {
         setPodErr(t("podNotImage"));
         return;
       }
-      if (file.size > 5 * 1024 * 1024) {
+      if (file.size > 8 * 1024 * 1024) {
         setPodErr(t("podTooLarge"));
         return;
       }
       setPodErr(null);
       setPodOk(null);
       setPodUploading(true);
-      const reader = new FileReader();
-      reader.onload = () => {
-        const dataUrl = reader.result as string;
-        void fetch("/api/public/driver-pod", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            job_id: jobId,
-            token,
-            base64: dataUrl,
-            filename: file.name,
-            confirmation_code: confirmCode.trim() || undefined,
-          }),
+      void fileToJpegDataUrl(file)
+        .then((dataUrl) => {
+          if (!dataUrl.startsWith("data:image/")) {
+            throw new Error(t("podNotImage"));
+          }
+          return fetch("/api/public/driver-pod", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              job_id: jobId,
+              token,
+              base64: dataUrl,
+            }),
+          });
         })
-          .then(async (res) => {
-            const data = (await res.json()) as { error?: string; pod_photo_url?: string; already_completed?: boolean };
-            if (!res.ok) throw new Error(typeof data.error === "string" ? data.error : t("podUploadFailed"));
-            return data;
-          })
-          .then((data) => {
-            if (data.pod_photo_url) setPodPhotoUrl(data.pod_photo_url);
-            setDeliveryComplete(true);
-            setPodOk(data.already_completed ? t("podAlreadyDone") : t("podUploadOk"));
-          })
-          .catch((er) => setPodErr(er instanceof Error ? er.message : t("podUploadFailed")))
-          .finally(() => setPodUploading(false));
-      };
-      reader.onerror = () => {
-        setPodUploading(false);
-        setPodErr(t("podReadFailed"));
-      };
-      reader.readAsDataURL(file);
+        .then(async (res) => {
+          const data = (await res.json()) as { error?: string; pod_photo_url?: string; already_completed?: boolean };
+          if (!res.ok) throw new Error(typeof data.error === "string" ? data.error : t("podUploadFailed"));
+          return data;
+        })
+        .then((data) => {
+          if (data.pod_photo_url) setPodPhotoUrl(data.pod_photo_url);
+          setDeliveryComplete(true);
+          setPodOk(data.already_completed ? t("podAlreadyDone") : t("podUploadOk"));
+        })
+        .catch((er) => setPodErr(er instanceof Error ? er.message : t("podUploadFailed")))
+        .finally(() => setPodUploading(false));
     },
-    [jobId, token, confirmCode, t]
+    [jobId, token, t]
   );
 
   useEffect(() => {
@@ -369,11 +402,6 @@ export function DriverShareLocationClient({
         <p className="mt-2 text-xs text-[#450a0a]/80">{t("keepOpen")}</p>
       </div>
 
-      <div className="rounded-xl border border-amber-200 bg-amber-50/60 p-4 text-sm text-amber-950/90">
-        <p className="font-medium">{t("privacyTitle")}</p>
-        <p className="mt-1">{t("privacyBody")}</p>
-      </div>
-
       <div
         className={`rounded-xl border-2 p-6 shadow-sm ${
           deliveryComplete
@@ -384,7 +412,6 @@ export function DriverShareLocationClient({
         }`}
       >
         <h3 className="text-base font-semibold text-[var(--primary)]">{t("podTitle")}</h3>
-        <p className="mt-2 text-sm text-[var(--foreground)]/80">{t("podIntro")}</p>
         {!deliveryComplete && !locationOkForPod && (
           <p className="mt-3 rounded-lg border border-amber-300 bg-amber-100/80 px-3 py-2 text-sm font-medium text-amber-950">
             {t("gpsRequiredBeforePod")}
@@ -404,16 +431,6 @@ export function DriverShareLocationClient({
           </div>
         ) : (
           <div className={`mt-4 space-y-3 ${!locationOkForPod ? "pointer-events-none opacity-55" : ""}`}>
-            <label className="block text-xs font-medium text-[var(--foreground)]/70">{t("podCodeLabel")}</label>
-            <input
-              type="text"
-              value={confirmCode}
-              onChange={(e) => setConfirmCode(e.target.value)}
-              placeholder={t("podCodePlaceholder")}
-              className="w-full max-w-md rounded-lg border-2 border-[#0d2137]/20 px-3 py-2 text-sm"
-              maxLength={64}
-              disabled={!locationOkForPod}
-            />
             <div>
               <label
                 className={`inline-flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white ${
@@ -422,7 +439,7 @@ export function DriverShareLocationClient({
               >
                 <input
                   type="file"
-                  accept="image/jpeg,image/png,image/webp"
+                  accept="image/*"
                   className="hidden"
                   disabled={podUploading || !locationOkForPod}
                   onChange={onPickDeliveryPhoto}
