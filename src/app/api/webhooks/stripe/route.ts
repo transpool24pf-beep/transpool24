@@ -5,8 +5,6 @@ import { sendOrderConfirmationEmail } from "@/lib/email";
 import { generateInvoicePdf } from "@/lib/invoice-pdf";
 import { jobIdFromCheckoutSession } from "@/lib/stripe-webhook-helpers";
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com";
-
 function getStripe(): Stripe {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) throw new Error("STRIPE_SECRET_KEY is required");
@@ -78,21 +76,10 @@ export async function POST(req: Request) {
         console.error("[TransPool24] Invoice PDF failed; sending confirmation without PDF:", e);
       }
       try {
-        const token = job.confirmation_token as string | null | undefined;
-        const confirmPaymentUrl = token
-          ? `${SITE}/de/order/confirm?job_id=${encodeURIComponent(jobId)}&token=${encodeURIComponent(token)}`
-          : null;
-        const trackOrderUrl = token
-          ? `${SITE}/de/order/track?job_id=${encodeURIComponent(jobId)}&token=${encodeURIComponent(token)}`
-          : null;
         const sent = await sendOrderConfirmationEmail(
           customerEmail,
           { ...job, customer_email: customerEmail },
           pdfBuffer,
-          {
-            confirmPaymentUrl,
-            trackOrderUrl,
-          },
         );
         if (!sent.success) {
           console.error("[TransPool24] Confirmation email:", sent.error);

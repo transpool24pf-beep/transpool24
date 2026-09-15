@@ -51,14 +51,6 @@ export async function POST(req: Request) {
     }
   }
 
-  const token = job.confirmation_token;
-  const confirmPaymentUrl = token
-    ? `${SITE}/de/order/confirm?job_id=${encodeURIComponent(job.id)}&token=${encodeURIComponent(token)}`
-    : null;
-  const trackOrderUrl = token
-    ? `${SITE}/de/order/track?job_id=${encodeURIComponent(job.id)}&token=${encodeURIComponent(token)}`
-    : null;
-
   let pdf: Uint8Array | null = null;
   try {
     pdf = await generateInvoicePdf(job as Job);
@@ -67,8 +59,6 @@ export async function POST(req: Request) {
   }
   const result = await sendOrderConfirmationEmail(email, job, pdf, {
     rateDriverUrl,
-    confirmPaymentUrl,
-    trackOrderUrl,
     driver: driverInfo,
   });
   if (!result.success) {

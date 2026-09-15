@@ -30,7 +30,6 @@ export function OrderConfirmClient({
   const [job, setJob] = useState<Job | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [payLoading, setPayLoading] = useState(false);
 
   useEffect(() => {
     if (!jobId || !token) {
@@ -51,27 +50,6 @@ export function OrderConfirmClient({
       })
       .finally(() => setLoading(false));
   }, [jobId, token]);
-
-  const handlePay = async () => {
-    if (!jobId || !token) return;
-    setPayLoading(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/create-checkout-session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ jobId, token, locale }),
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || "Checkout failed");
-      if (json.url) window.location.href = json.url;
-      else throw new Error("No checkout URL");
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong");
-    } finally {
-      setPayLoading(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -121,20 +99,9 @@ export function OrderConfirmClient({
         <p className="text-sm text-[var(--foreground)]/80">{t("driverTba")}</p>
       </div>
 
-      {error && (
-        <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>
-      )}
-
-      <div className="pt-2">
-        <button
-          type="button"
-          onClick={handlePay}
-          disabled={payLoading}
-          className="w-full rounded-lg bg-[var(--accent)] px-6 py-3 text-base font-medium text-white hover:opacity-90 disabled:opacity-70"
-        >
-          {payLoading ? "…" : t("payNow")}
-        </button>
-      </div>
+      <p className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
+        {t("invoiceAfterDelivery")}
+      </p>
     </div>
   );
 }
