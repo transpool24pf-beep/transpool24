@@ -291,6 +291,7 @@
     "distanceManualHint": "Nu s-a putut calcula automat — introduceți manual distanța în pasul următor.",
     "km": "km",
     "price": "Preţ",
+    "pricePlusVat": "+ 19 % MwSt.",
     "priceShowsAfterWeightPackages": "Completați toate câmpurile pentru a vedea prețul.",
     "priceCompleteAllFieldsHint": "Prețul apare după categorie, serviciu, detalii expediere, dimensiune încărcătură și distanță calculată. Relieful și vremea se aplică automat.",
     "pricePreviewLoading": "Se calculează prețul (rută, altitudine, vreme)…",

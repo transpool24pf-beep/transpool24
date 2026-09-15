@@ -427,6 +427,7 @@
     "distanceManualHint": "Could not calculate automatically — enter distance manually in the next step.",
     "km": "km",
     "price": "Price",
+    "pricePlusVat": "+ 19% VAT (MwSt.)",
     "priceShowsAfterWeightPackages": "Complete all fields below to see the price.",
     "priceCompleteAllFieldsHint": "The price appears after you select category, service type, cargo details (weight, parcels, photos), load size — and the route distance is calculated. Terrain and weather are applied automatically.",
     "priceMissingFieldsTitle": "To show the price, complete:",

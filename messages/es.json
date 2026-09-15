@@ -291,6 +291,7 @@
     "distanceManualHint": "No se pudo calcular — introduce la distancia manualmente en el siguiente paso.",
     "km": "km",
     "price": "Precio",
+    "pricePlusVat": "+ 19 % MwSt.",
     "priceShowsAfterWeightPackages": "Complete todos los campos para ver el precio.",
     "priceCompleteAllFieldsHint": "El precio aparece tras categoría, servicio, detalles (peso, bultos, fotos), tamaño de carga y distancia calculada. Terreno y clima se aplican automáticamente.",
     "pricePreviewLoading": "Calculando precio (ruta, elevación, clima)…",

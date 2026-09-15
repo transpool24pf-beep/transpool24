@@ -291,6 +291,7 @@
     "distanceManualHint": "Calcul impossible — saisissez la distance à l'étape suivante.",
     "km": "km",
     "price": "Prix",
+    "pricePlusVat": "+ 19 % MwSt.",
     "priceShowsAfterWeightPackages": "Remplissez tous les champs pour voir le prix.",
     "priceCompleteAllFieldsHint": "Le prix s’affiche après catégorie, service, détails d’envoi (poids, colis, photos), taille de chargement et distance calculée. Relief et météo sont appliqués automatiquement.",
     "pricePreviewLoading": "Calcul du prix (itinéraire, altitude, météo)…",

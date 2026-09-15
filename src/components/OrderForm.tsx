@@ -1684,6 +1684,7 @@ export function OrderForm({
               <p className="text-2xl font-bold text-[var(--accent)]">
                 {formatPrice(priceCents)}
               </p>
+              <p className="text-sm font-medium text-[var(--foreground)]/70">{t("pricePlusVat")}</p>
             </div>
           ) : (
             <div className="rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/5 p-4 space-y-2">
@@ -1756,6 +1757,7 @@ export function OrderForm({
             <p className="pt-2 text-lg font-bold text-[var(--accent)]">
               {t("total")}: {formatPrice(priceCents)}
             </p>
+            <p className="text-sm font-medium text-[var(--foreground)]/70">{t("pricePlusVat")}</p>
             </div>
           </div>
           <div className="rounded-lg border border-[#0d2137]/15 bg-[#0d2137]/5 p-4">

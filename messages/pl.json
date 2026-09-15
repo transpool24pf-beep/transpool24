@@ -290,6 +290,7 @@
     "distanceManualHint": "Nie można obliczyć automatycznie — w następnym kroku wprowadź odległość ręcznie.",
     "km": "km",
     "price": "Cena",
+    "pricePlusVat": "+ 19 % MwSt.",
     "priceShowsAfterWeightPackages": "Wypełnij wszystkie pola, aby zobaczyć cenę.",
     "priceCompleteAllFieldsHint": "Cena pojawi się po wyborze kategorii, usługi, szczegółów przesyłki, rozmiaru ładunku i obliczeniu trasy. Teren i pogoda są stosowane automatycznie.",
     "pricePreviewLoading": "Obliczanie ceny (trasa, wzniesienia, pogoda)…",

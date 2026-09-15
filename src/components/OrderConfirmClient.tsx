@@ -112,6 +112,7 @@ export function OrderConfirmClient({
         <p className="pt-2 text-lg font-bold text-[var(--accent)]">
           {t("total")}: {formatPrice(job.price_cents)}
         </p>
+        <p className="text-sm font-medium text-[var(--foreground)]/70">{t("pricePlusVat")}</p>
       </div>
 
       <div className="rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/5 p-4">

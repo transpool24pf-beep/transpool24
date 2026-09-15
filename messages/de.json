@@ -431,6 +431,7 @@
     "distanceManualHint": "Berechnung nicht möglich — Entfernung in der nächsten Schritt eingeben.",
     "km": "km",
     "price": "Preis",
+    "pricePlusVat": "zzgl. 19 % MwSt.",
     "priceShowsAfterWeightPackages": "Füllen Sie alle Felder aus, um den Preis zu sehen.",
     "priceCompleteAllFieldsHint": "Der Preis erscheint, wenn Kategorie, Service, Sendungsdetails (Gewicht, Stückzahl, Fotos), Ladungsgröße gewählt sind und die Route berechnet wurde. Gelände und Wetter werden automatisch berücksichtigt.",
     "priceMissingFieldsTitle": "Für den Preis fehlen noch:",
