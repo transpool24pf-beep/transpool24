@@ -331,6 +331,7 @@
     "thankYouMessage": "Güveniniz için teşekkür ederiz. Talebinizi onaylamak için en kısa sürede sizinle iletişime geçeceğiz.",
     "confirmByEmailHint": "Sipariş onayını e-posta ile göndereceğiz. Ödeme teslimattan sonra fatura ile yapılır.",
     "rateUsOnGoogle": "Deneyiminizi paylaşarak başkalarına yardımcı olun — Google'da bizi değerlendirin",
+    "rateUsOnGoogleTap": "Değerlendirmek için dokunun",
     "shareToDrivers": "Sürücü grubuna gönder (WhatsApp)",
     "orderRef": "Sipariş no",
     "confirmPageTitle": "Sipariş onaylandı",

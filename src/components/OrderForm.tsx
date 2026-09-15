@@ -1792,17 +1792,30 @@ export function OrderForm({
           <p className="text-center text-sm text-green-700">
             {t("orderRef")}: <code className="rounded bg-green-100 px-1.5 py-0.5 font-mono text-xs">{orderConfirmed.jobId}</code>
           </p>
-          <div className="border-t border-green-200 pt-4 text-center">
+          <div className="border-t border-green-200 pt-5">
             <a
               href={GOOGLE_WRITE_REVIEW_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block rounded-lg px-3 py-2 hover:bg-green-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-700"
+              className="group mx-auto flex w-full max-w-md flex-col items-center gap-3 rounded-2xl border-2 border-[#4285F4] bg-white px-5 py-5 text-center shadow-[0_8px_24px_rgba(66,133,244,0.18)] transition hover:-translate-y-0.5 hover:border-[#1a73e8] hover:shadow-[0_12px_28px_rgba(66,133,244,0.28)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1a73e8]"
             >
-              <p className="mb-1 text-sm font-medium text-green-800">{t("rateUsOnGoogle")}</p>
-              <div className="flex justify-center gap-0.5 text-2xl text-amber-400" aria-hidden>
-                ★★★★★
-              </div>
+              <span className="inline-flex items-center gap-2 rounded-full bg-[#4285F4]/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[#1967d2]">
+                <svg viewBox="0 0 24 24" className="h-4 w-4" aria-hidden>
+                  <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5c-.3 1.5-1.1 2.7-2.4 3.5v2.9h3.8c2.3-2.1 3.6-5.2 3.6-8.5z" />
+                  <path fill="#34A853" d="M12 24c3.2 0 5.9-1.1 7.9-2.9l-3.8-2.9c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.3v3c2 4 6.1 6.6 10.7 6.6z" />
+                  <path fill="#FBBC05" d="M5.3 14.4c-.2-.7-.4-1.4-.4-2.2s.1-1.5.4-2.2V7H1.3C.5 8.6 0 10.2 0 12.2s.5 3.6 1.3 5.2l4-2.9z" />
+                  <path fill="#EA4335" d="M12 4.8c1.7 0 3.3.6 4.5 1.8l3.4-3.4C17.9 1.2 15.2 0 12 0 7.4 0 3.3 2.6 1.3 6.6l4 3.1C6.2 6.9 8.9 4.8 12 4.8z" />
+                </svg>
+                Google
+              </span>
+              <p className="text-base font-bold leading-snug text-[#0d2137]">{t("rateUsOnGoogle")}</p>
+              <span className="flex items-center justify-center gap-1 text-3xl leading-none text-amber-400 drop-shadow-sm" aria-hidden>
+                <span className="transition group-hover:scale-110">★★★★★</span>
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-full bg-[#ea580c] px-5 py-2 text-sm font-bold text-white shadow-sm transition group-hover:bg-[#c2410c]">
+                {t("rateUsOnGoogleTap")}
+                <span aria-hidden>↗</span>
+              </span>
             </a>
           </div>
         </div>
