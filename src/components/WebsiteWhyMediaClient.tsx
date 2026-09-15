@@ -15,7 +15,7 @@ const MAX_VIDEO_BYTES = 200 * 1024 * 1024;
 type PresignOk = { signedUrl: string; publicUrl: string; error?: string };
 
 export function WebsiteWhyMediaClient() {
-  const [locale, setLocale] = useState<Locale>("de");
+  const [locale, setLocale] = useState<Locale>("ar");
   const [heroImageUrl, setHeroImageUrl] = useState("");
   const [sceneImageUrl, setSceneImageUrl] = useState("");
   const [howVideoUrl, setHowVideoUrl] = useState("");
@@ -32,12 +32,12 @@ export function WebsiteWhyMediaClient() {
     try {
       const res = await cmsFetch(`/api/website/content/why-transpool24?locale=${locale}`);
       const data = await parseFetchJson<{ payload?: { heroImageUrl?: string; sceneImageUrl?: string; howVideoUrl?: string }; error?: string }>(res);
-      if (!res.ok) throw new Error(data.error || "Laden fehlgeschlagen");
+      if (!res.ok) throw new Error(data.error || "فشل التحميل");
       setHeroImageUrl(normalizeWhyAssetUrl(data.payload?.heroImageUrl || ""));
       setSceneImageUrl(normalizeWhyAssetUrl(data.payload?.sceneImageUrl || ""));
       setHowVideoUrl((data.payload?.howVideoUrl || "").trim());
     } catch (e) {
-      setMessage(e instanceof Error ? e.message : "Laden fehlgeschlagen");
+      setMessage(e instanceof Error ? e.message : "فشل التحميل");
     } finally {
       setLoading(false);
     }
@@ -49,11 +49,11 @@ export function WebsiteWhyMediaClient() {
 
   const presignAndUpload = async (file: File, kind: "image" | "video", slot: "hero" | "scene" | "video") => {
     if (kind === "image" && file.size > MAX_IMAGE_BYTES) {
-      alert(`Bild max. ${MAX_IMAGE_BYTES / (1024 * 1024)} MB.`);
+      alert(`الصورة بحد أقصى ${MAX_IMAGE_BYTES / (1024 * 1024)} ميغابايت.`);
       return;
     }
     if (kind === "video" && file.size > MAX_VIDEO_BYTES) {
-      alert(`Video max. ${MAX_VIDEO_BYTES / (1024 * 1024)} MB.`);
+      alert(`الفيديو بحد أقصى ${MAX_VIDEO_BYTES / (1024 * 1024)} ميغابايت.`);
       return;
     }
 
@@ -72,16 +72,16 @@ export function WebsiteWhyMediaClient() {
         }),
       });
       const j = await parseFetchJson<PresignOk>(pres);
-      if (!pres.ok || !j.signedUrl) throw new Error(j.error || "Presign fehlgeschlagen");
+      if (!pres.ok || !j.signedUrl) throw new Error(j.error || "فشل تجهيز الرفع");
       await putFileToSupabaseSignedUrl(j.signedUrl, file, true);
       const pub = j.publicUrl;
-      if (!pub) throw new Error("Keine öffentliche URL zurückgegeben.");
+      if (!pub) throw new Error("لم يُرجع رابط عام.");
       if (slot === "hero") setHeroImageUrl(pub);
       else if (slot === "scene") setSceneImageUrl(pub);
       else setHowVideoUrl(pub);
-      setMessage("Upload fertig — bitte „Medien speichern“ klicken, damit die Seite die URLs in der Datenbank hat.");
+      setMessage("اكتمل الرفع — اضغط «حفظ الوسائط» حتى تُحفظ الروابط في قاعدة البيانات.");
     } catch (e) {
-      alert(e instanceof Error ? e.message : "Upload fehlgeschlagen");
+      alert(e instanceof Error ? e.message : "فشل الرفع");
     } finally {
       setUploading(null);
     }
@@ -107,16 +107,16 @@ export function WebsiteWhyMediaClient() {
         applyToAllLocales?: boolean;
         localesUpdated?: string[];
       }>(res);
-      if (!res.ok) throw new Error(data.error || "Speichern fehlgeschlagen");
+      if (!res.ok) throw new Error(data.error || "فشل الحفظ");
       if (data.applyToAllLocales && Array.isArray(data.localesUpdated)) {
         setMessage(
-          `Gespeichert für alle ${data.localesUpdated.length} Sprachen (z. B. /de/why, /en/why, /ar/why …). Medien-URLs sind jetzt überall gleich.`
+          `تم الحفظ لكل اللغات (${data.localesUpdated.length}) — مثل /de/why و /en/why و /ar/why. روابط الوسائط أصبحت متطابقة.`
         );
       } else {
-        setMessage(`Gespeichert. Seite /${locale}/why lädt Inhalte live aus der Datenbank (nicht aus dem Build-Cache).`);
+        setMessage(`تم الحفظ. صفحة /${locale}/why تقرأ المحتوى مباشرة من قاعدة البيانات.`);
       }
     } catch (e) {
-      setMessage(e instanceof Error ? e.message : "Speichern fehlgeschlagen");
+      setMessage(e instanceof Error ? e.message : "فشل الحفظ");
     } finally {
       setSaving(false);
     }
@@ -124,18 +124,18 @@ export function WebsiteWhyMediaClient() {
 
   return (
     <div>
-      <h1 className="mb-2 text-2xl font-semibold text-[#0d2137]">Homepage – Medien (Why-Seite)</h1>
+      <h1 className="mb-2 text-2xl font-semibold text-[#0d2137]">الصفحة الرئيسية – الوسائط (صفحة لماذا)</h1>
       <p className="mb-6 text-sm text-[#0d2137]/70">
-        Uploads gehen <strong>direkt zu Supabase</strong> (signierte URL) — umgeht das Vercel-Limit für große Dateien.
-        Öffentliche URL-Form:{" "}
+        الرفع يتم <strong>مباشرة إلى التخزين</strong> (رابط موقّع) لتجاوز حد حجم الملفات على Vercel.
+        شكل الرابط العام:{" "}
         <code className="rounded bg-[#0d2137]/5 px-1 break-all">
           …/object/public/driver-documents/why-page-media/…
         </code>{" "}
-        (Bucket <code className="rounded bg-[#0d2137]/5 px-1">driver-documents</code>, nicht{" "}
-        <code className="rounded bg-[#0d2137]/5 px-1">media/…</code>). Lokale Bilder:{" "}
-        <code className="rounded bg-[#0d2137]/5 px-1">/images/…</code>, nicht{" "}
-        <code className="rounded bg-[#0d2137]/5 px-1">./images/…</code>. Speicherort:{" "}
-        <code className="rounded bg-[#0d2137]/5 px-1">why-page-media/{`{locale}`}/</code> im Bucket{" "}
+        (الحاوية <code className="rounded bg-[#0d2137]/5 px-1">driver-documents</code> وليس{" "}
+        <code className="rounded bg-[#0d2137]/5 px-1">media/…</code>). الصور المحلية:{" "}
+        <code className="rounded bg-[#0d2137]/5 px-1">/images/…</code> وليس{" "}
+        <code className="rounded bg-[#0d2137]/5 px-1">./images/…</code>. مسار الحفظ:{" "}
+        <code className="rounded bg-[#0d2137]/5 px-1">why-page-media/{`{locale}`}/</code> داخل الحاوية{" "}
         <code className="rounded bg-[#0d2137]/5 px-1">driver-documents</code>.
       </p>
 
@@ -148,10 +148,10 @@ export function WebsiteWhyMediaClient() {
             className="mt-1 h-4 w-4 rounded border-[#0d2137]/30 text-[var(--accent)] focus:ring-[var(--accent)]"
           />
           <span className="text-sm text-[#0d2137]">
-            <strong className="font-semibold">Alle Sprachen / تطبيق على كل اللغات</strong>
+            <strong className="font-semibold">تطبيق على كل اللغات</strong>
             <span className="mt-1 block text-[#0d2137]/75">
-              Wenn aktiviert: Beim Speichern erhalten <strong>alle {locales.length} Sprachen</strong> dieselben Bild- und
-              Video-URLs (Vorschau &amp; Bearbeitung hier weiter nach Sprache — „Medien speichern“ schreibt überall).
+              عند التفعيل: عند الحفظ تحصل <strong>كل اللغات ({locales.length})</strong> على نفس روابط الصور والفيديو
+              (المعاينة هنا تبقى حسب اللغة المختارة).
             </span>
             <span className="mt-2 block text-xs text-amber-900/90" dir="rtl">
               إذا ظهر خطأ عند الحفظ: قد تحتاج قاعدة البيانات إلى توسيع قائمة اللغات — نفّذ ملف SQL{" "}
@@ -163,7 +163,7 @@ export function WebsiteWhyMediaClient() {
       </div>
 
       <div className="mb-6 flex flex-wrap items-center gap-3">
-        <label className="text-sm font-medium text-[#0d2137]">Sprache (Vorschau / Bearbeitung)</label>
+        <label className="text-sm font-medium text-[#0d2137]">اللغة (معاينة / تعديل)</label>
         <select
           value={locale}
           onChange={(e) => setLocale(e.target.value as Locale)}
@@ -181,7 +181,7 @@ export function WebsiteWhyMediaClient() {
           disabled={loading}
           className="rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm font-medium hover:bg-[#0d2137]/5 disabled:opacity-50"
         >
-          Neu laden
+          إعادة التحميل
         </button>
         <button
           type="button"
@@ -189,14 +189,14 @@ export function WebsiteWhyMediaClient() {
           disabled={saving || loading}
           className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white hover:opacity-95 disabled:opacity-50"
         >
-          {saving ? "Speichern…" : "Medien speichern"}
+          {saving ? "جاري الحفظ…" : "حفظ الوسائط"}
         </button>
       </div>
 
       {message && (
         <p
           className={`mb-4 text-sm ${
-            message.startsWith("Gespeichert") || message.startsWith("Upload fertig") ? "text-green-700" : "text-red-700"
+            message.startsWith("تم الحفظ") || message.startsWith("اكتمل الرفع") ? "text-green-700" : "text-red-700"
           }`}
         >
           {message}
@@ -204,18 +204,18 @@ export function WebsiteWhyMediaClient() {
       )}
 
       {loading ? (
-        <p className="text-[#0d2137]/70">Laden…</p>
+        <p className="text-[#0d2137]/70">جاري التحميل…</p>
       ) : (
         <div className="space-y-8">
           <section className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-[#0d2137]">Großes Bild (über FAQs)</h2>
-            <p className="mt-1 text-sm text-[#0d2137]/65">Breites Panorama — empfohlen 21:9 oder ähnlich. Max. 15 MB.</p>
+            <h2 className="text-lg font-semibold text-[#0d2137]">الصورة الكبيرة (فوق الأسئلة)</h2>
+            <p className="mt-1 text-sm text-[#0d2137]/65">بانوراما عريضة — يُفضَّل 21:9 أو ما يقاربها. حد أقصى 15 ميغابايت.</p>
             <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-start">
               <div className="relative h-32 w-full max-w-md overflow-hidden rounded-lg border border-[#0d2137]/10 bg-gray-100 sm:h-36">
                 {heroImageUrl ? (
                   <WhyCmsImage src={heroImageUrl} alt="" fill className="object-cover" />
                 ) : (
-                  <span className="flex h-full items-center justify-center text-sm text-[#0d2137]/40">Kein Bild</span>
+                  <span className="flex h-full items-center justify-center text-sm text-[#0d2137]/40">لا توجد صورة</span>
                 )}
               </div>
               <div className="min-w-0 flex-1 space-y-2">
@@ -230,30 +230,30 @@ export function WebsiteWhyMediaClient() {
                   }}
                   className="block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--accent)] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white"
                 />
-                <label className="block text-xs font-medium text-[#0d2137]/70">Bild-URL</label>
+                <label className="block text-xs font-medium text-[#0d2137]/70">رابط الصورة</label>
                 <input
                   type="text"
                   value={heroImageUrl}
                   onChange={(e) => setHeroImageUrl(e.target.value)}
                   onBlur={() => setHeroImageUrl(normalizeWhyAssetUrl(heroImageUrl))}
                   className="w-full rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm"
-                  placeholder="https://… oder /images/van1.png"
+                  placeholder="https://… أو /images/van1.png"
                 />
               </div>
             </div>
           </section>
 
           <section className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-[#0d2137]">Poster / Szenenbild („So funktioniert’s“)</h2>
+            <h2 className="text-lg font-semibold text-[#0d2137]">صورة المشهد («كيف يعمل»)</h2>
             <p className="mt-1 text-sm text-[#0d2137]/65">
-              Vorschaubild; bei YouTube/Vimeo öffnet Play das eingebettete Video. Max. 15 MB.
+              صورة المعاينة؛ مع يوتيوب/فيميو يفتح زر التشغيل الفيديو المضمّن. حد أقصى 15 ميغابايت.
             </p>
             <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-start">
               <div className="relative h-40 w-full max-w-xs overflow-hidden rounded-lg border border-[#0d2137]/10 bg-gray-100">
                 {sceneImageUrl ? (
                   <WhyCmsImage src={sceneImageUrl} alt="" fill className="object-cover" />
                 ) : (
-                  <span className="flex h-full items-center justify-center text-sm text-[#0d2137]/40">Kein Bild</span>
+                  <span className="flex h-full items-center justify-center text-sm text-[#0d2137]/40">لا توجد صورة</span>
                 )}
               </div>
               <div className="min-w-0 flex-1 space-y-2">
@@ -268,24 +268,23 @@ export function WebsiteWhyMediaClient() {
                   }}
                   className="block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--accent)] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white"
                 />
-                <label className="block text-xs font-medium text-[#0d2137]/70">Bild-URL</label>
+                <label className="block text-xs font-medium text-[#0d2137]/70">رابط الصورة</label>
                 <input
                   type="text"
                   value={sceneImageUrl}
                   onChange={(e) => setSceneImageUrl(e.target.value)}
                   onBlur={() => setSceneImageUrl(normalizeWhyAssetUrl(sceneImageUrl))}
                   className="w-full rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm"
-                  placeholder="https://… oder /images/van2.png"
+                  placeholder="https://… أو /images/van2.png"
                 />
               </div>
             </div>
           </section>
 
           <section className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
-            <h2 className="text-lg font-semibold text-[#0d2137]">Video</h2>
+            <h2 className="text-lg font-semibold text-[#0d2137]">الفيديو</h2>
             <p className="mt-1 text-sm text-[#0d2137]/65">
-              YouTube/Vimeo-Link oder direkte .mp4/.webm-URL. Datei-Upload: max. 200 MB, direkt zu Supabase. Leer = nur
-              Poster mit Play-Dekoration.
+              رابط يوتيوب/فيميو أو ملف .mp4/.webm مباشر. رفع الملف: حد أقصى 200 ميغابايت إلى التخزين. فارغ = الملصق فقط مع زر تشغيل شكلي.
             </p>
             <textarea
               value={howVideoUrl}
@@ -312,7 +311,7 @@ export function WebsiteWhyMediaClient() {
               onClick={() => setHowVideoUrl("")}
               className="mt-3 text-sm text-[var(--accent)] hover:underline"
             >
-              Video-URL leeren
+              مسح رابط الفيديو
             </button>
           </section>
         </div>

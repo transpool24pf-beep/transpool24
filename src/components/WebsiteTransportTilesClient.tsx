@@ -69,14 +69,14 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Diese Kachel wirklich löschen?")) return;
+    if (!confirm("هل تريد حذف هذه البطاقة؟")) return;
     setSaving(true);
     try {
       const res = await cmsFetch(`${apiBase}/${id}`, { method: "DELETE" });
       if (res.ok) setTiles(tiles.filter((t) => t.id !== id));
-      else alert("Löschen fehlgeschlagen.");
+      else alert("فشل الحذف.");
     } catch {
-      alert("Anfrage fehlgeschlagen.");
+      alert("فشل الطلب.");
     } finally {
       setSaving(false);
     }
@@ -85,7 +85,7 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.imageUrl?.trim()) {
-      alert("Bitte ein Bild hochladen oder eine Bild-URL angeben.");
+      alert("يرجى رفع صورة أو إدخال رابط الصورة.");
       return;
     }
     setSaving(true);
@@ -112,18 +112,18 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
           setEditingId(null);
           setIsAdding(false);
           setFormData({ title: "", imageUrl: "", driverPhotoUrl: "", order: tiles.length });
-          alert("Gespeichert.");
+          alert("تم الحفظ.");
         }
       } else {
         const errBody = await res.json().catch(() => ({}));
         const msg =
           typeof (errBody as { error?: string }).error === "string"
             ? (errBody as { error: string }).error
-            : "Speichern fehlgeschlagen.";
+            : "فشل الحفظ.";
         alert(msg);
       }
     } catch {
-      alert("Anfrage fehlgeschlagen.");
+      alert("فشل الطلب.");
     } finally {
       setSaving(false);
     }
@@ -134,11 +134,11 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
     e.target.value = "";
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      alert("Bitte ein Bild wählen (JPEG, PNG oder WebP).");
+      alert("يرجى اختيار صورة (JPEG أو PNG أو WebP).");
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      alert("Datei zu groß (max. 5 MB).");
+      alert("الملف أكبر من الحد المسموح (5 ميغابايت كحد أقصى).");
       return;
     }
     setImageUploading(true);
@@ -155,10 +155,10 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
         body: JSON.stringify({ base64: dataUrl, filename: file.name }),
       });
       const data = (await res.json()) as { url?: string; error?: string };
-      if (!res.ok) throw new Error(data.error || "Upload fehlgeschlagen.");
+      if (!res.ok) throw new Error(data.error || "فشل الرفع.");
       if (data.url) setFormData((prev) => ({ ...prev, imageUrl: data.url! }));
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Upload fehlgeschlagen.");
+      alert(err instanceof Error ? err.message : "فشل الرفع.");
     } finally {
       setImageUploading(false);
     }
@@ -167,7 +167,7 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
   const handleLookupByDriverNumber = async () => {
     const num = parseInt(driverNumberQuery.trim(), 10);
     if (!Number.isFinite(num) || num < 1) {
-      alert("Bitte eine gültige Fahrernummer eingeben. / أدخل رقم سائق صحيح.");
+      alert("أدخل رقم سائق صحيح.");
       return;
     }
     setLookupLoading(true);
@@ -178,11 +178,11 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
         body: JSON.stringify({ driverNumber: num }),
       });
       const data = (await res.json()) as { photoUrl?: string; fullName?: string; error?: string };
-      if (!res.ok) throw new Error(data.error || "Lookup fehlgeschlagen.");
-      if (!data.photoUrl) throw new Error("Keine Bild-URL.");
+      if (!res.ok) throw new Error(data.error || "فشل البحث.");
+      if (!data.photoUrl) throw new Error("لا توجد صورة.");
       setFormData((prev) => ({ ...prev, driverPhotoUrl: data.photoUrl! }));
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Lookup fehlgeschlagen.");
+      alert(err instanceof Error ? err.message : "فشل البحث.");
     } finally {
       setLookupLoading(false);
     }
@@ -216,7 +216,7 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
   if (loading) {
     return (
       <div className="rounded-xl bg-white p-8 shadow-sm">
-        <p className="text-[#0d2137]/70">Laden…</p>
+        <p className="text-[#0d2137]/70">جاري التحميل…</p>
       </div>
     );
   }
@@ -224,29 +224,28 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
   return (
     <div>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-2xl font-semibold text-[#0d2137]">Homepage – Transport-Kacheln</h1>
+        <h1 className="text-2xl font-semibold text-[#0d2137]">الصفحة الرئيسية – بطاقات النقل</h1>
         <button
           type="button"
           onClick={handleAdd}
           className="rounded-lg bg-[var(--accent)] px-4 py-2 font-medium text-white hover:opacity-95"
         >
-          + Neue Kachel
+          + بطاقة جديدة
         </button>
       </div>
 
       <p className="mb-8 text-sm text-[#0d2137]/70">
-        Bilder und Überschriften für den Bereich unter „Fahrer-Bewertungen“ auf der Startseite. Hochformat
-        (3:4) wirkt am besten.
+        الصور والعناوين لقسم «خدمات النقل الشائعة» على الصفحة الرئيسية. يُفضَّل المقاس العمودي (3:4).
       </p>
 
       {(editingId !== null || isAdding) && (
         <form onSubmit={handleSubmit} className="mb-8 rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-medium text-[#0d2137]">
-            {editingId ? "Kachel bearbeiten" : "Neue Kachel"}
+            {editingId ? "تعديل البطاقة" : "بطاقة جديدة"}
           </h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label className="mb-1 block text-sm font-medium text-[#0d2137]/80">Titel (auf dem Bild)</label>
+              <label className="mb-1 block text-sm font-medium text-[#0d2137]/80">العنوان (على الصورة)</label>
               <input
                 type="text"
                 value={formData.title}
@@ -256,7 +255,7 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="mb-1 block text-sm font-medium text-[#0d2137]/80">Bild</label>
+              <label className="mb-1 block text-sm font-medium text-[#0d2137]/80">الصورة</label>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
                 <div className="relative h-40 w-28 shrink-0 overflow-hidden rounded-xl border-2 border-[var(--accent)]/30 bg-gray-100">
                   {formData.imageUrl ? (
@@ -282,12 +281,12 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
                     className="block w-full text-sm text-[#0d2137] file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--accent)] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:opacity-95 disabled:opacity-50"
                   />
                   <p className="text-xs text-[#0d2137]/60">
-                    JPEG/PNG/WebP, max. 5 MB. Wird in Supabase Storage unter{" "}
-                    <code className="rounded bg-[#0d2137]/5 px-1">homepage-transport/</code> gespeichert.
+                    JPEG/PNG/WebP، حد أقصى 5 ميغابايت. تُحفظ في التخزين تحت{" "}
+                    <code className="rounded bg-[#0d2137]/5 px-1">homepage-transport/</code>.
                   </p>
                   <div>
                     <label className="mb-1 block text-xs font-medium text-[#0d2137]/70">
-                      Bild-URL (optional)
+                      رابط الصورة (اختياري)
                     </label>
                     <input
                       type="url"
@@ -297,17 +296,16 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
                       className="w-full rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
                     />
                   </div>
-                  {imageUploading && <p className="text-sm text-[var(--accent)]">Wird hochgeladen…</p>}
+                  {imageUploading && <p className="text-sm text-[var(--accent)]">جاري الرفع…</p>}
                 </div>
               </div>
             </div>
             <div className="sm:col-span-2 rounded-xl border border-[#0d2137]/10 bg-[#0d2137]/[0.03] p-4">
               <label className="mb-1 block text-sm font-medium text-[#0d2137]/80">
-                صورة السائق من صفحة الموقع / Fahrerfoto von der Website
+                صورة السائق من صفحة الموقع
               </label>
               <p className="mb-3 text-xs text-[#0d2137]/60">
-                اختر صورة سائق من تقييمات الصفحة أو من السائقين المعتمدين. تظهر دائرة فوق بطاقة «خدمات النقل
-                الشائعة». يمكنك أيضاً جعلها صورة البطاقة نفسها.
+                اختر صورة سائق من تقييمات الصفحة أو من السائقين المعتمدين. تظهر دائرة فوق بطاقة «خدمات النقل الشائعة». يمكنك أيضاً جعلها صورة البطاقة نفسها.
               </p>
               <div className="mb-3 flex items-center gap-3">
                 <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border-2 border-[var(--accent)] bg-gray-100">
@@ -332,7 +330,7 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
                       inputMode="numeric"
                       value={driverNumberQuery}
                       onChange={(e) => setDriverNumberQuery(e.target.value)}
-                      placeholder="Fahrernr. / رقم السائق"
+                      placeholder="رقم السائق"
                       className="w-36 rounded-lg border border-[#0d2137]/20 px-3 py-1.5 text-sm"
                     />
                     <button
@@ -341,7 +339,7 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
                       disabled={lookupLoading}
                       className="rounded-lg border border-[#0d2137]/20 px-3 py-1.5 text-sm font-medium hover:bg-[#0d2137]/5 disabled:opacity-50"
                     >
-                      {lookupLoading ? "…" : "Übernehmen / اختيار"}
+                      {lookupLoading ? "…" : "اختيار"}
                     </button>
                     {formData.driverPhotoUrl ? (
                       <button
@@ -351,7 +349,7 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
                         }
                         className="rounded-lg border border-[var(--accent)]/40 px-3 py-1.5 text-sm font-medium text-[var(--accent)] hover:bg-[var(--accent)]/10"
                       >
-                        استخدام كصورة البطاقة / Als Kachelbild
+                        استخدام كصورة البطاقة
                       </button>
                     ) : null}
                     {formData.driverPhotoUrl ? (
@@ -360,7 +358,7 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
                         onClick={() => setFormData((prev) => ({ ...prev, driverPhotoUrl: "" }))}
                         className="rounded-lg border border-red-200 px-3 py-1.5 text-sm text-red-700 hover:bg-red-50"
                       >
-                        Entfernen / إزالة
+                        إزالة
                       </button>
                     ) : null}
                   </div>
@@ -411,7 +409,7 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
               disabled={saving}
               className="rounded-lg bg-[var(--accent)] px-4 py-2 font-medium text-white hover:opacity-95 disabled:opacity-60"
             >
-              {saving ? "Speichern…" : "Speichern"}
+              {saving ? "جاري الحفظ…" : "حفظ"}
             </button>
             <button
               type="button"
@@ -422,7 +420,7 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
               }}
               className="rounded-lg border border-[#0d2137]/20 px-4 py-2 font-medium text-[#0d2137] hover:bg-[#0d2137]/5"
             >
-              Abbrechen
+              إلغاء
             </button>
           </div>
         </form>
@@ -431,9 +429,9 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
       <div className="space-y-4">
         {tiles.length === 0 ? (
           <div className="rounded-xl border border-[#0d2137]/10 bg-white p-8 text-center text-[#0d2137]/60">
-            <p>Noch keine Kacheln.</p>
+            <p>لا توجد بطاقات بعد.</p>
             <button type="button" onClick={handleAdd} className="mt-4 text-[var(--accent)] hover:underline">
-              Erste Kachel hinzufügen
+              إضافة أول بطاقة
             </button>
           </div>
         ) : (
@@ -474,7 +472,7 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
                     onClick={() => tile.id != null && handleReorder(tile.id, "up")}
                     disabled={index === 0}
                     className="rounded-lg border border-[#0d2137]/20 p-2 hover:bg-[#0d2137]/5 disabled:opacity-30"
-                    title="Nach oben"
+                    title="للأعلى"
                   >
                     ↑
                   </button>
@@ -483,7 +481,7 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
                     onClick={() => tile.id != null && handleReorder(tile.id, "down")}
                     disabled={index === arr.length - 1}
                     className="rounded-lg border border-[#0d2137]/20 p-2 hover:bg-[#0d2137]/5 disabled:opacity-30"
-                    title="Nach unten"
+                    title="للأسفل"
                   >
                     ↓
                   </button>
@@ -492,14 +490,14 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
                     onClick={() => handleEdit(tile)}
                     className="rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm font-medium text-[#0d2137] hover:bg-[#0d2137]/5"
                   >
-                    Bearbeiten
+                    تعديل
                   </button>
                   <button
                     type="button"
                     onClick={() => tile.id != null && handleDelete(tile.id)}
                     className="rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50"
                   >
-                    Löschen
+                    حذف
                   </button>
                 </div>
               </div>

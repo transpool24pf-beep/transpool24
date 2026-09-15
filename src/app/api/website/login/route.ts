@@ -12,12 +12,12 @@ export async function POST(req: Request) {
     const expected = process.env.WEBSITE_ADMIN_PASSWORD;
     if (!expected) {
       return NextResponse.json(
-        { error: "Website CMS not configured (set WEBSITE_ADMIN_PASSWORD)" },
+        { error: "نظام إدارة المحتوى غير مضبوط (عيّن WEBSITE_ADMIN_PASSWORD)" },
         { status: 500 },
       );
     }
     if (password !== expected) {
-      return NextResponse.json({ error: "Invalid password" }, { status: 401 });
+      return NextResponse.json({ error: "كلمة المرور غير صحيحة" }, { status: 401 });
     }
     const token = createWebsiteAdminSession();
     const res = NextResponse.json({ ok: true });
@@ -25,6 +25,6 @@ export async function POST(req: Request) {
     return res;
   } catch (e) {
     console.error("[website/login]", e);
-    return NextResponse.json({ error: "Login failed" }, { status: 500 });
+    return NextResponse.json({ error: "فشل تسجيل الدخول" }, { status: 500 });
   }
 }

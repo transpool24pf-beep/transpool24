@@ -25,10 +25,10 @@ export function WebsiteSocialLinksClient() {
     try {
       const res = await cmsFetch("/api/website/content/social-media");
       const data = await parseFetchJson<{ social?: SiteSocialMediaPayload; error?: string }>(res);
-      if (!res.ok) throw new Error(data.error || "Laden fehlgeschlagen");
+      if (!res.ok) throw new Error(data.error || "فشل التحميل");
       setSocial(data.social ?? empty);
     } catch (e) {
-      setMessage(e instanceof Error ? e.message : "Laden fehlgeschlagen");
+      setMessage(e instanceof Error ? e.message : "فشل التحميل");
     } finally {
       setLoading(false);
     }
@@ -48,10 +48,10 @@ export function WebsiteSocialLinksClient() {
         body: JSON.stringify(social),
       });
       const data = await parseFetchJson<{ error?: string }>(res);
-      if (!res.ok) throw new Error(data.error || "Speichern fehlgeschlagen");
-      setMessage("Gespeichert. Links erscheinen im Footer auf der Website.");
+      if (!res.ok) throw new Error(data.error || "فشل الحفظ");
+      setMessage("تم الحفظ. تظهر الروابط في تذييل الموقع.");
     } catch (e) {
-      setMessage(e instanceof Error ? e.message : "Speichern fehlgeschlagen");
+      setMessage(e instanceof Error ? e.message : "فشل الحفظ");
     } finally {
       setSaving(false);
     }
@@ -72,15 +72,15 @@ export function WebsiteSocialLinksClient() {
 
   return (
     <div>
-      <h1 className="mb-2 text-2xl font-semibold text-[#0d2137]">Social Media (Footer)</h1>
+      <h1 className="mb-2 text-2xl font-semibold text-[#0d2137]">وسائل التواصل (التذييل)</h1>
       <p className="mb-6 text-sm text-[#0d2137]/70">
-        URLs für Instagram, TikTok, LinkedIn, Facebook und YouTube. Leere Felder werden im Footer nicht angezeigt. Tabelle{" "}
-        <code className="rounded bg-[#0d2137]/5 px-1">site_social_media</code> in Supabase ausführen (
+        روابط إنستغرام وتيك توك ولينكدإن وفيسبوك ويوتيوب. الحقول الفارغة لا تظهر في التذييل. إن لزم الأمر نفّذ جدول{" "}
+        <code className="rounded bg-[#0d2137]/5 px-1">site_social_media</code> في Supabase (
         <code className="rounded bg-[#0d2137]/5 px-1">supabase/site_social_media.sql</code>).
       </p>
 
       {loading ? (
-        <p className="text-[#0d2137]/70">Laden…</p>
+        <p className="text-[#0d2137]/70">جاري التحميل…</p>
       ) : (
         <div className="space-y-4 rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
           {field("instagramUrl", "Instagram", "https://instagram.com/…")}
@@ -94,14 +94,14 @@ export function WebsiteSocialLinksClient() {
             disabled={saving}
             className="mt-2 rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-medium text-white hover:opacity-95 disabled:opacity-50"
           >
-            {saving ? "Speichern…" : "Speichern"}
+            {saving ? "جاري الحفظ…" : "حفظ"}
           </button>
         </div>
       )}
 
       {message && (
         <p
-          className={`mt-4 text-sm ${message.startsWith("Gespeichert") ? "text-green-700" : "text-red-700"}`}
+          className={`mt-4 text-sm ${message.startsWith("تم الحفظ") ? "text-green-700" : "text-red-700"}`}
         >
           {message}
         </p>
@@ -113,7 +113,7 @@ export function WebsiteSocialLinksClient() {
         disabled={loading}
         className="mt-4 text-sm text-[#0d2137]/70 underline hover:text-[#0d2137] disabled:opacity-50"
       >
-        Neu laden
+        إعادة التحميل
       </button>
     </div>
   );

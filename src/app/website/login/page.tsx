@@ -25,28 +25,32 @@ export default function WebsiteLoginPage() {
         return;
       }
       const data = await res.json().catch(() => ({}));
-      setError(data.error || "Anmeldung fehlgeschlagen");
+      setError(data.error || "فشل تسجيل الدخول");
     } catch {
-      setError("Netzwerkfehler");
+      setError("خطأ في الشبكة");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#0d2137] px-4 text-white">
+    <div
+      className="flex min-h-screen flex-col items-center justify-center bg-[#0d2137] px-4 text-white"
+      dir="rtl"
+      lang="ar"
+    >
       <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur">
-        <h1 className="text-center text-xl font-semibold">TransPool24 – Website</h1>
+        <h1 className="text-center text-xl font-semibold">TransPool24 – نظام إدارة محتوى الموقع</h1>
         <p className="mt-2 text-center text-sm text-white/70">
-          Nur für die Verwaltung von Inhalten auf www.transpool24.com (keine Aufträge).
+          لإدارة محتوى www.transpool24.com فقط (بدون الطلبات).
         </p>
         <p className="mt-1 text-center text-xs text-white/50">
-          Eigenes Passwort – nicht dasselbe wie die Auftrags-Administration.
+          كلمة مرور مستقلة — ليست نفسها المستخدمة في إدارة الطلبات.
         </p>
         <form onSubmit={handleSubmit} className="mt-8 space-y-4">
           <div>
             <label htmlFor="wp" className="mb-1 block text-sm text-white/80">
-              Passwort
+              كلمة المرور
             </label>
             <input
               id="wp"
@@ -64,7 +68,7 @@ export default function WebsiteLoginPage() {
             disabled={loading}
             className="w-full rounded-lg bg-[var(--accent)] py-3 font-medium text-white hover:opacity-95 disabled:opacity-60"
           >
-            {loading ? "…" : "Anmelden"}
+            {loading ? "…" : "تسجيل الدخول"}
           </button>
         </form>
       </div>

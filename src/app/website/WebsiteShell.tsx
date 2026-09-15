@@ -7,12 +7,12 @@ import { useEffect, useState } from "react";
 import { cmsFetch } from "@/lib/website-cms-fetch";
 
 const NAV = [
-  { href: "/website", label: "Homepage – Bewertungen" },
-  { href: "/website/hero", label: "Homepage – Hero (Bild & Texte)" },
-  { href: "/website/transport", label: "Homepage – Transport-Kacheln" },
-  { href: "/website/why", label: "Homepage – Warum TransPool24?" },
-  { href: "/website/why-media", label: "Homepage – Medien (Why) — Bilder/Video" },
-  { href: "/website/social", label: "Footer – Social Media URLs" },
+  { href: "/website", label: "الصفحة الرئيسية – تقييمات السائقين" },
+  { href: "/website/hero", label: "الصفحة الرئيسية – البطل (صورة ونصوص)" },
+  { href: "/website/transport", label: "الصفحة الرئيسية – بطاقات النقل" },
+  { href: "/website/why", label: "الصفحة الرئيسية – لماذا TransPool24؟" },
+  { href: "/website/why-media", label: "الصفحة الرئيسية – الوسائط (صور/فيديو)" },
+  { href: "/website/social", label: "التذييل – روابط التواصل" },
 ];
 
 export function WebsiteShell({ children }: { children: React.ReactNode }) {
@@ -42,8 +42,8 @@ export function WebsiteShell({ children }: { children: React.ReactNode }) {
 
   if (!checked) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0d2137] text-white">
-        <p>Laden…</p>
+      <div className="flex min-h-screen items-center justify-center bg-[#0d2137] text-white" dir="rtl" lang="ar">
+        <p>جاري التحميل…</p>
       </div>
     );
   }
@@ -55,115 +55,72 @@ export function WebsiteShell({ children }: { children: React.ReactNode }) {
   if (!authenticated) {
     router.replace("/website/login");
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0d2137] text-white">
-        <p>Weiterleitung zur Anmeldung…</p>
+      <div className="flex min-h-screen items-center justify-center bg-[#0d2137] text-white" dir="rtl" lang="ar">
+        <p>جاري التحويل إلى تسجيل الدخول…</p>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-[#e8eaed]">
+    <div className="min-h-screen bg-[#e8eaed]" dir="rtl" lang="ar">
       <header className="fixed left-0 right-0 top-0 z-10 border-b border-[#0d2137]/10 bg-[#e85d04] px-4 py-3 text-white shadow-sm">
         <div className="flex items-center justify-between">
           <Link href="/website" className="text-lg font-semibold tracking-tight">
-            TransPool24 – Website (nur Inhalt)
+            TransPool24 – نظام إدارة محتوى الموقع
           </Link>
           <div className="relative h-10 w-32 shrink-0">
             <Image
               src="/logo.png"
               alt="TransPool24"
               fill
-              className="object-contain object-right"
+              className="object-contain object-left"
               priority
             />
           </div>
         </div>
       </header>
-      <main className="flex min-h-screen flex-1 flex-col pt-14">
-        <div className="mx-auto flex-1 max-w-4xl px-4 py-8">{children}</div>
-        <footer className="border-t border-[#0d2137]/10 bg-white py-2 text-center text-xs text-[#0d2137]/60">
-          <a
-            href="https://www.transpool24.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-[#0d2137]"
-          >
-            www.transpool24.com
-          </a>
-          <span className="mx-2">·</span>
-          <span>Keine Aufträge / keine Kundendaten hier</span>
-          <span className="mx-2">·</span>
-          <span>
-            Buchung (/order): Lottie Strecke/Zusammenfassung · seitliche Truck-Dekor (Desktop, gegenläufig) · Fahrer (/driver): Live-Tracking-Hinweis
-          </span>
-          <span className="mx-2">·</span>
-          <span>
-            Startseite: DotLottie „Warehouse and delivery“ unter Fahrer-Team-Banner (volle Inhaltsbreite)
-          </span>
-          <span className="mx-2">·</span>
-          <span>
-            Globales Lade-Overlay: DotLottie „Loading blue“ bei langsamer Navigation / erstem Seitenaufbau
-          </span>
-          <span className="mx-2">·</span>
-          <span>
-            Homepage-Fahrer (/website): optional Foto per Fahrernummer aus genehmigter driver_applications (personal_photo_url)
-          </span>
-          <span className="mx-2">·</span>
-          <span>
-            Hero (/website/hero): Live aus DB (ISR/revalidate), Bild nach Speichern; Texte nur EN → Auto-Übersetzung
-            (DEEPL_AUTH_KEY oder GOOGLE_TRANSLATE_API_KEY, sonst MyMemory); Bild-Editor: URL-Proxy, Skalierung, Rotation,
-            Spiegeln, Export-Upload. CMS-Session: WEBSITE_ADMIN_COOKIE_DOMAIN=transpool24.com (ohne www) auf Vercel, wenn
-            www und Apex gemischt — sonst 401 nach Upload.
-          </span>
-          <br />
-          <span className="mt-1 inline-block" dir="rtl">
-            صفحة الحجز (/order): Lottie المسار والملخص · شاحنتان جانبيتان (سطح المكتب، حركة متعاكسة) · السائق (/driver): تلميح التتبع المباشر
-          </span>
-          <br />
-          <span className="mt-1 inline-block" dir="rtl">
-            الصفحة الرئيسية: شريط DotLottie «مستودع وتوصيل» تحت بانر «انضم إلى فريق السائقين» بعرض المحتوى الكامل
-          </span>
-          <br />
-          <span className="mt-1 inline-block" dir="rtl">
-            تحميل عام: طبقة DotLottie «Loading blue» عند بطء التنقل أو التحميل الأول للصفحة
-          </span>
-          <br />
-          <span className="mt-1 inline-block" dir="rtl">
-            تقييمات السائقين: يمكن جلب صورة السائق برقمه من طلب معتمد (personal_photo_url).
-          </span>
-          <br />
-          <span className="mt-1 inline-block" dir="rtl">
-            البطل (Hero): يُحمَّل مباشرة من قاعدة البيانات؛ الصورة تظهر بعد «حفظ»؛ النصوص بالإنجليزية فقط ثم ترجمة
-            تلقائية (يفضّل DEEPL أو Google API). محرّر الصورة: رابط عبر وكيل آمن، تحويل (مقياس/دوران/قلب)، رفع. لتفادي
-            401: عرّف WEBSITE_ADMIN_COOKIE_DOMAIN=transpool24.com على Vercel إذا خلطت www مع النطاق بدون www.
-          </span>
-        </footer>
-      </main>
-      <aside className="sticky top-14 h-[calc(100vh-3.5rem)] w-56 shrink-0 border-l border-[#0d2137]/10 bg-white shadow-sm">
-        <nav className="flex flex-col gap-1 p-4">
-          {NAV.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className={`rounded-lg px-4 py-3 text-sm font-medium transition ${
-                pathname === href
-                  ? "bg-[#e85d04] text-white"
-                  : "text-[#0d2137]/80 hover:bg-[#0d2137]/5 hover:text-[#0d2137]"
-              }`}
+      <div className="flex min-h-screen pt-14">
+        <aside className="sticky top-14 h-[calc(100vh-3.5rem)] w-56 shrink-0 border-l border-[#0d2137]/10 bg-white shadow-sm">
+          <nav className="flex flex-col gap-1 p-4">
+            {NAV.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                className={`rounded-lg px-4 py-3 text-sm font-medium transition ${
+                  pathname === href
+                    ? "bg-[#e85d04] text-white"
+                    : "text-[#0d2137]/80 hover:bg-[#0d2137]/5 hover:text-[#0d2137]"
+                }`}
+              >
+                {label}
+              </Link>
+            ))}
+            <div className="my-2 border-t border-[#0d2137]/10" />
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="rounded-lg px-4 py-3 text-right text-sm font-medium text-[#0d2137]/70 hover:bg-red-50 hover:text-red-700"
             >
-              {label}
-            </Link>
-          ))}
-          <div className="my-2 border-t border-[#0d2137]/10" />
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="rounded-lg px-4 py-3 text-left text-sm font-medium text-[#0d2137]/70 hover:bg-red-50 hover:text-red-700"
-          >
-            Abmelden
-          </button>
-        </nav>
-      </aside>
+              تسجيل الخروج
+            </button>
+          </nav>
+        </aside>
+        <main className="flex min-h-[calc(100vh-3.5rem)] min-w-0 flex-1 flex-col">
+          <div className="mx-auto w-full max-w-4xl flex-1 px-4 py-8">{children}</div>
+          <footer className="border-t border-[#0d2137]/10 bg-white py-3 text-center text-xs text-[#0d2137]/60">
+            <a
+              href="https://www.transpool24.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-[#0d2137]"
+            >
+              www.transpool24.com
+            </a>
+            <span className="mx-2">·</span>
+            <span>محتوى الموقع فقط — بلا طلبات وبلا بيانات عملاء</span>
+          </footer>
+        </main>
+      </div>
     </div>
   );
 }

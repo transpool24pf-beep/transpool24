@@ -104,7 +104,7 @@ export function WebsiteHeroImageEditor({
     };
     im.onerror = () => {
       setLoaded(null);
-      setStatus("Bild konnte nicht geladen werden.");
+      setStatus("تعذّر تحميل الصورة.");
     };
     im.src = dataUrl;
   }, []);
@@ -112,7 +112,7 @@ export function WebsiteHeroImageEditor({
   const handleLoadUrl = async () => {
     const u = sourceUrl.trim();
     if (!u) {
-      setStatus("URL eingeben.");
+      setStatus("أدخل الرابط.");
       return;
     }
     setBusy(true);
@@ -125,15 +125,15 @@ export function WebsiteHeroImageEditor({
       });
       const j = (await res.json()) as { mime?: string; base64?: string; error?: string };
       if (res.status === 401) {
-        throw new Error("Unauthorized — bitte unter /website/login neu anmelden. / أعد تسجيل الدخول");
+        throw new Error("انتهت الجلسة — سجّل الدخول من جديد.");
       }
-      if (!res.ok) throw new Error(j.error || "Proxy fehlgeschlagen");
-      if (!j.mime || !j.base64) throw new Error("Ungültige Antwort");
+      if (!res.ok) throw new Error(j.error || "فشل جلب الصورة");
+      if (!j.mime || !j.base64) throw new Error("استجابة غير صالحة");
       const dataUrl = `data:${j.mime};base64,${j.base64}`;
       loadImageFromDataUrl(dataUrl);
     } catch (e) {
       setLoaded(null);
-      setStatus(e instanceof Error ? e.message : "Laden fehlgeschlagen");
+      setStatus(e instanceof Error ? e.message : "فشل التحميل");
     } finally {
       setBusy(false);
     }
@@ -151,7 +151,7 @@ export function WebsiteHeroImageEditor({
   const handleLoadInitial = async () => {
     const u = initialUrl?.trim();
     if (!u || !u.startsWith("http")) {
-      setStatus("Keine gültige Hero-URL gespeichert.");
+      setStatus("لا يوجد رابط صورة بطل صالح محفوظ.");
       return;
     }
     setSourceUrl(u);
@@ -165,13 +165,13 @@ export function WebsiteHeroImageEditor({
       });
       const j = (await res.json()) as { mime?: string; base64?: string; error?: string };
       if (res.status === 401) {
-        throw new Error("Unauthorized — bitte unter /website/login neu anmelden. / أعد تسجيل الدخول");
+        throw new Error("انتهت الجلسة — سجّل الدخول من جديد.");
       }
-      if (!res.ok) throw new Error(j.error || "Proxy fehlgeschlagen");
-      if (!j.mime || !j.base64) throw new Error("Ungültige Antwort");
+      if (!res.ok) throw new Error(j.error || "فشل جلب الصورة");
+      if (!j.mime || !j.base64) throw new Error("استجابة غير صالحة");
       loadImageFromDataUrl(`data:${j.mime};base64,${j.base64}`);
     } catch (e) {
-      setStatus(e instanceof Error ? e.message : "Laden fehlgeschlagen");
+      setStatus(e instanceof Error ? e.message : "فشل التحميل");
     } finally {
       setBusy(false);
     }
@@ -195,7 +195,7 @@ export function WebsiteHeroImageEditor({
 
   const handleExportUpload = async () => {
     if (!loaded) {
-      setStatus("Zuerst ein Bild laden.");
+      setStatus("حمّل صورة أولاً.");
       return;
     }
     setBusy(true);
@@ -210,14 +210,14 @@ export function WebsiteHeroImageEditor({
       });
       const body = (await res.json()) as { url?: string; error?: string };
       if (res.status === 401) {
-        throw new Error("Unauthorized — bitte unter /website/login neu anmelden. / أعد تسجيل الدخول");
+        throw new Error("انتهت الجلسة — سجّل الدخول من جديد.");
       }
-      if (!res.ok) throw new Error(body.error || "Upload fehlgeschlagen.");
-      if (!body.url) throw new Error("Keine URL");
+      if (!res.ok) throw new Error(body.error || "فشل الرفع.");
+      if (!body.url) throw new Error("لا يوجد رابط");
       onUploaded(body.url);
-      setStatus("Hochgeladen — bitte unten „Speichern“ für die Startseite.");
+      setStatus("تم الرفع — اضغط «حفظ» في أسفل الصفحة.");
     } catch (e) {
-      setStatus(e instanceof Error ? e.message : "Export fehlgeschlagen");
+      setStatus(e instanceof Error ? e.message : "فشل التصدير");
     } finally {
       setBusy(false);
     }
@@ -229,13 +229,13 @@ export function WebsiteHeroImageEditor({
       dir="rtl"
     >
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
-        <h3 className="text-sm font-semibold text-white">تحويل الصورة · Bild transformieren</h3>
+        <h3 className="text-sm font-semibold text-white">تحويل الصورة</h3>
         <span className="text-[10px] text-white/45">URL · مقياس · دوران · قلب</span>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_200px] lg:items-start">
         <div className="space-y-3">
-          <label className="block text-xs text-white/70">رابط الصورة / Bild-URL</label>
+          <label className="block text-xs text-white/70">رابط الصورة</label>
           <div className="flex flex-col gap-2 sm:flex-row">
             <input
               type="url"
@@ -271,7 +271,7 @@ export function WebsiteHeroImageEditor({
 
           <div className="rounded-lg border border-white/10 bg-black/25 p-3">
             <div className="mb-2 flex items-center justify-between gap-2">
-              <span className="text-xs text-white/75">حجم (موحد) / Maßstab</span>
+              <span className="text-xs text-white/75">المقياس</span>
               <span className="font-mono text-xs text-[#5eead4]">{scalePct.toFixed(0)} %</span>
             </div>
             <input
@@ -288,7 +288,7 @@ export function WebsiteHeroImageEditor({
 
           <div className="rounded-lg border border-white/10 bg-black/25 p-3">
             <div className="mb-2 flex items-center justify-between gap-2">
-              <span className="text-xs text-white/75">استدارة / Rotation</span>
+              <span className="text-xs text-white/75">الاستدارة</span>
               <span className="font-mono text-xs text-[#5eead4]">{rotationDeg.toFixed(0)}°</span>
             </div>
             <input
@@ -330,7 +330,7 @@ export function WebsiteHeroImageEditor({
           </div>
 
           <div className="flex flex-wrap items-center gap-4 rounded-lg border border-white/10 bg-black/25 p-3">
-            <span className="text-xs text-white/75">عكس / Spiegeln</span>
+            <span className="text-xs text-white/75">عكس</span>
             <label className="flex cursor-pointer items-center gap-2 text-xs">
               <input type="checkbox" checked={flipH} disabled={disabled} onChange={(e) => setFlipH(e.target.checked)} className="accent-[#2dd4bf]" />
               أفقي
@@ -342,7 +342,7 @@ export function WebsiteHeroImageEditor({
           </div>
 
           <div className="rounded-lg border border-white/10 bg-black/25 p-3">
-            <label className="mb-1 block text-xs text-white/75">أقصى عرض للتصدير (بكسل) / Max. Exportbreite</label>
+            <label className="mb-1 block text-xs text-white/75">أقصى عرض للتصدير (بكسل)</label>
             <input
               type="number"
               min={800}
@@ -362,7 +362,7 @@ export function WebsiteHeroImageEditor({
             onClick={() => void handleExportUpload()}
             className="w-full rounded-xl bg-[var(--accent)] py-3 text-sm font-semibold text-white shadow-lg hover:opacity-95 disabled:opacity-50"
           >
-            تطبيق التحويل ورفع الصورة · Export &amp; Upload
+            تطبيق التحويل ورفع الصورة
           </button>
           {status ? <p className="text-xs text-amber-200/90">{status}</p> : null}
         </div>

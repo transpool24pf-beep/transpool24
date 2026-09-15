@@ -71,11 +71,11 @@ export function WebsiteHeroClient() {
     e.target.value = "";
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      alert("Bitte ein Bild wählen (JPEG, PNG oder WebP).");
+      alert("يرجى اختيار صورة (JPEG أو PNG أو WebP).");
       return;
     }
     if (file.size > 12 * 1024 * 1024) {
-      alert("Datei zu groß (max. 12 MB).");
+      alert("الملف أكبر من الحد المسموح (12 ميغابايت كحد أقصى).");
       return;
     }
     setImageUploading(true);
@@ -94,13 +94,13 @@ export function WebsiteHeroClient() {
       const body = (await res.json()) as { url?: string; error?: string };
       if (res.status === 401) {
         throw new Error(
-          "Nicht angemeldet — bitte /website/login öffnen und erneut anmelden. / الجلسة غير صالحة — سجّل الدخول من جديد.",
+          "انتهت الجلسة — سجّل الدخول من جديد من /website/login.",
         );
       }
-      if (!res.ok) throw new Error(body.error || "Upload fehlgeschlagen.");
+      if (!res.ok) throw new Error(body.error || "فشل الرفع.");
       if (body.url) setData((prev) => ({ ...prev, imageUrl: body.url! }));
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Upload fehlgeschlagen.");
+      alert(err instanceof Error ? err.message : "فشل الرفع.");
     } finally {
       setImageUploading(false);
     }
@@ -111,11 +111,11 @@ export function WebsiteHeroClient() {
     e.target.value = "";
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      alert("Bitte ein Bild wählen (JPEG, PNG oder WebP).");
+      alert("يرجى اختيار صورة (JPEG أو PNG أو WebP).");
       return;
     }
     if (file.size > 12 * 1024 * 1024) {
-      alert("Datei zu groß (max. 12 MB).");
+      alert("الملف أكبر من الحد المسموح (12 ميغابايت كحد أقصى).");
       return;
     }
     setTruckUploading(true);
@@ -134,13 +134,13 @@ export function WebsiteHeroClient() {
       const body = (await res.json()) as { url?: string; error?: string };
       if (res.status === 401) {
         throw new Error(
-          "Nicht angemeldet — bitte /website/login öffnen und erneut anmelden. / الجلسة غير صالحة — سجّل الدخول من جديد.",
+          "انتهت الجلسة — سجّل الدخول من جديد من /website/login.",
         );
       }
-      if (!res.ok) throw new Error(body.error || "Upload fehlgeschlagen.");
+      if (!res.ok) throw new Error(body.error || "فشل الرفع.");
       if (body.url) setData((prev) => ({ ...prev, truckImageUrl: body.url! }));
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Upload fehlgeschlagen.");
+      alert(err instanceof Error ? err.message : "فشل الرفع.");
     } finally {
       setTruckUploading(false);
     }
@@ -166,21 +166,21 @@ export function WebsiteHeroClient() {
       if (res.ok) {
         await load();
         let msg =
-          "Gespeichert. Startseite und Magazin (/blog) laden Hero-Daten live aus der Datenbank (kein Build nötig).";
+          "تم الحفظ. الصفحة الرئيسية والمجلة (/blog) تقرآن بيانات البطل مباشرة من قاعدة البيانات.";
         if (body.translationFallback) {
           msg +=
-            "\n\nHinweis: Ohne DEEPL_AUTH_KEY oder GOOGLE_TRANSLATE_API_KEY wird MyMemory genutzt (begrenzt). Für stabile Übersetzungen DeepL empfohlen.";
+            "\n\nملاحظة: بدون مفتاح DeepL أو Google Translate تُستخدم خدمة محدودة. يُفضّل DeepL للترجمة المستقرة.";
         }
         alert(msg);
       } else if (res.status === 401) {
         alert(
-          "Sitzung abgelaufen oder nicht angemeldet. Bitte erneut unter /website/login anmelden.\n\nانتهت الجلسة — سجّل الدخول من جديد من /website/login",
+          "انتهت الجلسة — سجّل الدخول من جديد من /website/login",
         );
       } else {
-        alert(body.error || "Speichern fehlgeschlagen.");
+        alert(body.error || "فشل الحفظ.");
       }
     } catch {
-      alert("Anfrage fehlgeschlagen.");
+      alert("فشل الطلب.");
     } finally {
       setSaving(false);
     }
@@ -189,7 +189,7 @@ export function WebsiteHeroClient() {
   if (loading) {
     return (
       <div className="rounded-xl bg-white p-8 shadow-sm">
-        <p className="text-[#0d2137]/70">Laden…</p>
+        <p className="text-[#0d2137]/70">جاري التحميل…</p>
       </div>
     );
   }
@@ -197,30 +197,21 @@ export function WebsiteHeroClient() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-[#0d2137]">Hero – Startseite &amp; Magazin</h1>
+        <h1 className="text-2xl font-semibold text-[#0d2137]">البطل – الصفحة الرئيسية والمجلة</h1>
         <p className="mt-1 text-sm text-[#0d2137]/70">
-          <strong className="text-[#0d2137]">Startseite:</strong> klassischer Hero mit Rahmen (dieses Bild + Texte).
-          <strong className="ms-1 text-[#0d2137]">Magazin (/blog):</strong> großer Logistik-Cover inkl. LKW-Vordergrund
-          nutzt dieselben Daten. Texte nur auf Englisch — beim Speichern werden alle Sprachen übersetzt.
-        </p>
-        <p className="mt-1 text-sm text-[#0d2137]/70" dir="rtl">
-          <strong>الصفحة الرئيسية:</strong> الهيرو الكلاسيكي. <strong>المجلة (/blog):</strong> نفس صورة الخلفية والنصوص
-          + شاحمة الـHero. أدخل النصوص بالإنجليزية؛ تُترجم تلقائياً.
+          <strong className="text-[#0d2137]">الصفحة الرئيسية:</strong> قسم البطل الكلاسيكي (هذه الصورة والنصوص).{" "}
+          <strong className="ms-1 text-[#0d2137]">المجلة (/blog):</strong> غلاف لوجستي كبير مع شاحنة في المقدمة يستخدم نفس البيانات. أدخل النصوص بالإنجليزية؛ تُترجم تلقائياً عند الحفظ.
         </p>
         <p className="mt-2 text-sm font-medium text-[#0d2137]">
-          LKW erscheint nur auf der <strong>Magazin-Startseite</strong> — PNG mit Transparenz empfohlen.
-        </p>
-        <p className="text-sm text-[#0d2137]/70" dir="rtl">
-          الشاحمة تظهر على <strong>صفحة المدونة فقط</strong> — يُفضّل PNG شفاف.
+          الشاحنة تظهر على <strong>صفحة المجلة فقط</strong> — يُفضّل ملف PNG شفاف.
         </p>
       </div>
 
       <form onSubmit={handleSave} className="space-y-8">
         <div className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-lg font-medium text-[#0d2137]">Magazin: Hero-LKW (überlappend)</h2>
+          <h2 className="mb-4 text-lg font-medium text-[#0d2137]">المجلة: شاحنة البطل (متداخلة)</h2>
           <p className="mb-4 text-sm text-[#0d2137]/65">
-            Nur auf der <strong>Magazin-Startseite</strong> (z. B. /de/blog) sichtbar, unten rechts über dem Übergang.
-            Ohne Bild: Standard (Unsplash).
+            تظهر فقط على <strong>صفحة المجلة</strong> (مثل /ar/blog) أسفل اليمين. بدون صورة يُستخدم الافتراضي.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
             <div className="relative h-40 w-full max-w-xs shrink-0 overflow-hidden rounded-xl border-2 border-[#0d2137]/10 bg-gray-100">
@@ -236,7 +227,7 @@ export function WebsiteHeroClient() {
                 />
               ) : (
                 <span className="flex h-full w-full items-center justify-center px-2 text-center text-xs text-[#0d2137]/45">
-                  Standard-LKW (wenn leer)
+                  شاحنة افتراضية (إن تُرك فارغاً)
                 </span>
               )}
             </div>
@@ -250,7 +241,7 @@ export function WebsiteHeroClient() {
               />
               <input
                 type="url"
-                placeholder="Oder LKW-Bild-URL"
+                placeholder="أو رابط صورة الشاحنة"
                 value={data.truckImageUrl ?? ""}
                 onChange={(e) =>
                   setData((prev) => ({ ...prev, truckImageUrl: e.target.value.trim() || null }))
@@ -262,14 +253,14 @@ export function WebsiteHeroClient() {
                 className="text-xs font-medium text-red-700 underline"
                 onClick={() => setData((prev) => ({ ...prev, truckImageUrl: null }))}
               >
-                LKW-Bild zurücksetzen (Standard)
+                إعادة صورة الشاحنة للافتراضي
               </button>
             </div>
           </div>
         </div>
 
         <div className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
-          <h2 className="mb-4 text-lg font-medium text-[#0d2137]">Hintergrundbild (Startseite + Magazin-Cover)</h2>
+          <h2 className="mb-4 text-lg font-medium text-[#0d2137]">صورة الخلفية (الصفحة الرئيسية وغلاف المجلة)</h2>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
             <div className="relative h-48 w-full max-w-sm shrink-0 overflow-hidden rounded-xl border-2 border-[#0d2137]/10 bg-gray-100">
               {data.imageUrl ? (
@@ -284,7 +275,7 @@ export function WebsiteHeroClient() {
                 />
               ) : (
                 <span className="flex h-full w-full items-center justify-center text-sm text-[#0d2137]/40">
-                  Kein Bild – Standard wird verwendet
+                  لا توجد صورة — سيُستخدم الافتراضي
                 </span>
               )}
             </div>
@@ -297,15 +288,11 @@ export function WebsiteHeroClient() {
                 className="block w-full text-sm text-[#0d2137] file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--accent)] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:opacity-95 disabled:opacity-50"
               />
               <p className="text-xs text-[#0d2137]/60">
-                JPEG/PNG/WebP, max. 12 MB — lieber hohe Auflösung (z. B. 2400px+ Breite), minimal komprimiert. Nach
-                Upload „Speichern“.
-              </p>
-              <p className="text-xs text-[#0d2137]/55" dir="rtl">
-                يُفضَّل صورة عريضة عالية الدقة (مثلاً 2400 بكسل فأكثر) وبأقل ضغط ممكن؛ الحد الأقصى 12 ميجابايت.
+                JPEG/PNG/WebP، حد أقصى 12 ميغابايت — يُفضَّل عرض عالٍ (مثلاً 2400 بكسل فأكثر) وبأقل ضغط. بعد الرفع اضغط «حفظ».
               </p>
               <input
                 type="url"
-                placeholder="Oder URL einfügen (direkt speichern, ohne Editor)"
+                placeholder="أو ألصق رابطاً (حفظ مباشر بدون المحرّر)"
                 value={data.imageUrl ?? ""}
                 onChange={(e) => setData((prev) => ({ ...prev, imageUrl: e.target.value.trim() || null }))}
                 className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 text-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
@@ -322,20 +309,20 @@ export function WebsiteHeroClient() {
               onBusyChange={setImageUploading}
               onUploaded={(url) => setData((prev) => ({ ...prev, imageUrl: url }))}
             />
-            <p className="mt-2 text-xs text-[#0d2137]/55" dir="rtl">
-              المحرّر: رابط أو ملف، ثم مقياس ودوران وقلب، ثم «Export &amp; Upload»، ثم احفظ الصفحة.
+            <p className="mt-2 text-xs text-[#0d2137]/55">
+              المحرّر: رابط أو ملف، ثم مقياس ودوران وقلب، ثم «تطبيق التحويل ورفع الصورة»، ثم احفظ الصفحة.
             </p>
           </div>
         </div>
 
         <div className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
-          <h2 className="mb-2 text-lg font-medium text-[#0d2137]">Hero-Texte (nur Englisch)</h2>
+          <h2 className="mb-2 text-lg font-medium text-[#0d2137]">نصوص البطل (بالإنجليزية فقط)</h2>
           <p className="mb-6 text-sm text-[#0d2137]/65">
-            Leer lassen = keine CMS-Texte, die Website nutzt dann die Standard-Übersetzungen aus den Sprachdateien.
+            اتركها فارغة لاستخدام الترجمات الافتراضية من ملفات اللغات على الموقع.
           </p>
           <div className="grid gap-4 sm:grid-cols-3">
             <div>
-              <label className="mb-1 block text-xs font-medium text-[#0d2137]/70">Headline (EN)</label>
+              <label className="mb-1 block text-xs font-medium text-[#0d2137]/70">العنوان (إنجليزي)</label>
               <input
                 type="text"
                 value={english.headline}
@@ -345,7 +332,7 @@ export function WebsiteHeroClient() {
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-[#0d2137]/70">Subtitle (EN)</label>
+              <label className="mb-1 block text-xs font-medium text-[#0d2137]/70">العنوان الفرعي (إنجليزي)</label>
               <input
                 type="text"
                 value={english.subtitle}
@@ -355,7 +342,7 @@ export function WebsiteHeroClient() {
               />
             </div>
             <div>
-              <label className="mb-1 block text-xs font-medium text-[#0d2137]/70">Button (EN)</label>
+              <label className="mb-1 block text-xs font-medium text-[#0d2137]/70">الزر (إنجليزي)</label>
               <input
                 type="text"
                 value={english.cta}
@@ -368,10 +355,10 @@ export function WebsiteHeroClient() {
 
           <details className="mt-8 rounded-lg border border-[#0d2137]/10 bg-[#f8fafc] p-4">
             <summary className="cursor-pointer text-sm font-semibold text-[#0d2137]">
-              Alle Sprachen (Vorschau nach Speichern)
+              كل اللغات (معاينة بعد الحفظ)
             </summary>
-            <p className="mt-2 text-xs text-[#0d2137]/60" dir="rtl">
-              معاينة لكل اللغة بعد الحفظ
+            <p className="mt-2 text-xs text-[#0d2137]/60">
+              معاينة لكل لغة بعد الحفظ
             </p>
             <div className="mt-4 space-y-4">
               {WEBSITE_CMS_LOCALE_OPTIONS.map(({ code, label }) => (
@@ -380,15 +367,15 @@ export function WebsiteHeroClient() {
                     {label} ({code})
                   </p>
                   <p>
-                    <span className="text-[#0d2137]/55">Titel: </span>
+                    <span className="text-[#0d2137]/55">العنوان: </span>
                     {data.headline[code] || "—"}
                   </p>
                   <p className="mt-1">
-                    <span className="text-[#0d2137]/55">Untertitel: </span>
+                    <span className="text-[#0d2137]/55">العنوان الفرعي: </span>
                     {data.subtitle[code] || "—"}
                   </p>
                   <p className="mt-1">
-                    <span className="text-[#0d2137]/55">Button: </span>
+                    <span className="text-[#0d2137]/55">الزر: </span>
                     {data.cta[code] || "—"}
                   </p>
                 </div>
@@ -402,7 +389,7 @@ export function WebsiteHeroClient() {
           disabled={saving}
           className="rounded-xl bg-[var(--accent)] px-8 py-3 font-semibold text-white shadow-lg transition hover:opacity-95 disabled:opacity-60"
         >
-          {saving ? "Speichern & übersetzen…" : "Speichern & alle Sprachen übersetzen"}
+          {saving ? "جاري الحفظ والترجمة…" : "حفظ وترجمة كل اللغات"}
         </button>
       </form>
     </div>

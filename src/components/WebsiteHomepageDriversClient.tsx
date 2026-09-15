@@ -69,7 +69,7 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Möchten Sie diesen Fahrer wirklich löschen?")) return;
+    if (!confirm("هل تريد حذف هذا السائق؟")) return;
     setSaving(true);
     try {
       const res = await cmsFetch(`${apiBase}/${id}`, {
@@ -78,10 +78,10 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
       if (res.ok) {
         setDrivers(drivers.filter((d) => d.id !== id));
       } else {
-        alert("Löschen fehlgeschlagen.");
+        alert("فشل الحذف.");
       }
     } catch {
-      alert("Anfrage fehlgeschlagen.");
+      alert("فشل الطلب.");
     } finally {
       setSaving(false);
     }
@@ -116,17 +116,17 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
           customerName: "",
           order: drivers.length,
         });
-        alert("Gespeichert.");
+        alert("تم الحفظ.");
       } else {
         const errBody = await res.json().catch(() => ({}));
         const msg =
           typeof (errBody as { error?: string }).error === "string"
             ? (errBody as { error: string }).error
-            : "Speichern fehlgeschlagen.";
+            : "فشل الحفظ.";
         alert(msg);
       }
     } catch {
-      alert("Anfrage fehlgeschlagen.");
+      alert("فشل الطلب.");
     } finally {
       setSaving(false);
     }
@@ -135,7 +135,7 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
   const handleLookupByDriverNumber = async () => {
     const num = parseInt(driverNumberQuery.trim(), 10);
     if (!Number.isFinite(num) || num < 1) {
-      alert("Bitte eine gültige Fahrernummer eingeben (positive Zahl). / أدخل رقماً صحيحاً.");
+      alert("أدخل رقم سائق صحيح.");
       return;
     }
     setLookupLoading(true);
@@ -147,20 +147,20 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
       });
       const data = (await res.json()) as { photoUrl?: string; fullName?: string; error?: string };
       if (res.status === 401) {
-        alert("Nicht angemeldet — bitte /website/login. / أعد تسجيل الدخول.");
+        alert("غير مسجّل الدخول — سجّل الدخول من /website/login.");
         return;
       }
       if (!res.ok) {
-        throw new Error(data.error || "Lookup fehlgeschlagen.");
+        throw new Error(data.error || "فشل البحث.");
       }
-      if (!data.photoUrl) throw new Error("Keine Bild-URL.");
+      if (!data.photoUrl) throw new Error("لا توجد صورة.");
       setFormData((prev) => ({
         ...prev,
         photo: data.photoUrl!,
         name: prev.name.trim() ? prev.name : data.fullName?.trim() || prev.name,
       }));
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Lookup fehlgeschlagen.");
+      alert(err instanceof Error ? err.message : "فشل البحث.");
     } finally {
       setLookupLoading(false);
     }
@@ -171,11 +171,11 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
     e.target.value = "";
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      alert("Bitte ein Bild wählen (JPEG, PNG oder WebP).");
+      alert("يرجى اختيار صورة (JPEG أو PNG أو WebP).");
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      alert("Datei zu groß (max. 5 MB).");
+      alert("الملف أكبر من الحد المسموح (5 ميغابايت كحد أقصى).");
       return;
     }
     setPhotoUploading(true);
@@ -192,10 +192,10 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
         body: JSON.stringify({ base64: dataUrl, filename: file.name }),
       });
       const data = (await res.json()) as { url?: string; error?: string };
-      if (!res.ok) throw new Error(data.error || "Upload fehlgeschlagen.");
+      if (!res.ok) throw new Error(data.error || "فشل الرفع.");
       if (data.url) setFormData((prev) => ({ ...prev, photo: data.url! }));
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Upload fehlgeschlagen.");
+      alert(err instanceof Error ? err.message : "فشل الرفع.");
     } finally {
       setPhotoUploading(false);
     }
@@ -228,7 +228,7 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
   if (loading) {
     return (
       <div className="rounded-xl bg-white p-8 shadow-sm">
-        <p className="text-[#0d2137]/70">Laden…</p>
+        <p className="text-[#0d2137]/70">جاري التحميل…</p>
       </div>
     );
   }
@@ -237,15 +237,10 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
     <div>
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-[#0d2137]">Homepage – Fahrer-Bewertungen</h1>
+          <h1 className="text-2xl font-semibold text-[#0d2137]">الصفحة الرئيسية – تقييمات السائقين</h1>
           <p className="mt-2 max-w-3xl text-sm leading-relaxed text-[#0d2137]/70">
-            Einträge werden in der Datenbank gespeichert und auf der Startseite im Karussell angezeigt — beliebig viele
-            Bewertungen, Reihenfolge mit ↑↓. Nach dem Speichern erscheinen neue Fahrer nach einem Seitenrefresh auf der
-            Website.
-          </p>
-          <p className="mt-1 max-w-3xl text-sm text-[#0d2137]/60" dir="rtl">
-            تُحفظ البطاقات في قاعدة البيانات وتظهر في الصفحة الرئيسية في شريط متحرك؛ يمكنك إضافة أي عدد وترتيبها. قد
-            تحتاج لتحديث الصفحة لرؤية التحديث فوراً.
+            تُحفظ البطاقات في قاعدة البيانات وتظهر في شريط التقييمات على الصفحة الرئيسية. يمكنك إضافة أي عدد وترتيبها
+            بالأسهم. بعد الحفظ حدّث صفحة الموقع لرؤية التحديث فوراً.
           </p>
         </div>
         <button
@@ -253,18 +248,18 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
           onClick={handleAdd}
           className="shrink-0 rounded-lg bg-[var(--accent)] px-4 py-2 font-medium text-white hover:opacity-95 sm:self-start"
         >
-          + Neuer Fahrer
+          + سائق جديد
         </button>
       </div>
 
       {(editingId !== null || isAdding) && (
         <form onSubmit={handleSubmit} className="mb-8 rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-medium text-[#0d2137]">
-            {editingId ? "Fahrer bearbeiten" : "Neuer Fahrer"}
+            {editingId ? "تعديل السائق" : "سائق جديد"}
           </h2>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-medium text-[#0d2137]/80">Name</label>
+              <label className="mb-1 block text-sm font-medium text-[#0d2137]/80">الاسم</label>
               <input
                 type="text"
                 value={formData.name}
@@ -274,11 +269,9 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
               />
             </div>
             <div className="sm:col-span-2 rounded-xl border border-[var(--accent)]/20 bg-[var(--accent)]/5 p-4">
-              <label className="mb-2 block text-sm font-medium text-[#0d2137]/85">
-                Fahrernummer · رقم السائق
-              </label>
+              <label className="mb-2 block text-sm font-medium text-[#0d2137]/85">رقم السائق</label>
               <p className="mb-2 text-xs text-[#0d2137]/65">
-                Zugelassene Fahrer: Foto aus der Datenbank (Persönliches Foto im Antrag) übernehmen — keine Datei nötig.
+                للسائقين المعتمدين: يمكن جلب الصورة الشخصية من الطلب دون رفع ملف.
               </p>
               <div className="flex flex-wrap items-center gap-2">
                 <input
@@ -287,7 +280,7 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
                   inputMode="numeric"
                   value={driverNumberQuery}
                   onChange={(e) => setDriverNumberQuery(e.target.value)}
-                  placeholder="z. B. 12"
+                  placeholder="مثال: 10002"
                   disabled={lookupLoading || photoUploading}
                   className="w-36 rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] disabled:opacity-50"
                 />
@@ -297,15 +290,15 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
                   disabled={lookupLoading || photoUploading}
                   className="rounded-lg bg-[#0d2137] px-4 py-2 text-sm font-medium text-white hover:opacity-95 disabled:opacity-50"
                 >
-                  {lookupLoading ? "…" : "Foto laden · تحميل الصورة"}
+                  {lookupLoading ? "…" : "تحميل الصورة"}
                 </button>
               </div>
-              <p className="mt-2 text-xs text-[#0d2137]/55" dir="rtl">
-                فقط سائق معتمد (approved) ولديه صورة شخصية في طلب التسجيل.
+              <p className="mt-2 text-xs text-[#0d2137]/55">
+                فقط سائق معتمد ولديه صورة شخصية في طلب التسجيل.
               </p>
             </div>
             <div className="sm:col-span-2">
-              <label className="mb-1 block text-sm font-medium text-[#0d2137]/80">Foto (manuell)</label>
+              <label className="mb-1 block text-sm font-medium text-[#0d2137]/80">الصورة (يدوياً)</label>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
                 <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border-2 border-[var(--accent)]/30 bg-gray-100">
                   {formData.photo ? (
@@ -335,27 +328,26 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
                     className="block w-full text-sm text-[#0d2137] file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--accent)] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:opacity-95 disabled:opacity-50"
                   />
                   <p className="text-xs text-[#0d2137]/60">
-                    Bild von Ihrem Computer hochladen (JPEG/PNG/WebP, max. 5 MB). Wird in Supabase Storage
-                    gespeichert und als öffentliche URL im Eintrag verwendet.
+                    ارفع صورة من جهازك (JPEG/PNG/WebP، حد أقصى 5 ميغابايت). تُحفظ في التخزين وتُستخدم كرابط عام.
                   </p>
                   <div>
                     <label className="mb-1 block text-xs font-medium text-[#0d2137]/70">
-                      Bild-URL (optional, statt Upload)
+                      رابط الصورة (اختياري بدل الرفع)
                     </label>
                     <input
                       type="url"
                       value={formData.photo}
                       onChange={(e) => setFormData({ ...formData, photo: e.target.value })}
-                      placeholder="https://… (externe Links funktionieren oft nicht – Upload bevorzugen)"
+                      placeholder="https://… (يفضّل الرفع بدل الروابط الخارجية)"
                       className="w-full rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
                     />
                   </div>
-                  {photoUploading && <p className="text-sm text-[var(--accent)]">Wird hochgeladen…</p>}
+                  {photoUploading && <p className="text-sm text-[var(--accent)]">جاري الرفع…</p>}
                 </div>
               </div>
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-[#0d2137]/80">Bewertung (1-5)</label>
+              <label className="mb-1 block text-sm font-medium text-[#0d2137]/80">التقييم (1-5)</label>
               <input
                 type="number"
                 min={1}
@@ -367,7 +359,7 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-[#0d2137]/80">Kundenname</label>
+              <label className="mb-1 block text-sm font-medium text-[#0d2137]/80">اسم العميل</label>
               <input
                 type="text"
                 value={formData.customerName}
@@ -377,7 +369,7 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
               />
             </div>
             <div className="sm:col-span-2">
-              <label className="mb-1 block text-sm font-medium text-[#0d2137]/80">Kommentar</label>
+              <label className="mb-1 block text-sm font-medium text-[#0d2137]/80">التعليق</label>
               <textarea
                 value={formData.comment}
                 onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
@@ -393,7 +385,7 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
               disabled={saving}
               className="rounded-lg bg-[var(--accent)] px-4 py-2 font-medium text-white hover:opacity-95 disabled:opacity-60"
             >
-              {saving ? "Speichern…" : "Speichern"}
+              {saving ? "جاري الحفظ…" : "حفظ"}
             </button>
             <button
               type="button"
@@ -412,7 +404,7 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
               }}
               className="rounded-lg border border-[#0d2137]/20 px-4 py-2 font-medium text-[#0d2137] hover:bg-[#0d2137]/5"
             >
-              Abbrechen
+              إلغاء
             </button>
           </div>
         </form>
@@ -421,13 +413,13 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
       <div className="space-y-4">
         {drivers.length === 0 ? (
           <div className="rounded-xl border border-[#0d2137]/10 bg-white p-8 text-center text-[#0d2137]/60">
-            <p>Noch keine Fahrer hinzugefügt.</p>
+            <p>لا يوجد سائقون بعد.</p>
             <button
               type="button"
               onClick={handleAdd}
               className="mt-4 text-[var(--accent)] hover:underline"
             >
-              Ersten Fahrer hinzufügen
+              إضافة أول سائق
             </button>
           </div>
         ) : (
@@ -467,7 +459,7 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
                     onClick={() => driver.id != null && handleReorder(driver.id, "up")}
                     disabled={index === 0}
                     className="rounded-lg border border-[#0d2137]/20 p-2 hover:bg-[#0d2137]/5 disabled:opacity-30"
-                    title="Nach oben"
+                    title="للأعلى"
                   >
                     ↑
                   </button>
@@ -476,7 +468,7 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
                     onClick={() => driver.id != null && handleReorder(driver.id, "down")}
                     disabled={index === drivers.length - 1}
                     className="rounded-lg border border-[#0d2137]/20 p-2 hover:bg-[#0d2137]/5 disabled:opacity-30"
-                    title="Nach unten"
+                    title="للأسفل"
                   >
                     ↓
                   </button>
@@ -485,14 +477,14 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
                     onClick={() => handleEdit(driver)}
                     className="rounded-lg border border-[#0d2137]/20 px-3 py-2 text-sm font-medium text-[#0d2137] hover:bg-[#0d2137]/5"
                   >
-                    Bearbeiten
+                    تعديل
                   </button>
                   <button
                     type="button"
                     onClick={() => driver.id != null && handleDelete(driver.id)}
                     className="rounded-lg border border-red-200 px-3 py-2 text-sm font-medium text-red-700 hover:bg-red-50"
                   >
-                    Löschen
+                    حذف
                   </button>
                 </div>
               </div>

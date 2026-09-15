@@ -1,8 +1,8 @@
 import { WebsiteShell } from "./WebsiteShell";
 
 export const metadata = {
-  title: { absolute: "TransPool24 | Website CMS" },
-  description: "Verwaltung von Inhalten auf transpool24.com (ohne Aufträge)",
+  title: { absolute: "TransPool24 | نظام إدارة محتوى الموقع" },
+  description: "إدارة محتوى transpool24.com (بدون الطلبات)",
   robots: "noindex, nofollow",
 };
 
