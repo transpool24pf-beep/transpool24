@@ -371,7 +371,7 @@
     "trackMapTitle": "Carte et itinéraire",
     "trackMapHint": "Ligne grise: itinéraire prévu. Orange: trace GPS en direct. Le marqueur apparaît dès la première position.",
     "trackLiveMarker": "Position actuelle",
-    "trackNoGeocode": "Carte automatique indisponible. Ouvrir l’itinéraire dans Google Maps.",
+    "trackNoGeocode": "Carte automatique indisponible pour ces adresses.",
     "trackOpenGoogleDirections": "Ouvrir dans Google Maps"
   },
   "footer": {

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { rateLimitResponse } from "@/lib/rate-limit";
 import { createServerSupabase } from "@/lib/supabase";
 import { geocodeAddressForMap } from "@/lib/route-distance-server";
+import { fetchGoogleDrivingRoute } from "@/lib/google-maps-route";
 
 const OSRM_URL = "https://router.project-osrm.org/route/v1/driving";
 
@@ -103,13 +104,32 @@ export async function GET(req: Request) {
     };
   }
 
-  const [pickupG, deliveryG] = await Promise.all([
-    geocodeAddressForMap(job.pickup_address),
-    geocodeAddressForMap(job.delivery_address),
-  ]);
-
   let routeGeometry: GeoJSON.LineString | null = null;
-  if (pickupG && deliveryG) {
+  let pickupG: { lat: number; lon: number } | null = null;
+  let deliveryG: { lat: number; lon: number } | null = null;
+
+  const mapsKey = process.env.GOOGLE_MAPS_API_KEY;
+  if (mapsKey) {
+    const googleRoute = await fetchGoogleDrivingRoute(
+      job.pickup_address,
+      job.delivery_address,
+      mapsKey
+    );
+    if (googleRoute) {
+      pickupG = googleRoute.from;
+      deliveryG = googleRoute.to;
+      routeGeometry = googleRoute.geometry;
+    }
+  }
+  if (!pickupG || !deliveryG) {
+    const [p, d] = await Promise.all([
+      geocodeAddressForMap(job.pickup_address),
+      geocodeAddressForMap(job.delivery_address),
+    ]);
+    pickupG = pickupG ?? p;
+    deliveryG = deliveryG ?? d;
+  }
+  if (pickupG && deliveryG && !routeGeometry) {
     routeGeometry = await fetchOsrmLine(pickupG, deliveryG);
     if (!routeGeometry) {
       routeGeometry = {

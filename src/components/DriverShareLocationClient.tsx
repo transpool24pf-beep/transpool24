@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { mapsNavigateToDestination, mapsRoutePickupToDelivery } from "@/lib/google-maps-links";
 import { bcp47ForSiteLocale } from "@/lib/bcp47-locale";
+import { isUsableGpsAccuracy } from "@/lib/driver-gps";
 
 type ValidateResponse = {
   ok?: boolean;
@@ -21,7 +22,7 @@ type ValidateResponse = {
   error?: string;
 };
 
-const MIN_INTERVAL_MS = 12_000;
+const MIN_INTERVAL_MS = 8_000;
 
 export function DriverShareLocationClient({
   jobId,
@@ -135,13 +136,33 @@ export function DriverShareLocationClient({
     setSharing(true);
     watchId.current = navigator.geolocation.watchPosition(
       (pos) => {
-        void sendPosition(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy);
+        if (!isUsableGpsAccuracy(pos.coords.accuracy)) return;
+        void sendPosition(
+          pos.coords.latitude,
+          pos.coords.longitude,
+          pos.coords.accuracy,
+        );
       },
       (geoErr) => {
         setErr(geoErr.message || t("permissionDenied"));
         stopSharing();
       },
-      { enableHighAccuracy: true, maximumAge: 10_000, timeout: 20_000 }
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 25_000 }
+    );
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        if (!isUsableGpsAccuracy(pos.coords.accuracy)) return;
+        lastPostAt.current = 0;
+        void sendPosition(
+          pos.coords.latitude,
+          pos.coords.longitude,
+          pos.coords.accuracy,
+        );
+      },
+      () => {
+        /* watchPosition continues */
+      },
+      { enableHighAccuracy: true, maximumAge: 0, timeout: 20_000 }
     );
   }, [jobId, token, sendPosition, stopSharing, t]);
 

@@ -370,7 +370,7 @@
     "trackMapTitle": "Mapa i trasa",
     "trackMapHint": "Szara linia przerywana: planowana trasa (odbiór → dostawa). Linia pomarańczowa: ślad GPS na żywo, gdy kierowca udostępni swoją lokalizację. Znacznik na żywo pojawia się, gdy tylko otrzymamy aktualizację pozycji.",
     "trackLiveMarker": "Aktualna pozycja pojazdu",
-    "trackNoGeocode": "Nie mogliśmy załadować automatycznej mapy dla tych adresów. Zamiast tego otwórz trasę w Mapach Google.",
+    "trackNoGeocode": "Nie mogliśmy załadować automatycznej mapy dla tych adresów.",
     "trackOpenGoogleDirections": "Otwórz trasę w Mapach Google"
   },
   "footer": {

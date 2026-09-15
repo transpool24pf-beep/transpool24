@@ -8,14 +8,18 @@ const OSRM_URL = "https://router.project-osrm.org/route/v1/driving";
  * (Google Places formatted lines often fail Nominatim).
  */
 export async function geocodeAddressForMap(address: string): Promise<{ lat: number; lon: number } | null> {
-  const hit = await geocodeGermanyOne(address);
-  if (hit && Number.isFinite(hit.lat) && Number.isFinite(hit.lon)) {
-    return { lat: hit.lat, lon: hit.lon };
-  }
+  const q = address.trim();
+  if (!q) return null;
   const key = process.env.GOOGLE_MAPS_API_KEY;
   if (key) {
-    const g = await googleGeocodeGermany(address, key);
-    if (g) return g;
+    const g = await googleGeocodeGermany(q, key);
+    if (g && Number.isFinite(g.lat) && Number.isFinite(g.lon)) {
+      return { lat: g.lat, lon: g.lon };
+    }
+  }
+  const hit = await geocodeGermanyOne(q);
+  if (hit && Number.isFinite(hit.lat) && Number.isFinite(hit.lon)) {
+    return { lat: hit.lat, lon: hit.lon };
   }
   return null;
 }

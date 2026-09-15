@@ -81,6 +81,9 @@ export async function POST(req: Request) {
     heading: body.heading != null ? Number(body.heading) : null,
   });
   if (!result.ok) {
+    if (result.message === "GPS accuracy too low") {
+      return NextResponse.json({ ok: true, skipped: true });
+    }
     return NextResponse.json(
       { error: result.message, hint: "Run supabase/add_driver_tracking_token.sql and roadmap_foundation.sql" },
       { status: 500 }

@@ -511,7 +511,7 @@
     "trackMapTitle": "Map & route",
     "trackMapHint": "Gray dashed: planned route (pickup → delivery). Orange line: live GPS trail when the driver shares location (link from admin). Large round marker: driver photo at the current GPS, or an orange pin if no photo is on file. The orange button opens Google Maps zoomed on that spot.",
     "trackLiveMarker": "Current vehicle position",
-    "trackNoGeocode": "We could not load the automatic map for these addresses. Open the route in Google Maps instead.",
+    "trackNoGeocode": "We could not load the automatic map for these addresses.",
     "trackOpenGoogleDirections": "Open route in Google Maps"
   },
   "footer": {

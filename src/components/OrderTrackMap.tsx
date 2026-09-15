@@ -34,8 +34,8 @@ function createDriverPhotoDivIcon(href: string): L.DivIcon {
     className: "leaflet-driver-photo-marker",
     html: `<div class="leaflet-driver-photo-marker__inner"><img src="${safe}" alt="" decoding="async" fetchpriority="high" /></div>`,
     iconSize: [s, s],
-    iconAnchor: [half, s],
-    popupAnchor: [0, -(s - 8)],
+    iconAnchor: [half, half],
+    popupAnchor: [0, -(half - 4)],
   });
 }
 
@@ -49,8 +49,8 @@ function createDriverGpsFallbackDivIcon(): L.DivIcon {
       <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-4.5 7-11a7 7 0 1 0-14 0c0 6.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5" fill="white" stroke="none"/></svg>
     </div>`,
     iconSize: [s, s],
-    iconAnchor: [half, s],
-    popupAnchor: [0, -(s - 8)],
+    iconAnchor: [half, half],
+    popupAnchor: [0, -(half - 4)],
   });
 }
 
@@ -72,10 +72,10 @@ function FitSmart({ points }: { points: LatLng[] }) {
   useEffect(() => {
     if (points.length === 0) return;
     if (points.length === 1) {
-      map.setView([points[0].lat, points[0].lng], 13);
+      map.setView([points[0].lat, points[0].lng], 16);
     } else {
       const ll = points.map((p) => L.latLng(p.lat, p.lng));
-      map.fitBounds(L.latLngBounds(ll), { padding: [48, 48], maxZoom: 14 });
+      map.fitBounds(L.latLngBounds(ll), { padding: [48, 48], maxZoom: 16 });
     }
     const t = setTimeout(() => map.invalidateSize(), 200);
     return () => clearTimeout(t);

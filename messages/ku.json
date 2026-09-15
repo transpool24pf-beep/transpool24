@@ -371,7 +371,7 @@
     "trackMapTitle": "Nexşe & rê",
     "trackMapHint": "Xeta şikestî ya gewr: rêça plankirî (hilgirtin → radestkirin). Xeta porteqalî: gava ku ajokar cîhê xwe parve dike, şopa GPS ya zindî. Nîşana zindî gava ku em nûvekirinek pozîsyonê werdigirin zû xuya dibe.",
     "trackLiveMarker": "Helwesta wesayîta heyî",
-    "trackNoGeocode": "Me nekarî nexşeya otomatîkî ya van navnîşanan bar bike. Li şûna wê rêyê di Nexşeyên Google de vekin.",
+    "trackNoGeocode": "Me nekarî nexşeya otomatîkî ya van navnîşanan bar bike.",
     "trackOpenGoogleDirections": "Di Google Maps de rê veke"
   },
   "footer": {

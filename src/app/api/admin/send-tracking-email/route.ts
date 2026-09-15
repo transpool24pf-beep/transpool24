@@ -30,7 +30,6 @@ export async function POST(req: Request) {
   }
 
   const trackOrderUrl = `${SITE}/de/order/track?job_id=${encodeURIComponent(job_id)}&token=${encodeURIComponent(token)}`;
-  const googleMapsDirectionsUrl = `https://www.google.com/maps/dir/${encodeURIComponent(job.pickup_address ?? "")}/${encodeURIComponent(job.delivery_address ?? "")}`;
 
   let driverInfo: OrderEmailDriverInfo | null = null;
   const driverAppId = job.assigned_driver_application_id as string | null | undefined;
@@ -54,7 +53,6 @@ export async function POST(req: Request) {
 
   const result = await sendTrackingUpdateEmail(email, job as Job, {
     trackOrderUrl,
-    googleMapsDirectionsUrl,
     driver: driverInfo,
   });
 

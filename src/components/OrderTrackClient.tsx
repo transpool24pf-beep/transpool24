@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 
 import type { TrailPointMap } from "@/components/OrderTrackMap";
 import { bcp47ForSiteLocale } from "@/lib/bcp47-locale";
+import { normalizeDriverGps } from "@/lib/driver-gps";
 
 const OrderTrackMap = dynamic(
   () => import("@/components/OrderTrackMap").then((m) => m.OrderTrackMap),
@@ -81,14 +82,16 @@ export function OrderTrackClient({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const load = useCallback(() => {
+  const load = useCallback((opts?: { silent?: boolean }) => {
     if (!jobId || !token) {
       setError(t("trackMissingParams"));
       setLoading(false);
       return;
     }
-    setLoading(true);
-    setError(null);
+    if (!opts?.silent) {
+      setLoading(true);
+      setError(null);
+    }
     fetch(
       `/api/public/order-tracking?job_id=${encodeURIComponent(jobId)}&token=${encodeURIComponent(token)}`
     )
@@ -111,28 +114,40 @@ export function OrderTrackClient({
           setTrail(data.trail ?? []);
           setStops(data.stops ?? []);
           setDelivered(Boolean(data.delivered));
+          setError(null);
         }
       )
       .catch((e) => {
+        if (opts?.silent) return;
         setError(e instanceof Error ? e.message : t("invalidLink"));
         setJob(null);
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        if (!opts?.silent) setLoading(false);
+      });
   }, [jobId, token, t]);
 
   useEffect(() => {
     load();
   }, [load]);
 
-  const trailForMap: TrailPointMap[] = useMemo(
-    () =>
-      trail.map((p) => ({
-        lat: Number(p.latitude),
-        lng: Number(p.longitude),
-        recorded_at: p.recorded_at,
-      })),
-    [trail]
-  );
+  useEffect(() => {
+    if (!jobId || !token || delivered) return;
+    const id = window.setInterval(() => {
+      load({ silent: true });
+    }, 8000);
+    return () => window.clearInterval(id);
+  }, [jobId, token, delivered, load]);
+
+  const trailForMap: TrailPointMap[] = useMemo(() => {
+    const out: TrailPointMap[] = [];
+    for (const p of trail) {
+      const g = normalizeDriverGps(Number(p.latitude), Number(p.longitude));
+      if (!g) continue;
+      out.push({ lat: g.lat, lng: g.lng, recorded_at: p.recorded_at });
+    }
+    return out;
+  }, [trail]);
 
   /** API returns trail newest-first; first valid point = latest driver GPS. */
   const newestTrailPoint = useMemo(() => {
@@ -149,26 +164,32 @@ export function OrderTrackClient({
     jobLng != null &&
     Number.isFinite(jobLat) &&
     Number.isFinite(jobLng);
-  const effectiveLat = hasJobGps ? jobLat : newestTrailPoint?.lat ?? null;
-  const effectiveLng = hasJobGps ? jobLng : newestTrailPoint?.lng ?? null;
+  const jobGps = hasJobGps ? normalizeDriverGps(jobLat!, jobLng!) : null;
+  const hasNormalizedJobGps = jobGps != null;
+  const trailNewerThanJob =
+    newestTrailPoint != null &&
+    job?.last_driver_location_at != null &&
+    new Date(newestTrailPoint.recorded_at).getTime() > new Date(job.last_driver_location_at).getTime() + 500;
+  const useTrail = newestTrailPoint != null && (!hasNormalizedJobGps || trailNewerThanJob);
+  const effectiveLat = useTrail ? newestTrailPoint!.lat : jobGps?.lat ?? newestTrailPoint?.lat ?? null;
+  const effectiveLng = useTrail ? newestTrailPoint!.lng : jobGps?.lng ?? newestTrailPoint?.lng ?? null;
   const hasEffectiveLive =
     effectiveLat != null &&
     effectiveLng != null &&
     Number.isFinite(effectiveLat) &&
     Number.isFinite(effectiveLng);
 
-  const googleDirUrl = useMemo(() => {
-    if (!job) return "";
-    return `https://www.google.com/maps/dir/${encodeURIComponent(job.pickup_address)}/${encodeURIComponent(job.delivery_address)}`;
+  const remainingMinutes = useMemo(() => {
+    if (!job) return null;
+    if (job.estimated_arrival_at) {
+      const m = Math.round((new Date(job.estimated_arrival_at).getTime() - Date.now()) / 60_000);
+      return Math.max(0, m);
+    }
+    if (job.eta_minutes_remaining != null && Number.isFinite(job.eta_minutes_remaining)) {
+      return Math.max(0, Math.round(job.eta_minutes_remaining));
+    }
+    return null;
   }, [job]);
-
-  /** Opens Google Maps centered on live GPS with street-level zoom (better than plain ?q= for tracking). */
-  const googleMapsLiveTrackingUrl = useMemo(() => {
-    if (!hasEffectiveLive || effectiveLat == null || effectiveLng == null) return "";
-    const la = effectiveLat.toFixed(6);
-    const ln = effectiveLng.toFixed(6);
-    return `https://www.google.com/maps/@${la},${ln},17z`;
-  }, [hasEffectiveLive, effectiveLat, effectiveLng]);
 
   const showMap = Boolean(
     routePlan ||
@@ -290,10 +311,10 @@ export function OrderTrackClient({
               </dd>
             </div>
           )}
-          {job.eta_minutes_remaining != null && (
+          {remainingMinutes != null && (
             <div>
               <dt className="text-[var(--foreground)]/60">{t("trackEtaMinutesLabel")}</dt>
-              <dd>{t("trackEtaMinutes", { minutes: job.eta_minutes_remaining })}</dd>
+              <dd>{t("trackEtaMinutes", { minutes: remainingMinutes })}</dd>
             </div>
           )}
           <div>
@@ -328,7 +349,6 @@ export function OrderTrackClient({
       {showMap && (
         <div className="space-y-2">
           <h2 className="text-lg font-semibold text-[var(--primary)]">{t("trackMapTitle")}</h2>
-          <p className="text-sm text-[var(--foreground)]/75">{t("trackMapHint")}</p>
           <OrderTrackMap
             pickup={
               routePlan
@@ -356,40 +376,10 @@ export function OrderTrackClient({
       )}
 
       {!showMap && (
-        <div className="space-y-3 rounded-lg border border-dashed border-[#0d2137]/25 bg-[#0d2137]/[0.03] p-4 text-sm text-[var(--foreground)]/80">
+        <div className="rounded-lg border border-dashed border-[#0d2137]/25 bg-[#0d2137]/[0.03] p-4 text-sm text-[var(--foreground)]/80">
           <p>{t("trackNoGeocode")}</p>
-          <a
-            href={googleDirUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block font-medium text-[var(--accent)] hover:underline"
-          >
-            {t("trackOpenGoogleDirections")}
-          </a>
         </div>
       )}
-
-      {hasEffectiveLive && googleMapsLiveTrackingUrl && (
-        <a
-          href={googleMapsLiveTrackingUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex w-full items-center justify-center rounded-xl bg-[var(--accent)] px-4 py-3.5 text-center text-sm font-semibold text-white shadow-md transition hover:opacity-95"
-        >
-          {t("trackMapLink")}
-        </a>
-      )}
-
-      <div className="flex flex-wrap gap-2">
-        <a
-          href={googleDirUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="rounded-xl border-2 border-[#0d2137]/20 bg-white px-4 py-2 text-sm font-medium text-[#0d2137] hover:bg-[#0d2137]/5"
-        >
-          {t("trackOpenGoogleDirections")}
-        </a>
-      </div>
 
       {stops.length > 0 && (
         <div className="rounded-xl border border-[#0d2137]/10 bg-white p-5">

@@ -370,7 +370,7 @@
     "trackMapTitle": "Harita ve rota",
     "trackMapHint": "Gri kesik çizgi: planlanan rota. Turuncu: canlı GPS izi. İlk konumla birlikte canlı işaret görünür.",
     "trackLiveMarker": "Anlık konum",
-    "trackNoGeocode": "Otomatik harita yüklenemedi. Rotayı Google Haritalar’da açın.",
+    "trackNoGeocode": "Otomatik harita yüklenemedi.",
     "trackOpenGoogleDirections": "Google Haritalar’da rotayı aç"
   },
   "footer": {

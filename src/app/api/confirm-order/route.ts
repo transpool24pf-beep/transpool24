@@ -20,6 +20,14 @@ function generateToken(): string {
   return randomBytes(24).toString("base64url");
 }
 
+function cityFromGermanAddress(address: string): string | null {
+  const m = address.match(/\b\d{5}\s+([^,]+)/);
+  if (!m) return null;
+  const city = m[1].replace(/\s*Deutschland\s*$/i, "").trim();
+  if (!city || /^\d+$/.test(city)) return null;
+  return city.slice(0, 80);
+}
+
 export async function POST(req: Request) {
   try {
     const limited = rateLimitResponse(req, "confirm");
@@ -148,9 +156,9 @@ export async function POST(req: Request) {
         customer_email: email || null,
         preferred_pickup_at: pickupTime || null,
         pickup_address: pickupAddress,
-        pickup_city: "Pforzheim",
+        pickup_city: cityFromGermanAddress(pickupAddress),
         delivery_address: deliveryAddress,
-        delivery_city: null,
+        delivery_city: cityFromGermanAddress(deliveryAddress),
         cargo_size: cargoSize,
         cargo_details:
           cargoDetails && typeof cargoDetails === "object"

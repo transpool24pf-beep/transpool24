@@ -515,7 +515,7 @@
     "trackMapTitle": "Karte & Route",
     "trackMapHint": "Grau gestrichelt: geplante Route (Abholung → Lieferung). Orange Linie: Live-GPS, sobald der Fahrer den Standort teilt (Link aus der Verwaltung). Großer runder Marker: Fahrerfoto an der aktuellen Position — ohne Foto erscheint ein orangefarbener Standort-Pin (unterscheidet sich von den blauen Abhol-/Liefer-Markern). Der orangefarbene Button öffnet Google Maps stark gezoomt.",
     "trackLiveMarker": "Aktuelle Position",
-    "trackNoGeocode": "Für diese Adressen konnte keine automatische Karte geladen werden. Route stattdessen in Google Maps öffnen.",
+    "trackNoGeocode": "Für diese Adressen konnte keine automatische Karte geladen werden.",
     "trackOpenGoogleDirections": "Route in Google Maps öffnen"
   },
   "footer": {

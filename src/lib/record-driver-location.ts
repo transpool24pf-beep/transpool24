@@ -1,19 +1,29 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { getRouteDistanceAndDuration } from "@/lib/route-distance-server";
+import { isUsableGpsAccuracy, normalizeDriverGps } from "@/lib/driver-gps";
 
 /** Insert GPS point + update jobs.last_driver_* (service role). */
 export async function recordDriverLocationForJob(
   supabase: SupabaseClient,
   jobId: string,
-  lat: number,
-  lng: number,
+  latRaw: number,
+  lngRaw: number,
   opts?: { accuracy_m?: number | null; heading?: number | null }
 ): Promise<{ ok: true; recorded_at: string } | { ok: false; message: string }> {
+  const fixed = normalizeDriverGps(latRaw, lngRaw);
+  if (!fixed) {
+    return { ok: false, message: "Invalid latitude/longitude" };
+  }
+  if (!isUsableGpsAccuracy(opts?.accuracy_m ?? null)) {
+    return { ok: false, message: "GPS accuracy too low" };
+  }
+  const { lat, lng } = fixed;
   const now = new Date().toISOString();
 
   const { data: jobRow, error: jobFetchErr } = await supabase
     .from("jobs")
     .select(
-      "logistics_status, estimated_arrival_at, eta_minutes_remaining, duration_minutes"
+      "logistics_status, estimated_arrival_at, eta_minutes_remaining, duration_minutes, delivery_address"
     )
     .eq("id", jobId)
     .maybeSingle();
@@ -48,17 +58,28 @@ export async function recordDriverLocationForJob(
     if (st === "assigned" || st === "paid" || st === "confirmed") {
       jobUpdate.logistics_status = "in_transit";
     }
-    const noEta =
-      jobRow.estimated_arrival_at == null && jobRow.eta_minutes_remaining == null;
-    const dm =
-      typeof jobRow.duration_minutes === "number" && jobRow.duration_minutes > 0
-        ? jobRow.duration_minutes
-        : null;
-    if (noEta && dm != null) {
-      jobUpdate.eta_minutes_remaining = dm;
-      const arrival = new Date();
-      arrival.setMinutes(arrival.getMinutes() + dm);
-      jobUpdate.estimated_arrival_at = arrival.toISOString();
+    const dest = typeof jobRow.delivery_address === "string" ? jobRow.delivery_address.trim() : "";
+    if (dest) {
+      const liveRoute = await getRouteDistanceAndDuration(`${lat},${lng}`, dest);
+      if (liveRoute?.durationMinutes != null && liveRoute.durationMinutes > 0) {
+        jobUpdate.eta_minutes_remaining = liveRoute.durationMinutes;
+        const arrival = new Date();
+        arrival.setMinutes(arrival.getMinutes() + liveRoute.durationMinutes);
+        jobUpdate.estimated_arrival_at = arrival.toISOString();
+      }
+    } else {
+      const noEta =
+        jobRow.estimated_arrival_at == null && jobRow.eta_minutes_remaining == null;
+      const dm =
+        typeof jobRow.duration_minutes === "number" && jobRow.duration_minutes > 0
+          ? jobRow.duration_minutes
+          : null;
+      if (noEta && dm != null) {
+        jobUpdate.eta_minutes_remaining = dm;
+        const arrival = new Date();
+        arrival.setMinutes(arrival.getMinutes() + dm);
+        jobUpdate.estimated_arrival_at = arrival.toISOString();
+      }
     }
   }
 

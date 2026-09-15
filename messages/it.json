@@ -371,7 +371,7 @@
     "trackMapTitle": "Mappa e percorso",
     "trackMapHint": "Linea tratteggiata grigia: percorso previsto (ritiro → consegna). Linea arancione: traccia GPS in tempo reale quando l'autista condivide la propria posizione. L'indicatore live appare non appena riceviamo un aggiornamento della posizione.",
     "trackLiveMarker": "Posizione attuale del veicolo",
-    "trackNoGeocode": "Non è stato possibile caricare la mappa automatica per questi indirizzi. Apri invece il percorso in Google Maps.",
+    "trackNoGeocode": "Non è stato possibile caricare la mappa automatica per questi indirizzi.",
     "trackOpenGoogleDirections": "Apri il percorso su Google Maps"
   },
   "footer": {

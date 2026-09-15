@@ -602,7 +602,7 @@ function buildTrackingUpdateHtml(
   job: Job,
   options: {
     trackOrderUrl: string;
-    googleMapsDirectionsUrl: string;
+    googleMapsDirectionsUrl?: string;
     driver?: OrderEmailDriverInfo | null;
   },
   branding: TransactionalEmailBranding
@@ -689,9 +689,6 @@ function buildTrackingUpdateHtml(
             Jetzt live verfolgen
           </a>
         </p>
-        <p style="margin:0 0 8px 0; text-align:center; font-size:14px;">
-          <a href="${escapeHref(options.googleMapsDirectionsUrl)}" style="color:${headerBlue}; text-decoration:underline;">Route in Google Maps öffnen</a>
-        </p>
         <p style="margin:16px 0 0 0; font-size:12px; color:#94a3b8; text-align:center;">TransPool24 · Pforzheim &amp; Region · Diese E-Mail enthält keinen PDF-Anhang.</p>
       </div>
     </td></tr>
@@ -705,7 +702,7 @@ export async function sendTrackingUpdateEmail(
   job: Job,
   options: {
     trackOrderUrl: string;
-    googleMapsDirectionsUrl: string;
+    googleMapsDirectionsUrl?: string;
     driver?: OrderEmailDriverInfo | null;
   }
 ): Promise<{ success: boolean; error?: string }> {

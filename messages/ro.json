@@ -371,7 +371,7 @@
     "trackMapTitle": "Hartă și traseu",
     "trackMapHint": "Linie gri întreruptă: traseu planificat (preluare → livrare). Linie portocalie: traseu GPS live atunci când șoferul își împărtășește locația. Marcatorul live apare imediat ce primim o actualizare a poziției.",
     "trackLiveMarker": "Poziția actuală a vehiculului",
-    "trackNoGeocode": "Nu am putut încărca harta automată pentru aceste adrese. Deschideți traseul în Google Maps.",
+    "trackNoGeocode": "Nu am putut încărca harta automată pentru aceste adrese.",
     "trackOpenGoogleDirections": "Deschideți traseul în Google Maps"
   },
   "footer": {

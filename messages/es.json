@@ -371,7 +371,7 @@
     "trackMapTitle": "Mapa y ruta",
     "trackMapHint": "Línea gris: ruta prevista. Naranja: rastro GPS en vivo. El marcador aparece con la primera posición.",
     "trackLiveMarker": "Posición actual",
-    "trackNoGeocode": "No se pudo cargar el mapa automático. Abrir la ruta en Google Maps.",
+    "trackNoGeocode": "No se pudo cargar el mapa automático para estas direcciones.",
     "trackOpenGoogleDirections": "Abrir ruta en Google Maps"
   },
   "footer": {
