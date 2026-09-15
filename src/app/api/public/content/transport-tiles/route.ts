@@ -5,6 +5,8 @@ import {
   type HomepageTransportTileRow,
 } from "@/lib/homepage-transport-tiles-map";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const supabase = createServerSupabase();

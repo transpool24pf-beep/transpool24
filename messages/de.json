@@ -299,7 +299,8 @@
       "d1_title": "Möbeltransport",
       "d2_title": "Motorradtransport",
       "d3_title": "Autotransport",
-      "d4_title": "Mann und Transporter"
+      "d4_title": "Mann und Transporter",
+      "driverPhotoAlt": "Fahrer {name}"
     },
     "germanyMap": {
       "eyebrow": "Wir verbinden Deutschland",

@@ -159,7 +159,8 @@
       "d1_title": "Entrega de muebles",
       "d2_title": "Transporte de motos",
       "d3_title": "Transporte de coches",
-      "d4_title": "Hombre y furgoneta"
+      "d4_title": "Hombre y furgoneta",
+      "driverPhotoAlt": "Conductor {name}"
     },
     "germanyMap": {
       "eyebrow": "Conectamos Alemania",

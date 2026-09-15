@@ -159,7 +159,8 @@
       "d1_title": "Livrare mobila",
       "d2_title": "Transport motociclete",
       "d3_title": "Transport auto",
-      "d4_title": "Barbat si duba"
+      "d4_title": "Barbat si duba",
+      "driverPhotoAlt": "Șofer {name}"
     },
     "germanyMap": {
       "eyebrow": "Conectăm Germania",

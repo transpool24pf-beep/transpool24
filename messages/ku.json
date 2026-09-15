@@ -159,7 +159,8 @@
       "d1_title": "Radestkirina mobîlya",
       "d2_title": "transport Motorcycle",
       "d3_title": "transport car",
-      "d4_title": "Mirov û van"
+      "d4_title": "Mirov û van",
+      "driverPhotoAlt": "Ajoker {name}"
     },
     "germanyMap": {
       "eyebrow": "Em Almanyayê girêdidin",

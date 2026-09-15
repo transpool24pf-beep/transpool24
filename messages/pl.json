@@ -158,7 +158,8 @@
       "d1_title": "Dostawa mebli",
       "d2_title": "Transport motocykli",
       "d3_title": "Transport samochodowy",
-      "d4_title": "Mężczyzna i furgonetka"
+      "d4_title": "Mężczyzna i furgonetka",
+      "driverPhotoAlt": "Kierowca {name}"
     },
     "germanyMap": {
       "eyebrow": "Łączymy Niemcy",

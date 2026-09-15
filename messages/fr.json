@@ -159,7 +159,8 @@
       "d1_title": "Livraison de meubles",
       "d2_title": "Transport de motos",
       "d3_title": "Transport de voitures",
-      "d4_title": "Homme et camionnette"
+      "d4_title": "Homme et camionnette",
+      "driverPhotoAlt": "Chauffeur {name}"
     },
     "germanyMap": {
       "eyebrow": "Nous relions l'Allemagne",

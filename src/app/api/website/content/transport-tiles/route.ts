@@ -3,6 +3,7 @@ import { requireWebsiteAdmin } from "@/lib/website-admin-api";
 import { createServerSupabase } from "@/lib/supabase";
 import {
   mapHomepageTransportTileRow,
+  tileWritePayload,
   type HomepageTransportTileRow,
 } from "@/lib/homepage-transport-tiles-map";
 
@@ -46,15 +47,32 @@ export async function POST(request: Request) {
 
     const newOrder = (maxData?.order ?? -1) + 1;
 
-    const { data, error } = await supabase
+    const payload = {
+      ...tileWritePayload({ ...body, order: body.order ?? newOrder }),
+      title: body.title,
+      image_url: body.imageUrl,
+      order: body.order ?? newOrder,
+    };
+
+    let { data, error } = await supabase
       .from("homepage_transport_tiles")
-      .insert({
-        title: body.title,
-        image_url: body.imageUrl,
-        order: body.order ?? newOrder,
-      })
+      .insert(payload)
       .select()
       .single();
+
+    if (error && String(error.message || "").includes("driver_photo_url")) {
+      const retry = await supabase
+        .from("homepage_transport_tiles")
+        .insert({
+          title: body.title,
+          image_url: body.imageUrl,
+          order: body.order ?? newOrder,
+        })
+        .select()
+        .single();
+      data = retry.data;
+      error = retry.error;
+    }
 
     if (error) throw error;
 

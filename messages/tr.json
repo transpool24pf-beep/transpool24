@@ -158,7 +158,8 @@
       "d1_title": "Mobilya teslimatı",
       "d2_title": "Motosiklet taşıma",
       "d3_title": "Araç taşıma",
-      "d4_title": "Şoför ve minibüs"
+      "d4_title": "Şoför ve minibüs",
+      "driverPhotoAlt": "Sürücü {name}"
     },
     "germanyMap": {
       "eyebrow": "Almanya'yı birbirine bağlıyoruz",

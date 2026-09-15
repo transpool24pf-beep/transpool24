@@ -159,7 +159,8 @@
       "d1_title": "Consegna mobili",
       "d2_title": "Trasporto moto",
       "d3_title": "Trasporto auto",
-      "d4_title": "Uomo e furgone"
+      "d4_title": "Uomo e furgone",
+      "driverPhotoAlt": "Autista {name}"
     },
     "germanyMap": {
       "eyebrow": "Colleghiamo la Germania",

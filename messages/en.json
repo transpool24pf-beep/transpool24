@@ -295,7 +295,8 @@
       "d1_title": "Furniture delivery",
       "d2_title": "Motorcycle transport",
       "d3_title": "Car transport",
-      "d4_title": "Man and van"
+      "d4_title": "Man and van",
+      "driverPhotoAlt": "Driver {name}"
     },
     "germanyMap": {
       "eyebrow": "We connect Germany",

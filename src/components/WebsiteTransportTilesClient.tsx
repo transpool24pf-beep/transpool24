@@ -8,8 +8,16 @@ interface Tile {
   id?: number;
   title: string;
   imageUrl: string;
+  driverPhotoUrl?: string;
   order?: number;
 }
+
+type DriverPhotoOption = {
+  name: string;
+  photoUrl: string;
+  source: "homepage" | "approved";
+  driverNumber?: number | null;
+};
 
 type Props = { apiBase: string };
 
@@ -25,8 +33,12 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
   const [formData, setFormData] = useState<Tile>({
     title: "",
     imageUrl: "",
+    driverPhotoUrl: "",
     order: 0,
   });
+  const [driverPhotos, setDriverPhotos] = useState<DriverPhotoOption[]>([]);
+  const [driverNumberQuery, setDriverNumberQuery] = useState("");
+  const [lookupLoading, setLookupLoading] = useState(false);
 
   useEffect(() => {
     cmsFetch(`${apiBase}`)
@@ -34,17 +46,26 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
       .then((data) => setTiles(data.tiles || []))
       .catch(() => setTiles([]))
       .finally(() => setLoading(false));
+    cmsFetch("/api/website/content/transport-tiles/driver-photos")
+      .then((r) => r.json())
+      .then((data) => setDriverPhotos(Array.isArray(data.photos) ? data.photos : []))
+      .catch(() => setDriverPhotos([]));
   }, [apiBase]);
 
   const handleAdd = () => {
     setEditingId(null);
     setIsAdding(true);
-    setFormData({ title: "", imageUrl: "", order: tiles.length });
+    setDriverNumberQuery("");
+    setFormData({ title: "", imageUrl: "", driverPhotoUrl: "", order: tiles.length });
   };
 
   const handleEdit = (tile: Tile) => {
     setEditingId(tile.id ?? null);
-    setFormData(tile);
+    setDriverNumberQuery("");
+    setFormData({
+      ...tile,
+      driverPhotoUrl: tile.driverPhotoUrl ?? "",
+    });
   };
 
   const handleDelete = async (id: number) => {
@@ -83,10 +104,16 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
         } else {
           setTiles([...tiles, data.tile]);
         }
-        setEditingId(null);
-        setIsAdding(false);
-        setFormData({ title: "", imageUrl: "", order: tiles.length });
-        alert("Gespeichert.");
+        if (formData.driverPhotoUrl && !(data.tile?.driverPhotoUrl ?? "").trim()) {
+          alert(
+            "صورة السائق لم تُحفظ في قاعدة البيانات. شغّل الملف supabase/homepage_transport_tiles_driver_photo.sql في Supabase SQL Editor ثم أعد الحفظ.",
+          );
+        } else {
+          setEditingId(null);
+          setIsAdding(false);
+          setFormData({ title: "", imageUrl: "", driverPhotoUrl: "", order: tiles.length });
+          alert("Gespeichert.");
+        }
       } else {
         const errBody = await res.json().catch(() => ({}));
         const msg =
@@ -134,6 +161,30 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
       alert(err instanceof Error ? err.message : "Upload fehlgeschlagen.");
     } finally {
       setImageUploading(false);
+    }
+  };
+
+  const handleLookupByDriverNumber = async () => {
+    const num = parseInt(driverNumberQuery.trim(), 10);
+    if (!Number.isFinite(num) || num < 1) {
+      alert("Bitte eine gültige Fahrernummer eingeben. / أدخل رقم سائق صحيح.");
+      return;
+    }
+    setLookupLoading(true);
+    try {
+      const res = await cmsFetch("/api/website/content/drivers/lookup-by-number", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ driverNumber: num }),
+      });
+      const data = (await res.json()) as { photoUrl?: string; fullName?: string; error?: string };
+      if (!res.ok) throw new Error(data.error || "Lookup fehlgeschlagen.");
+      if (!data.photoUrl) throw new Error("Keine Bild-URL.");
+      setFormData((prev) => ({ ...prev, driverPhotoUrl: data.photoUrl! }));
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Lookup fehlgeschlagen.");
+    } finally {
+      setLookupLoading(false);
     }
   };
 
@@ -250,6 +301,109 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
                 </div>
               </div>
             </div>
+            <div className="sm:col-span-2 rounded-xl border border-[#0d2137]/10 bg-[#0d2137]/[0.03] p-4">
+              <label className="mb-1 block text-sm font-medium text-[#0d2137]/80">
+                صورة السائق من صفحة الموقع / Fahrerfoto von der Website
+              </label>
+              <p className="mb-3 text-xs text-[#0d2137]/60">
+                اختر صورة سائق من تقييمات الصفحة أو من السائقين المعتمدين. تظهر دائرة فوق بطاقة «خدمات النقل
+                الشائعة». يمكنك أيضاً جعلها صورة البطاقة نفسها.
+              </p>
+              <div className="mb-3 flex items-center gap-3">
+                <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full border-2 border-[var(--accent)] bg-gray-100">
+                  {formData.driverPhotoUrl ? (
+                    <Image
+                      src={formData.driverPhotoUrl}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      unoptimized={formData.driverPhotoUrl.startsWith("http")}
+                    />
+                  ) : (
+                    <span className="flex h-full w-full items-center justify-center text-[10px] text-[#0d2137]/40">
+                      —
+                    </span>
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap gap-2">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={driverNumberQuery}
+                      onChange={(e) => setDriverNumberQuery(e.target.value)}
+                      placeholder="Fahrernr. / رقم السائق"
+                      className="w-36 rounded-lg border border-[#0d2137]/20 px-3 py-1.5 text-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => void handleLookupByDriverNumber()}
+                      disabled={lookupLoading}
+                      className="rounded-lg border border-[#0d2137]/20 px-3 py-1.5 text-sm font-medium hover:bg-[#0d2137]/5 disabled:opacity-50"
+                    >
+                      {lookupLoading ? "…" : "Übernehmen / اختيار"}
+                    </button>
+                    {formData.driverPhotoUrl ? (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setFormData((prev) => ({ ...prev, imageUrl: prev.driverPhotoUrl || prev.imageUrl }))
+                        }
+                        className="rounded-lg border border-[var(--accent)]/40 px-3 py-1.5 text-sm font-medium text-[var(--accent)] hover:bg-[var(--accent)]/10"
+                      >
+                        استخدام كصورة البطاقة / Als Kachelbild
+                      </button>
+                    ) : null}
+                    {formData.driverPhotoUrl ? (
+                      <button
+                        type="button"
+                        onClick={() => setFormData((prev) => ({ ...prev, driverPhotoUrl: "" }))}
+                        className="rounded-lg border border-red-200 px-3 py-1.5 text-sm text-red-700 hover:bg-red-50"
+                      >
+                        Entfernen / إزالة
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
+              </div>
+              {driverPhotos.length === 0 ? (
+                <p className="text-xs text-[#0d2137]/50">
+                  لا توجد صور بعد — أضف سائقين من تقييمات الصفحة أو من طلبات السائقين المعتمدة.
+                </p>
+              ) : (
+                <div className="grid max-h-64 grid-cols-3 gap-2 overflow-y-auto sm:grid-cols-5">
+                  {driverPhotos.map((p) => {
+                    const selected = formData.driverPhotoUrl === p.photoUrl;
+                    const label = p.driverNumber
+                      ? `${p.name} · ${String(p.driverNumber).padStart(5, "0")}`
+                      : p.name;
+                    return (
+                      <button
+                        key={`${p.source}-${p.photoUrl}`}
+                        type="button"
+                        title={label}
+                        onClick={() => setFormData((prev) => ({ ...prev, driverPhotoUrl: p.photoUrl }))}
+                        className={`overflow-hidden rounded-lg border-2 text-start ${
+                          selected ? "border-[var(--accent)] ring-2 ring-[var(--accent)]/40" : "border-transparent"
+                        }`}
+                      >
+                        <span className="relative block aspect-square">
+                          <Image
+                            src={p.photoUrl}
+                            alt={p.name}
+                            fill
+                            className="object-cover"
+                            sizes="80px"
+                            unoptimized={p.photoUrl.startsWith("http")}
+                          />
+                        </span>
+                        <span className="block truncate px-1 py-1 text-[10px] text-[#0d2137]/70">{label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
           <div className="mt-4 flex gap-2">
             <button
@@ -264,7 +418,7 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
               onClick={() => {
                 setEditingId(null);
                 setIsAdding(false);
-                setFormData({ title: "", imageUrl: "", order: tiles.length });
+                setFormData({ title: "", imageUrl: "", driverPhotoUrl: "", order: tiles.length });
               }}
               className="rounded-lg border border-[#0d2137]/20 px-4 py-2 font-medium text-[#0d2137] hover:bg-[#0d2137]/5"
             >
@@ -299,6 +453,17 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
                     unoptimized={!tile.imageUrl || tile.imageUrl.startsWith("http")}
                   />
                 </div>
+                {tile.driverPhotoUrl ? (
+                  <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border-2 border-[var(--accent)]">
+                    <Image
+                      src={tile.driverPhotoUrl}
+                      alt=""
+                      fill
+                      className="object-cover"
+                      unoptimized={tile.driverPhotoUrl.startsWith("http")}
+                    />
+                  </div>
+                ) : null}
                 <div className="min-w-0 flex-1">
                   <h3 className="font-semibold text-[#0d2137]">{tile.title}</h3>
                   <p className="mt-1 truncate text-xs text-[#0d2137]/50">{tile.imageUrl}</p>
