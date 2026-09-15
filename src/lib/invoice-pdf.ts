@@ -213,9 +213,10 @@ export async function generateInvoicePdf(
     : amountCents;
   if (type === "customer") {
     const vat = splitGermanVatFromGross(totalCents);
-    draw(`Netto: EUR ${(vat.netCents / 100).toFixed(2)}`);
-    draw(`zzgl. 19 % MwSt.: EUR ${(vat.vatCents / 100).toFixed(2)}`);
-    draw(`Gesamtbetrag (brutto): EUR ${(vat.grossCents / 100).toFixed(2)}`, { size: 12, bold: true });
+    y -= 4;
+    draw("Netto: EUR " + (vat.netCents / 100).toFixed(2));
+    draw("zzgl. 19 % MwSt.: EUR " + (vat.vatCents / 100).toFixed(2), { bold: true });
+    draw("Gesamtbetrag (brutto): EUR " + (vat.grossCents / 100).toFixed(2), { size: 12, bold: true });
   } else {
     const totalEur = (totalCents / 100).toFixed(2);
     draw(`Gesamtbetrag: EUR ${totalEur}`, { size: 12, bold: true });
