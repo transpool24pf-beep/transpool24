@@ -173,10 +173,10 @@ export const ADMIN_PAGES_DE: Record<string, string> = {
   "settings.bookingsPaused": "pausiert",
   "settings.pricePerKmTitle": "Preis pro km nach Ladungsgröße",
   "settings.pricePerKmDesc":
-    "Abhängig von Strecke und Größe (XS / M / L). Euro pro Kilometer mit Komma (z. B. 2,30); intern als Cent/km gespeichert.",
+    "Ein Satz für 3,5-t-Fahrzeug. Euro pro Kilometer mit Komma (z. B. 2,30); intern als Cent/km gespeichert.",
   "settings.sizeXS": "Klein (XS)",
   "settings.sizeM": "Mittel (M)",
-  "settings.sizeL": "Groß (L)",
+  "settings.sizeL": "3,5 t",
   "settings.perKm": "€ / km",
   "settings.driverWithCarTitle": "Stundenlohn: Fahrer mit Fahrzeug",
   "settings.driverWithCarDesc":
@@ -371,10 +371,10 @@ export const ADMIN_PAGES_AR: Record<string, string> = {
   "settings.bookingsPaused": "موقوف",
   "settings.pricePerKmTitle": "السعر لكل كم حسب حجم الحمولة",
   "settings.pricePerKmDesc":
-    "حسب المسافة والحجم (XS / M / L). يورو لكل كيلومتر بفاصلة (مثلاً 2,30)؛ يُخزَّن داخلياً بالسنت/كم.",
+    "سعر واحد لسيارة 3,5 طن. يورو لكل كيلومتر بفاصلة (مثلاً 2,30)؛ يُخزَّن داخلياً بالسنت/كم.",
   "settings.sizeXS": "صغير (XS)",
   "settings.sizeM": "متوسط (M)",
-  "settings.sizeL": "كبير (L)",
+  "settings.sizeL": "3,5 طن",
   "settings.perKm": "€ / كم",
   "settings.driverWithCarTitle": "أجر الساعة: سائق مع مركبة",
   "settings.driverWithCarDesc":

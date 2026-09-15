@@ -16,6 +16,8 @@ import {
   loadOrderAddressHistory,
   mergePersistedAddresses,
   filterAddressHistoryForQuery,
+  appendOrderAddressLine,
+  saveOrderAddressHistory,
 } from "@/lib/order-address-history";
 import { localeToHtmlLang } from "@/lib/locale-html-lang";
 import {
@@ -67,8 +69,9 @@ type RouteGeo = {
   geometry: GeoJSON.LineString | null;
 };
 
-const CARGO_OPTIONS = ["XS", "M", "L"] as const;
-type CargoSize = (typeof CARGO_OPTIONS)[number];
+type CargoSize = "XS" | "M" | "L";
+/** Single vehicle class offered on the order form: 3.5 t van. */
+const FIXED_CARGO_SIZE: CargoSize = "L";
 
 const SERVICE_OPTIONS: { value: ServiceType; key: "serviceDriverOnly" | "serviceDriverCar" | "serviceDriverCarAssistant" }[] = [
   { value: "driver_only", key: "serviceDriverOnly" },
@@ -208,7 +211,7 @@ const initial: OrderFormData = {
   deliveryAddressLine: "",
   pickupDate: "",
   pickupTime: "",
-  cargoSize: "M",
+  cargoSize: FIXED_CARGO_SIZE,
   cargoCategory: "",
   serviceType: "",
   distanceKm: DEFAULT_KM,
@@ -304,7 +307,7 @@ export function OrderForm({
     const d = loadOrderFormDraft();
     if (d) {
       setStep(Math.min(4, Math.max(1, d.step)));
-      setData(d.data);
+      setData({ ...d.data, cargoSize: FIXED_CARGO_SIZE });
       setPickupDateField(maskPickupDateInput(d.pickupDateField));
       setCargoPhotoUrls(Array.isArray(d.cargoPhotoUrls) ? d.cargoPhotoUrls : []);
       setPhoneCountryCode(d.phoneCountryCode || "+49");
@@ -445,6 +448,15 @@ export function OrderForm({
     [deliverySuggestions, deliveryHistoryKeySet]
   );
 
+  const persistAddressLine = useCallback((line: string) => {
+    setAddressHistory((prev) => {
+      const next = appendOrderAddressLine(prev, line);
+      if (next === prev) return prev;
+      saveOrderAddressHistory(next);
+      return next;
+    });
+  }, []);
+
   const applyAddressLineSuggestion = useCallback((field: "pickup" | "delivery", s: Suggestion) => {
     void (async () => {
       const rotateSession = () => {
@@ -454,6 +466,7 @@ export function OrderForm({
             : `tp24-${Date.now()}`;
       };
       const key = field === "pickup" ? "pickupAddressLine" : "deliveryAddressLine";
+      let stored = (s.display_name || "").trim();
       try {
         if (s.place_id) {
           const res = await fetch(
@@ -461,30 +474,29 @@ export function OrderForm({
           );
           const j = (await res.json()) as PlaceDetailsJson;
           rotateSession();
-          setData((prev) => ({
-            ...prev,
-            [key]: lineFromPlaceDetails(j, s.display_name || (field === "pickup" ? prev.pickupAddressLine : prev.deliveryAddressLine)),
-          }));
+          stored = lineFromPlaceDetails(j, stored).trim() || stored;
+          setData((prev) => ({ ...prev, [key]: stored }));
           setError(null);
         } else {
           setData((prev) => ({
             ...prev,
-            [key]: s.display_name || (field === "pickup" ? prev.pickupAddressLine : prev.deliveryAddressLine),
+            [key]: stored || (field === "pickup" ? prev.pickupAddressLine : prev.deliveryAddressLine),
           }));
           setError(null);
         }
       } catch {
         setData((prev) => ({
           ...prev,
-          [key]: s.display_name || (field === "pickup" ? prev.pickupAddressLine : prev.deliveryAddressLine),
+          [key]: stored || (field === "pickup" ? prev.pickupAddressLine : prev.deliveryAddressLine),
         }));
         setError(null);
       }
+      persistAddressLine(stored);
       if (field === "pickup") setPickupSuggestions([]);
       else setDeliverySuggestions([]);
       setSuggestionsOpen(null);
     })();
-  }, []);
+  }, [persistAddressLine]);
 
   const normalizePhone = (value: string, countryCode: string = phoneCountryCode) => {
     const digits = value.replace(/\D/g, "");
@@ -635,7 +647,7 @@ export function OrderForm({
               deliveryAddress,
               pickupTime:
                 data.pickupDate && data.pickupTime ? `${data.pickupDate}T${data.pickupTime}` : null,
-              cargoSize: data.cargoSize,
+              cargoSize: FIXED_CARGO_SIZE,
               serviceType: data.serviceType || "driver_car",
               weightKg: data.cargoWeightKg,
               cargoCategory: data.cargoCategory,
@@ -991,7 +1003,7 @@ export function OrderForm({
           pickupAddress,
           deliveryAddress,
           pickupTime: data.pickupDate && data.pickupTime ? `${data.pickupDate}T${data.pickupTime}` : null,
-          cargoSize: data.cargoSize,
+          cargoSize: FIXED_CARGO_SIZE,
           serviceType: data.serviceType || "driver_car",
           distanceKm: data.distanceKm,
           priceCents,
@@ -1203,7 +1215,7 @@ export function OrderForm({
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
               {t("pickup")}
             </label>
-            <div className="relative">
+            <div className={`relative ${suggestionsOpen === "pickup" ? "z-30" : ""}`}>
               <input
                 ref={pickupAddressRef}
                 type="text"
@@ -1214,14 +1226,26 @@ export function OrderForm({
                   update({ pickupAddressLine: e.target.value });
                   setSuggestionsOpen("pickup");
                 }}
-                onFocus={() => setSuggestionsOpen("pickup")}
-                onBlur={() => setTimeout(() => setSuggestionsOpen(null), 200)}
+                onMouseDown={() => {
+                  setAddressHistory(loadOrderAddressHistory());
+                  setSuggestionsOpen("pickup");
+                }}
+                onFocus={() => {
+                  setAddressHistory(loadOrderAddressHistory());
+                  setSuggestionsOpen("pickup");
+                }}
+                onBlur={() => {
+                  persistAddressLine(data.pickupAddressLine);
+                  setTimeout(() => {
+                    setSuggestionsOpen((open) => (open === "pickup" ? null : open));
+                  }, 200);
+                }}
                 placeholder={t("addressOneLinePlaceholder")}
                 className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
               />
               {suggestionsOpen === "pickup" &&
                 (pickupHistoryMatches.length > 0 || pickupApiSuggestionsDeduped.length > 0) && (
-                  <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-[#0d2137]/20 bg-white py-1 shadow-lg">
+                  <ul className="absolute z-30 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-[#0d2137]/20 bg-white py-1 shadow-lg">
                     {pickupHistoryMatches.length > 0 && (
                       <>
                         <li className="pointer-events-none px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--foreground)]/50">
@@ -1274,7 +1298,7 @@ export function OrderForm({
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
               {t("delivery")}
             </label>
-            <div className="relative">
+            <div className={`relative ${suggestionsOpen === "delivery" ? "z-30" : ""}`}>
               <input
                 ref={deliveryAddressRef}
                 type="text"
@@ -1285,14 +1309,26 @@ export function OrderForm({
                   update({ deliveryAddressLine: e.target.value });
                   setSuggestionsOpen("delivery");
                 }}
-                onFocus={() => setSuggestionsOpen("delivery")}
-                onBlur={() => setTimeout(() => setSuggestionsOpen(null), 200)}
+                onMouseDown={() => {
+                  setAddressHistory(loadOrderAddressHistory());
+                  setSuggestionsOpen("delivery");
+                }}
+                onFocus={() => {
+                  setAddressHistory(loadOrderAddressHistory());
+                  setSuggestionsOpen("delivery");
+                }}
+                onBlur={() => {
+                  persistAddressLine(data.deliveryAddressLine);
+                  setTimeout(() => {
+                    setSuggestionsOpen((open) => (open === "delivery" ? null : open));
+                  }, 200);
+                }}
                 placeholder={t("addressOneLinePlaceholder")}
                 className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
               />
               {suggestionsOpen === "delivery" &&
                 (deliveryHistoryMatches.length > 0 || deliveryApiSuggestionsDeduped.length > 0) && (
-                  <ul className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-[#0d2137]/20 bg-white py-1 shadow-lg">
+                  <ul className="absolute z-30 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-[#0d2137]/20 bg-white py-1 shadow-lg">
                     {deliveryHistoryMatches.length > 0 && (
                       <>
                         <li className="pointer-events-none px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--foreground)]/50">
@@ -1602,21 +1638,11 @@ export function OrderForm({
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
               {t("cargoSize")}
             </label>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {CARGO_OPTIONS.map((size) => (
-                <button
-                  key={size}
-                  type="button"
-                  onClick={() => update({ cargoSize: size })}
-                  className={`rounded-lg border px-3 py-2 text-sm font-medium transition ${
-                    data.cargoSize === size
-                      ? "border-[var(--accent)] bg-[var(--accent)]/10 text-[var(--accent)]"
-                      : "border-[#0d2137]/20 text-[var(--foreground)] hover:border-[#0d2137]/40"
-                  }`}
-                >
-                  {t(`cargo${size}` as "cargoXS")}
-                </button>
-              ))}
+            <div
+              className="rounded-lg border border-[var(--accent)] bg-[var(--accent)]/10 px-3 py-2 text-sm font-medium text-[var(--accent)]"
+              aria-live="polite"
+            >
+              {t("cargoL")}
             </div>
           </div>
           <div className="rounded-lg border border-[#0d2137]/15 bg-[#0d2137]/5 p-4">
@@ -1726,7 +1752,7 @@ export function OrderForm({
             {data.cargoCategory && (
               <p><strong>{t("cargoWhatToTransport")}:</strong> {t(CARGO_CATEGORIES.find((c) => c.id === data.cargoCategory)?.labelKey ?? "cargoCatGeneralOther")}</p>
             )}
-            <p><strong>{t("cargoSize")}:</strong> {t(`cargo${data.cargoSize}` as "cargoXS")}</p>
+            <p><strong>{t("cargoSize")}:</strong> {t("cargoL")}</p>
             <p>
               <strong>{t("cargoDetails")}:</strong> {data.cargoWeightKg} kg · {t("packageCount")}: {data.packageCount} ·{" "}
               {t("cargoPhotosLabel")}: {cargoPhotoUrls.length}

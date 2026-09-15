@@ -20,12 +20,6 @@ const DEFAULT_PRICE_PER_KM_CENTS: Record<"XS" | "M" | "L", number> = {
   L: 200,
 };
 
-const SIZE_LABEL_KEYS: Record<"XS" | "M" | "L", string> = {
-  XS: "settings.sizeXS",
-  M: "settings.sizeM",
-  L: "settings.sizeL",
-};
-
 function formatEur(cents: number): string {
   return new Intl.NumberFormat("de-DE", {
     minimumFractionDigits: 2,
@@ -89,6 +83,7 @@ export default function AdminSettingsPage() {
           ...(data.cargo_category_adjustment_cents as Record<string, number> | undefined),
         };
         const perKm = data.price_per_km_cents ?? DEFAULT_PRICE_PER_KM_CENTS;
+        const km35 = perKm.L ?? perKm.M ?? perKm.XS ?? DEFAULT_PRICE_PER_KM_CENTS.L;
         setPricing({
           price_per_km_cents: perKm,
           driver_hourly_rate_cents: withCar,
@@ -98,9 +93,9 @@ export default function AdminSettingsPage() {
           cargo_category_adjustment_cents: cats,
         });
         setPerKmEur({
-          XS: formatEur(perKm.XS ?? DEFAULT_PRICE_PER_KM_CENTS.XS),
-          M: formatEur(perKm.M ?? DEFAULT_PRICE_PER_KM_CENTS.M),
-          L: formatEur(perKm.L ?? DEFAULT_PRICE_PER_KM_CENTS.L),
+          XS: formatEur(km35),
+          M: formatEur(km35),
+          L: formatEur(km35),
         });
         setDriverRateEur(formatEur(withCar));
         setDriverOnlyEur(formatEur(onlyDriver));
@@ -123,14 +118,13 @@ export default function AdminSettingsPage() {
     for (const c of CARGO_CATEGORIES) {
       categoryAdjust[c.id] = Math.max(0, parseEur(categoryEur[c.id] ?? "0"));
     }
-    const pricePerKmCents: Record<string, number> = {};
-    for (const size of ["XS", "M", "L"] as const) {
-      const parsed = parseEur(perKmEur[size] ?? "0");
-      pricePerKmCents[size] = Math.max(
-        1,
-        parsed || DEFAULT_PRICE_PER_KM_CENTS[size]
-      );
-    }
+    const parsed = parseEur(perKmEur.L ?? "0");
+    const cents = Math.max(1, parsed || DEFAULT_PRICE_PER_KM_CENTS.L);
+    const pricePerKmCents: Record<string, number> = {
+      XS: cents,
+      M: cents,
+      L: cents,
+    };
     const toSave = {
       ...pricing,
       price_per_km_cents: pricePerKmCents,
@@ -216,23 +210,19 @@ export default function AdminSettingsPage() {
         <section className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
           <h2 className="mb-1 text-lg font-medium text-[#0d2137]">{t("settings.pricePerKmTitle")}</h2>
           <p className="mb-4 text-sm text-[#0d2137]/60">{t("settings.pricePerKmDesc")}</p>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            {(["XS", "M", "L"] as const).map((size) => (
-              <div key={size}>
-                <label className="mb-2 block text-sm font-medium text-[#0d2137]/80">{t(SIZE_LABEL_KEYS[size])}</label>
-                <input
-                  type="text"
-                  inputMode="decimal"
-                  value={perKmEur[size]}
-                  onChange={(e) =>
-                    setPerKmEur((prev) => ({ ...prev, [size]: e.target.value }))
-                  }
-                  placeholder="1,20"
-                  className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2.5 text-lg focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-                />
-                <p className="mt-1 text-xs text-[#0d2137]/50">{t("settings.perKm")}</p>
-              </div>
-            ))}
+          <div className="max-w-xs">
+            <label className="mb-2 block text-sm font-medium text-[#0d2137]/80">{t("settings.sizeL")}</label>
+            <input
+              type="text"
+              inputMode="decimal"
+              value={perKmEur.L}
+              onChange={(e) =>
+                setPerKmEur((prev) => ({ ...prev, XS: e.target.value, M: e.target.value, L: e.target.value }))
+              }
+              placeholder="1,20"
+              className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2.5 text-lg focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+            />
+            <p className="mt-1 text-xs text-[#0d2137]/50">{t("settings.perKm")}</p>
           </div>
         </section>
 
