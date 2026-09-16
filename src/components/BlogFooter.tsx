@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { getPublicContactEmail, getPublicContactMailto } from "@/lib/site-contact";
+import { getPublicContactEmail, getPublicContactMailto, getPublicContactPhone, getPublicContactTelHref } from "@/lib/site-contact";
 import { BrandWordmark } from "@/components/BrandWordmark";
 import { SiteSocialIcons } from "@/components/SiteSocialIcons";
 
@@ -85,8 +85,8 @@ export function BlogFooter() {
                 <span>{t("template.touchAddress")}</span>
               </li>
               <li>
-                <a href={`tel:${t("template.touchPhone").replace(/\s/g, "")}`} className="hover:text-[var(--accent)] hover:underline">
-                  {t("template.touchPhone")}
+                <a href={getPublicContactTelHref()} className="hover:text-[var(--accent)] hover:underline" dir="ltr">
+                  {getPublicContactPhone()}
                 </a>
               </li>
               <li>

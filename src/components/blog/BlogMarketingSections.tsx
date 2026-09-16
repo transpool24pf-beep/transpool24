@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { BlogFaqClient, type BlogFaqItem } from "@/components/blog/BlogFaqClient";
 import type { Locale } from "@/i18n/routing";
-import { getPublicContactEmail, getPublicContactMailto } from "@/lib/site-contact";
+import { getPublicContactEmail, getPublicContactMailto, getPublicContactPhone, getPublicContactTelHref } from "@/lib/site-contact";
 
 const STATS_IMG =
   "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=900&q=80&auto=format&fit=crop";
@@ -285,8 +285,8 @@ export async function BlogTemplateAfterPosts({ locale }: { locale: Locale }) {
                 </span>
                 <div>
                   <p className="text-xs font-bold uppercase tracking-wide text-white/70">{t("template.touchPhoneLabel")}</p>
-                  <a href={`tel:${t("template.touchPhone").replace(/\s/g, "")}`} className="mt-1 block font-semibold hover:underline">
-                    {t("template.touchPhone")}
+                  <a href={getPublicContactTelHref()} className="mt-1 block font-semibold hover:underline" dir="ltr">
+                    {getPublicContactPhone()}
                   </a>
                 </div>
               </li>

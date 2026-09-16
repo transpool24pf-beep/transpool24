@@ -1,6 +1,7 @@
-/** Public contact email shown on the website (mailto links, privacy, support sidebar). */
+/** Public contact shown on the website (mailto, tel, privacy, support sidebar). */
 
-export const DEFAULT_PUBLIC_CONTACT_EMAIL = "hello@transpool24.com";
+export const DEFAULT_PUBLIC_CONTACT_EMAIL = "transpool24pf@gmail.com";
+export const DEFAULT_PUBLIC_CONTACT_PHONE = "+49 176 22624264";
 
 function parseBareEmail(raw: string | undefined): string | null {
   const s = (raw ?? "").trim().replace(/^["']|["']$/g, "");
@@ -21,4 +22,13 @@ export function getPublicContactEmail(): string {
 
 export function getPublicContactMailto(): string {
   return `mailto:${getPublicContactEmail()}`;
+}
+
+export function getPublicContactPhone(): string {
+  const raw = (process.env.NEXT_PUBLIC_CONTACT_PHONE ?? "").trim();
+  return raw || DEFAULT_PUBLIC_CONTACT_PHONE;
+}
+
+export function getPublicContactTelHref(): string {
+  return `tel:${getPublicContactPhone().replace(/[\s-]/g, "")}`;
 }

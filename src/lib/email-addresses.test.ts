@@ -41,7 +41,7 @@ describe("email-addresses", () => {
     delete process.env.SUPPORT_INBOX_EMAIL;
     delete process.env.PUBLIC_CONTACT_EMAIL;
     delete process.env.NEXT_PUBLIC_CONTACT_EMAIL;
-    expect(getCustomerReplyToEmail()).toBe("hello@transpool24.com");
-    expect(getSupportInboxEmail()).toBe("hello@transpool24.com");
+    expect(getCustomerReplyToEmail()).toBe("transpool24pf@gmail.com");
+    expect(getSupportInboxEmail()).toBe("transpool24pf@gmail.com");
   });
 });
