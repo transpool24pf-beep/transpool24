@@ -94,7 +94,7 @@ export function WebsiteHeroClient() {
       const body = (await res.json()) as { url?: string; error?: string };
       if (res.status === 401) {
         throw new Error(
-          "انتهت الجلسة — سجّل الدخول من جديد من /website/login.",
+          "انتهت الجلسة, سجّل الدخول من جديد من /website/login.",
         );
       }
       if (!res.ok) throw new Error(body.error || "فشل الرفع.");
@@ -134,7 +134,7 @@ export function WebsiteHeroClient() {
       const body = (await res.json()) as { url?: string; error?: string };
       if (res.status === 401) {
         throw new Error(
-          "انتهت الجلسة — سجّل الدخول من جديد من /website/login.",
+          "انتهت الجلسة, سجّل الدخول من جديد من /website/login.",
         );
       }
       if (!res.ok) throw new Error(body.error || "فشل الرفع.");
@@ -174,7 +174,7 @@ export function WebsiteHeroClient() {
         alert(msg);
       } else if (res.status === 401) {
         alert(
-          "انتهت الجلسة — سجّل الدخول من جديد من /website/login",
+          "انتهت الجلسة, سجّل الدخول من جديد من /website/login",
         );
       } else {
         alert(body.error || "فشل الحفظ.");
@@ -203,7 +203,7 @@ export function WebsiteHeroClient() {
           <strong className="ms-1 text-[#0d2137]">المجلة (/blog):</strong> غلاف لوجستي كبير مع شاحنة في المقدمة يستخدم نفس البيانات. أدخل النصوص بالإنجليزية؛ تُترجم تلقائياً عند الحفظ.
         </p>
         <p className="mt-2 text-sm font-medium text-[#0d2137]">
-          الشاحنة تظهر على <strong>صفحة المجلة فقط</strong> — يُفضّل ملف PNG شفاف.
+          الشاحنة تظهر على <strong>صفحة المجلة فقط</strong>, يُفضّل ملف PNG شفاف.
         </p>
       </div>
 
@@ -275,7 +275,7 @@ export function WebsiteHeroClient() {
                 />
               ) : (
                 <span className="flex h-full w-full items-center justify-center text-sm text-[#0d2137]/40">
-                  لا توجد صورة — سيُستخدم الافتراضي
+                  لا توجد صورة, سيُستخدم الافتراضي
                 </span>
               )}
             </div>
@@ -288,7 +288,7 @@ export function WebsiteHeroClient() {
                 className="block w-full text-sm text-[#0d2137] file:mr-3 file:rounded-lg file:border-0 file:bg-[var(--accent)] file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:opacity-95 disabled:opacity-50"
               />
               <p className="text-xs text-[#0d2137]/60">
-                JPEG/PNG/WebP، حد أقصى 12 ميغابايت — يُفضَّل عرض عالٍ (مثلاً 2400 بكسل فأكثر) وبأقل ضغط. بعد الرفع اضغط «حفظ».
+                JPEG/PNG/WebP، حد أقصى 12 ميغابايت, يُفضَّل عرض عالٍ (مثلاً 2400 بكسل فأكثر) وبأقل ضغط. بعد الرفع اضغط «حفظ».
               </p>
               <input
                 type="url"
@@ -368,15 +368,15 @@ export function WebsiteHeroClient() {
                   </p>
                   <p>
                     <span className="text-[#0d2137]/55">العنوان: </span>
-                    {data.headline[code] || "—"}
+                    {data.headline[code] || "-"}
                   </p>
                   <p className="mt-1">
                     <span className="text-[#0d2137]/55">العنوان الفرعي: </span>
-                    {data.subtitle[code] || "—"}
+                    {data.subtitle[code] || "-"}
                   </p>
                   <p className="mt-1">
                     <span className="text-[#0d2137]/55">الزر: </span>
-                    {data.cta[code] || "—"}
+                    {data.cta[code] || "-"}
                   </p>
                 </div>
               ))}

@@ -14,7 +14,7 @@ import { localeAlternatesAndSocial } from "@/lib/locale-seo-metadata";
 
 export const revalidate = 60;
 
-/** Blog hero — iStock delivery scene (licensed use per your account; served crisp via next/image unoptimized). */
+/** Blog hero, iStock delivery scene (licensed use per your account; served crisp via next/image unoptimized). */
 const BLOG_HERO_BACKGROUND =
   "https://media.istockphoto.com/id/1795667445/photo/asian-woman-receiving-product-from-delivery-man-at-home-young-owner-woman-order-product-from.jpg?s=170667a&w=0&k=20&c=z4DKtsdWUvhJWsVvLB3OlZ1eVtib_ftEZj0a0fzHoR4=";
 /** Blog hero vehicle: `assets/pngegg.png` → public */

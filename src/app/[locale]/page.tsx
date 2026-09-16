@@ -193,7 +193,7 @@ export default async function HomePage({
 
         <GermanyConnectSection locale={locale} />
 
-        {/* Driver CTA — immersive card (sennder-style), single “Become a driver” action */}
+        {/* Driver CTA, immersive card (sennder-style), single “Become a driver” action */}
         <section className="bg-[#f5f5f5] py-20 sm:py-28">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <p className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--accent)]">

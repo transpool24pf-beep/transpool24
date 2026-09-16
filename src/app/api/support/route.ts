@@ -140,7 +140,7 @@ ${branding.headerHtml}
     ${commLanguage ? `<p><strong>Sprache:</strong> ${escapeHtml(commLanguage)}</p>` : ""}
     ${pageLocale ? `<p><strong>Seite:</strong> ${escapeHtml(pageLocale)}</p>` : ""}
     <p><strong>Marketing OK:</strong> ${marketingOptIn ? "Ja" : "Nein"}</p>
-    <p><strong>Fahrernummer:</strong> ${driverNumber != null ? escapeHtml(String(driverNumber)) : "—"}</p>
+    <p><strong>Fahrernummer:</strong> ${driverNumber != null ? escapeHtml(String(driverNumber)) : "-"}</p>
     ${jobId ? `<p><strong>Job-ID:</strong> ${escapeHtml(jobId)}</p>` : ""}
     <p><strong>Nachricht:</strong></p>
     <pre style="white-space:pre-wrap; background:#f5f5f5; padding:12px; border-radius:8px;">${escapeHtml(message)}</pre>

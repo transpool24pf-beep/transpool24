@@ -89,8 +89,8 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           } else {
             setDeployLine(
               t("shell.footerDeploy")
-                .replace("{env}", j.vercelEnv ?? "—")
-                .replace("{sha}", j.gitSha ?? "—")
+                .replace("{env}", j.vercelEnv ?? "-")
+                .replace("{sha}", j.gitSha ?? "-")
             );
           }
           setDeployMeta({

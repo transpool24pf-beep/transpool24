@@ -107,7 +107,7 @@ export const CARGO_CATEGORY_LABEL_DE: Record<CargoCategoryId, string> = {
   general_other: "Allgemeine Ware / Sonstiges",
 };
 
-/** Pre-B2B category ids still stored on old jobs — show readable German label. */
+/** Pre-B2B category ids still stored on old jobs, show readable German label. */
 export const LEGACY_CARGO_CATEGORY_LABEL_DE: Record<string, string> = {
   furniture_general: "Möbel / Allgemein (alt)",
   moving_services: "Umzugsdienstleistungen (alt)",
@@ -127,15 +127,15 @@ export function isCargoCategoryId(id: unknown): id is CargoCategoryId {
   return typeof id === "string" && CARGO_CATEGORIES.some((c) => c.id === id);
 }
 
-/** Label for PDF, emails, admin — German. */
+/** Label for PDF, emails, admin, German. */
 export function cargoCategoryLabelDe(id: string | null | undefined): string {
-  if (id == null || id === "") return "—";
+  if (id == null || id === "") return "-";
   if (isLoadCarrierId(id)) return LOAD_CARRIER_LABEL_DE[id];
   if (isCargoCategoryId(id)) return CARGO_CATEGORY_LABEL_DE[id];
   return LEGACY_CARGO_CATEGORY_LABEL_DE[id] ?? id;
 }
 
-/** Load-carrier types (booking form Loads row — emails/PDF use German labels). */
+/** Load-carrier types (booking form Loads row, emails/PDF use German labels). */
 export type LoadCarrierId =
   | "carton"
   | "container"
@@ -338,6 +338,6 @@ export function suggestVehicleLabel(size: CargoSize): string {
     case "L":
       return "LKW / Großraum";
     default:
-      return "—";
+      return "-";
   }
 }

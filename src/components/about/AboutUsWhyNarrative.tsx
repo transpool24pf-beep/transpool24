@@ -21,7 +21,7 @@ function isRtlLocale(locale: string): boolean {
 }
 
 /**
- * «About us» narrative on /[locale]/why and optional blog block — all locales via messages/*.json → aboutNarrative.
+ * «About us» narrative on /[locale]/why and optional blog block, all locales via messages/*.json → aboutNarrative.
  */
 export async function AboutUsWhyNarrative({ locale, embedded = false }: Props) {
   const loc = locale as Locale;
@@ -98,7 +98,7 @@ export async function AboutUsWhyNarrative({ locale, embedded = false }: Props) {
         </section>
 
         <p className="rounded-xl bg-[#fafbfc] px-5 py-4 text-center text-base font-semibold text-[var(--primary)] ring-1 ring-[#0d2137]/8">
-          <span className="text-[var(--accent)]">TransPool24</span> — {t("ctaPrefix")}{" "}
+          <span className="text-[var(--accent)]">TransPool24</span>, {t("ctaPrefix")}{" "}
           <Link
             href={`/${loc}/order`}
             className="text-[var(--accent)] underline underline-offset-2 hover:opacity-90"

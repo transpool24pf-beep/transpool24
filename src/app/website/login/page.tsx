@@ -45,7 +45,7 @@ export default function WebsiteLoginPage() {
           لإدارة محتوى www.transpool24.com فقط (بدون الطلبات).
         </p>
         <p className="mt-1 text-center text-xs text-white/50">
-          كلمة مرور مستقلة — ليست نفسها المستخدمة في إدارة الطلبات.
+          كلمة مرور مستقلة, ليست نفسها المستخدمة في إدارة الطلبات.
         </p>
         <form onSubmit={handleSubmit} className="mt-8 space-y-4">
           <div>

@@ -24,7 +24,7 @@ export const DRIVER_DETAIL_DE: Record<string, string> = {
   "da.manualStars": "Manuell (Sterne)",
   "da.balance": "Offener Saldo (an Fahrer zu zahlen)",
   "da.balanceHint":
-    "Bei Überweisung an den Fahrer den Betrag hier verbuchen — der Saldo sinkt automatisch.",
+    "Bei Überweisung an den Fahrer den Betrag hier verbuchen, der Saldo sinkt automatisch.",
   "da.recordPay": "Zahlung verbuchen (€)",
   "da.payExample": "z. B. 128,95",
   "da.subtract": "Abziehen",
@@ -134,7 +134,7 @@ export const DRIVER_DETAIL_AR: Record<string, string> = {
   "da.customerRating": "تقييم العملاء",
   "da.manualStars": "يدوي (نجوم)",
   "da.balance": "الرصيد المفتوح (مستحق للسائق)",
-  "da.balanceHint": "عند التحويل للسائق سجّل المبلغ هنا — ينخفض الرصيد تلقائياً.",
+  "da.balanceHint": "عند التحويل للسائق سجّل المبلغ هنا, ينخفض الرصيد تلقائياً.",
   "da.recordPay": "تسجيل دفعة (€)",
   "da.payExample": "مثال: 128,95",
   "da.subtract": "خصم",

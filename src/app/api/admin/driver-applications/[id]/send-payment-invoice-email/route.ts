@@ -44,8 +44,8 @@ export async function POST(
     return NextResponse.json({ error: "Driver has no email" }, { status: 400 });
   }
 
-  const iban = (data.iban ?? "").trim() || "—";
-  const accountHolder = (data.bank_account_holder_name ?? "").trim() || (data.full_name ?? "—");
+  const iban = (data.iban ?? "").trim() || "-";
+  const accountHolder = (data.bank_account_holder_name ?? "").trim() || (data.full_name ?? "-");
   const driverNum = data.driver_number != null ? Number(data.driver_number) : null;
   const invoiceNumber = `TP24-${driverNum != null ? String(driverNum).padStart(5, "0") : "00000"}-${Date.now().toString(36).toUpperCase()}`;
   const contractNumber = `TP24-Vertrag-${driverNum != null ? String(driverNum).padStart(5, "0") : "00000"}-${Date.now().toString(36).toUpperCase()}`;
@@ -77,7 +77,7 @@ export async function POST(
       driver_name: String(data.full_name ?? ""),
       invoice_number: invoiceNumber,
       date: dateStr,
-      driver_number: driverNum != null ? String(driverNum).padStart(5, "0") : "—",
+      driver_number: driverNum != null ? String(driverNum).padStart(5, "0") : "-",
       contract_number: contractNumber,
       amount_eur: amount.toFixed(2),
       tip_eur: tip.toFixed(2),

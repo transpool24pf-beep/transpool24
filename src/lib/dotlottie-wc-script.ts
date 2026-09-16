@@ -31,7 +31,7 @@ export function ensureDotlottieScript(): Promise<void> {
   return scriptPromise;
 }
 
-/** After script `load`, `customElements.define` may run on next tick — poll. Call after `ensureDotlottieScript()`. */
+/** After script `load`, `customElements.define` may run on next tick, poll. Call after `ensureDotlottieScript()`. */
 export async function waitForDotlottieWcRegistered(maxMs = 10000): Promise<boolean> {
   const deadline = Date.now() + maxMs;
   while (Date.now() < deadline) {

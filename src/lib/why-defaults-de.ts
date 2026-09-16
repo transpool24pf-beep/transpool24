@@ -1,46 +1,46 @@
 import type { WhyPagePayload } from "./why-transpool24-types";
 
-/** Gewerbe und Handel — inklusive Privatumzüge und Möbel */
+/** Gewerbe und Handel, inklusive Privatumzüge und Möbel */
 export const whyPageDe: WhyPagePayload = {
   metaTitle: "Warum TransPool24? | B2B-Transport Pforzheim & Region",
   heroBadge: "Pforzheim · Baden-Württemberg · Deutschland",
   headline: "Warum Unternehmen und gewerbliche Partner TransPool24 nutzen",
   heroSub:
-    "Wir organisieren Straßentransporte für Betriebe, Großhandel, Märkte und Werkstätten zwischen Pforzheim, Karlsruhe und der Region — mit klaren Preisen, verlässlichen Fahrern und digitaler Buchung. Wir transportieren auch private Wohnungsumzüge und Möbel.",
+    "Wir organisieren Straßentransporte für Betriebe, Großhandel, Märkte und Werkstätten zwischen Pforzheim, Karlsruhe und der Region, mit klaren Preisen, verlässlichen Fahrern und digitaler Buchung. Wir transportieren auch private Wohnungsumzüge und Möbel.",
   sidebarTitle: "Was Gewerbekunden schätzen",
   sidebar: [
     {
       icon: "zap",
       title: "Schnell & planbar",
-      body: "Route, Fahrzeugkategorie und Leistungsstufe online — Festpreis vor der Zahlung. Ideal für Ersatzteile, Paletten und terminkritische Touren.",
+      body: "Route, Fahrzeugkategorie und Leistungsstufe online, Festpreis vor der Zahlung. Ideal für Ersatzteile, Paletten und terminkritische Touren.",
     },
     {
       icon: "shield",
       title: "Verlässlich statt Paket-Chaos",
-      body: "Sensible Ladung braucht einen zuverlässigen Carrier — nicht einen Standardpaketdienst, bei dem Sendungen „untergehen“. Klare Übergaben und nachvollziehbare Abläufe.",
+      body: "Sensible Ladung braucht einen zuverlässigen Carrier, nicht einen Standardpaketdienst, bei dem Sendungen „untergehen“. Klare Übergaben und nachvollziehbare Abläufe.",
     },
     {
       icon: "clipboard",
       title: "Regionale Profis",
-      body: "Fahrer, die Pforzheim, die Autoland-Region und Karlsruhe kennen — inkl. Zufahrten zu Autohäusern, Großmarkt und Industriegebieten.",
+      body: "Fahrer, die Pforzheim, die Autoland-Region und Karlsruhe kennen, inkl. Zufahrten zu Autohäusern, Großmarkt und Industriegebieten.",
     },
   ],
-  introTitle: "Gewerbe & Handel — und Privatumzüge sowie Möbel",
+  introTitle: "Gewerbe & Handel, und Privatumzüge sowie Möbel",
   introLead:
-    "TransPool24 richtet sich an Unternehmen: Fabriken, Großhändler, Supermärkte, Autohäuser, Druckereien und Zulieferer. Zusätzlich transportieren wir private Wohnungsumzüge, Möbel und Haushaltsgeräte.\n\nWir verbinden Sie mit passendem Fahrzeug und Fahrer für Paletten, Maschinenteile, trockene Lebensmittelkartons und Umzugsgut — transparent und buchbar wie eine moderne Logistikplattform.",
+    "TransPool24 richtet sich an Unternehmen: Fabriken, Großhändler, Supermärkte, Autohäuser, Druckereien und Zulieferer. Zusätzlich transportieren wir private Wohnungsumzüge, Möbel und Haushaltsgeräte.\n\nWir verbinden Sie mit passendem Fahrzeug und Fahrer für Paletten, Maschinenteile, trockene Lebensmittelkartons und Umzugsgut, transparent und buchbar wie eine moderne Logistikplattform.",
   h2_1: "Was ist TransPool24?",
-  p1: "Eine digitale Buchungsplattform für gewerblichen Straßentransport in und um Pforzheim mit Reichweite in Baden-Württemberg und deutschlandweit. Sie beschreiben Strecke, Ladung und Leistungsstufe (nur Fahrer, Fahrer mit Fahrzeug, mit Helfer) und zahlen online — wir koordinieren die Ausführung mit professionellen Fahrern.\n\nGeeignet für B2B-Sendungen: vom Stapler-tauglichen Palettenauftrag bis zu sensiblen Ersatzteillieferungen.",
+  p1: "Eine digitale Buchungsplattform für gewerblichen Straßentransport in und um Pforzheim mit Reichweite in Baden-Württemberg und deutschlandweit. Sie beschreiben Strecke, Ladung und Leistungsstufe (nur Fahrer, Fahrer mit Fahrzeug, mit Helfer) und zahlen online, wir koordinieren die Ausführung mit professionellen Fahrern.\n\nGeeignet für B2B-Sendungen: vom Stapler-tauglichen Palettenauftrag bis zu sensiblen Ersatzteillieferungen.",
   h2_2: "Die Region als Wirtschaftsraum",
-  p2: "Pforzheim (Goldstadt) steht für Schmuck, Uhren und Präzisionsmechanik. Baden-Württemberg ist Herzstück der Automobilindustrie — Mercedes, Porsche und ein dichtes Netz aus Autohäusern und Ersatzteillagern.\n\nDazwischen: Großhandel für Gastronomie und Einzelhandel in Karlsruhe, Druckereien und Verpackungsbetriebe. Genau dort entstehen die Touren, die wir unterstützen — zwischen Werk, Lager, Werkstatt und Markt.",
+  p2: "Pforzheim (Goldstadt) steht für Schmuck, Uhren und Präzisionsmechanik. Baden-Württemberg ist Herzstück der Automobilindustrie, Mercedes, Porsche und ein dichtes Netz aus Autohäusern und Ersatzteillagern.\n\nDazwischen: Großhandel für Gastronomie und Einzelhandel in Karlsruhe, Druckereien und Verpackungsbetriebe. Genau dort entstehen die Touren, die wir unterstützen, zwischen Werk, Lager, Werkstatt und Markt.",
   h2_3: "Warum Firmen mit uns fahren",
-  p3: "• Zuverlässigkeit: feste Ansprechpartner, klare Zeitfenster, dokumentierte Übergaben wo nötig.\n• Paletten & Stapler: viele Sendungen sind volle Paletten — effizientes Be- und Entladen mit Stapler möglich.\n• Faire Preise vor dem Kauf: Entfernung, Kategorie und Leistungsstufe bestimmen den Preis — ohne versteckte Post-Capture-Gebühren.\n• Privatumzüge & Möbel: Wohnungen, Möbel und Haushaltsgeräte — online buchen wie jede andere Sendung, optional mit Helfer zum Be- und Entladen.",
+  p3: "• Zuverlässigkeit: feste Ansprechpartner, klare Zeitfenster, dokumentierte Übergaben wo nötig.\n• Paletten & Stapler: viele Sendungen sind volle Paletten, effizientes Be- und Entladen mit Stapler möglich.\n• Faire Preise vor dem Kauf: Entfernung, Kategorie und Leistungsstufe bestimmen den Preis, ohne versteckte Post-Capture-Gebühren.\n• Privatumzüge & Möbel: Wohnungen, Möbel und Haushaltsgeräte, online buchen wie jede andere Sendung, optional mit Helfer zum Be- und Entladen.",
   tipsTitle: "Fünf Tipps für gewerbliche Buchungen",
-  tipsIntro: "Praxisnah für Lager, Werkstätten und Disposition — angepasst an TransPool24.",
+  tipsIntro: "Praxisnah für Lager, Werkstätten und Disposition, angepasst an TransPool24.",
   tips: [
     {
       title: "Palettenmaß und Zufahrt nennen",
       detail:
-        "EU-Palette, Hubhöhe, Rampe oder Bordstein — das hilft, Fahrzeug und Zeit für Be-/Entladen richtig zu planen.",
+        "EU-Palette, Hubhöhe, Rampe oder Bordstein, das hilft, Fahrzeug und Zeit für Be-/Entladen richtig zu planen.",
     },
     {
       title: "Ansprechpartner und Avis",
@@ -50,7 +50,7 @@ export const whyPageDe: WhyPagePayload = {
     {
       title: "Fotos bei ungewöhnlicher Ladung",
       detail:
-        "Maschinenteile, sperrige Kartons oder empfindliche Verpackung — ein Bild erleichtert die Fahrzeugwahl.",
+        "Maschinenteile, sperrige Kartons oder empfindliche Verpackung, ein Bild erleichtert die Fahrzeugwahl.",
     },
     {
       title: "Zeitfenster realistisch wählen",
@@ -60,20 +60,20 @@ export const whyPageDe: WhyPagePayload = {
     {
       title: "Leistungsstufe passend wählen",
       detail:
-        "Nur Fahrer vs. Fahrzeug vs. Helfer beeinflussen Aufwand und Preis — so buchen, wie die Rampe und das Gewicht es erfordern.",
+        "Nur Fahrer vs. Fahrzeug vs. Helfer beeinflussen Aufwand und Preis, so buchen, wie die Rampe und das Gewicht es erfordern.",
     },
   ],
   servicesTitle: "Beispiele: Branchen, mit denen wir arbeiten",
   servicesIntro:
-    "Auszug aus der Region — kein Anspruch auf Vollständigkeit. Wir fahren für Gewerbe und auch Privatumzüge sowie Möbel.",
+    "Auszug aus der Region, kein Anspruch auf Vollständigkeit. Wir fahren für Gewerbe und auch Privatumzüge sowie Möbel.",
   serviceTypes: [
     {
       name: "Privatumzüge & Möbel",
-      body: "Wir transportieren Wohnungen, Häuser, Möbel und Haushaltsgeräte in Pforzheim, der Region und deutschlandweit.\n\nTypische Ladung: Schränke, Betten, Haushaltsgeräte, Umzugskartons und sperrige Möbelstücke.\n\nVorteil: Online-Buchung mit klarem Preis vor der Zahlung und professionellem Fahrer — optional mit Helfer zum Be- und Entladen.",
+      body: "Wir transportieren Wohnungen, Häuser, Möbel und Haushaltsgeräte in Pforzheim, der Region und deutschlandweit.\n\nTypische Ladung: Schränke, Betten, Haushaltsgeräte, Umzugskartons und sperrige Möbelstücke.\n\nVorteil: Online-Buchung mit klarem Preis vor der Zahlung und professionellem Fahrer, optional mit Helfer zum Be- und Entladen.",
     },
     {
       name: "Schmuck, Uhren & Präzision (Goldstadt Pforzheim)",
-      body: "Pforzheim ist für Gold, Schmuck und feinmechanische Anlagen bekannt.\n\nWas wir typischerweise fahren: Ersatzteile für Maschinen, nicht-wertvolle Rohstoffe in Versandkartons, oder große Lieferungen von Herstellern zu Händlern und nach Karlsruhe.\n\nVorteil: Diese Unternehmen zahlen für Zuverlässigkeit — sensible Ladung braucht einen vertrauenswürdigen Carrier, nicht einen Paketdienst, bei dem Sendungen verloren gehen.",
+      body: "Pforzheim ist für Gold, Schmuck und feinmechanische Anlagen bekannt.\n\nWas wir typischerweise fahren: Ersatzteile für Maschinen, nicht-wertvolle Rohstoffe in Versandkartons, oder große Lieferungen von Herstellern zu Händlern und nach Karlsruhe.\n\nVorteil: Diese Unternehmen zahlen für Zuverlässigkeit, sensible Ladung braucht einen vertrauenswürdigen Carrier, nicht einen Paketdienst, bei dem Sendungen verloren gehen.",
     },
     {
       name: "KFZ-Ersatzteile & Autohäuser",
@@ -81,23 +81,23 @@ export const whyPageDe: WhyPagePayload = {
     },
     {
       name: "Lebensmittel & Getränke (trocken, Karton)",
-      body: "Fokus auf trockene Ware ohne Kühlkette — damit bleiben Auflagen überschaubar.\n\nMit wem: Großhändler (Großhandel), die Restaurants und Supermärkte in Karlsruhe und Umgebung beliefern.\n\nWas wir fahren: Öl in Kartons, Konserven, Limonaden, Reinigungsmittel in Großgebinden.\n\nVorteil: stabile, schwere Ladung; langfristige Bezugsbeziehungen sind üblich.",
+      body: "Fokus auf trockene Ware ohne Kühlkette, damit bleiben Auflagen überschaubar.\n\nMit wem: Großhändler (Großhandel), die Restaurants und Supermärkte in Karlsruhe und Umgebung beliefern.\n\nWas wir fahren: Öl in Kartons, Konserven, Limonaden, Reinigungsmittel in Großgebinden.\n\nVorteil: stabile, schwere Ladung; langfristige Bezugsbeziehungen sind üblich.",
     },
     {
       name: "Druckereien & Verpackung",
-      body: "Zwischen Pforzheim und Karlsruhe sitzen große Druck- und Verpackungsbetriebe.\n\nWas wir fahren: Paletten Papier, gedruckte Broschüren, Kartonagen für Industriekunden.\n\nVorteil: oft volle Paletten — Be- und Entladen geht schnell mit dem Gabelstapler (Stapler).",
+      body: "Zwischen Pforzheim und Karlsruhe sitzen große Druck- und Verpackungsbetriebe.\n\nWas wir fahren: Paletten Papier, gedruckte Broschüren, Kartonagen für Industriekunden.\n\nVorteil: oft volle Paletten, Be- und Entladen geht schnell mit dem Gabelstapler (Stapler).",
     },
   ],
   platformTitle: "So nutzen Sie TransPool24 als Firma",
   platformBody:
-    "Sie tragen Abholung und Ziel, Kategorie (XS/M/L), Gewicht und Leistungsstufe ein. Sie sehen den Preis vor der Zahlung und buchen online. Wir weisen einen passenden Fahrer zu — Sie können den Ablauf verfolgen und den Support bei Änderungen erreichen.\n\nBuchungen für Gewerbe und Privat: Straßentransport sowie Wohnungsumzüge und Möbel.",
+    "Sie tragen Abholung und Ziel, Kategorie (XS/M/L), Gewicht und Leistungsstufe ein. Sie sehen den Preis vor der Zahlung und buchen online. Wir weisen einen passenden Fahrer zu, Sie können den Ablauf verfolgen und den Support bei Änderungen erreichen.\n\nBuchungen für Gewerbe und Privat: Straßentransport sowie Wohnungsumzüge und Möbel.",
   completingTitle: "Zustellung professionell abschließen",
   completingP1:
-    "Klären Sie vor Abholung, wer die Ware übergibt, und dokumentieren Sie bei Bedarf den Zustand (Fotos) — das erleichtert Rückfragen.",
+    "Klären Sie vor Abholung, wer die Ware übergibt, und dokumentieren Sie bei Bedarf den Zustand (Fotos), das erleichtert Rückfragen.",
   completingP2:
     "Dispositions- oder Warenannahme soll am Liefertag erreichbar sein. Änderungen an Tor oder Zeit bitte früh mitteilen.",
   completingP3:
-    "Ihr Feedback nach der Lieferung hilft, Qualität zu sichern — und anderen B2B-Kunden bei der Entscheidung.",
+    "Ihr Feedback nach der Lieferung hilft, Qualität zu sichern, und anderen B2B-Kunden bei der Entscheidung.",
   closingLine: "Wir freuen uns auf Ihren nächsten gewerblichen Transport.",
   heroImageUrl: "/transpool24-email-banner.png",
   sceneImageUrl: "/images/445.png",
@@ -106,7 +106,7 @@ export const whyPageDe: WhyPagePayload = {
   howSteps: [
     {
       title: "Online buchen",
-      body: "Route, Ladung und Leistungsstufe — Festpreis sehen und sicher bezahlen.",
+      body: "Route, Ladung und Leistungsstufe, Festpreis sehen und sicher bezahlen.",
     },
     {
       title: "Fahrer zuweisen",
@@ -122,7 +122,7 @@ export const whyPageDe: WhyPagePayload = {
   faqs: [
     {
       q: "Führt TransPool24 Privatumzüge durch?",
-      a: "Ja. Wir transportieren private Wohnungsumzüge, Möbel und Haushaltsgeräte — zusätzlich zu gewerblichen Sendungen. Buchen Sie online wie jede andere Tour; optional mit Helfer zum Be- und Entladen.",
+      a: "Ja. Wir transportieren private Wohnungsumzüge, Möbel und Haushaltsgeräte, zusätzlich zu gewerblichen Sendungen. Buchen Sie online wie jede andere Tour; optional mit Helfer zum Be- und Entladen.",
     },
     {
       q: "Liefert TransPool24 in meiner Region?",
@@ -130,11 +130,11 @@ export const whyPageDe: WhyPagePayload = {
     },
     {
       q: "Welche Fahrzeuge gibt es?",
-      a: "Je nach XS/M/L und Gewicht — von Transportern bis größeren Nutzfahrzeugen. Genaue Maße und Paletteninfo verbessern die Zuordnung.",
+      a: "Je nach XS/M/L und Gewicht, von Transportern bis größeren Nutzfahrzeugen. Genaue Maße und Paletteninfo verbessern die Zuordnung.",
     },
     {
       q: "Paletten und Stapler?",
-      a: "Viele B2B-Sendungen sind palettiert. Geben Sie an, ob Rampe, Torhöhe oder Bordsteinabsetzung vorliegt — dann planen wir Zeit und Fahrzeug passend.",
+      a: "Viele B2B-Sendungen sind palettiert. Geben Sie an, ob Rampe, Torhöhe oder Bordsteinabsetzung vorliegt, dann planen wir Zeit und Fahrzeug passend.",
     },
     {
       q: "Kühltransporte?",
@@ -142,7 +142,7 @@ export const whyPageDe: WhyPagePayload = {
     },
     {
       q: "Wann sehe ich den Preis?",
-      a: "Den vollen Preis sehen Sie vor der Zahlung im Checkout — abhängig von Strecke, Kategorie und Leistungsstufe.",
+      a: "Den vollen Preis sehen Sie vor der Zahlung im Checkout, abhängig von Strecke, Kategorie und Leistungsstufe.",
     },
     {
       q: "Wer führt den Transport aus?",
@@ -162,7 +162,7 @@ export const whyPageDe: WhyPagePayload = {
     },
     {
       q: "Vergleich zu Marktplätzen wie Shiply?",
-      a: "Ähnliche Idee: transparente Angebote und professionelle Ausführung — mit regionalem Fokus auf Pforzheim/Karlsruhe, deutschsprachigem Support und klarer Ausrichtung auf B2B-Transport.",
+      a: "Ähnliche Idee: transparente Angebote und professionelle Ausführung, mit regionalem Fokus auf Pforzheim/Karlsruhe, deutschsprachigem Support und klarer Ausrichtung auf B2B-Transport.",
     },
   ],
 };

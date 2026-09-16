@@ -94,7 +94,7 @@ export default function AdminRatingsPage() {
             <tbody>
               {reviews.map((r) => {
                 const driverLabel =
-                  (r.driver_applications?.full_name && r.driver_applications.full_name.trim()) || "—";
+                  (r.driver_applications?.full_name && r.driver_applications.full_name.trim()) || "-";
                 const pub = Boolean(r.customer_review_published);
                 return (
                   <tr key={r.id} className="border-b border-[#0d2137]/5">
@@ -102,7 +102,7 @@ export default function AdminRatingsPage() {
                       {r.order_number ?? r.id.slice(0, 8)}
                     </td>
                     <td className="max-w-[140px] truncate px-3 py-3 text-[#0d2137]/90" title={r.company_name}>
-                      {r.company_name || "—"}
+                      {r.company_name || "-"}
                     </td>
                     <td className="max-w-[120px] truncate px-3 py-3 text-[#0d2137]/90" title={driverLabel}>
                       {driverLabel}
@@ -112,7 +112,7 @@ export default function AdminRatingsPage() {
                       <span className="sr-only">{r.customer_driver_rating}</span>
                     </td>
                     <td className="max-w-[220px] px-3 py-3 text-[#0d2137]/85">
-                      <span className="line-clamp-2">{r.customer_driver_comment?.trim() || "—"}</span>
+                      <span className="line-clamp-2">{r.customer_driver_comment?.trim() || "-"}</span>
                     </td>
                     <td className="px-3 py-3">
                       <label className="inline-flex cursor-pointer items-center gap-2">

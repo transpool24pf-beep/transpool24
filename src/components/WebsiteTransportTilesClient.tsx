@@ -268,7 +268,7 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
                     />
                   ) : (
                     <span className="flex h-full w-full items-center justify-center text-xs text-[#0d2137]/40">
-                      —
+                      , 
                     </span>
                   )}
                 </div>
@@ -319,7 +319,7 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
                     />
                   ) : (
                     <span className="flex h-full w-full items-center justify-center text-[10px] text-[#0d2137]/40">
-                      —
+                      , 
                     </span>
                   )}
                 </div>
@@ -366,7 +366,7 @@ export function WebsiteTransportTilesClient({ apiBase }: Props) {
               </div>
               {driverPhotos.length === 0 ? (
                 <p className="text-xs text-[#0d2137]/50">
-                  لا توجد صور بعد — أضف سائقين من تقييمات الصفحة أو من طلبات السائقين المعتمدة.
+                  لا توجد صور بعد, أضف سائقين من تقييمات الصفحة أو من طلبات السائقين المعتمدة.
                 </p>
               ) : (
                 <div className="grid max-h-64 grid-cols-3 gap-2 overflow-y-auto sm:grid-cols-5">

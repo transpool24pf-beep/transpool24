@@ -147,7 +147,7 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
       });
       const data = (await res.json()) as { photoUrl?: string; fullName?: string; error?: string };
       if (res.status === 401) {
-        alert("غير مسجّل الدخول — سجّل الدخول من /website/login.");
+        alert("غير مسجّل الدخول, سجّل الدخول من /website/login.");
         return;
       }
       if (!res.ok) {
@@ -315,7 +315,7 @@ export function WebsiteHomepageDriversClient({ apiBase }: Props) {
                     />
                   ) : (
                     <span className="flex h-full w-full items-center justify-center text-xs text-[#0d2137]/40">
-                      —
+                      , 
                     </span>
                   )}
                 </div>

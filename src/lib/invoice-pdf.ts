@@ -37,9 +37,9 @@ function formatEur(cents: number): string {
 }
 
 function formatDeDate(iso: string | Date | null | undefined): string {
-  if (!iso) return "—";
+  if (!iso) return "-";
   const d = iso instanceof Date ? iso : new Date(iso);
-  if (Number.isNaN(d.getTime())) return "—";
+  if (Number.isNaN(d.getTime())) return "-";
   return d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
@@ -221,7 +221,7 @@ export async function generateInvoicePdf(
   const plzOrt =
     `${recipient.postalCode} ${recipient.city}`.trim() ||
     parseDeAddress(job.pickup_address || "").plzOrt ||
-    (job.pickup_city ? `${job.pickup_city}` : "—");
+    (job.pickup_city ? `${job.pickup_city}` : "-");
 
   tealBar(page, leftX, y, colW, 20, "RECHNUNGSEMPFÄNGER", fontBold);
   tealBar(page, rightX, y, colW, 20, "RECHNUNGSAUSSTELLER", fontBold);

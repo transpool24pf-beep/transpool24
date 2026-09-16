@@ -96,7 +96,7 @@ const IC = {
   worker: "\u{1F477}",
 };
 
-/** WhatsApp message for driver group — German only. */
+/** WhatsApp message for driver group, German only. */
 function buildWhatsAppMessage(o: Job): string {
   const orderRef = o.order_number != null ? String(o.order_number) : o.id;
   const driverEur = getDriverPriceEur(o);
@@ -122,7 +122,7 @@ function buildWhatsAppMessage(o: Job): string {
     o.cargo_details && Array.isArray((o.cargo_details as { photoUrls?: unknown }).photoUrls)
       ? ((o.cargo_details as { photoUrls: string[] }).photoUrls).filter((u) => typeof u === "string")
       : [];
-  const distanceStr = o.distance_km != null ? `${o.distance_km} km` : "—";
+  const distanceStr = o.distance_km != null ? `${o.distance_km} km` : "-";
   const volumeStr = cargoVolumeStr(o.cargo_details);
   const serviceLabel = serviceTypeLabelDe(o.service_type);
   const blocks: string[] = [
@@ -370,7 +370,7 @@ export default function AdminOrderDetailPage({
     window.open(`https://wa.me/${digits}`, "_blank", "noopener");
   };
 
-  /** Google Maps links + GPS share page — WhatsApp text German only. */
+  /** Google Maps links + GPS share page, WhatsApp text German only. */
   const openWhatsAppDriverNavLinks = async () => {
     if (!order) return;
     if (!order.assigned_driver_application_id) {
@@ -389,7 +389,7 @@ export default function AdminOrderDetailPage({
     }
     const pickupUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(order.pickup_address)}&travelmode=driving`;
     const orderRef = order.order_number != null ? String(order.order_number) : order.id.slice(0, 8);
-    const distStr = order.distance_km != null ? `${order.distance_km} km` : "—";
+    const distStr = order.distance_km != null ? `${order.distance_km} km` : "-";
 
     let driverTrackUrl: string | null = null;
     try {
@@ -406,8 +406,8 @@ export default function AdminOrderDetailPage({
 
     const customerLines = [
       "👤 Kunde / Kontakt:",
-      `Firma: ${order.company_name || "—"}`,
-      `Telefon: ${order.phone || "—"}`,
+      `Firma: ${order.company_name || "-"}`,
+      `Telefon: ${order.phone || "-"}`,
       ...(order.customer_email?.trim() ? [`E-Mail: ${order.customer_email.trim()}`] : []),
       "",
       `Abholung: ${order.pickup_address}`,
@@ -645,7 +645,7 @@ export default function AdminOrderDetailPage({
             </div>
             <div>
               <dt className="text-[#0d2137]/60">{odT(locale, "od.emailCustomer")}</dt>
-              <dd>{order.customer_email ?? "—"}</dd>
+              <dd>{order.customer_email ?? "-"}</dd>
             </div>
             <div>
               <dt className="text-[#0d2137]/60">{odT(locale, "od.pickup")}</dt>
@@ -769,7 +769,7 @@ export default function AdminOrderDetailPage({
               )}
             <div>
               <dt className="text-[#0d2137]/60">{odT(locale, "od.distance")}</dt>
-              <dd>{order.distance_km != null ? `${order.distance_km} km` : "—"}</dd>
+              <dd>{order.distance_km != null ? `${order.distance_km} km` : "-"}</dd>
             </div>
             <div>
               <dt className="text-[#0d2137]/60">{odT(locale, "od.priceCustomer")}</dt>

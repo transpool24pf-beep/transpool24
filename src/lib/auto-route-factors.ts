@@ -99,7 +99,7 @@ function mapGoogleConditionToWeather(condition: string | undefined): RouteWeathe
 }
 
 /**
- * Google Maps Platform — Weather API (enable "Weather API" on the same project as the key).
+ * Google Maps Platform, Weather API (enable "Weather API" on the same project as the key).
  * Falls back to null so caller can use Open-Meteo.
  */
 export async function weatherFromGoogle(

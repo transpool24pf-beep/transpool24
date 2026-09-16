@@ -52,7 +52,7 @@ export function getSupportFromEmail(): string {
   );
 }
 
-/** @deprecated Use getInfoFromEmail — kept for support-form notifications. */
+/** @deprecated Use getInfoFromEmail, kept for support-form notifications. */
 export function getResendFromEmail(): string {
   return getInfoFromEmail();
 }
@@ -86,12 +86,12 @@ function withReplyTo(from: string): { from: string; replyTo?: string } {
   return replyTo ? { from, replyTo } : { from };
 }
 
-/** Orders, tracking, invoices — info@ */
+/** Orders, tracking, invoices, info@ */
 export function transactionalEmailSendOptions(): { from: string; replyTo?: string } {
   return withReplyTo(getInfoFromEmail());
 }
 
-/** Admin → customer free-form — support@ */
+/** Admin → customer free-form, support@ */
 export function manualCustomerEmailSendOptions(): { from: string; replyTo?: string } {
   return withReplyTo(getSupportFromEmail());
 }

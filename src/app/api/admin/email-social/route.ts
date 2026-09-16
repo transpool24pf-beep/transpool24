@@ -72,7 +72,7 @@ export async function PUT(req: Request) {
     const { data: exists } = await supabase.from("site_social_media").select("id").eq("id", 1).maybeSingle();
     if (!exists) {
       return NextResponse.json(
-        { error: "site_social_media row missing — run supabase/site_social_media.sql" },
+        { error: "site_social_media row missing, run supabase/site_social_media.sql" },
         { status: 500 },
       );
     }
@@ -94,7 +94,7 @@ export async function PUT(req: Request) {
         return NextResponse.json(
           {
             error:
-              "Database columns missing — run supabase/site_social_media_email_footer.sql in Supabase SQL Editor",
+              "Database columns missing, run supabase/site_social_media_email_footer.sql in Supabase SQL Editor",
           },
           { status: 500 },
         );

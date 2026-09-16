@@ -9,7 +9,7 @@ const STATS_IMG =
   "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=900&q=80&auto=format&fit=crop";
 const TOUCH_IMG =
   "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=900&q=80&auto=format&fit=crop";
-/** Blog index — closing visual above dark footer (`assets/7654.png` → public). */
+/** Blog index, closing visual above dark footer (`assets/7654.png` → public). */
 const BLOG_FOOTER_MODEL = "/images/7654.png";
 
 function StarRow() {
@@ -68,7 +68,7 @@ export async function BlogTemplateBeforePosts({ locale }: { locale: Locale }) {
         </div>
       </section>
 
-      {/* Services — 3 cards */}
+      {/* Services, 3 cards */}
       <section className="bg-white px-4 py-14 sm:px-6 sm:py-20 lg:py-24">
         <div className="mx-auto max-w-7xl">
           <p className="text-center text-xs font-bold uppercase tracking-[0.2em] text-[var(--accent)]">

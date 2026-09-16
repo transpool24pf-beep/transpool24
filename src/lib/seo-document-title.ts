@@ -11,11 +11,11 @@ export function seoDocumentTitle(raw: string): Metadata["title"] {
   if (/^TransPool24\s*\|/i.test(s)) {
     return { absolute: s };
   }
-  const dash = s.match(/^TransPool24\s*[–—\-]\s*(.+)$/i);
+  const dash = s.match(/^TransPool24\s*[–, \-]\s*(.+)$/i);
   if (dash) {
     return { absolute: `${BRAND} | ${dash[1].trim()}` };
   }
-  const trimmed = s.replace(/\s*\|\s*TransPool24(?:\s*[—–-].*)?$/i, "").trim();
+  const trimmed = s.replace(/\s*\|\s*TransPool24(?:\s*[, –-].*)?$/i, "").trim();
   const rest = trimmed.length > 0 ? trimmed : s;
   return { absolute: `${BRAND} | ${rest}` };
 }

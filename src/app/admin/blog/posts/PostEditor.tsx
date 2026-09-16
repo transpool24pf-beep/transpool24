@@ -99,7 +99,7 @@ export function PostEditor({ postId }: { postId?: string }) {
           if (o.postId === postId) {
             sessionStorage.removeItem("blog_last_translate");
             if (o.locales?.length) {
-              setInfo(`Übersetzt in: ${o.locales.join(", ")}${o.note ? ` — ${o.note}` : ""}`);
+              setInfo(`Übersetzt in: ${o.locales.join(", ")}${o.note ? `, ${o.note}` : ""}`);
             } else if (o.note) {
               setInfo(o.note);
             }
@@ -180,7 +180,7 @@ export function PostEditor({ postId }: { postId?: string }) {
         if (!r.ok) throw new Error(j.error || "Speichern fehlgeschlagen");
         if (j.translatedLocales?.length || j.translationNote) {
           if (j.translatedLocales?.length) {
-            setInfo(`Übersetzt in: ${j.translatedLocales.join(", ")}${j.translationNote ? ` — ${j.translationNote}` : ""}`);
+            setInfo(`Übersetzt in: ${j.translatedLocales.join(", ")}${j.translationNote ? `, ${j.translationNote}` : ""}`);
           } else if (j.translationNote) {
             setInfo(j.translationNote);
           }

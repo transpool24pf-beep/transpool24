@@ -1,46 +1,46 @@
 import type { WhyPagePayload } from "./why-transpool24-types";
 
-/** Business, trade — and private home moves & furniture */
+/** Business, trade, and private home moves & furniture */
 export const whyPageEn: WhyPagePayload = {
   metaTitle: "Why TransPool24? | B2B transport Pforzheim & region",
   heroBadge: "Pforzheim · Baden-Württemberg · Germany",
   headline: "Why businesses and trade partners choose TransPool24",
   heroSub:
-    "We organise road transport for companies, wholesalers, supermarkets and workshops between Pforzheim, Karlsruhe and the wider region — with clear pricing, reliable drivers and online booking. We also move private homes and furniture.",
+    "We organise road transport for companies, wholesalers, supermarkets and workshops between Pforzheim, Karlsruhe and the wider region, with clear pricing, reliable drivers and online booking. We also move private homes and furniture.",
   sidebarTitle: "What commercial customers value",
   sidebar: [
     {
       icon: "zap",
       title: "Fast & plannable",
-      body: "Route, vehicle category and service level online — fixed price before you pay. Ideal for spare parts, pallets and time-sensitive runs.",
+      body: "Route, vehicle category and service level online, fixed price before you pay. Ideal for spare parts, pallets and time-sensitive runs.",
     },
     {
       icon: "shield",
       title: "Reliable, not parcel roulette",
-      body: "Sensitive cargo needs a trustworthy carrier — not a standard parcel network where shipments get lost. Clear handovers and traceable processes.",
+      body: "Sensitive cargo needs a trustworthy carrier, not a standard parcel network where shipments get lost. Clear handovers and traceable processes.",
     },
     {
       icon: "clipboard",
       title: "Regional professionals",
-      body: "Drivers who know Pforzheim, the automotive region and Karlsruhe — including access to dealerships, wholesale depots and industrial estates.",
+      body: "Drivers who know Pforzheim, the automotive region and Karlsruhe, including access to dealerships, wholesale depots and industrial estates.",
     },
   ],
-  introTitle: "Business & trade — and private homes and furniture",
+  introTitle: "Business & trade, and private homes and furniture",
   introLead:
-    "TransPool24 is built for companies: factories, wholesalers, supermarkets, dealerships, printers and suppliers. We also transport private home moves, furniture and household appliances.\n\nWe match you with the right vehicle and driver for pallets, machine parts, dry grocery cartons and household moves — transparent and bookable like a modern logistics platform.",
+    "TransPool24 is built for companies: factories, wholesalers, supermarkets, dealerships, printers and suppliers. We also transport private home moves, furniture and household appliances.\n\nWe match you with the right vehicle and driver for pallets, machine parts, dry grocery cartons and household moves, transparent and bookable like a modern logistics platform.",
   h2_1: "What is TransPool24?",
-  p1: "A digital booking platform for commercial road transport in and around Pforzheim, with reach across Baden-Württemberg and Germany. You describe route, cargo and service level (driver only, driver with vehicle, with assistant) and pay online — we coordinate execution with professional drivers.\n\nSuited to B2B shipments: from forklift-friendly pallet jobs to sensitive spare-part deliveries.",
+  p1: "A digital booking platform for commercial road transport in and around Pforzheim, with reach across Baden-Württemberg and Germany. You describe route, cargo and service level (driver only, driver with vehicle, with assistant) and pay online, we coordinate execution with professional drivers.\n\nSuited to B2B shipments: from forklift-friendly pallet jobs to sensitive spare-part deliveries.",
   h2_2: "The region as an economic area",
-  p2: "Pforzheim (Goldstadt) stands for jewellery, watches and precision engineering. Baden-Württemberg is the heart of the automotive industry — Mercedes, Porsche and a dense network of dealerships and parts warehouses.\n\nIn between: wholesale supplying restaurants and retail in Karlsruhe, printing and packaging plants. Those are the lanes we support — between plant, warehouse, workshop and store.",
+  p2: "Pforzheim (Goldstadt) stands for jewellery, watches and precision engineering. Baden-Württemberg is the heart of the automotive industry, Mercedes, Porsche and a dense network of dealerships and parts warehouses.\n\nIn between: wholesale supplying restaurants and retail in Karlsruhe, printing and packaging plants. Those are the lanes we support, between plant, warehouse, workshop and store.",
   h2_3: "Why companies ship with us",
-  p3: "• Reliability: clear contacts, realistic time windows, documented handovers where needed.\n• Pallets & forklifts: many loads are full pallets — efficient load/unload with a forklift.\n• Fair price before purchase: distance, category and service level set the price — no hidden post-capture fees.\n• Private homes and furniture: flats, furniture and appliances — book online like any other shipment, optionally with a helper for loading and unloading.",
+  p3: "• Reliability: clear contacts, realistic time windows, documented handovers where needed.\n• Pallets & forklifts: many loads are full pallets, efficient load/unload with a forklift.\n• Fair price before purchase: distance, category and service level set the price, no hidden post-capture fees.\n• Private homes and furniture: flats, furniture and appliances, book online like any other shipment, optionally with a helper for loading and unloading.",
   tipsTitle: "Five tips for commercial bookings",
-  tipsIntro: "Practical for warehouse, workshop and dispatch — tailored to TransPool24.",
+  tipsIntro: "Practical for warehouse, workshop and dispatch, tailored to TransPool24.",
   tips: [
     {
       title: "State pallet type and access",
       detail:
-        "Euro pallet, lift height, ramp or kerbside — helps us plan vehicle and loading time correctly.",
+        "Euro pallet, lift height, ramp or kerbside, helps us plan vehicle and loading time correctly.",
     },
     {
       title: "Named contact and gate passes",
@@ -50,7 +50,7 @@ export const whyPageEn: WhyPagePayload = {
     {
       title: "Photos for unusual cargo",
       detail:
-        "Machine parts, bulky cartons or fragile packing — a picture makes vehicle choice easier.",
+        "Machine parts, bulky cartons or fragile packing, a picture makes vehicle choice easier.",
     },
     {
       title: "Pick realistic time windows",
@@ -60,20 +60,20 @@ export const whyPageEn: WhyPagePayload = {
     {
       title: "Match the service level",
       detail:
-        "Driver-only vs vehicle vs assistant changes effort and price — book what the ramp and weight require.",
+        "Driver-only vs vehicle vs assistant changes effort and price, book what the ramp and weight require.",
     },
   ],
   servicesTitle: "Examples: sectors we work with",
   servicesIntro:
-    "A sample from the region — not exhaustive. We serve businesses and also private home moves and furniture.",
+    "A sample from the region, not exhaustive. We serve businesses and also private home moves and furniture.",
   serviceTypes: [
     {
       name: "Private home moves & furniture",
-      body: "We move flats, houses, furniture and household appliances in Pforzheim, the region and across Germany.\n\nTypical loads: wardrobes, beds, appliances, moving boxes and bulky furniture.\n\nThe upside: online booking with a clear price before payment and a professional driver — optionally with a helper for loading and unloading.",
+      body: "We move flats, houses, furniture and household appliances in Pforzheim, the region and across Germany.\n\nTypical loads: wardrobes, beds, appliances, moving boxes and bulky furniture.\n\nThe upside: online booking with a clear price before payment and a professional driver, optionally with a helper for loading and unloading.",
     },
     {
       name: "Jewellery, watches & precision (Goldstadt Pforzheim)",
-      body: "Pforzheim is known for gold, jewellery and precision machinery.\n\nWhat we typically move: spare parts for machines, non-precious raw materials in shipping cartons, or large B2B drops from manufacturers to distributors and into Karlsruhe.\n\nThe upside: these firms pay for reliability — sensitive goods need a trusted carrier, not a parcel operator that loses shipments.",
+      body: "Pforzheim is known for gold, jewellery and precision machinery.\n\nWhat we typically move: spare parts for machines, non-precious raw materials in shipping cartons, or large B2B drops from manufacturers to distributors and into Karlsruhe.\n\nThe upside: these firms pay for reliability, sensitive goods need a trusted carrier, not a parcel operator that loses shipments.",
     },
     {
       name: "Car parts & dealerships (KFZ)",
@@ -81,23 +81,23 @@ export const whyPageEn: WhyPagePayload = {
     },
     {
       name: "Food & beverages (dry, carton)",
-      body: "We focus on dry goods without a cold chain — so regulatory complexity stays manageable.\n\nWho we work with: wholesalers supplying restaurants and supermarkets in Karlsruhe and surroundings.\n\nWhat we move: oil in cartons, canned goods, soft drinks, bulk cleaning products.\n\nThe upside: heavy, predictable loads; long-term supply relationships are common.",
+      body: "We focus on dry goods without a cold chain, so regulatory complexity stays manageable.\n\nWho we work with: wholesalers supplying restaurants and supermarkets in Karlsruhe and surroundings.\n\nWhat we move: oil in cartons, canned goods, soft drinks, bulk cleaning products.\n\nThe upside: heavy, predictable loads; long-term supply relationships are common.",
     },
     {
       name: "Printing & packaging",
-      body: "Between Pforzheim and Karlsruhe there are major print and packaging operations.\n\nWhat we move: pallets of paper, printed brochures, cartons for industrial customers.\n\nThe upside: often full pallets — loading and unloading is quick with a forklift (Stapler).",
+      body: "Between Pforzheim and Karlsruhe there are major print and packaging operations.\n\nWhat we move: pallets of paper, printed brochures, cartons for industrial customers.\n\nThe upside: often full pallets, loading and unloading is quick with a forklift (Stapler).",
     },
   ],
   platformTitle: "How your company uses TransPool24",
   platformBody:
-    "You enter pickup and destination, category (XS/M/L), weight and service level. You see the price before payment and book online. We assign a suitable driver — you can follow progress and contact support if plans change.\n\nBookings for businesses and private customers: commercial road transport as well as home moves and furniture.",
+    "You enter pickup and destination, category (XS/M/L), weight and service level. You see the price before payment and book online. We assign a suitable driver, you can follow progress and contact support if plans change.\n\nBookings for businesses and private customers: commercial road transport as well as home moves and furniture.",
   completingTitle: "Closing the delivery professionally",
   completingP1:
-    "Before pickup, agree who hands over the goods and photograph condition if useful — that simplifies any follow-up questions.",
+    "Before pickup, agree who hands over the goods and photograph condition if useful, that simplifies any follow-up questions.",
   completingP2:
     "Dispatch or goods-in should be reachable on the delivery day. Report gate or time changes as early as possible.",
   completingP3:
-    "Feedback after delivery helps us protect quality — and helps other B2B customers decide with confidence.",
+    "Feedback after delivery helps us protect quality, and helps other B2B customers decide with confidence.",
   closingLine: "We look forward to your next commercial transport.",
   heroImageUrl: "/transpool24-email-banner.png",
   sceneImageUrl: "/images/445.png",
@@ -106,7 +106,7 @@ export const whyPageEn: WhyPagePayload = {
   howSteps: [
     {
       title: "Book online",
-      body: "Route, cargo and service level — see a fixed price and pay securely.",
+      body: "Route, cargo and service level, see a fixed price and pay securely.",
     },
     {
       title: "We assign a driver",
@@ -122,7 +122,7 @@ export const whyPageEn: WhyPagePayload = {
   faqs: [
     {
       q: "Does TransPool24 do private home moves?",
-      a: "Yes. We transport private home moves, furniture and household appliances — in addition to commercial shipments. Book online like any other job; optionally add a helper for loading and unloading.",
+      a: "Yes. We transport private home moves, furniture and household appliances, in addition to commercial shipments. Book online like any other job; optionally add a helper for loading and unloading.",
     },
     {
       q: "Do you deliver in my area?",
@@ -130,11 +130,11 @@ export const whyPageEn: WhyPagePayload = {
     },
     {
       q: "What vehicles are available?",
-      a: "Depending on XS/M/L and weight — from vans to larger commercial vehicles. Accurate dimensions and pallet info improve matching.",
+      a: "Depending on XS/M/L and weight, from vans to larger commercial vehicles. Accurate dimensions and pallet info improve matching.",
     },
     {
       q: "Pallets and forklifts?",
-      a: "Many B2B loads are palletised. Tell us about ramp, door height or kerbside drop — we plan time and vehicle accordingly.",
+      a: "Many B2B loads are palletised. Tell us about ramp, door height or kerbside drop, we plan time and vehicle accordingly.",
     },
     {
       q: "Refrigerated food?",
@@ -142,7 +142,7 @@ export const whyPageEn: WhyPagePayload = {
     },
     {
       q: "When do I see the price?",
-      a: "You see the full price before payment at checkout — based on distance, category and service level.",
+      a: "You see the full price before payment at checkout, based on distance, category and service level.",
     },
     {
       q: "Who executes the transport?",
@@ -162,7 +162,7 @@ export const whyPageEn: WhyPagePayload = {
     },
     {
       q: "How do you compare to marketplaces like Shiply?",
-      a: "Similar idea: transparent offers and professional execution — with a regional focus on Pforzheim/Karlsruhe, language-friendly support and a clear B2B transport positioning.",
+      a: "Similar idea: transparent offers and professional execution, with a regional focus on Pforzheim/Karlsruhe, language-friendly support and a clear B2B transport positioning.",
     },
   ],
 };

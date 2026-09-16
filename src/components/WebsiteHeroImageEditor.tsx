@@ -125,7 +125,7 @@ export function WebsiteHeroImageEditor({
       });
       const j = (await res.json()) as { mime?: string; base64?: string; error?: string };
       if (res.status === 401) {
-        throw new Error("انتهت الجلسة — سجّل الدخول من جديد.");
+        throw new Error("انتهت الجلسة, سجّل الدخول من جديد.");
       }
       if (!res.ok) throw new Error(j.error || "فشل جلب الصورة");
       if (!j.mime || !j.base64) throw new Error("استجابة غير صالحة");
@@ -165,7 +165,7 @@ export function WebsiteHeroImageEditor({
       });
       const j = (await res.json()) as { mime?: string; base64?: string; error?: string };
       if (res.status === 401) {
-        throw new Error("انتهت الجلسة — سجّل الدخول من جديد.");
+        throw new Error("انتهت الجلسة, سجّل الدخول من جديد.");
       }
       if (!res.ok) throw new Error(j.error || "فشل جلب الصورة");
       if (!j.mime || !j.base64) throw new Error("استجابة غير صالحة");
@@ -210,12 +210,12 @@ export function WebsiteHeroImageEditor({
       });
       const body = (await res.json()) as { url?: string; error?: string };
       if (res.status === 401) {
-        throw new Error("انتهت الجلسة — سجّل الدخول من جديد.");
+        throw new Error("انتهت الجلسة, سجّل الدخول من جديد.");
       }
       if (!res.ok) throw new Error(body.error || "فشل الرفع.");
       if (!body.url) throw new Error("لا يوجد رابط");
       onUploaded(body.url);
-      setStatus("تم الرفع — اضغط «حفظ» في أسفل الصفحة.");
+      setStatus("تم الرفع, اضغط «حفظ» في أسفل الصفحة.");
     } catch (e) {
       setStatus(e instanceof Error ? e.message : "فشل التصدير");
     } finally {

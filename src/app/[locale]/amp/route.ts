@@ -3,7 +3,7 @@ import { type Locale, routing } from "@/i18n/routing";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com";
 
-/** Minimal valid AMP document with AdSense AMP auto-ads (raw HTML — no React root layout). */
+/** Minimal valid AMP document with AdSense AMP auto-ads (raw HTML, no React root layout). */
 function ampDocument(locale: Locale): string {
   const canonical = `${SITE}/${locale}`;
   return `<!doctype html>
@@ -22,7 +22,7 @@ function ampDocument(locale: Locale): string {
 <amp-auto-ads type="adsense" data-ad-client="ca-pub-9998186124580672"></amp-auto-ads>
 <main>
   <h1>TransPool24</h1>
-  <p>Digital logistics &amp; road transport — <a href="${canonical}">View full site</a>.</p>
+  <p>Digital logistics &amp; road transport, <a href="${canonical}">View full site</a>.</p>
 </main>
 </body>
 </html>`;

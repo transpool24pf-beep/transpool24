@@ -1,6 +1,6 @@
 import type { AdminLocale } from "@/lib/admin-ui-strings";
 
-/** Active execution — until delivered/cancelled/draft excluded from this board */
+/** Active execution, until delivered/cancelled/draft excluded from this board */
 export const ADMIN_IN_PROGRESS_STATUS_SET = new Set(["confirmed", "paid", "assigned", "in_transit"]);
 
 export const ADMIN_ORDER_STATUS_CONFIG: Record<

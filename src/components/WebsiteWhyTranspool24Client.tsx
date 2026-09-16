@@ -13,7 +13,7 @@ export function WebsiteWhyTranspool24Client() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  /** Same full JSON written to every locale row (text will be identical everywhere — use only if intended) */
+  /** Same full JSON written to every locale row (text will be identical everywhere, use only if intended) */
   const [applyToAllLocales, setApplyToAllLocales] = useState(false);
 
   const load = useCallback(async () => {
@@ -41,13 +41,13 @@ export function WebsiteWhyTranspool24Client() {
     try {
       payload = JSON.parse(jsonText);
     } catch {
-      setMessage("JSON غير صالح — راجع الصيغة.");
+      setMessage("JSON غير صالح, راجع الصيغة.");
       return;
     }
     if (
       applyToAllLocales &&
       !confirm(
-        "ستحصل كل اللغات على نفس هذا الـ JSON — أي أن العناوين ونصوص الأسئلة ستكون متطابقة في كل المواقع (مثلاً ألماني على /ar/why).\n\n" +
+        "ستحصل كل اللغات على نفس هذا الـ JSON, أي أن العناوين ونصوص الأسئلة ستكون متطابقة في كل المواقع (مثلاً ألماني على /ar/why).\n\n" +
           "للصور والفيديو استخدم صفحة «الوسائط» مع خيار «تطبيق على كل اللغات».\n\nهل تريد الحفظ رغم ذلك؟"
       )
     ) {
@@ -90,7 +90,7 @@ export function WebsiteWhyTranspool24Client() {
       if (!res.ok) throw new Error(data.error || "فشل الاستعادة");
       setJsonText(JSON.stringify(data.payload, null, 2));
       setMessage(
-        "تمت الاستعادة: حُذف سجل قاعدة البيانات. الصفحة العامة /[locale]/why تستخدم الآن النصوص الافتراضية من الكود — لا حاجة لحفظ جديد.",
+        "تمت الاستعادة: حُذف سجل قاعدة البيانات. الصفحة العامة /[locale]/why تستخدم الآن النصوص الافتراضية من الكود, لا حاجة لحفظ جديد.",
       );
     } catch (e) {
       setMessage(e instanceof Error ? e.message : "فشل الاستعادة");
@@ -107,7 +107,7 @@ export function WebsiteWhyTranspool24Client() {
         <div className="text-sm text-[#0d2137]">
           <p className="font-bold text-[#0d2137]">صور وفيديو صفحة «لماذا»؟</p>
           <p className="mt-1 text-[#0d2137]/85">
-            ليست هنا — افتح صفحة <strong>الوسائط</strong> من القائمة الجانبية أو الزر أدناه. هناك: صورة البانوراما، صورة
+            ليست هنا, افتح صفحة <strong>الوسائط</strong> من القائمة الجانبية أو الزر أدناه. هناك: صورة البانوراما، صورة
             المشهد، ورفع الفيديو + خيار <strong>تطبيق على كل اللغات</strong>.
           </p>
         </div>
@@ -121,13 +121,13 @@ export function WebsiteWhyTranspool24Client() {
 
       <p className="mb-6 text-sm text-[#0d2137]/70">
         محتوى صفحة{" "}
-        <code className="rounded bg-[#0d2137]/5 px-1">/[locale]/why</code> — عدّل JSON ثم احفظ. السجلات المحفوظة في{" "}
+        <code className="rounded bg-[#0d2137]/5 px-1">/[locale]/why</code>, عدّل JSON ثم احفظ. السجلات المحفوظة في{" "}
         <code className="rounded bg-[#0d2137]/5 px-1">why_transpool24_locale</code>{" "}
         <strong>تستبدل</strong> نصوص الكود (
         <code className="rounded bg-[#0d2137]/5 px-1">src/lib/why-defaults-*.ts</code>
         ). إذا ظهرت نصوص قديمة على الموقع: اختر اللغة ثم <strong>النصوص الافتراضية</strong> لحذف سجل القاعدة واستخدام
         النصوص الحالية. كذلك يُتجاهل JSON المحفوظ بدون{" "}
-        <code className="rounded bg-[#0d2137]/5 px-1">contentRevision</code> أحدث من الكود — وتعرض الصفحة النصوص الافتراضية.
+        <code className="rounded bg-[#0d2137]/5 px-1">contentRevision</code> أحدث من الكود, وتعرض الصفحة النصوص الافتراضية.
       </p>
       <div
         className="mb-6 rounded-lg border border-[var(--accent)]/20 bg-[var(--accent)]/5 px-4 py-3 text-sm text-[#0d2137]"

@@ -26,7 +26,7 @@ ${branding.headerHtml}
     <p style="margin:0 0 12px;font-size:16px;color:#0d2137;">Guten Tag,</p>
     <p style="margin:0 0 12px;font-size:15px;line-height:1.5;color:#334155;">
       Ihr Auftrag <strong>#${escapeHtml(orderRef)}</strong> (${escapeHtml(job.company_name || "Kunde")}) ist bei uns eingegangen und wird bearbeitet.
-      Sie müssen nichts tun — wir melden uns bei Änderungen.
+      Sie müssen nichts tun, wir melden uns bei Änderungen.
     </p>
     ${
       trackUrl

@@ -72,7 +72,7 @@ function RateDriverContent() {
         <p className="mt-2 text-center text-[#0d2137]/70">
           {alreadyRated ? "Sie haben den Fahrer bereits bewertet." : "Ihre Bewertung wurde gespeichert."}
         </p>
-        <p className="mt-4 text-center text-sm text-[#0d2137]/60">— TransPool24</p>
+        <p className="mt-4 text-center text-sm text-[#0d2137]/60">,  TransPool24</p>
       </div>
     );
   }

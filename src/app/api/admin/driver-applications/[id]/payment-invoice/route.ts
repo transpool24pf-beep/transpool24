@@ -38,8 +38,8 @@ export async function GET(
     return NextResponse.json({ error: "Only approved drivers" }, { status: 400 });
   }
 
-  const iban = (data.iban ?? "").trim() || "—";
-  const accountHolder = (data.bank_account_holder_name ?? "").trim() || (data.full_name ?? "—");
+  const iban = (data.iban ?? "").trim() || "-";
+  const accountHolder = (data.bank_account_holder_name ?? "").trim() || (data.full_name ?? "-");
   const driverNum = data.driver_number != null ? Number(data.driver_number) : null;
   const invoiceNumber = `TP24-${driverNum != null ? String(driverNum).padStart(5, "0") : "00000"}-${Date.now().toString(36).toUpperCase()}`;
   const contractNumber = `TP24-Vertrag-${driverNum != null ? String(driverNum).padStart(5, "0") : "00000"}-${Date.now().toString(36).toUpperCase()}`;

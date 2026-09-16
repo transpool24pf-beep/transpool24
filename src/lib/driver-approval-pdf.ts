@@ -52,7 +52,7 @@ export async function generateDriverApprovalPdf(app: DriverAppForPdf): Promise<U
   const margin = 50;
   let y = height - margin;
 
-  // —— Header: IONOS-style ——
+  // , ,  Header: IONOS-style , , 
   // Left: Title + Subtitle
   y = drawText(page, font, fontBold, "Zulassung zur Fahreranwendung", {
     y,
@@ -174,7 +174,7 @@ export async function generateDriverApprovalPdf(app: DriverAppForPdf): Promise<U
   y = drawText(page, font, fontBold, `Zulassungsdatum: ${approvedDateStr}`, { y, size: 10, x: margin });
   y -= 16;
 
-  // --- Legal consents (online application) — ASCII-safe for Helvetica WinAnsi ---
+  // --- Legal consents (online application), ASCII-safe for Helvetica WinAnsi ---
   y = drawText(page, font, fontBold, "Consents at application (online form)", {
     y,
     size: 10,
@@ -185,7 +185,7 @@ export async function generateDriverApprovalPdf(app: DriverAppForPdf): Promise<U
   const submitted =
     app.application_submitted_at && String(app.application_submitted_at).trim()
       ? new Date(app.application_submitted_at).toLocaleString("de-DE")
-      : "—";
+      : "-";
   y = drawText(page, font, fontBold, `Application submitted: ${toWinAnsiSafe(submitted)}`, { y, size: 9, x: margin });
   y = drawText(
     page,

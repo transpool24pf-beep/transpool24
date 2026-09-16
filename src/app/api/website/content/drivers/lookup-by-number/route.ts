@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     const photo = (data.personal_photo_url ?? "").trim();
     if (!photo) {
       return NextResponse.json(
-        { error: "No personal photo stored for this driver — upload one in driver application first." },
+        { error: "No personal photo stored for this driver, upload one in driver application first." },
         { status: 400 },
       );
     }

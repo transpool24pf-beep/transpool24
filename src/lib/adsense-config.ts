@@ -2,11 +2,11 @@
 export const ADSENSE_CLIENT =
   process.env.NEXT_PUBLIC_ADSENSE_CLIENT ?? "ca-pub-9998186124580672";
 
-/** Fixed sidebar rail dimensions (px) — matches classic skyscraper slot. */
+/** Fixed sidebar rail dimensions (px), matches classic skyscraper slot. */
 export const ADSENSE_SIDEBAR_WIDTH = 160;
 export const ADSENSE_SIDEBAR_HEIGHT = 600;
 
-/** Manual display units — create in AdSense → Ads → By ad unit → Display. */
+/** Manual display units, create in AdSense → Ads → By ad unit → Display. */
 export const ADSENSE_SLOT_SIDEBAR_LEFT =
   process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR_LEFT?.trim() ?? "6424372308";
 export const ADSENSE_SLOT_SIDEBAR_RIGHT =
@@ -39,7 +39,7 @@ export function adsAllowedForPath(pathname: string | null): boolean {
   if (!pathname) return false;
 
   const parts = pathname.split("/").filter(Boolean);
-  // /de — homepage
+  // /de, homepage
   if (parts.length === 1) return true;
   if (parts.length === 0) return false;
 

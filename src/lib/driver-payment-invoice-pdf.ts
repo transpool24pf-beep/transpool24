@@ -41,7 +41,7 @@ export async function generateDriverPaymentInvoicePdf(data: DriverPaymentInvoice
   const page = doc.addPage([595, 842]);
   const { width, height } = page.getSize();
 
-  // —— Zone 1: Header (Logo + Company) ——
+  // , ,  Zone 1: Header (Logo + Company) , , 
   let y = height - MARGIN;
   const logoBytes = await getPdfLogoBytes();
   let logoHeight = 0;
@@ -82,7 +82,7 @@ export async function generateDriverPaymentInvoicePdf(data: DriverPaymentInvoice
   }
   y -= Math.max(58, logoHeight + 20);
 
-  // —— Zone 2: Recipient (left) + Invoice meta (right) ——
+  // , ,  Zone 2: Recipient (left) + Invoice meta (right) , , 
   const leftX = MARGIN;
   const metaX = width - MARGIN - 200;
   drawText(page, font, fontBold, "Rechnungsempfänger", { x: leftX, y, size: 10, bold: true });
@@ -98,12 +98,12 @@ export async function generateDriverPaymentInvoicePdf(data: DriverPaymentInvoice
   drawText(page, font, fontBold, `Vertragsnummer: ${toWinAnsiSafe(data.contract_number)}`, { x: metaX, y: y - (SMALL + 2) * 3, size: 9 });
   y -= LINE * 4 + 16;
 
-  // —— Zone 3: Title ——
+  // , ,  Zone 3: Title , , 
   drawText(page, font, fontBold, "Ihre Rechnung", { x: leftX, y, size: 14, bold: true });
   drawText(page, font, fontBold, "Fahrervergütung", { x: leftX, y: y - LINE, size: 11 });
   y -= LINE * 2 + 12;
 
-  // —— Zone 4: Table ——
+  // , ,  Zone 4: Table , , 
   const col1 = leftX;
   const col2 = leftX + 220;
   const col3 = width - MARGIN - 85;
@@ -134,13 +134,13 @@ export async function generateDriverPaymentInvoicePdf(data: DriverPaymentInvoice
   page.drawText(`${totalEur.toFixed(2)} EUR`, { x: col3, y, size: 11, font: fontBold, color: rgb(0.1, 0.1, 0.15) });
   y -= 28;
 
-  // —— Zone 5: Payment details ——
+  // , ,  Zone 5: Payment details , , 
   drawText(page, font, fontBold, "Zahlung an:", { x: leftX, y, size: 10, bold: true });
   drawText(page, font, fontBold, `IBAN: ${toWinAnsiSafe(data.iban)}`, { x: leftX, y: y - LINE, size: 10 });
   drawText(page, font, fontBold, `Kontoinhaber: ${toWinAnsiSafe(data.account_holder_name)}`, { x: leftX, y: y - LINE * 2, size: 10 });
   y -= LINE * 3 + 20;
 
-  // —— Zone 6: Help block (right sidebar, same height as Zahlung an) ——
+  // , ,  Zone 6: Help block (right sidebar, same height as Zahlung an) , , 
   const helpX = width - MARGIN - 200;
   const helpYStart = y + LINE * 3 + 12;
   let helpY = helpYStart;
@@ -158,7 +158,7 @@ export async function generateDriverPaymentInvoicePdf(data: DriverPaymentInvoice
   helpY -= SMALL + 1;
   drawText(page, font, fontBold, "Servicezeiten: taeglich rund um die Uhr", { x: helpX, y: helpY, size: 8 });
 
-  // —— Zone 7: Footer (below payment and help blocks) ——
+  // , ,  Zone 7: Footer (below payment and help blocks) , , 
   y -= 28;
   drawText(page, font, fontBold, "Mit freundlichen Grüssen,", { x: leftX, y, size: 10 });
   drawText(page, font, fontBold, `Rechnungsservice ${PDF_COMPANY.name}`, { x: leftX, y: y - LINE, size: 10 });

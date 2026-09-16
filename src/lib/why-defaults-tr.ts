@@ -1,46 +1,46 @@
 import type { WhyPagePayload } from "./why-transpool24-types";
 
-/** B2B odak: şirketler, toptan, marketler, servisler — özel ev taşımacılığı çekirdek değil */
+/** B2B odak: şirketler, toptan, marketler, servisler, özel ev taşımacılığı çekirdek değil */
 export const whyPageTr: WhyPagePayload = {
   metaTitle: "Neden TransPool24? | B2B taşımacılık Pforzheim ve bölge",
   heroBadge: "Pforzheim · Baden-Württemberg · Almanya",
   headline: "İşletmeler ve ticari ortaklar neden TransPool24 kullanıyor",
   heroSub:
-    "Pforzheim, Karlsruhe ve çevresinde şirketler, toptancılar, süpermarketler ve atölyeler için karayolu taşıması düzenliyoruz — net fiyat, güvenilir sürücüler ve online rezervasyon. Özel ev ve mobilya taşıması da yapıyoruz.",
+    "Pforzheim, Karlsruhe ve çevresinde şirketler, toptancılar, süpermarketler ve atölyeler için karayolu taşıması düzenliyoruz, net fiyat, güvenilir sürücüler ve online rezervasyon. Özel ev ve mobilya taşıması da yapıyoruz.",
   sidebarTitle: "Ticari müşterilerin değer verdiği şeyler",
   sidebar: [
     {
       icon: "zap",
       title: "Hızlı ve planlanabilir",
-      body: "Rota, araç sınıfı ve hizmet seviyesi çevrimiçi — ödemeden önce sabit fiyat. Yedek parça, palet ve zamana duyarlı seferler için ideal.",
+      body: "Rota, araç sınıfı ve hizmet seviyesi çevrimiçi, ödemeden önce sabit fiyat. Yedek parça, palet ve zamana duyarlı seferler için ideal.",
     },
     {
       icon: "shield",
       title: "Güvenilir taşıyıcı, kargo kaosu değil",
-      body: "Hassas yük güvenilir bir taşıyıcı ister — gönderilerin kaybolduğu standart kargo ağları değil. Net teslim ve izlenebilir süreçler.",
+      body: "Hassas yük güvenilir bir taşıyıcı ister, gönderilerin kaybolduğu standart kargo ağları değil. Net teslim ve izlenebilir süreçler.",
     },
     {
       icon: "clipboard",
       title: "Bölgeyi bilen profesyoneller",
-      body: "Pforzheim’ı, otomotiv bölgesini ve Karlsruhe’yi bilen sürücüler — bayi, toptan depo ve sanayi bölgelerine erişim dahil.",
+      body: "Pforzheim’ı, otomotiv bölgesini ve Karlsruhe’yi bilen sürücüler, bayi, toptan depo ve sanayi bölgelerine erişim dahil.",
     },
   ],
-  introTitle: "İş ve ticaret — ve özel ev ile mobilya taşıması",
+  introTitle: "İş ve ticaret, ve özel ev ile mobilya taşıması",
   introLead:
-    "TransPool24 şirketler içindir: fabrikalar, toptancılar, süpermarketler, bayiler, matbaalar ve tedarikçiler. Ayrıca özel ev taşıması, mobilya ve ev aletleri taşıyoruz.\n\nPaletler, makine parçaları, kuru gıda kolileri ve ev eşyası için doğru araç ve sürücüyü eşleştiriyoruz — modern bir lojistik platformu gibi şeffaf ve rezerve edilebilir.",
+    "TransPool24 şirketler içindir: fabrikalar, toptancılar, süpermarketler, bayiler, matbaalar ve tedarikçiler. Ayrıca özel ev taşıması, mobilya ve ev aletleri taşıyoruz.\n\nPaletler, makine parçaları, kuru gıda kolileri ve ev eşyası için doğru araç ve sürücüyü eşleştiriyoruz, modern bir lojistik platformu gibi şeffaf ve rezerve edilebilir.",
   h2_1: "TransPool24 nedir?",
-  p1: "Pforzheim ve çevresinde ticari karayolu taşıması için dijital rezervasyon platformu; Baden-Württemberg ve Almanya genelinde erişim. Rota, yük ve hizmet seviyesini (yalnız sürücü, araçlı sürücü, yardımcılı) tanımlayıp çevrimiçi ödüyorsunuz — profesyonel sürücülerle koordinasyonu biz yapıyoruz.\n\nB2B gönderilere uygundur: forklift uyumlu palet işlerinden hassas yedek parça teslimatına kadar.",
+  p1: "Pforzheim ve çevresinde ticari karayolu taşıması için dijital rezervasyon platformu; Baden-Württemberg ve Almanya genelinde erişim. Rota, yük ve hizmet seviyesini (yalnız sürücü, araçlı sürücü, yardımcılı) tanımlayıp çevrimiçi ödüyorsunuz, profesyonel sürücülerle koordinasyonu biz yapıyoruz.\n\nB2B gönderilere uygundur: forklift uyumlu palet işlerinden hassas yedek parça teslimatına kadar.",
   h2_2: "Bölge bir ekonomik alan olarak",
-  p2: "Pforzheim (Goldstadt) mücevher, saat ve hassas mühendislikle bilinir. Baden-Württemberg otomotivin kalbidir — Mercedes, Porsche ve yoğun bayi ve yedek parça ağı.\n\nArada: Karlsruhe’deki restoran ve perakendeyi besleyen toptan, matbaa ve ambalaj tesisleri. Desteklediğimiz hatlar bunlar — fabrika, depo, atölye ve mağaza arasında.",
+  p2: "Pforzheim (Goldstadt) mücevher, saat ve hassas mühendislikle bilinir. Baden-Württemberg otomotivin kalbidir, Mercedes, Porsche ve yoğun bayi ve yedek parça ağı.\n\nArada: Karlsruhe’deki restoran ve perakendeyi besleyen toptan, matbaa ve ambalaj tesisleri. Desteklediğimiz hatlar bunlar, fabrika, depo, atölye ve mağaza arasında.",
   h2_3: "Şirketler neden bizimle gönderiyor",
-  p3: "• Güvenilirlik: net muhataplar, gerçekçi zaman pencereleri, gerektiğinde belgelenmiş teslim.\n• Palet ve forklift: birçok yük tam palet — forklift ile hızlı yükleme/boşaltma.\n• Satın almadan önce adil fiyat: mesafe, kategori ve hizmet seviyesi fiyatı belirler — gizli ek ücret yok.\n• Özel ev ve mobilya taşıması: daireler, mobilya ve ev aletleri — diğer gönderiler gibi çevrimiçi rezerve edin, yükleme için isteğe bağlı yardımcı.",
+  p3: "• Güvenilirlik: net muhataplar, gerçekçi zaman pencereleri, gerektiğinde belgelenmiş teslim.\n• Palet ve forklift: birçok yük tam palet, forklift ile hızlı yükleme/boşaltma.\n• Satın almadan önce adil fiyat: mesafe, kategori ve hizmet seviyesi fiyatı belirler, gizli ek ücret yok.\n• Özel ev ve mobilya taşıması: daireler, mobilya ve ev aletleri, diğer gönderiler gibi çevrimiçi rezerve edin, yükleme için isteğe bağlı yardımcı.",
   tipsTitle: "Ticari rezervasyon için beş ipucu",
-  tipsIntro: "Depo, atölye ve sevkiyat için — TransPool24’e göre.",
+  tipsIntro: "Depo, atölye ve sevkiyat için, TransPool24’e göre.",
   tips: [
     {
       title: "Palet tipi ve erişimi belirtin",
       detail:
-        "Euro palet, kaldırma yüksekliği, rampa veya kaldırım — araç ve yükleme süresini doğru planlamamıza yardım eder.",
+        "Euro palet, kaldırma yüksekliği, rampa veya kaldırım, araç ve yükleme süresini doğru planlamamıza yardım eder.",
     },
     {
       title: "İsim ve kapı / mal kabul iletişimi",
@@ -50,7 +50,7 @@ export const whyPageTr: WhyPagePayload = {
     {
       title: "Olağandışı yük için fotoğraf",
       detail:
-        "Makine parçaları, hacimli koliler veya kırılgan ambalaj — fotoğraf araç seçimini kolaylaştırır.",
+        "Makine parçaları, hacimli koliler veya kırılgan ambalaj, fotoğraf araç seçimini kolaylaştırır.",
     },
     {
       title: "Gerçekçi zaman penceresi",
@@ -60,16 +60,16 @@ export const whyPageTr: WhyPagePayload = {
     {
       title: "Hizmet seviyesini eşleştirin",
       detail:
-        "Yalnız sürücü / araç / yardımcı efor ve fiyatı değiştirir — rampa ve ağırlığın gerektirdiğini seçin.",
+        "Yalnız sürücü / araç / yardımcı efor ve fiyatı değiştirir, rampa ve ağırlığın gerektirdiğini seçin.",
     },
   ],
   servicesTitle: "Örnekler: birlikte çalıştığımız sektörler",
   servicesIntro:
-    "Bölgeden bir örnek — tam liste değil. B2B karayolu taşımacılığıysa sektörünüz de uyar.",
+    "Bölgeden bir örnek, tam liste değil. B2B karayolu taşımacılığıysa sektörünüz de uyar.",
   serviceTypes: [
     {
       name: "Mücevher, saat ve hassas üretim (Goldstadt Pforzheim)",
-      body: "Pforzheim altın, mücevher ve hassas makinelerle tanınır.\n\nTipik olarak taşıdıklarımız: makine yedek parçaları, değerli olmayan hammaddeler (koli), üreticilerden distribütörlere ve Karlsruhe’ye büyük B2B sevkiyatlar.\n\nAvantaj: Bu firmalar güvenilirlik için öder — hassas yük güvenilir bir taşıyıcı ister, gönderileri kaybeden kargo şirketi değil.",
+      body: "Pforzheim altın, mücevher ve hassas makinelerle tanınır.\n\nTipik olarak taşıdıklarımız: makine yedek parçaları, değerli olmayan hammaddeler (koli), üreticilerden distribütörlere ve Karlsruhe’ye büyük B2B sevkiyatlar.\n\nAvantaj: Bu firmalar güvenilirlik için öder, hassas yük güvenilir bir taşıyıcı ister, gönderileri kaybeden kargo şirketi değil.",
     },
     {
       name: "Oto yedek parça ve bayiler (KFZ)",
@@ -77,19 +77,19 @@ export const whyPageTr: WhyPagePayload = {
     },
     {
       name: "Gıda ve içecek (kuru, koli)",
-      body: "Soğuk zincir olmayan kuru ürünlere odaklanıyoruz — mevzuat daha yönetilebilir kalır.\n\nKiminle: Karlsruhe ve çevresinde restoran ve marketleri besleyen toptancılar.\n\nNe taşırız: koli içi yağ, konserve, gazlı içecek, toplu temizlik malzemeleri.\n\nAvantaj: Ağır, öngörülebilir yükler; uzun süreli tedarik ilişkileri yaygındır.",
+      body: "Soğuk zincir olmayan kuru ürünlere odaklanıyoruz, mevzuat daha yönetilebilir kalır.\n\nKiminle: Karlsruhe ve çevresinde restoran ve marketleri besleyen toptancılar.\n\nNe taşırız: koli içi yağ, konserve, gazlı içecek, toplu temizlik malzemeleri.\n\nAvantaj: Ağır, öngörülebilir yükler; uzun süreli tedarik ilişkileri yaygındır.",
     },
     {
       name: "Matbaa ve ambalaj",
-      body: "Pforzheim ile Karlsruhe arasında büyük matbaa ve ambalaj tesisleri var.\n\nNe taşırız: kağıt paletleri, basılı broşürler, sanayi için kartonlar.\n\nAvantaj: Sıklıkla tam palet — forklift (Stapler) ile yükleme/boşaltma çok hızlıdır.",
+      body: "Pforzheim ile Karlsruhe arasında büyük matbaa ve ambalaj tesisleri var.\n\nNe taşırız: kağıt paletleri, basılı broşürler, sanayi için kartonlar.\n\nAvantaj: Sıklıkla tam palet, forklift (Stapler) ile yükleme/boşaltma çok hızlıdır.",
     },
   ],
   platformTitle: "Şirketiniz TransPool24’ü nasıl kullanır",
   platformBody:
-    "Alım ve varış, kategori (XS/M/L), ağırlık ve hizmet seviyesini girersiniz. Ödemeden önce fiyatı görür, çevrimiçi rezerve edersiniz. Uygun bir sürücü atarız — ilerlemeyi takip edebilir, plan değişirse desteğe ulaşabilirsiniz.\n\nRezervasyonlar ticari ve kurumsal göndericilere yöneliktir; özel durumlar için ekibimize danışın.",
+    "Alım ve varış, kategori (XS/M/L), ağırlık ve hizmet seviyesini girersiniz. Ödemeden önce fiyatı görür, çevrimiçi rezerve edersiniz. Uygun bir sürücü atarız, ilerlemeyi takip edebilir, plan değişirse desteğe ulaşabilirsiniz.\n\nRezervasyonlar ticari ve kurumsal göndericilere yöneliktir; özel durumlar için ekibimize danışın.",
   completingTitle: "Teslimatı profesyonelce tamamlama",
   completingP1:
-    "Alımdan önce kimin teslim edeceğini netleştirin; gerekirse durumu fotoğraflayın — sonraki soruları kolaylaştırır.",
+    "Alımdan önce kimin teslim edeceğini netleştirin; gerekirse durumu fotoğraflayın, sonraki soruları kolaylaştırır.",
   completingP2:
     "Sevkiyat veya mal kabul teslim günü ulaşılabilir olmalı. Kapı veya saat değişikliğini erken bildirin.",
   completingP3:
@@ -102,7 +102,7 @@ export const whyPageTr: WhyPagePayload = {
   howSteps: [
     {
       title: "Çevrimiçi rezervasyon",
-      body: "Rota, yük ve hizmet seviyesi — sabit fiyat ve güvenli ödeme.",
+      body: "Rota, yük ve hizmet seviyesi, sabit fiyat ve güvenli ödeme.",
     },
     {
       title: "Sürücü ataması",
@@ -126,11 +126,11 @@ export const whyPageTr: WhyPagePayload = {
     },
     {
       q: "Hangi araçlar var?",
-      a: "XS/M/L ve ağırlığa göre — minibüsten daha büyük ticari araçlara. Net ölçüler ve palet bilgisi eşleşmeyi iyileştirir.",
+      a: "XS/M/L ve ağırlığa göre, minibüsten daha büyük ticari araçlara. Net ölçüler ve palet bilgisi eşleşmeyi iyileştirir.",
     },
     {
       q: "Palet ve forklift?",
-      a: "Birçok B2B yük paletlidir. Rampa, kapı yüksekliği veya kaldırım bırakma bildirin — süre ve aracı buna göre planlarız.",
+      a: "Birçok B2B yük paletlidir. Rampa, kapı yüksekliği veya kaldırım bırakma bildirin, süre ve aracı buna göre planlarız.",
     },
     {
       q: "Soğuk zincirli gıda?",
@@ -138,7 +138,7 @@ export const whyPageTr: WhyPagePayload = {
     },
     {
       q: "Fiyatı ne zaman görürüm?",
-      a: "Ödeme öncesi ödeme adımında tam fiyat — mesafe, kategori ve hizmet seviyesine göre.",
+      a: "Ödeme öncesi ödeme adımında tam fiyat, mesafe, kategori ve hizmet seviyesine göre.",
     },
     {
       q: "Taşımayı kim yapar?",
@@ -158,7 +158,7 @@ export const whyPageTr: WhyPagePayload = {
     },
     {
       q: "Shiply gibi pazar yerleriyle karşılaştırma?",
-      a: "Benzer fikir: şeffaf teklifler ve profesyonel icra — Pforzheim/Karlsruhe bölgesel odağı, çok dilli destek ve net B2B taşımacılık konumlandırması.",
+      a: "Benzer fikir: şeffaf teklifler ve profesyonel icra, Pforzheim/Karlsruhe bölgesel odağı, çok dilli destek ve net B2B taşımacılık konumlandırması.",
     },
   ],
 };

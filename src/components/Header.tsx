@@ -29,7 +29,7 @@ function isLargeCenterLogoPath(pathname: string | null): boolean {
   return section === "order" || section === "driver" || section === "blog";
 }
 
-/** Order / driver flows: on small screens hide nav (logo + header car only — avoids crowding). */
+/** Order / driver flows: on small screens hide nav (logo + header car only, avoids crowding). */
 function isOrderOrDriverFlowPath(pathname: string | null): boolean {
   if (!pathname) return false;
   const parts = pathname.split("/").filter(Boolean);
@@ -218,7 +218,7 @@ export function Header({ hideLogo }: HeaderProps) {
       className="sticky top-0 z-50 relative overflow-visible border-b-2 border-[#0d2137]/25 bg-[var(--background)]"
     >
       <HeaderCarLottieTrack />
-      {/* No backdrop-blur / frosted layer — it blurs the DotLottie behind this row */}
+      {/* No backdrop-blur / frosted layer, it blurs the DotLottie behind this row */}
       <div className="relative z-10">
         {hideLogo ? (
           <div className="mx-auto flex max-w-6xl items-center justify-end gap-2 px-4 py-0.5 sm:px-6 sm:py-1">

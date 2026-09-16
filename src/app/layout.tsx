@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     template: "TransPool24 | %s",
   },
   description:
-    "Digital logistics & road transport in Pforzheim, Germany — book online, real-time tracking, secure payments.",
+    "Digital logistics & road transport in Pforzheim, Germany, book online, real-time tracking, secure payments.",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },

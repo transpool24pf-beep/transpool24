@@ -146,7 +146,7 @@ export async function POST(req: Request) {
     const unloadingMinutes = p.unloadingMinutes;
     const totalDriverMinutes = p.totalDriverMinutes;
 
-    /** Fahrerpreis = 18 × Hin- und Rückfahrt (Cent) — 18 Cent pro km Hin+Rück */
+    /** Fahrerpreis = 18 × Hin- und Rückfahrt (Cent), 18 Cent pro km Hin+Rück */
     const roundTripKm = distanceKm * 2;
     const driverPriceCents = Math.round(18 * roundTripKm);
 

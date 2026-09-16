@@ -1,46 +1,46 @@
 import type { WhyPagePayload } from "./why-transpool24-types";
 
-/** Enfoque B2B: empresas, mayoristas, supermercados, talleres — no mudanzas privadas como núcleo */
+/** Enfoque B2B: empresas, mayoristas, supermercados, talleres, no mudanzas privadas como núcleo */
 export const whyPageEs: WhyPagePayload = {
   metaTitle: "¿Por qué TransPool24? | Transporte B2B Pforzheim y región",
   heroBadge: "Pforzheim · Baden-Wurtemberg · Alemania",
   headline: "Por qué empresas y socios comerciales eligen TransPool24",
   heroSub:
-    "Organizamos transporte por carretera para empresas, mayoristas, supermercados y talleres entre Pforzheim, Karlsruhe y la región — precios claros, conductores fiables y reserva online. También hacemos mudanzas privadas y transporte de muebles.",
+    "Organizamos transporte por carretera para empresas, mayoristas, supermercados y talleres entre Pforzheim, Karlsruhe y la región, precios claros, conductores fiables y reserva online. También hacemos mudanzas privadas y transporte de muebles.",
   sidebarTitle: "Lo que valoran los clientes comerciales",
   sidebar: [
     {
       icon: "zap",
       title: "Rápido y planificable",
-      body: "Ruta, categoría de vehículo y nivel de servicio online — precio fijo antes de pagar. Ideal para repuestos, palés y envíos urgentes.",
+      body: "Ruta, categoría de vehículo y nivel de servicio online, precio fijo antes de pagar. Ideal para repuestos, palés y envíos urgentes.",
     },
     {
       icon: "shield",
       title: "Confianza, no ruleta de paquetería",
-      body: "La carga sensible necesita un transportista fiable — no una red de paquetes donde se pierden envíos. Entregas claras y procesos trazables.",
+      body: "La carga sensible necesita un transportista fiable, no una red de paquetes donde se pierden envíos. Entregas claras y procesos trazables.",
     },
     {
       icon: "clipboard",
       title: "Profesionales de la zona",
-      body: "Conductores que conocen Pforzheim, la región del automóvil y Karlsruhe — incluido acceso a concesionarios, depósitos mayoristas y polígonos.",
+      body: "Conductores que conocen Pforzheim, la región del automóvil y Karlsruhe, incluido acceso a concesionarios, depósitos mayoristas y polígonos.",
     },
   ],
-  introTitle: "Negocio y comercio — y mudanzas privadas y muebles",
+  introTitle: "Negocio y comercio, y mudanzas privadas y muebles",
   introLead:
-    "TransPool24 está pensado para empresas: fábricas, mayoristas, supermercados, concesionarios, imprentas y proveedores. También transportamos mudanzas privadas, muebles y electrodomésticos.\n\nTe emparejamos con el vehículo y conductor adecuados para palés, piezas de maquinaria, cajas secas de alimentación y mudanzas del hogar — transparente y reservable como una plataforma logística moderna.",
+    "TransPool24 está pensado para empresas: fábricas, mayoristas, supermercados, concesionarios, imprentas y proveedores. También transportamos mudanzas privadas, muebles y electrodomésticos.\n\nTe emparejamos con el vehículo y conductor adecuados para palés, piezas de maquinaria, cajas secas de alimentación y mudanzas del hogar, transparente y reservable como una plataforma logística moderna.",
   h2_1: "¿Qué es TransPool24?",
-  p1: "Plataforma digital de reserva para transporte comercial por carretera en Pforzheim y alrededores, con alcance en Baden-Wurtemberg y Alemania. Describes ruta, carga y nivel de servicio (solo conductor, con vehículo, con ayudante) y pagas online — coordinamos la ejecución con conductores profesionales.\n\nAdecuado para envíos B2B: desde trabajos con palé y carretilla hasta entregas de repuestos sensibles.",
+  p1: "Plataforma digital de reserva para transporte comercial por carretera en Pforzheim y alrededores, con alcance en Baden-Wurtemberg y Alemania. Describes ruta, carga y nivel de servicio (solo conductor, con vehículo, con ayudante) y pagas online, coordinamos la ejecución con conductores profesionales.\n\nAdecuado para envíos B2B: desde trabajos con palé y carretilla hasta entregas de repuestos sensibles.",
   h2_2: "La región como espacio económico",
-  p2: "Pforzheim (Goldstadt) es sinónimo de oro, relojes y ingeniería de precisión. Baden-Wurtemberg es el corazón del automóvil — Mercedes, Porsche y una red densa de concesionarios y almacenes de piezas.\n\nEntre medias: mayoristas que abastecen restaurantes y comercio en Karlsruhe, imprentas y embalaje. Esos son los corredores que apoyamos — entre planta, almacén, taller y tienda.",
+  p2: "Pforzheim (Goldstadt) es sinónimo de oro, relojes y ingeniería de precisión. Baden-Wurtemberg es el corazón del automóvil, Mercedes, Porsche y una red densa de concesionarios y almacenes de piezas.\n\nEntre medias: mayoristas que abastecen restaurantes y comercio en Karlsruhe, imprentas y embalaje. Esos son los corredores que apoyamos, entre planta, almacén, taller y tienda.",
   h2_3: "Por qué las empresas envían con nosotros",
-  p3: "• Fiabilidad: contactos claros, ventanas horarias realistas, entregas documentadas si hace falta.\n• Palés y carretilla: muchas cargas son palés completos — carga/descarga eficiente con carretilla elevadora.\n• Precio justo antes de comprar: distancia, categoría y nivel de servicio fijan el precio — sin cargos ocultos tras el pago.\n• Mudanzas privadas y muebles: pisos, mobiliario y electrodomésticos — reserva online como cualquier envío, con ayudante opcional para carga y descarga.",
+  p3: "• Fiabilidad: contactos claros, ventanas horarias realistas, entregas documentadas si hace falta.\n• Palés y carretilla: muchas cargas son palés completos, carga/descarga eficiente con carretilla elevadora.\n• Precio justo antes de comprar: distancia, categoría y nivel de servicio fijan el precio, sin cargos ocultos tras el pago.\n• Mudanzas privadas y muebles: pisos, mobiliario y electrodomésticos, reserva online como cualquier envío, con ayudante opcional para carga y descarga.",
   tipsTitle: "Cinco consejos para reservas comerciales",
-  tipsIntro: "Práctico para almacén, taller y expedición — adaptado a TransPool24.",
+  tipsIntro: "Práctico para almacén, taller y expedición, adaptado a TransPool24.",
   tips: [
     {
       title: "Indique tipo de palé y acceso",
       detail:
-        "Palé euro, altura de elevación, rampa o acera — ayuda a planificar vehículo y tiempo de carga.",
+        "Palé euro, altura de elevación, rampa o acera, ayuda a planificar vehículo y tiempo de carga.",
     },
     {
       title: "Contacto con nombre y acceso",
@@ -50,7 +50,7 @@ export const whyPageEs: WhyPagePayload = {
     {
       title: "Fotos para cargas inusuales",
       detail:
-        "Piezas de máquina, cajas voluminosas o embalaje frágil — una foto facilita elegir vehículo.",
+        "Piezas de máquina, cajas voluminosas o embalaje frágil, una foto facilita elegir vehículo.",
     },
     {
       title: "Ventanas horarias realistas",
@@ -60,16 +60,16 @@ export const whyPageEs: WhyPagePayload = {
     {
       title: "Ajuste el nivel de servicio",
       detail:
-        "Solo conductor / vehículo / ayudante cambia esfuerzo y precio — reserve lo que exijan rampa y peso.",
+        "Solo conductor / vehículo / ayudante cambia esfuerzo y precio, reserve lo que exijan rampa y peso.",
     },
   ],
   servicesTitle: "Ejemplos: sectores con los que trabajamos",
   servicesIntro:
-    "Muestra de la región — no exhaustivo. Su sector encaja si es transporte B2B por carretera.",
+    "Muestra de la región, no exhaustivo. Su sector encaja si es transporte B2B por carretera.",
   serviceTypes: [
     {
       name: "Joyería, relojes y precisión (Goldstadt Pforzheim)",
-      body: "Pforzheim es conocida por oro, joyería y maquinaria de precisión.\n\nLo que solemos transportar: repuestos para máquinas, materias primas no valiosas en cajas, o grandes entregas B2B de fabricantes a distribuidores y hacia Karlsruhe.\n\nVentaja: estas empresas pagan por fiabilidad — la carga sensible necesita un transportista de confianza, no un operador de paquetes que pierde envíos.",
+      body: "Pforzheim es conocida por oro, joyería y maquinaria de precisión.\n\nLo que solemos transportar: repuestos para máquinas, materias primas no valiosas en cajas, o grandes entregas B2B de fabricantes a distribuidores y hacia Karlsruhe.\n\nVentaja: estas empresas pagan por fiabilidad, la carga sensible necesita un transportista de confianza, no un operador de paquetes que pierde envíos.",
     },
     {
       name: "Recambios de coches y concesionarios (KFZ)",
@@ -77,23 +77,23 @@ export const whyPageEs: WhyPagePayload = {
     },
     {
       name: "Alimentación y bebidas (seco, cartón)",
-      body: "Nos centramos en productos secos sin cadena de frío — así la normativa es más manejable.\n\nCon quién: mayoristas (Großhandel) que abastecen restaurantes y supermercados en Karlsruhe y alrededores.\n\nQué movemos: aceite en cajas, conservas, refrescos, productos de limpieza a granel.\n\nVentaja: cargas pesadas y previsibles; relaciones de suministro a largo plazo son habituales.",
+      body: "Nos centramos en productos secos sin cadena de frío, así la normativa es más manejable.\n\nCon quién: mayoristas (Großhandel) que abastecen restaurantes y supermercados en Karlsruhe y alrededores.\n\nQué movemos: aceite en cajas, conservas, refrescos, productos de limpieza a granel.\n\nVentaja: cargas pesadas y previsibles; relaciones de suministro a largo plazo son habituales.",
     },
     {
       name: "Imprenta y embalaje",
-      body: "Entre Pforzheim y Karlsruhe hay grandes imprentas y plantas de embalaje.\n\nQué movemos: palés de papel, folletos impresos, cartones para clientes industriales.\n\nVentaja: a menudo palés completos — carga y descarga muy rápida con carretilla (Stapler).",
+      body: "Entre Pforzheim y Karlsruhe hay grandes imprentas y plantas de embalaje.\n\nQué movemos: palés de papel, folletos impresos, cartones para clientes industriales.\n\nVentaja: a menudo palés completos, carga y descarga muy rápida con carretilla (Stapler).",
     },
   ],
   platformTitle: "Cómo usa TransPool24 su empresa",
   platformBody:
-    "Introduce recogida, destino, categoría (XS/M/L), peso y nivel de servicio. Ves el precio antes de pagar y reservas online. Asignamos un conductor adecuado — puedes seguir el progreso y contactar soporte si cambian los planes.\n\nLas reservas van dirigidas a remitentes comerciales e institucionales; casos especiales: consulte al equipo.",
+    "Introduce recogida, destino, categoría (XS/M/L), peso y nivel de servicio. Ves el precio antes de pagar y reservas online. Asignamos un conductor adecuado, puedes seguir el progreso y contactar soporte si cambian los planes.\n\nLas reservas van dirigidas a remitentes comerciales e institucionales; casos especiales: consulte al equipo.",
   completingTitle: "Cerrar la entrega de forma profesional",
   completingP1:
-    "Antes de la recogida, acuerde quién entrega la mercancía y documente el estado si conviene (fotos) — simplifica dudas posteriores.",
+    "Antes de la recogida, acuerde quién entrega la mercancía y documente el estado si conviene (fotos), simplifica dudas posteriores.",
   completingP2:
     "Expedición o recepción debe estar localizable el día de entrega. Comunique cambios de puerta u horario pronto.",
   completingP3:
-    "Su feedback tras la entrega ayuda a mantener la calidad — y a otros clientes B2B a decidir con confianza.",
+    "Su feedback tras la entrega ayuda a mantener la calidad, y a otros clientes B2B a decidir con confianza.",
   closingLine: "Esperamos su próximo transporte comercial.",
   heroImageUrl: "/transpool24-email-banner.png",
   sceneImageUrl: "/images/445.png",
@@ -102,7 +102,7 @@ export const whyPageEs: WhyPagePayload = {
   howSteps: [
     {
       title: "Reservar online",
-      body: "Ruta, carga y nivel de servicio — precio cerrado y pago seguro.",
+      body: "Ruta, carga y nivel de servicio, precio cerrado y pago seguro.",
     },
     {
       title: "Asignamos conductor",
@@ -118,7 +118,7 @@ export const whyPageEs: WhyPagePayload = {
   faqs: [
     {
       q: "¿TransPool24 hace mudanzas privadas?",
-      a: "Sí. Transportamos mudanzas privadas, muebles y electrodomésticos — además de envíos comerciales. Reserve online como cualquier otro trabajo; ayudante opcional para carga y descarga.",
+      a: "Sí. Transportamos mudanzas privadas, muebles y electrodomésticos, además de envíos comerciales. Reserve online como cualquier otro trabajo; ayudante opcional para carga y descarga.",
     },
     {
       q: "¿Cubren mi zona?",
@@ -126,11 +126,11 @@ export const whyPageEs: WhyPagePayload = {
     },
     {
       q: "¿Qué vehículos hay?",
-      a: "Según XS/M/L y peso — desde furgonetas hasta vehículos comerciales mayores. Medidas e info de palés mejoran el emparejamiento.",
+      a: "Según XS/M/L y peso, desde furgonetas hasta vehículos comerciales mayores. Medidas e info de palés mejoran el emparejamiento.",
     },
     {
       q: "¿Palés y carretilla?",
-      a: "Muchas cargas B2B van paletizadas. Indique rampa, altura de puerta o entrega en acera — planificamos tiempo y vehículo.",
+      a: "Muchas cargas B2B van paletizadas. Indique rampa, altura de puerta o entrega en acera, planificamos tiempo y vehículo.",
     },
     {
       q: "¿Alimentos refrigerados?",
@@ -138,7 +138,7 @@ export const whyPageEs: WhyPagePayload = {
     },
     {
       q: "¿Cuándo veo el precio?",
-      a: "Precio total antes del pago en checkout — según distancia, categoría y nivel de servicio.",
+      a: "Precio total antes del pago en checkout, según distancia, categoría y nivel de servicio.",
     },
     {
       q: "¿Quién ejecuta el transporte?",
@@ -158,7 +158,7 @@ export const whyPageEs: WhyPagePayload = {
     },
     {
       q: "¿Comparación con Shiply?",
-      a: "Idea similar: ofertas claras y ejecución profesional — con foco regional Pforzheim/Karlsruhe, soporte multilingüe y posicionamiento B2B claro.",
+      a: "Idea similar: ofertas claras y ejecución profesional, con foco regional Pforzheim/Karlsruhe, soporte multilingüe y posicionamiento B2B claro.",
     },
   ],
 };

@@ -79,7 +79,7 @@ export function WebsiteWhyMediaClient() {
       if (slot === "hero") setHeroImageUrl(pub);
       else if (slot === "scene") setSceneImageUrl(pub);
       else setHowVideoUrl(pub);
-      setMessage("اكتمل الرفع — اضغط «حفظ الوسائط» حتى تُحفظ الروابط في قاعدة البيانات.");
+      setMessage("اكتمل الرفع, اضغط «حفظ الوسائط» حتى تُحفظ الروابط في قاعدة البيانات.");
     } catch (e) {
       alert(e instanceof Error ? e.message : "فشل الرفع");
     } finally {
@@ -110,7 +110,7 @@ export function WebsiteWhyMediaClient() {
       if (!res.ok) throw new Error(data.error || "فشل الحفظ");
       if (data.applyToAllLocales && Array.isArray(data.localesUpdated)) {
         setMessage(
-          `تم الحفظ لكل اللغات (${data.localesUpdated.length}) — مثل /de/why و /en/why و /ar/why. روابط الوسائط أصبحت متطابقة.`
+          `تم الحفظ لكل اللغات (${data.localesUpdated.length}), مثل /de/why و /en/why و /ar/why. روابط الوسائط أصبحت متطابقة.`
         );
       } else {
         setMessage(`تم الحفظ. صفحة /${locale}/why تقرأ المحتوى مباشرة من قاعدة البيانات.`);
@@ -154,7 +154,7 @@ export function WebsiteWhyMediaClient() {
               (المعاينة هنا تبقى حسب اللغة المختارة).
             </span>
             <span className="mt-2 block text-xs text-amber-900/90" dir="rtl">
-              إذا ظهر خطأ عند الحفظ: قد تحتاج قاعدة البيانات إلى توسيع قائمة اللغات — نفّذ ملف SQL{" "}
+              إذا ظهر خطأ عند الحفظ: قد تحتاج قاعدة البيانات إلى توسيع قائمة اللغات, نفّذ ملف SQL{" "}
               <code className="rounded bg-white/80 px-1">supabase/FIX_why_save_all_languages.sql</code> في Supabase →
               SQL Editor.
             </span>
@@ -209,7 +209,7 @@ export function WebsiteWhyMediaClient() {
         <div className="space-y-8">
           <section className="rounded-xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
             <h2 className="text-lg font-semibold text-[#0d2137]">الصورة الكبيرة (فوق الأسئلة)</h2>
-            <p className="mt-1 text-sm text-[#0d2137]/65">بانوراما عريضة — يُفضَّل 21:9 أو ما يقاربها. حد أقصى 15 ميغابايت.</p>
+            <p className="mt-1 text-sm text-[#0d2137]/65">بانوراما عريضة, يُفضَّل 21:9 أو ما يقاربها. حد أقصى 15 ميغابايت.</p>
             <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-start">
               <div className="relative h-32 w-full max-w-md overflow-hidden rounded-lg border border-[#0d2137]/10 bg-gray-100 sm:h-36">
                 {heroImageUrl ? (

@@ -272,9 +272,9 @@ export default function AdminDriverApplicationDetailPage({
           <p><strong>{t("da.email")}:</strong> <span dir="ltr">{app.email}</span></p>
           <p><strong>{t("da.phone")}:</strong> <span dir="ltr">{app.phone}</span></p>
           <p><strong>{t("da.city")}:</strong> {app.city}</p>
-          <p><strong>{t("da.tax")}:</strong> {app.tax_or_commercial_number || "—"}</p>
-          <p><strong>{t("da.languages")}:</strong> {app.languages_spoken || "—"}</p>
-          <p><strong>{t("da.plate")}:</strong> {app.vehicle_plate || "—"}</p>
+          <p><strong>{t("da.tax")}:</strong> {app.tax_or_commercial_number || "-"}</p>
+          <p><strong>{t("da.languages")}:</strong> {app.languages_spoken || "-"}</p>
+          <p><strong>{t("da.plate")}:</strong> {app.vehicle_plate || "-"}</p>
         </div>
 
         <div className="mt-6 rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/[0.03] p-4">
@@ -321,7 +321,7 @@ export default function AdminDriverApplicationDetailPage({
                     {" "}({(app.stats.customer_rating_avg ?? app.star_rating)?.toFixed(1)})
                   </span>
                 ) : (
-                  "—"
+                  "-"
                 )}
               </span>
               <span className="flex items-center gap-1">
@@ -576,7 +576,7 @@ export default function AdminDriverApplicationDetailPage({
               </div>
             ) : (
               <p className="text-sm text-[#0d2137]/70">
-                {app.desired_note || "—"}
+                {app.desired_note || "-"}
                 <button
                   type="button"
                   onClick={() => setDesiredNoteEdit(app.desired_note ?? "")}
@@ -623,7 +623,7 @@ export default function AdminDriverApplicationDetailPage({
             ) : (
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-sm text-[#0d2137]/80">
-                  {t("da.iban")}: {app.iban || "—"} · {t("da.holder")}: {app.bank_account_holder_name || "—"}
+                  {t("da.iban")}: {app.iban || "-"} · {t("da.holder")}: {app.bank_account_holder_name || "-"}
                 </span>
                 <button
                   type="button"
@@ -1018,7 +1018,7 @@ export default function AdminDriverApplicationDetailPage({
               ) : (
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="text-sm text-[#0d2137]/80">
-                    {t("da.iban")}: {app?.iban || "—"} · {t("da.holder")}: {app?.bank_account_holder_name || "—"}
+                    {t("da.iban")}: {app?.iban || "-"} · {t("da.holder")}: {app?.bank_account_holder_name || "-"}
                   </span>
                   <button
                     type="button"

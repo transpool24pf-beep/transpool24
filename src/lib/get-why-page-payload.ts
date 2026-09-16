@@ -16,7 +16,7 @@ function dbPayloadRevision(p: WhyPagePayload): number {
 const DEFAULT_HERO_IMAGE = "/transpool24-email-banner.png";
 const DEFAULT_SCENE_IMAGE = "/images/445.png";
 
-/** Repo never shipped /images/van1.png or van2.png — replace legacy defaults & old CMS values */
+/** Repo never shipped /images/van1.png or van2.png, replace legacy defaults & old CMS values */
 function fixLegacyWhyMediaUrls(p: WhyPagePayload): WhyPagePayload {
   let hero = (p.heroImageUrl || "").trim();
   let scene = (p.sceneImageUrl || "").trim();

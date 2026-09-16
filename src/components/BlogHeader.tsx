@@ -105,7 +105,7 @@ export function BlogHeader() {
 
   return (
     <header className="sticky top-0 z-50 bg-white text-[#1a1a1a] shadow-[0_4px_24px_-8px_rgba(0,0,0,0.08)]">
-      {/* Top bar — template */}
+      {/* Top bar, template */}
       <div className="bg-[#222] text-[11px] text-white/90 sm:text-xs">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-2 px-4 py-2 sm:px-6">
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1">

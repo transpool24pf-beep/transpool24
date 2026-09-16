@@ -117,7 +117,7 @@ export function WebsiteShell({ children }: { children: React.ReactNode }) {
               www.transpool24.com
             </a>
             <span className="mx-2">·</span>
-            <span>محتوى الموقع فقط — بلا طلبات وبلا بيانات عملاء</span>
+            <span>محتوى الموقع فقط, بلا طلبات وبلا بيانات عملاء</span>
           </footer>
         </main>
       </div>

@@ -1,5 +1,5 @@
 /**
- * Google Places (legacy REST) — Germany-only suggestions + details.
+ * Google Places (legacy REST), Germany-only suggestions + details.
  * Uses server-side GOOGLE_MAPS_API_KEY. Enable "Places API" in Google Cloud.
  * Session token links Autocomplete + Place Details for billing.
  */

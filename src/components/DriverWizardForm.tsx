@@ -690,9 +690,9 @@ export function DriverWizardForm({
             <p><strong>{t("reviewEmail")}:</strong> {form.email}</p>
             <p><strong>{t("reviewWhatsapp")}:</strong> {form.phoneCountryCode} {form.phone}</p>
             <p><strong>{t("reviewCity")}:</strong> {resolvedCity()}</p>
-            <p><strong>{t("reviewTax")}:</strong> {form.taxOrCommercialNumber || "—"}</p>
-            <p><strong>{t("reviewLanguages")}:</strong> {form.languagesSpoken || "—"}</p>
-            <p><strong>{t("reviewVehiclePlate")}:</strong> {form.vehiclePlate || "—"}</p>
+            <p><strong>{t("reviewTax")}:</strong> {form.taxOrCommercialNumber || "-"}</p>
+            <p><strong>{t("reviewLanguages")}:</strong> {form.languagesSpoken || "-"}</p>
+            <p><strong>{t("reviewVehiclePlate")}:</strong> {form.vehiclePlate || "-"}</p>
           </div>
           <div className="rounded-xl border-2 border-[var(--accent)]/40 bg-[#fff8f0] p-4">
             <p className="mb-2 font-semibold text-[#0d2137]">{WORK_POLICY_TITLE}</p>

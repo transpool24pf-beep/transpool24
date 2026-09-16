@@ -240,7 +240,7 @@ export type OrderFormData = {
   companyName: string;
   email: string;
   phone: string;
-  /** Full pickup line: street, house no., postcode (and city) — one field */
+  /** Full pickup line: street, house no., postcode (and city), one field */
   pickupAddressLine: string;
   deliveryAddressLine: string;
   pickupAddr: StructuredAddress;
@@ -1672,7 +1672,7 @@ export function OrderForm({
                         }
                         className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
                       >
-                        <option value="">— {t("loadCarrierPlaceholder")}</option>
+                        <option value="">,  {t("loadCarrierPlaceholder")}</option>
                         {LOAD_CARRIERS.map((c) => (
                           <option key={c.id} value={c.id}>
                             {t(c.labelKey)}
@@ -1873,7 +1873,7 @@ export function OrderForm({
             </label>
             {distanceFromRoute ? (
               <div className="rounded-lg border border-green-200 bg-green-50/50 px-4 py-3 text-sm font-medium text-green-800">
-                {data.distanceKm} km — {t("distanceFromRouteLabel")}
+                {data.distanceKm} km, {t("distanceFromRouteLabel")}
               </div>
             ) : (
               <input
@@ -1949,17 +1949,17 @@ export function OrderForm({
                       month: "long",
                       day: "numeric",
                     })
-                  : "—"}{" "}
+                  : "-"}{" "}
                 {data.pickupTime ? data.pickupTime : ""}
               </p>
             )}
-            <p><strong>{t("serviceType")}:</strong>             {data.serviceType ? t(SERVICE_OPTIONS.find((o) => o.value === data.serviceType)?.key ?? "serviceDriverCar") : "—"}</p>
+            <p><strong>{t("serviceType")}:</strong>             {data.serviceType ? t(SERVICE_OPTIONS.find((o) => o.value === data.serviceType)?.key ?? "serviceDriverCar") : "-"}</p>
             {loads.map((line, idx) => (
               <p key={idx}>
                 <strong>
                   {t("loadRowLabel")} {idx + 1}:
                 </strong>{" "}
-                {line.quantity}× {line.loadCarrier ? t(`loadCarrier_${line.loadCarrier}`) : "—"}
+                {line.quantity}× {line.loadCarrier ? t(`loadCarrier_${line.loadCarrier}`) : "-"}
                 {line.content ? ` · ${line.content}` : ""} · {line.lengthCm}×{line.widthCm}×{line.heightCm} cm ·{" "}
                 {line.kgPerUnit} kg · {t("loadStackable")}: {line.stackable ? t("loadYes") : t("loadNo")} ·{" "}
                 {t("loadDangerousGoods")}: {line.dangerousGoods ? t("loadYes") : t("loadNo")}

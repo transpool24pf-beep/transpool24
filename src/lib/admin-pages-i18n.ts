@@ -21,7 +21,7 @@ export const ADMIN_PAGES_DE: Record<string, string> = {
   "common.status": "Status",
   "common.company": "Firma",
   "common.country": "Land",
-  "common.none": "—",
+  "common.none": "-",
 
   "login.title": "TransPool24 – Admin",
   "login.subtitle": "Admin-Passwort eingeben, um fortzufahren.",
@@ -137,11 +137,11 @@ export const ADMIN_PAGES_DE: Record<string, string> = {
   "blog.hubSubtitle":
     "Redaktionelle Inhalte (Transport, Märkte, Brennstoffpreise). Veröffentlichte Artikel erscheinen unter /[Sprache]/blog. Bitte SQL supabase/blog.sql in Supabase ausführen.",
   "blog.hubMultilingual":
-    "Mehrsprachig: Beim neuen Artikel Option „In alle Sprachen übersetzen“ — setzt OPENAI_API_KEY in den Vercel-Umgebungsvariablen (OpenAI API). Ohne Key wird nur die gewählte Sprache gespeichert.",
+    "Mehrsprachig: Beim neuen Artikel Option „In alle Sprachen übersetzen“, setzt OPENAI_API_KEY in den Vercel-Umgebungsvariablen (OpenAI API). Ohne Key wird nur die gewählte Sprache gespeichert.",
   "blog.postsCard": "Artikel",
   "blog.postsCardDesc": "Beiträge mit Bild, Markdown-Text, Kategorie und Tags.",
   "blog.pagesCard": "Statische Seiten",
-  "blog.pagesCardDesc": "z. B. Über das Magazin, Impressum-Hinweis, Disclaimer — erscheinen in der Blog-Navigation.",
+  "blog.pagesCardDesc": "z. B. Über das Magazin, Impressum-Hinweis, Disclaimer, erscheinen in der Blog-Navigation.",
   "blog.postsTitle": "Blog-Artikel",
   "blog.postsSubtitle": "Entwürfe und veröffentlichte Beiträge",
   "blog.language": "Sprache",
@@ -223,7 +223,7 @@ export const ADMIN_PAGES_AR: Record<string, string> = {
   "common.status": "الحالة",
   "common.company": "الشركة",
   "common.country": "البلد",
-  "common.none": "—",
+  "common.none": "-",
 
   "login.title": "TransPool24 – الإدارة",
   "login.subtitle": "أدخل كلمة مرور الإدارة للمتابعة.",
@@ -293,7 +293,7 @@ export const ADMIN_PAGES_AR: Record<string, string> = {
   "reports.cancelled": "ملغى",
   "reports.invoicesTitle": "فواتير العملاء (PDF) – مدفوعة",
   "reports.invoicesDesc":
-    "تحميل مباشر لفاتورة النظام (كما في الطلبات). فقط الطلبات ذات payment_status = paid وغير الملغاة — آخر 100.",
+    "تحميل مباشر لفاتورة النظام (كما في الطلبات). فقط الطلبات ذات payment_status = paid وغير الملغاة, آخر 100.",
   "reports.noPaid": "لا توجد طلبات مدفوعة في القائمة.",
   "reports.colNr": "رقم",
   "reports.colAmount": "المبلغ",
@@ -339,11 +339,11 @@ export const ADMIN_PAGES_AR: Record<string, string> = {
   "blog.hubSubtitle":
     "محتوى تحريري (نقل، أسواق، أسعار الوقود). المقالات المنشورة تظهر تحت /[اللغة]/blog. نفّذ supabase/blog.sql في Supabase.",
   "blog.hubMultilingual":
-    "متعدد اللغات: عند مقال جديد خيار «ترجمة لكل اللغات» — يتطلب OPENAI_API_KEY في Vercel. بدون المفتاح تُحفظ اللغة المختارة فقط.",
+    "متعدد اللغات: عند مقال جديد خيار «ترجمة لكل اللغات», يتطلب OPENAI_API_KEY في Vercel. بدون المفتاح تُحفظ اللغة المختارة فقط.",
   "blog.postsCard": "مقالات",
   "blog.postsCardDesc": "منشورات بصورة ونص Markdown وفئة ووسوم.",
   "blog.pagesCard": "صفحات ثابتة",
-  "blog.pagesCardDesc": "مثل «عن المجلة»، إشعار قانوني — تظهر في تنقل المدونة.",
+  "blog.pagesCardDesc": "مثل «عن المجلة»، إشعار قانوني, تظهر في تنقل المدونة.",
   "blog.postsTitle": "مقالات المدونة",
   "blog.postsSubtitle": "مسودات ومنشورات",
   "blog.language": "اللغة",
@@ -390,7 +390,7 @@ export const ADMIN_PAGES_AR: Record<string, string> = {
   "settings.perHour": "يورو لكل ساعة",
   "settings.driverOnlyTitle": "أجر الساعة: سائق فقط (بدون مركبة)",
   "settings.driverOnlyDesc":
-    "لخدمة «سائق فقط» — السعر يُحسب حسب وقت القيادة فقط (بدون جزء الكيلومتر).",
+    "لخدمة «سائق فقط», السعر يُحسب حسب وقت القيادة فقط (بدون جزء الكيلومتر).",
   "settings.weightTitle": "الوزن: رسوم إضافية لكل 10 كغ",
   "settings.weightDesc":
     "يُحسب لكل 10 كغ من وزن الحمولة (مثلاً 0,50 € = 50 سنت لكل 10 كغ). يُطبَّق فور الحفظ على حسابات الأسعار الجديدة.",

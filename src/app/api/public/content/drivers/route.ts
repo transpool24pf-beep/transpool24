@@ -61,7 +61,7 @@ export async function GET() {
       });
     } else if (pubErr) {
       if (String(pubErr.message).includes("customer_review_published")) {
-        /* migration not applied — skip published block */
+        /* migration not applied, skip published block */
       } else {
         console.warn("[public/content/drivers] published reviews skip:", pubErr.message);
       }

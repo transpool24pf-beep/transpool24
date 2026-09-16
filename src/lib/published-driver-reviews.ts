@@ -38,7 +38,7 @@ export function mapJobReviewRowToCarouselDriver(row: JobReviewRow) {
     photo,
     rating: Math.min(5, Math.max(1, Math.round(Number(row.customer_driver_rating)))),
     comment: (row.customer_driver_comment && row.customer_driver_comment.trim()) || "",
-    customerName: row.company_name?.trim() || "—",
+    customerName: row.company_name?.trim() || "-",
     order: 0,
   };
 }

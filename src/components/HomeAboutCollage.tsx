@@ -16,7 +16,7 @@ export async function HomeAboutCollage({ locale }: { locale: string }) {
     <section className="bg-white py-16 sm:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-          {/* Collage — asymmetric grid like template */}
+          {/* Collage, asymmetric grid like template */}
           <div className="relative mx-auto w-full max-w-xl lg:mx-0">
             <div className="grid grid-cols-12 gap-3 sm:gap-4">
               <div className="relative col-span-7 row-span-2 min-h-[220px] overflow-hidden rounded-2xl shadow-lg ring-1 ring-black/5 sm:min-h-[280px]">

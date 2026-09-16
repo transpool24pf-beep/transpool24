@@ -1,5 +1,5 @@
 /**
- * OpenStreetMap Nominatim — Germany-focused geocoding & suggestions.
+ * OpenStreetMap Nominatim, Germany-focused geocoding & suggestions.
  * Respect usage policy: server-side only, identify via User-Agent.
  */
 

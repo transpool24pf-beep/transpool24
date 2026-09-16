@@ -12,7 +12,7 @@ export async function generateMetadata({
   const t = await getTranslations("order");
   return localeAlternatesAndSocial(locale, "/order", {
     title: t("title"),
-    description: `${t("title")} — ${t("step1")}`,
+    description: `${t("title")}, ${t("step1")}`,
   });
 }
 

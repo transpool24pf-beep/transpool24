@@ -71,10 +71,10 @@ function buildConfirmationHtml(
         </td>
         <td>
           <p style="margin: 0 0 4px 0;"><strong>${escapeHtml(driver.full_name)}</strong></p>
-          <p style="margin: 0 0 4px 0; color: #64748b;">${driver.star_rating != null ? driver.star_rating.toFixed(1) : "—"} Sterne</p>
+          <p style="margin: 0 0 4px 0; color: #64748b;">${driver.star_rating != null ? driver.star_rating.toFixed(1) : "-"} Sterne</p>
           <p style="margin: 0 0 4px 0;">Telefonnummer: ${escapeHtml(driver.phone)}</p>
-          <p style="margin: 0 0 4px 0;">Kennzeichen: ${escapeHtml(driver.vehicle_plate || "—")}</p>
-          <p style="margin: 0;">Sprachen: ${escapeHtml(driver.languages_spoken || "—")}</p>
+          <p style="margin: 0 0 4px 0;">Kennzeichen: ${escapeHtml(driver.vehicle_plate || "-")}</p>
+          <p style="margin: 0;">Sprachen: ${escapeHtml(driver.languages_spoken || "-")}</p>
         </td>
       </tr>
     </table>
@@ -136,7 +136,7 @@ function buildConfirmationHtml(
           <tr><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Datum</td><td style="border-bottom: 1px solid #e2e8f0;">${date}</td></tr>
           <tr style="background: #f8fafc;"><td style="border-bottom: 1px solid #e2e8f0; color: #64748b; vertical-align:top;">Abholung</td><td style="border-bottom: 1px solid #e2e8f0;">${addressHtmlForJob(job, "pickup")}</td></tr>
           <tr><td style="border-bottom: 1px solid #e2e8f0; color: #64748b; vertical-align:top;">Lieferung (Empfänger)</td><td style="border-bottom: 1px solid #e2e8f0;">${addressHtmlForJob(job, "delivery")}</td></tr>
-          <tr style="background: #f8fafc;"><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Ladung / Distanz</td><td style="border-bottom: 1px solid #e2e8f0;">${job.cargo_size}, ${job.distance_km ?? "—"} km</td></tr>
+          <tr style="background: #f8fafc;"><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Ladung / Distanz</td><td style="border-bottom: 1px solid #e2e8f0;">${job.cargo_size}, ${job.distance_km ?? "-"} km</td></tr>
           ${cargoLoadsRows}
           ${cargoCategoryDe ? `<tr><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Warenkategorie</td><td style="border-bottom: 1px solid #e2e8f0;">${escapeHtml(cargoCategoryDe)}</td></tr>` : ""}
           ${weightRow}
@@ -149,7 +149,7 @@ function buildConfirmationHtml(
         <p style="margin: 16px 0 0 0; font-size: 14px; color: #64748b;">Die Zahlung erfolgt nach der Zustellung per ordnungsgemäßer Rechnung. Eine Vorauszahlung ist nicht erforderlich.</p>
         <p style="margin: 12px 0 0 0; font-size: 14px; color: #64748b;">Sie können die Vertragsdetails in der Auftragszusammenfassung unten einsehen. Die beigefügte PDF enthält Details zur Fahrt, zum Fahrer und zu den Firmeninformationen.</p>
         ${rateBlock}
-        <p style="margin-top: 24px; font-size: 13px; color: #94a3b8;">— TransPool24</p>
+        <p style="margin-top: 24px; font-size: 13px; color: #94a3b8;">,  TransPool24</p>
         ${buildEmailFooterOrderBlock(footer)}
       </div>
     </td></tr>
@@ -196,7 +196,7 @@ function logisticsStatusLabelDe(status: string | null | undefined): string {
     delivered: "Zugestellt",
     cancelled: "Storniert",
   };
-  if (!s) return "—";
+  if (!s) return "-";
   return map[s] ?? s.replace(/_/g, " ");
 }
 
@@ -274,7 +274,7 @@ export async function sendOrderConfirmationEmail(
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com";
 /** Bump after replacing public/transpool24-email-logo.png (Gmail/proxy cache). */
 const EMAIL_HEADER_CACHE_BUST = process.env.EMAIL_HEADER_CACHE_BUST?.trim() || "20260403g";
-/** Dedicated file for mail + support forms — avoids production /5439.png (site header) being an old banner strip. */
+/** Dedicated file for mail + support forms, avoids production /5439.png (site header) being an old banner strip. */
 const EMAIL_HEADER_LOGO_URL = `${SITE_URL}/transpool24-email-logo.png?v=${encodeURIComponent(EMAIL_HEADER_CACHE_BUST)}`;
 /**
  * Fluid logo in mail: scales down on phones (no fixed height → no vertical squashing),
@@ -410,7 +410,7 @@ function buildDeliveryConfirmationHtml(
         ${podBlock}
         ${trackBlock}
         ${rateBlock}
-        <p style="margin:28px 0 0 0; font-size:13px; color:#94a3b8;">— TransPool24</p>
+        <p style="margin:28px 0 0 0; font-size:13px; color:#94a3b8;">,  TransPool24</p>
         ${buildEmailFooterOrderBlock(footer)}
       </div>
     </td></tr>
@@ -426,7 +426,7 @@ export async function sendDeliveryConfirmationEmail(
     trackOrderUrl: string | null;
     rateDriverUrl: string | null;
     podPhotoUrl: string | null;
-    /** Optional image attachment (base64, no data: prefix) — same URL as podPhotoUrl, fetched server-side */
+    /** Optional image attachment (base64, no data: prefix), same URL as podPhotoUrl, fetched server-side */
     podPhotoAttachment?: { filename: string; contentBase64: string } | null;
   }
 ): Promise<{ success: boolean; error?: string }> {
@@ -491,12 +491,12 @@ function thankYouCargoDescriptionDe(job: Job): string {
   const loads = parseCargoLoads(cd).filter((l) => l.quantity >= 1);
   if (loads.length > 0) {
     const first = cargoCategoryLabelDe(loads[0].loadCarrier || null);
-    if (first && first !== "—") return `im Bereich „${escapeHtml(first)}“`;
+    if (first && first !== "-") return `im Bereich „${escapeHtml(first)}“`;
   }
   const cat = cd?.cargoCategory != null ? String(cd.cargoCategory) : "";
   if (cat) {
     const label = cargoCategoryLabelDe(cat);
-    if (label && label !== "—") return `im Bereich „${escapeHtml(label)}“`;
+    if (label && label !== "-") return `im Bereich „${escapeHtml(label)}“`;
   }
   return `für Ihre Sendung (Größe ${escapeHtml(job.cargo_size || "XS")})`;
 }
@@ -566,7 +566,7 @@ function buildThankYouDeliveryHtml(
           </p>
         </div>
         <p style="margin:20px 0 0 0; font-size:15px; line-height:1.6; color:#334155;">${thankYouEmailSignoffHtml()}</p>
-        <p style="margin:28px 0 0 0; font-size:13px; color:#94a3b8;">— TransPool24</p>
+        <p style="margin:28px 0 0 0; font-size:13px; color:#94a3b8;">,  TransPool24</p>
         ${buildEmailFooterOrderBlock(footer)}
       </div>
     </td></tr>
@@ -652,7 +652,7 @@ function buildTrackingUpdateHtml(
           timeStyle: "short",
         })
       : null;
-  const distStr = job.distance_km != null ? `${job.distance_km} km` : "—";
+  const distStr = job.distance_km != null ? `${job.distance_km} km` : "-";
   const cdTrack = job.cargo_details as Record<string, unknown> | null;
   const loadsTrack = formatCargoLoadsPlainDe(cdTrack);
   const cargoCatTrack =
@@ -672,10 +672,10 @@ function buildTrackingUpdateHtml(
         </td>
         <td style="vertical-align:top; font-size:14px; color:#334155;">
           <p style="margin:0 0 6px 0;"><strong>${escapeHtml(options.driver.full_name)}</strong></p>
-          <p style="margin:0 0 4px 0; color:#64748b;">${options.driver.star_rating != null ? `${options.driver.star_rating.toFixed(1)} Sterne` : "—"}</p>
+          <p style="margin:0 0 4px 0; color:#64748b;">${options.driver.star_rating != null ? `${options.driver.star_rating.toFixed(1)} Sterne` : "-"}</p>
           <p style="margin:0 0 4px 0;">Telefonnummer: ${escapeHtml(options.driver.phone)}</p>
-          <p style="margin:0 0 4px 0;">Kennzeichen: ${escapeHtml(options.driver.vehicle_plate || "—")}</p>
-          <p style="margin:0;">Sprachen: ${escapeHtml(options.driver.languages_spoken || "—")}</p>
+          <p style="margin:0 0 4px 0;">Kennzeichen: ${escapeHtml(options.driver.vehicle_plate || "-")}</p>
+          <p style="margin:0;">Sprachen: ${escapeHtml(options.driver.languages_spoken || "-")}</p>
         </td>
       </tr></table>
     </td></tr>
@@ -797,7 +797,7 @@ function buildDriverApprovalHtml(
   branding: TransactionalEmailBranding,
   footer: ResolvedEmailFooter
 ): string {
-  const driverNum = data.driver_number != null ? String(data.driver_number).padStart(5, "0") : "—";
+  const driverNum = data.driver_number != null ? String(data.driver_number).padStart(5, "0") : "-";
   const dateStr = new Date(data.approved_at).toLocaleDateString("de-DE", {
     day: "2-digit",
     month: "2-digit",
@@ -843,11 +843,11 @@ function buildDriverApprovalHtml(
               <tr><td>
                 <table width="100%" cellpadding="4" cellspacing="0">
                   <tr><td style="text-align:left; font-weight:600; color:#0d2137;">Fahrernummer:</td><td style="text-align:right;">#${driverNum}</td></tr>
-                  <tr><td style="text-align:left; font-weight:600; color:#0d2137;">Name:</td><td style="text-align:right;">${escapeHtml(data.full_name || "—")}</td></tr>
-                  <tr><td style="text-align:left; font-weight:600; color:#0d2137;">E-Mail:</td><td style="text-align:right;">${escapeHtml(data.email || "—")}</td></tr>
-                  <tr><td style="text-align:left; font-weight:600; color:#0d2137;">Telefon / WhatsApp:</td><td style="text-align:right;">${escapeHtml(data.phone?.trim() || "—")}</td></tr>
-                  <tr><td style="text-align:left; font-weight:600; color:#0d2137;">Stadt:</td><td style="text-align:right;">${escapeHtml(data.city?.trim() || "—")}</td></tr>
-                  <tr><td style="text-align:left; font-weight:600; color:#0d2137;">Steuer-/Handelsnummer:</td><td style="text-align:right;">${escapeHtml(data.tax_or_commercial_number?.trim() || "—")}</td></tr>
+                  <tr><td style="text-align:left; font-weight:600; color:#0d2137;">Name:</td><td style="text-align:right;">${escapeHtml(data.full_name || "-")}</td></tr>
+                  <tr><td style="text-align:left; font-weight:600; color:#0d2137;">E-Mail:</td><td style="text-align:right;">${escapeHtml(data.email || "-")}</td></tr>
+                  <tr><td style="text-align:left; font-weight:600; color:#0d2137;">Telefon / WhatsApp:</td><td style="text-align:right;">${escapeHtml(data.phone?.trim() || "-")}</td></tr>
+                  <tr><td style="text-align:left; font-weight:600; color:#0d2137;">Stadt:</td><td style="text-align:right;">${escapeHtml(data.city?.trim() || "-")}</td></tr>
+                  <tr><td style="text-align:left; font-weight:600; color:#0d2137;">Steuer-/Handelsnummer:</td><td style="text-align:right;">${escapeHtml(data.tax_or_commercial_number?.trim() || "-")}</td></tr>
                   <tr><td style="text-align:left; font-weight:600; color:#0d2137;">Genehmigungsdatum:</td><td style="text-align:right;">${dateStr}</td></tr>
                   ${data.vehicle_plate ? `<tr><td style="text-align:left; font-weight:600; color:#0d2137;">Kennzeichen:</td><td style="text-align:right;">${escapeHtml(data.vehicle_plate)}</td></tr>` : ""}
                 </table>
@@ -864,7 +864,7 @@ function buildDriverApprovalHtml(
               <img src="${QR_WHATSAPP_URL}" alt="QR-Code WhatsApp" width="140" height="140" style="display:block; width:140px; height:140px; background:#fff; border-radius:12px; padding:8px; border:1px solid #eee;" />
             </p>
             <p style="margin:0; font-size:13px; color:#777;">
-              — TransPool24 · Pforzheim & Region<br>
+             , TransPool24 · Pforzheim & Region<br>
               <a href="${SITE_URL}" style="color:#0d2137;">www.transpool24.com</a>
             </p>
           </td>
@@ -1082,7 +1082,7 @@ function buildCustomCustomerEmailHtml(
     <tr><td style="text-align:left;">
       <div style="background: #fff; border-radius: 12px; padding: 28px 28px 0 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); direction:ltr; text-align:left;">
         <p style="margin: 0; font-size: 16px; line-height: 1.65; color: #334155;">${bodyHtml}</p>
-        <p style="margin-top: 24px; font-size: 13px; color: #94a3b8;">— TransPool24</p>
+        <p style="margin-top: 24px; font-size: 13px; color: #94a3b8;">,  TransPool24</p>
         ${buildEmailFooterOrderBlock(footer)}
       </div>
     </td></tr>

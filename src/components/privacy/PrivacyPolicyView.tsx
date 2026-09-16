@@ -99,7 +99,7 @@ export function PrivacyPolicyView({ locale }: Props) {
               <p className="mt-3 text-sm leading-relaxed text-[var(--foreground)]/75">{t("socialIntro")}</p>
               <ul className="mt-4 space-y-2 text-sm">
                 <li>
-                  <span className="font-semibold text-[var(--primary)]">Instagram</span> —{" "}
+                  <span className="font-semibold text-[var(--primary)]">Instagram</span> , {" "}
                   <a
                     href="https://privacycenter.instagram.com/policy"
                     target="_blank"
@@ -110,7 +110,7 @@ export function PrivacyPolicyView({ locale }: Props) {
                   </a>
                 </li>
                 <li>
-                  <span className="font-semibold text-[var(--primary)]">TikTok</span> —{" "}
+                  <span className="font-semibold text-[var(--primary)]">TikTok</span> , {" "}
                   <a
                     href="https://www.tiktok.com/legal/page/eea/privacy-policy/de"
                     target="_blank"
@@ -121,7 +121,7 @@ export function PrivacyPolicyView({ locale }: Props) {
                   </a>
                 </li>
                 <li>
-                  <span className="font-semibold text-[var(--primary)]">LinkedIn</span> —{" "}
+                  <span className="font-semibold text-[var(--primary)]">LinkedIn</span> , {" "}
                   <a
                     href="https://legal.linkedin.com/privacy-policy"
                     target="_blank"
@@ -132,7 +132,7 @@ export function PrivacyPolicyView({ locale }: Props) {
                   </a>
                 </li>
                 <li>
-                  <span className="font-semibold text-[var(--primary)]">Facebook</span> —{" "}
+                  <span className="font-semibold text-[var(--primary)]">Facebook</span> , {" "}
                   <a
                     href="https://www.facebook.com/privacy/policy"
                     target="_blank"
@@ -143,7 +143,7 @@ export function PrivacyPolicyView({ locale }: Props) {
                   </a>
                 </li>
                 <li>
-                  <span className="font-semibold text-[var(--primary)]">YouTube</span> —{" "}
+                  <span className="font-semibold text-[var(--primary)]">YouTube</span> , {" "}
                   <a
                     href="https://policies.google.com/privacy"
                     target="_blank"

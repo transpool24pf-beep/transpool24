@@ -6,7 +6,7 @@ const OSRM_URL = "https://router.project-osrm.org/route/v1/driving";
 
 /** Shown when routing fails so admins can fix Google Cloud / Vercel setup */
 const HINT_GOOGLE_SERVER =
-  "Google Cloud: enable Directions API + Geocoding API (same project as Places). For the API key → Application restrictions: use “None” or restrict by API only — not “HTTP referrers only” (server requests from Vercel have no browser referrer).";
+  "Google Cloud: enable Directions API + Geocoding API (same project as Places). For the API key → Application restrictions: use “None” or restrict by API only, not “HTTP referrers only” (server requests from Vercel have no browser referrer).";
 
 const HINT_NO_KEY =
   "Set GOOGLE_MAPS_API_KEY in Vercel → Environment Variables, save, then Redeploy.";

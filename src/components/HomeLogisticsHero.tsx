@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
-/** Default truck (delivery van) when CMS has no truck image — replace via Website → Hero → truck image. */
+/** Default truck (delivery van) when CMS has no truck image, replace via Website → Hero → truck image. */
 const DEFAULT_TRUCK_UNSPLASH =
   "https://images.unsplash.com/photo-1566576721346-d4a3b4b8ae2f?w=960&q=85&auto=format&fit=crop";
 
@@ -91,10 +91,10 @@ export async function HomeLogisticsHero({
   const truckSrc = truckImageUrl?.trim() || DEFAULT_TRUCK_UNSPLASH;
   const landCardHref =
     landFreightCardHref?.trim() || `/${locale}/order`;
-  /** Land-freight overlap card — DO Spaces (sharp photo; `overlay="clear"` avoids orange wash). */
+  /** Land-freight overlap card, DO Spaces (sharp photo; `overlay="clear"` avoids orange wash). */
   const cardImgRoad =
     "https://sk-bucket.sgp1.cdn.digitaloceanspaces.com/2022/04/24234214/shutterstock_637016899_censored.jpg";
-  /** Second land-service card (no sea/air) — loading / last-mile visual */
+  /** Second land-service card (no sea/air), loading / last-mile visual */
   const cardImgLand2 =
     "https://images.unsplash.com/photo-1616432043562-7a89e2f4e936?w=600&q=80&auto=format&fit=crop";
 
@@ -112,7 +112,7 @@ export async function HomeLogisticsHero({
             sizes="100vw"
             unoptimized={heroImage.startsWith("http")}
           />
-          {/* Neutral darkening only — no orange wash or blur on the photo */}
+          {/* Neutral darkening only, no orange wash or blur on the photo */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/78 via-black/58 to-black/38 rtl:bg-gradient-to-l" />
         </div>
 

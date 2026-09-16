@@ -9,7 +9,7 @@ function normalizeAddressKey(s: string): string {
   return s.trim().toLowerCase().replace(/\s+/g, " ");
 }
 
-/** Same bar as OrderForm before continuing — only store reasonably complete lines */
+/** Same bar as OrderForm before continuing, only store reasonably complete lines */
 export function isStorableOrderAddressLine(value: string): boolean {
   const t = value.trim();
   if (t.length < 10) return false;

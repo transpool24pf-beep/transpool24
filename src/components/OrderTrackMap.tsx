@@ -23,7 +23,7 @@ function escapeAttr(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&#39;").replace(/</g, "&lt;");
 }
 
-/** Live driver avatar on track map — size matches `.leaflet-driver-photo-marker__inner` in globals.css */
+/** Live driver avatar on track map, size matches `.leaflet-driver-photo-marker__inner` in globals.css */
 const DRIVER_PHOTO_MARKER_PX = 64;
 
 function createDriverPhotoDivIcon(href: string): L.DivIcon {

@@ -12,7 +12,7 @@ declare global {
   }
 }
 
-/** Fixed “random” layout — stable across SSR/hydration. */
+/** Fixed “random” layout, stable across SSR/hydration. */
 const PLACEMENTS = [
   { topPct: 5, leftPct: 3, size: 210, opacity: 0.34, rot: -14, drift: "a" as const },
   { topPct: 52, leftPct: -4, size: 125, opacity: 0.24, rot: 22, drift: "b" as const },

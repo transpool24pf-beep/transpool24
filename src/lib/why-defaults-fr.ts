@@ -1,46 +1,46 @@
 import type { WhyPagePayload } from "./why-transpool24-types";
 
-/** Focus B2B : entreprises, grossistes, magasins, ateliers — pas le déménagement privé comme cœur d’activité */
+/** Focus B2B : entreprises, grossistes, magasins, ateliers, pas le déménagement privé comme cœur d’activité */
 export const whyPageFr: WhyPagePayload = {
   metaTitle: "Pourquoi TransPool24 ? | Transport B2B Pforzheim et région",
   heroBadge: "Pforzheim · Bade-Wurtemberg · Allemagne",
   headline: "Pourquoi les entreprises et partenaires commerciaux choisissent TransPool24",
   heroSub:
-    "Nous organisons le transport routier pour les entreprises, grossistes, supermarchés et ateliers entre Pforzheim, Karlsruhe et la région — tarifs clairs, chauffeurs fiables et réservation en ligne. Nous transportons aussi les déménagements privés et le mobilier.",
+    "Nous organisons le transport routier pour les entreprises, grossistes, supermarchés et ateliers entre Pforzheim, Karlsruhe et la région, tarifs clairs, chauffeurs fiables et réservation en ligne. Nous transportons aussi les déménagements privés et le mobilier.",
   sidebarTitle: "Ce que les clients professionnels apprécient",
   sidebar: [
     {
       icon: "zap",
       title: "Rapide et planifiable",
-      body: "Itinéraire, catégorie de véhicule et niveau de service en ligne — prix fixe avant paiement. Idéal pour pièces détachées, palettes et courses urgentes.",
+      body: "Itinéraire, catégorie de véhicule et niveau de service en ligne, prix fixe avant paiement. Idéal pour pièces détachées, palettes et courses urgentes.",
     },
     {
       icon: "shield",
       title: "Fiabilité, pas le hasard des colis",
-      body: "Les marchandises sensibles exigent un transporteur de confiance — pas un réseau de colis où les envois se perdent. Remises en main propres claires et processus traçables.",
+      body: "Les marchandises sensibles exigent un transporteur de confiance, pas un réseau de colis où les envois se perdent. Remises en main propres claires et processus traçables.",
     },
     {
       icon: "clipboard",
       title: "Professionnels du terrain",
-      body: "Chauffeurs qui connaissent Pforzheim, la région automobile et Karlsruhe — y compris l’accès aux concessions, dépôts de gros et zones industrielles.",
+      body: "Chauffeurs qui connaissent Pforzheim, la région automobile et Karlsruhe, y compris l’accès aux concessions, dépôts de gros et zones industrielles.",
     },
   ],
-  introTitle: "Entreprises et commerce — et déménagements privés ainsi que mobilier",
+  introTitle: "Entreprises et commerce, et déménagements privés ainsi que mobilier",
   introLead:
-    "TransPool24 s’adresse aux entreprises : usines, grossistes, supermarchés, concessions, imprimeries et fournisseurs. Nous transportons aussi les déménagements privés, le mobilier et les appareils ménagers.\n\nNous vous mettons en relation avec le bon véhicule et chauffeur pour palettes, pièces de machines, cartons secs d’épicerie et biens de déménagement — de façon transparente et réservable comme une plateforme logistique moderne.",
+    "TransPool24 s’adresse aux entreprises : usines, grossistes, supermarchés, concessions, imprimeries et fournisseurs. Nous transportons aussi les déménagements privés, le mobilier et les appareils ménagers.\n\nNous vous mettons en relation avec le bon véhicule et chauffeur pour palettes, pièces de machines, cartons secs d’épicerie et biens de déménagement, de façon transparente et réservable comme une plateforme logistique moderne.",
   h2_1: "Qu’est-ce que TransPool24 ?",
-  p1: "Une plateforme de réservation numérique pour le transport routier professionnel à Pforzheim et alentours, avec une portée sur le Bade-Wurtemberg et l’Allemagne. Vous décrivez l’itinéraire, la marchandise et le niveau de service (chauffeur seul, avec véhicule, avec aide) et payez en ligne — nous coordonnons l’exécution avec des chauffeurs professionnels.\n\nAdapté aux envois B2B : des missions palettes compatibles chariot élévateur aux livraisons de pièces sensibles.",
+  p1: "Une plateforme de réservation numérique pour le transport routier professionnel à Pforzheim et alentours, avec une portée sur le Bade-Wurtemberg et l’Allemagne. Vous décrivez l’itinéraire, la marchandise et le niveau de service (chauffeur seul, avec véhicule, avec aide) et payez en ligne, nous coordonnons l’exécution avec des chauffeurs professionnels.\n\nAdapté aux envois B2B : des missions palettes compatibles chariot élévateur aux livraisons de pièces sensibles.",
   h2_2: "La région comme espace économique",
-  p2: "Pforzheim (Goldstadt) est réputée pour l’or, les montres et la mécanique de précision. Le Bade-Wurtemberg est le cœur de l’automobile — Mercedes, Porsche et un maillage dense de concessions et de stocks de pièces.\n\nEntre les deux : le gros alimentant restaurants et commerce à Karlsruhe, imprimeries et emballage. Ce sont ces flux que nous soutenons — entre usine, entrepôt, atelier et point de vente.",
+  p2: "Pforzheim (Goldstadt) est réputée pour l’or, les montres et la mécanique de précision. Le Bade-Wurtemberg est le cœur de l’automobile, Mercedes, Porsche et un maillage dense de concessions et de stocks de pièces.\n\nEntre les deux : le gros alimentant restaurants et commerce à Karlsruhe, imprimeries et emballage. Ce sont ces flux que nous soutenons, entre usine, entrepôt, atelier et point de vente.",
   h2_3: "Pourquoi les entreprises nous font confiance",
-  p3: "• Fiabilité : interlocuteurs clairs, créneaux réalistes, remises documentées si besoin.\n• Palettes et chariot : beaucoup de charges sont des palettes complètes — chargement/déchargement rapide au chariot élévateur (Stapler).\n• Prix équitable avant achat : distance, catégorie et niveau de service fixent le prix — sans frais cachés après paiement.\n• Déménagements privés et mobilier : appartements, meubles et appareils — réservez en ligne comme tout autre envoi, avec aide optionnelle au chargement.",
+  p3: "• Fiabilité : interlocuteurs clairs, créneaux réalistes, remises documentées si besoin.\n• Palettes et chariot : beaucoup de charges sont des palettes complètes, chargement/déchargement rapide au chariot élévateur (Stapler).\n• Prix équitable avant achat : distance, catégorie et niveau de service fixent le prix, sans frais cachés après paiement.\n• Déménagements privés et mobilier : appartements, meubles et appareils, réservez en ligne comme tout autre envoi, avec aide optionnelle au chargement.",
   tipsTitle: "Cinq conseils pour les réservations professionnelles",
-  tipsIntro: "Pratique pour entrepôt, atelier et expédition — adapté à TransPool24.",
+  tipsIntro: "Pratique pour entrepôt, atelier et expédition, adapté à TransPool24.",
   tips: [
     {
       title: "Indiquez type de palette et accès",
       detail:
-        "Palette euro, hauteur de levée, rampe ou trottoir — nous aide à planifier véhicule et temps de chargement.",
+        "Palette euro, hauteur de levée, rampe ou trottoir, nous aide à planifier véhicule et temps de chargement.",
     },
     {
       title: "Contact nommé et accès site",
@@ -50,7 +50,7 @@ export const whyPageFr: WhyPagePayload = {
     {
       title: "Photos pour chargements inhabituels",
       detail:
-        "Pièces machines, cartons volumineux ou emballage fragile — une photo facilite le choix du véhicule.",
+        "Pièces machines, cartons volumineux ou emballage fragile, une photo facilite le choix du véhicule.",
     },
     {
       title: "Créneaux réalistes",
@@ -60,16 +60,16 @@ export const whyPageFr: WhyPagePayload = {
     {
       title: "Adaptez le niveau de service",
       detail:
-        "Chauffeur seul / véhicule / aide change l’effort et le prix — choisissez ce qu’imposent la rampe et le poids.",
+        "Chauffeur seul / véhicule / aide change l’effort et le prix, choisissez ce qu’imposent la rampe et le poids.",
     },
   ],
   servicesTitle: "Exemples : secteurs avec lesquels nous travaillons",
   servicesIntro:
-    "Un échantillon régional — liste non exhaustive. Votre secteur convient aussi s’il s’agit de transport routier B2B.",
+    "Un échantillon régional, liste non exhaustive. Votre secteur convient aussi s’il s’agit de transport routier B2B.",
   serviceTypes: [
     {
       name: "Bijouterie, montres et précision (Goldstadt Pforzheim)",
-      body: "Pforzheim est connue pour l’or, les bijoux et les machines de précision.\n\nCe que nous transportons souvent : pièces pour machines, matières non précieuses en cartons, ou grosses livraisons B2B des fabricants vers distributeurs et Karlsruhe.\n\nL’avantage : ces entreprises paient pour la fiabilité — les marchandises sensibles exigent un transporteur de confiance, pas un opérateur colis qui perd les envois.",
+      body: "Pforzheim est connue pour l’or, les bijoux et les machines de précision.\n\nCe que nous transportons souvent : pièces pour machines, matières non précieuses en cartons, ou grosses livraisons B2B des fabricants vers distributeurs et Karlsruhe.\n\nL’avantage : ces entreprises paient pour la fiabilité, les marchandises sensibles exigent un transporteur de confiance, pas un opérateur colis qui perd les envois.",
     },
     {
       name: "Pièces auto et concessions (KFZ)",
@@ -77,23 +77,23 @@ export const whyPageFr: WhyPagePayload = {
     },
     {
       name: "Alimentation et boissons (sec, carton)",
-      body: "Nous nous concentrons sur les produits secs sans chaîne du froid — pour limiter la complexité réglementaire.\n\nAvec qui : grossistes (Großhandel) approvisionnant restaurants et supermarchés à Karlsruhe et environs.\n\nCe que nous transportons : huile en cartons, conserves, boissons gazeuses, produits d’entretien en gros.\n\nL’avantage : charges lourdes et stables ; relations d’approvisionnement souvent longues.",
+      body: "Nous nous concentrons sur les produits secs sans chaîne du froid, pour limiter la complexité réglementaire.\n\nAvec qui : grossistes (Großhandel) approvisionnant restaurants et supermarchés à Karlsruhe et environs.\n\nCe que nous transportons : huile en cartons, conserves, boissons gazeuses, produits d’entretien en gros.\n\nL’avantage : charges lourdes et stables ; relations d’approvisionnement souvent longues.",
     },
     {
       name: "Imprimerie et emballage",
-      body: "Entre Pforzheim et Karlsruhe se trouvent de grandes imprimeries et usines d’emballage.\n\nCe que nous transportons : palettes de papier, brochures imprimées, cartons pour l’industrie.\n\nL’avantage : souvent palettes complètes — chargement/déchargement très rapide au chariot élévateur (Stapler).",
+      body: "Entre Pforzheim et Karlsruhe se trouvent de grandes imprimeries et usines d’emballage.\n\nCe que nous transportons : palettes de papier, brochures imprimées, cartons pour l’industrie.\n\nL’avantage : souvent palettes complètes, chargement/déchargement très rapide au chariot élévateur (Stapler).",
     },
   ],
   platformTitle: "Comment votre entreprise utilise TransPool24",
   platformBody:
-    "Vous saisissez enlèvement, destination, catégorie (XS/M/L), poids et niveau de service. Vous voyez le prix avant paiement et réservez en ligne. Nous affectons un chauffeur adapté — vous suivez l’avancement et contactez le support si les plans changent.\n\nLes réservations visent les expéditeurs commerciaux et institutionnels ; cas particuliers : contactez notre équipe.",
+    "Vous saisissez enlèvement, destination, catégorie (XS/M/L), poids et niveau de service. Vous voyez le prix avant paiement et réservez en ligne. Nous affectons un chauffeur adapté, vous suivez l’avancement et contactez le support si les plans changent.\n\nLes réservations visent les expéditeurs commerciaux et institutionnels ; cas particuliers : contactez notre équipe.",
   completingTitle: "Clôturer la livraison professionnellement",
   completingP1:
-    "Avant enlèvement, convenez qui remet la marchandise et photographiez l’état si utile — simplifie les questions ultérieures.",
+    "Avant enlèvement, convenez qui remet la marchandise et photographiez l’état si utile, simplifie les questions ultérieures.",
   completingP2:
     "L’expédition ou la réception doit être joignable le jour J. Signalez tôt tout changement de portail ou d’horaire.",
   completingP3:
-    "Votre retour après livraison aide à maintenir la qualité — et les autres clients B2B à choisir en confiance.",
+    "Votre retour après livraison aide à maintenir la qualité, et les autres clients B2B à choisir en confiance.",
   closingLine: "Nous avons hâte de prendre en charge votre prochain transport professionnel.",
   heroImageUrl: "/transpool24-email-banner.png",
   sceneImageUrl: "/images/445.png",
@@ -102,7 +102,7 @@ export const whyPageFr: WhyPagePayload = {
   howSteps: [
     {
       title: "Réserver en ligne",
-      body: "Itinéraire, marchandise et niveau de service — prix ferme et paiement sécurisé.",
+      body: "Itinéraire, marchandise et niveau de service, prix ferme et paiement sécurisé.",
     },
     {
       title: "Attribution d’un chauffeur",
@@ -118,7 +118,7 @@ export const whyPageFr: WhyPagePayload = {
   faqs: [
     {
       q: "TransPool24 fait-il des déménagements privés ?",
-      a: "Oui. Nous transportons les déménagements privés, le mobilier et les appareils ménagers — en plus des envois professionnels. Réservez en ligne comme toute autre tournée ; aide optionnelle au chargement et déchargement.",
+      a: "Oui. Nous transportons les déménagements privés, le mobilier et les appareils ménagers, en plus des envois professionnels. Réservez en ligne comme toute autre tournée ; aide optionnelle au chargement et déchargement.",
     },
     {
       q: "Couvrez-vous ma zone ?",
@@ -126,11 +126,11 @@ export const whyPageFr: WhyPagePayload = {
     },
     {
       q: "Quels véhicules ?",
-      a: "Selon XS/M/L et poids — des utilitaires aux véhicules plus grands. Dimensions et infos palettes améliorent l’appariement.",
+      a: "Selon XS/M/L et poids, des utilitaires aux véhicules plus grands. Dimensions et infos palettes améliorent l’appariement.",
     },
     {
       q: "Palettes et chariot élévateur ?",
-      a: "Beaucoup de flux B2B sont palettisés. Indiquez rampe, hauteur de porte ou dépose trottoir — nous planifions temps et véhicule.",
+      a: "Beaucoup de flux B2B sont palettisés. Indiquez rampe, hauteur de porte ou dépose trottoir, nous planifions temps et véhicule.",
     },
     {
       q: "Frais réfrigérés ?",
@@ -138,7 +138,7 @@ export const whyPageFr: WhyPagePayload = {
     },
     {
       q: "Quand vois-je le prix ?",
-      a: "Prix total avant paiement au checkout — selon distance, catégorie et niveau de service.",
+      a: "Prix total avant paiement au checkout, selon distance, catégorie et niveau de service.",
     },
     {
       q: "Qui exécute le transport ?",
@@ -158,7 +158,7 @@ export const whyPageFr: WhyPagePayload = {
     },
     {
       q: "Comparaison avec Shiply ?",
-      a: "Idée proche : offres claires et exécution pro — avec focus régional Pforzheim/Karlsruhe, support multilingue et positionnement B2B net.",
+      a: "Idée proche : offres claires et exécution pro, avec focus régional Pforzheim/Karlsruhe, support multilingue et positionnement B2B net.",
     },
   ],
 };
