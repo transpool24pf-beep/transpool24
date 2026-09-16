@@ -45,23 +45,25 @@ export default async function HomePage({
       <HomeJsonLd locale={locale} />
       <Header />
       <main className="min-h-[calc(100vh-8rem)]">
-        <section className="relative isolate min-h-[min(92vh,46rem)] overflow-hidden bg-gradient-to-br from-[#d9e0e8] via-[#eef1f5] to-[#f8f9fb]">
-          <div className="pointer-events-none absolute inset-0 flex items-end justify-center sm:items-center sm:justify-end">
+        <section className="relative min-h-[min(90vh,44rem)] overflow-hidden bg-[#dfe5ec]">
+          <div className="absolute inset-0">
             <Image
               src={TRANSPOOL24_VAN_IMAGE}
               alt="TransPool24"
-              width={1024}
-              height={620}
+              fill
               priority
               quality={95}
-              className="h-auto w-[min(100%,72rem)] max-h-[min(88%,40rem)] object-contain object-center sm:me-[-4%] sm:max-h-[92%] sm:w-[min(78%,58rem)] sm:object-right rtl:sm:me-0 rtl:sm:ms-[-4%]"
-              sizes="(max-width: 640px) 100vw, 78vw"
-              style={{ filter: "drop-shadow(0 32px 48px rgba(13,33,55,0.2))" }}
+              className="scale-[1.06] object-cover object-[54%_58%] sm:object-[58%_52%]"
+              sizes="100vw"
             />
           </div>
-          <div className="relative z-10 flex min-h-[min(92vh,46rem)] flex-col justify-start px-4 pb-16 pt-10 sm:justify-center sm:px-6 sm:py-24 lg:px-8">
+          <div
+            className="absolute inset-0 bg-gradient-to-r from-[#dfe5ec]/75 via-[#dfe5ec]/25 to-transparent rtl:bg-gradient-to-l rtl:from-[#dfe5ec]/75 rtl:via-[#dfe5ec]/25 rtl:to-transparent"
+            aria-hidden
+          />
+          <div className="relative z-10 flex min-h-[min(90vh,44rem)] flex-col justify-center px-4 py-24 sm:px-6 sm:py-28 lg:px-8">
             <div className="mx-auto w-full max-w-7xl">
-              <div className="max-w-xl rounded-3xl bg-white/80 p-5 shadow-[0_18px_50px_-24px_rgba(13,33,55,0.35)] ring-1 ring-white/80 backdrop-blur-md sm:max-w-[32rem] sm:p-8">
+              <div className="max-w-xl lg:max-w-2xl">
                 <div
                   className="relative inline-block max-w-full rounded-xl border-2 border-white/55 bg-[var(--accent)] px-5 py-4 sm:px-8 sm:py-6 md:px-9 md:py-7"
                   style={{
@@ -77,12 +79,12 @@ export default async function HomePage({
                     {heroHeadline}
                   </h1>
                 </div>
-                <p className="mt-6 max-w-xl text-lg font-semibold leading-snug text-[#0d2137] sm:text-xl md:text-2xl">
+                <p className="mt-6 max-w-xl text-lg font-semibold leading-snug text-[#0d2137] [text-shadow:0_1px_12px_rgba(255,255,255,0.95),0_0_2px_rgba(255,255,255,0.9)] sm:text-xl md:text-2xl">
                   {heroSubtitle}
                 </p>
                 <Link
                   href={`/${locale}/order`}
-                  className="mt-8 inline-flex items-center gap-2 rounded-xl border-2 border-white/50 bg-[var(--accent)] px-10 py-4 text-lg font-bold text-white shadow-[0_8px_24px_rgba(232,93,4,0.35)] transition hover:brightness-110"
+                  className="mt-8 inline-flex items-center gap-2 rounded-xl border-2 border-white/50 bg-[var(--accent)] px-10 py-4 text-lg font-bold text-white shadow-[0_8px_24px_rgba(232,93,4,0.35)] transition hover:brightness-110 sm:mt-10"
                 >
                   {heroCta}
                   <svg
