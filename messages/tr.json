@@ -189,6 +189,21 @@
       "headline": "Pforzheim ve bölgedeki ağımıza katılın",
       "body": "Adil saatlik ücret, net süreçler ve yolda size destek olan bir ekip — birkaç adımda başvurun.",
       "logoAlt": "TransPool24"
+    },
+    "cargoTypes": {
+      "titleBefore": "Acil gönderilerden tam yüke — adil fiyatlarla taşıma.",
+      "titleHighlight": "Her tür nakliye",
+      "titleAfter": "",
+      "subtitle": "Küçük paket veya tam yük: TransPool24 ile her gönderi boyutu için hızlı ve güvenilir taşıma. Pforzheim ve tüm Almanya’da zamanında teslimat.",
+      "example": "örneğin",
+      "kleinstTitle": "Küçük gönderiler",
+      "kleinstDesc": "İş randevuları için belgeler, küçük makine yedek parçaları, tıbbi analiz için laboratuvar numuneleri.",
+      "kurzTitle": "Kısa turlar",
+      "kurzDesc": "Şehir içi ofis malzemesi, etkinlik mekânlarına catering, sahaya acil aletler.",
+      "paletteTitle": "Palet",
+      "paletteDesc": "Ticaret ve üretim için paletlenmiş mallar — güvenli istif, net etiket, yola hazır.",
+      "teilTitle": "Kısmi yükler",
+      "teilDesc": "Çuvallar, kartonlar ve karışık kısmi yükler — tam kamyon gerekmediğinde ekonomik birleştirme."
     }
   },
   "order": {

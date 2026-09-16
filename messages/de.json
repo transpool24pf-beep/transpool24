@@ -330,6 +330,21 @@
       "headline": "Werden Sie Teil unseres Netzwerks in Pforzheim und der Region",
       "body": "Faire Stundenvergütung, klare Abläufe und ein Team, das Sie unterstützt — bewerben Sie sich in wenigen Schritten.",
       "logoAlt": "TransPool24"
+    },
+    "cargoTypes": {
+      "titleBefore": "Von Eilsendungen bis zu Komplettladungen — Transporte zu fairen Preisen.",
+      "titleHighlight": "Jede Art von Transport",
+      "titleAfter": "",
+      "subtitle": "Ob kleines Paket oder volle Ladung: buchen Sie bei TransPool24 schnelle, zuverlässige Transporte — für jede Sendungsgröße. Wir liefern pünktlich in Pforzheim und ganz Deutschland.",
+      "example": "zum Beispiel",
+      "kleinstTitle": "Kleinstsendungen",
+      "kleinstDesc": "Dokumente für Geschäftstermine, kleine Ersatzteile für Maschinen, Laborproben für medizinische Analysen.",
+      "kurzTitle": "Kurztouren",
+      "kurzDesc": "Büromaterial innerhalb der Stadt, Catering zu Veranstaltungsorten, dringende Werkzeuge zum Einsatzort.",
+      "paletteTitle": "Palette",
+      "paletteDesc": "Palettierte Ware für Handel und Produktion — sicher gestapelt, klar etikettiert, bereit zur Tour.",
+      "teilTitle": "Teilladungen",
+      "teilDesc": "Säcke, Kartons und gemischte Teilladungen — wirtschaftlich gebündelt, wenn Sie keine volle Lkw-Ladung brauchen."
     }
   },
   "order": {

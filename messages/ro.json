@@ -190,6 +190,21 @@
       "headline": "Alăturați-vă rețelei noastre din Pforzheim și din regiune",
       "body": "Plata orară corectă, procese clare și o echipă care vă sprijină pe drum — aplicați în câțiva pași.",
       "logoAlt": "TransPool24"
+    },
+    "cargoTypes": {
+      "titleBefore": "De la colete urgente la încărcături complete, la un preț corect.",
+      "titleHighlight": "Orice tip de transport",
+      "titleAfter": "",
+      "subtitle": "Colet mic sau încărcătură completă: transport rapid și de încredere cu TransPool24. La timp în Pforzheim și în toată Germania.",
+      "example": "de exemplu",
+      "kleinstTitle": "Expedieri mici",
+      "kleinstDesc": "Documente pentru întâlniri, piese de schimb mici, probe de laborator.",
+      "kurzTitle": "Curse scurte",
+      "kurzDesc": "Materiale de birou în oraș, catering la evenimente, unelte urgente pe șantier.",
+      "paletteTitle": "Palet",
+      "paletteDesc": "Marfă paletizată pentru comerț și producție — stivuită sigur, gata de plecare.",
+      "teilTitle": "Încărcături parțiale",
+      "teilDesc": "Saci, cutii și loturi parțiale — grupate economic fără un camion întreg."
     }
   },
   "order": {

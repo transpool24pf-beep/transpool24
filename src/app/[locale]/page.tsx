@@ -7,6 +7,7 @@ import { DriversCarousel } from "@/components/DriversCarousel";
 import { HomeTransportOperations } from "@/components/HomeTransportOperations";
 import { GermanyConnectSection } from "@/components/GermanyConnectSection";
 import { HomepageDriverLogisticsLottie } from "@/components/HomepageDriverLogisticsLottie";
+import { HomeCargoTypes } from "@/components/HomeCargoTypes";
 import { HomeJsonLd } from "@/components/seo/HomeJsonLd";
 import { ContentAdBanner } from "@/components/ads/ContentAdBanner";
 import { getHomepageHero } from "@/lib/homepage-hero";
@@ -242,6 +243,8 @@ export default async function HomePage({
             </div>
           </div>
         </section>
+
+        <HomeCargoTypes />
 
         <HomepageDriverLogisticsLottie />
 

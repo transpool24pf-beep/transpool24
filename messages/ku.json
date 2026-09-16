@@ -190,6 +190,21 @@
       "headline": "Tevlî tora me ya li Pforzheim û herêmê bibin",
       "body": "Meaşê saetê yê adil, pêvajoyên zelal, û tîmek ku di rê de piştgirî dide we - di çend gavan de serlêdan bikin.",
       "logoAlt": "TransPool24"
+    },
+    "cargoTypes": {
+      "titleBefore": "Ji şandina lezgîn heta barkirina temam bi bihayên dadmend.",
+      "titleHighlight": "Her cure veguhestin",
+      "titleAfter": "",
+      "subtitle": "Pakêta piçûk an barkirina temam: bi TransPool24 veguhestina bilez û pêbawer. Li Pforzheim û hemû Almanyayê di wextê xwe de.",
+      "example": "mînak",
+      "kleinstTitle": "Şandinên piçûk",
+      "kleinstDesc": "Belge ji bo hevdîtinên kar, parçeyên piçûk, nimûneyên laboratuarê.",
+      "kurzTitle": "Geryên kurt",
+      "kurzDesc": "Malzemeyên ofîsê di bajêr de, catering ji bo bûyeran, amûrên lezgîn bo cihê kar.",
+      "paletteTitle": "Palet",
+      "paletteDesc": "Malên paletkirî ji bo bazirganî û hilberînê — ewle hatine danîn, amade ne.",
+      "teilTitle": "Barkirinên qismî",
+      "teilDesc": "Çewal, qutî û barkirinên qismî — aborî, gava kamyonek temam ne hewce ye."
     }
   },
   "order": {

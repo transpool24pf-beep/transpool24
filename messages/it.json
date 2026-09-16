@@ -190,6 +190,21 @@
       "headline": "Unisciti alla nostra rete a Pforzheim e nella regione",
       "body": "Retribuzione oraria giusta, processi chiari e un team che ti supporta durante il viaggio: fai domanda in pochi passaggi.",
       "logoAlt": "TransPool24"
+    },
+    "cargoTypes": {
+      "titleBefore": "Dai plichi urgenti ai carichi completi a un prezzo equo.",
+      "titleHighlight": "Ogni tipo di trasporto",
+      "titleAfter": "",
+      "subtitle": "Pacco piccolo o carico completo: prenota con TransPool24 un trasporto rapido e affidabile. Puntuale a Pforzheim e in tutta la Germania.",
+      "example": "ad esempio",
+      "kleinstTitle": "Spedizioni piccole",
+      "kleinstDesc": "Documenti per appuntamenti di lavoro, piccoli ricambi, campioni di laboratorio.",
+      "kurzTitle": "Giri brevi",
+      "kurzDesc": "Materiale per ufficio in città, catering per eventi, utensili urgenti in cantiere.",
+      "paletteTitle": "Pallet",
+      "paletteDesc": "Merce su pallet per commercio e produzione — impilata in sicurezza, pronta a partire.",
+      "teilTitle": "Carichi parziali",
+      "teilDesc": "Sacchi, cartoni e carichi parziali misti — raggruppati in modo economico senza un camion intero."
     }
   },
   "order": {
