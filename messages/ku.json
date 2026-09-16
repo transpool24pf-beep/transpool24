@@ -467,7 +467,7 @@
     "licenseFront": "Destûra ajotinê - pêş",
     "licenseBack": "Lîsansa ajotinê - paş",
     "taxNumber": "Hejmara bacê an bazirganî",
-    "taxPlaceholder": "Ger pêkan be",
+    "taxPlaceholder": "Pêwîst",
     "personalPhoto": "Wêneya kesane ya bi paşxaneya spî",
     "languagesSpoken": "Zimanên ku hûn baş diaxivin",
     "languagesPlaceholder": "wek mînak. Erebî, Almanî, Îngilîzî",
@@ -533,12 +533,16 @@
       "faq2q": "TransPool24 çawa dide?",
       "faq2a": "We work on an hourly basis – depending on distance and loading/unloading time, transparent and traceable.",
       "faq3q": "Bajarê min nayê navnîş kirin - ez dikarim hîn jî serlêdan bikim?",
-      "faq3a": "Erê. \"Yên din\" hilbijêrin û bajarê xwe di şîroveyan de binihêrin - em ê li we vegerin.",
+      "faq3a": "Erê. \"Yên din\" hilbijêrin û navê bajêr binivîsin — li ser nexşeyê bixweber xuya dike.",
       "faq4q": "Ma ez hewceyê wesayîta xweya xwe me?",
       "faq4a": "Hûn dikarin wekî ajoker-tenê, bi wesayit, an bi wesayit û arîkar re bixebitin - li gorî kar.",
       "faq5q": "Ez çawa dikarim xwe bigihînim te?",
       "faq5a": "Piştî serlêdana we em hûrguliyên we dinirxînin û bi e-name an têlefonê bi we re têkilî daynin."
-    }
+    },
+    "cityOther": "Yên din",
+    "cityCustom": "Navê bajêr ê ku hûn lê dijîn",
+    "cityCustomPlaceholder": "mînak Heilbronn",
+    "missingFieldsIntro": "Ji kerema xwe van qadan tijî bikin:"
   },
   "driverShare": {
     "pageTitle": "Cihê xwe parve bikin",

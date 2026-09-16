@@ -9,7 +9,6 @@ import {
   WORK_POLICY_TITLE,
   WORK_POLICY_TEXT,
 } from "@/lib/driver-policy";
-import type { DriverWizardFormSnapshot } from "@/lib/driver-wizard-storage";
 import {
   clearDriverWizardDraft,
   driverWizardHasProgress,
@@ -23,12 +22,14 @@ const DriverCityMap = dynamic(
   { ssr: false }
 );
 
-const CITIES = ["Pforzheim", "Stuttgart", "Karlsruhe", "Mannheim", "Heidelberg", "Sonstige"];
+const LIST_CITIES = ["Pforzheim", "Stuttgart", "Karlsruhe", "Mannheim", "Heidelberg"];
+const CITY_OTHER = "Sonstige";
 /** 3 steps: basics → documents + vehicle → review */
 const STEP_ICONS = ["📋", "🪪", "✓"];
 
 type FormData = {
   city: string;
+  cityCustom: string;
   fullName: string;
   email: string;
   phoneCountryCode: string;
@@ -49,6 +50,7 @@ type FormData = {
 
 const initialForm: FormData = {
   city: "",
+  cityCustom: "",
   fullName: "",
   email: "",
   phoneCountryCode: "+49",
@@ -193,9 +195,11 @@ export function DriverWizardForm({
   const [draftRestored, setDraftRestored] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [missing, setMissing] = useState<string[]>([]);
   const [countryCodeOpen, setCountryCodeOpen] = useState(false);
   const countryCodeRef = useRef<HTMLDivElement>(null);
   const saveDraftTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const missingBoxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const d = parseDriverWizardDraft();
@@ -254,30 +258,90 @@ export function DriverWizardForm({
 
   const update = (k: keyof FormData, v: string | boolean) => setForm((f) => ({ ...f, [k]: v }));
 
-  const step1Valid =
-    form.city &&
-    form.fullName.trim() &&
-    form.email.trim() &&
-    form.phone.trim() &&
-    form.servicePolicyAccepted;
+  const resolvedCity = () =>
+    form.city === CITY_OTHER ? form.cityCustom.trim() : form.city.trim();
 
-  /** Step 2 = personal documents + vehicle (incl. sample vehicle photo) */
-  const personalAndVehicleValid =
-    form.idDocumentFrontUrl &&
-    form.idDocumentBackUrl &&
-    form.licenseFrontUrl &&
-    form.licenseBackUrl &&
-    form.taxOrCommercialNumber.trim() &&
-    form.personalPhotoUrl &&
-    form.languagesSpoken.trim() &&
-    form.vehiclePlate.trim() &&
-    form.vehicleDocumentsUrl &&
-    form.vehiclePhotoUrl;
+  const missingStep1 = (): string[] => {
+    const m: string[] = [];
+    if (!form.city) m.push(t("city"));
+    else if (form.city === CITY_OTHER && !form.cityCustom.trim()) m.push(t("cityCustom"));
+    if (!form.fullName.trim()) m.push(t("fullName"));
+    if (!form.email.trim()) m.push(t("email"));
+    if (!form.phone.trim()) m.push(t("whatsapp"));
+    if (!form.servicePolicyAccepted) m.push(t("servicePolicy"));
+    return m;
+  };
 
-  const reviewStepValid = form.workPolicyAccepted;
+  const missingStep2 = (): string[] => {
+    const m: string[] = [];
+    if (!form.idDocumentFrontUrl) m.push(t("idDocumentFront"));
+    if (!form.idDocumentBackUrl) m.push(t("idDocumentBack"));
+    if (!form.licenseFrontUrl) m.push(t("licenseFront"));
+    if (!form.licenseBackUrl) m.push(t("licenseBack"));
+    if (!form.taxOrCommercialNumber.trim()) m.push(t("taxNumber"));
+    if (!form.personalPhotoUrl) m.push(t("personalPhoto"));
+    if (!form.languagesSpoken.trim()) m.push(t("languagesSpoken"));
+    if (!form.vehiclePlate.trim()) m.push(t("vehiclePlate"));
+    if (!form.vehicleDocumentsUrl) m.push(t("vehicleDocuments"));
+    if (!form.vehiclePhotoUrl) m.push(t("vehiclePhoto"));
+    return m;
+  };
+
+  const missingStep3 = (): string[] => {
+    const m: string[] = [];
+    if (!form.workPolicyAccepted) m.push(t("workPolicyAgree"));
+    return m;
+  };
+
+  const missingForStep = (s: number): string[] => {
+    if (s === 1) return missingStep1();
+    if (s === 2) return missingStep2();
+    return missingStep3();
+  };
+
+  useEffect(() => {
+    setMissing((prev) => {
+      if (prev.length === 0) return prev;
+      return missingForStep(step);
+    });
+    // Recompute only after the user already tried Continue/Submit on this step.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form, step]);
+
+  const showMissing = (items: string[]) => {
+    setMissing(items);
+    if (items.length) {
+      window.setTimeout(() => missingBoxRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 80);
+    }
+  };
+
+  const missingBox =
+    missing.length > 0 ? (
+      <div
+        ref={missingBoxRef}
+        className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+        role="alert"
+      >
+        <p className="font-semibold">{t("missingFieldsIntro")}</p>
+        <ul className="mt-1 list-disc ps-5">
+          {missing.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </div>
+    ) : null;
 
   const handleSubmit = async () => {
-    if (!reviewStepValid) return;
+    const s1 = missingStep1();
+    const s2 = missingStep2();
+    const s3 = missingStep3();
+    const m = [...s1, ...s2, ...s3];
+    if (m.length) {
+      if (s1.length) setStep(1);
+      else if (s2.length) setStep(2);
+      showMissing(m);
+      return;
+    }
     setSubmitError(null);
     setSubmitLoading(true);
     try {
@@ -288,13 +352,13 @@ export function DriverWizardForm({
           fullName: form.fullName.trim(),
           email: form.email.trim(),
           phone: `${form.phoneCountryCode}${form.phone.replace(/\D/g, "")}`.replace(/^\+/, "+"),
-          city: form.city,
+          city: resolvedCity(),
           servicePolicyAccepted: form.servicePolicyAccepted,
           idDocumentFrontUrl: form.idDocumentFrontUrl || null,
           idDocumentBackUrl: form.idDocumentBackUrl || null,
           licenseFrontUrl: form.licenseFrontUrl || null,
           licenseBackUrl: form.licenseBackUrl || null,
-          taxOrCommercialNumber: form.taxOrCommercialNumber.trim() || null,
+          taxOrCommercialNumber: form.taxOrCommercialNumber.trim(),
           personalPhotoUrl: form.personalPhotoUrl || null,
           languagesSpoken: form.languagesSpoken.trim() || null,
           vehiclePlate: form.vehiclePlate.trim() || null,
@@ -382,18 +446,37 @@ export function DriverWizardForm({
           <h2 className="text-xl font-bold text-[#0d2137]">{t("step1Title")}</h2>
           <div className="space-y-4">
             <div>
-              <label className="mb-1 block text-sm font-medium text-[#0d2137]">{t("city")}</label>
+              <label className="mb-1 block text-sm font-medium text-[#0d2137]">{t("city")} *</label>
               <select
                 value={form.city}
-                onChange={(e) => update("city", e.target.value)}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setForm((f) => ({ ...f, city: v, cityCustom: v === CITY_OTHER ? f.cityCustom : "" }));
+                }}
                 className="w-full rounded-xl border border-[#0d2137]/20 bg-white px-4 py-3"
               >
                 <option value="">{t("cityPlaceholder")}</option>
-                {CITIES.map((c) => (
-                  <option key={c} value={c}>{c}</option>
+                {LIST_CITIES.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
                 ))}
+                <option value={CITY_OTHER}>{t("cityOther")}</option>
               </select>
             </div>
+            {form.city === CITY_OTHER && (
+              <div>
+                <label className="mb-1 block text-sm font-medium text-[#0d2137]">{t("cityCustom")} *</label>
+                <input
+                  type="text"
+                  value={form.cityCustom}
+                  onChange={(e) => update("cityCustom", e.target.value)}
+                  placeholder={t("cityCustomPlaceholder")}
+                  className="w-full rounded-xl border border-[#0d2137]/20 px-4 py-3"
+                  required
+                />
+              </div>
+            )}
             <div>
               <label className="mb-1 block text-sm font-medium text-[#0d2137]">{t("fullName")}</label>
               <input
@@ -466,17 +549,22 @@ export function DriverWizardForm({
             </div>
           </div>
           <div className="mt-6">
-            <DriverCityMap />
+            <DriverCityMap city={resolvedCity()} />
           </div>
+          {missingBox}
           <div className="mt-8 flex justify-between gap-4">
             <button type="button" onClick={onBack} className="rounded-xl border border-[#0d2137]/20 bg-white px-6 py-3 font-medium text-[#0d2137]">
               {t("back")}
             </button>
             <button
               type="button"
-              onClick={() => setStep(2)}
-              disabled={!step1Valid}
-              className="rounded-xl bg-[var(--accent)] px-8 py-3 font-semibold text-white disabled:opacity-50"
+              onClick={() => {
+                const m = missingStep1();
+                showMissing(m);
+                if (m.length) return;
+                setStep(2);
+              }}
+              className="rounded-xl bg-[var(--accent)] px-8 py-3 font-semibold text-white"
             >
               {t("continue")}
             </button>
@@ -530,7 +618,7 @@ export function DriverWizardForm({
               uploadFailed={t("uploadFailed")}
             />
             <div className="sm:col-span-2">
-              <label className="mb-1 block text-sm font-medium text-[#0d2137]">{t("taxNumber")}</label>
+              <label className="mb-1 block text-sm font-medium text-[#0d2137]">{t("taxNumber")} *</label>
               <input
                 type="text"
                 value={form.taxOrCommercialNumber}
@@ -605,15 +693,20 @@ export function DriverWizardForm({
               />
             </div>
           </div>
+          {missingBox}
           <div className="mt-8 flex justify-between gap-4">
             <button type="button" onClick={() => setStep(1)} className="rounded-xl border border-[#0d2137]/20 bg-white px-6 py-3 font-medium text-[#0d2137]">
               {t("back")}
             </button>
             <button
               type="button"
-              onClick={() => setStep(3)}
-              disabled={!personalAndVehicleValid}
-              className="rounded-xl bg-[var(--accent)] px-8 py-3 font-semibold text-white disabled:opacity-50"
+              onClick={() => {
+                const m = missingStep2();
+                showMissing(m);
+                if (m.length) return;
+                setStep(3);
+              }}
+              className="rounded-xl bg-[var(--accent)] px-8 py-3 font-semibold text-white"
             >
               {t("continue")}
             </button>
@@ -629,7 +722,7 @@ export function DriverWizardForm({
             <p><strong>{t("reviewName")}:</strong> {form.fullName}</p>
             <p><strong>{t("reviewEmail")}:</strong> {form.email}</p>
             <p><strong>{t("reviewWhatsapp")}:</strong> {form.phoneCountryCode} {form.phone}</p>
-            <p><strong>{t("reviewCity")}:</strong> {form.city}</p>
+            <p><strong>{t("reviewCity")}:</strong> {resolvedCity()}</p>
             <p><strong>{t("reviewTax")}:</strong> {form.taxOrCommercialNumber || "—"}</p>
             <p><strong>{t("reviewLanguages")}:</strong> {form.languagesSpoken || "—"}</p>
             <p><strong>{t("reviewVehiclePlate")}:</strong> {form.vehiclePlate || "—"}</p>
@@ -649,6 +742,7 @@ export function DriverWizardForm({
               <span className="text-sm text-[#0d2137]">{t("workPolicyAgree")}</span>
             </label>
           </div>
+          {missingBox}
           {submitError && <p className="text-red-600 text-sm">{submitError}</p>}
           <div className="mt-8 flex justify-between gap-4">
             <button type="button" onClick={() => setStep(2)} className="rounded-xl border border-[#0d2137]/20 bg-white px-6 py-3 font-medium text-[#0d2137]">
@@ -657,7 +751,7 @@ export function DriverWizardForm({
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={!reviewStepValid || submitLoading}
+              disabled={submitLoading}
               className="rounded-xl bg-[var(--accent)] px-8 py-3 font-semibold text-white disabled:opacity-50"
             >
               {submitLoading ? t("submitting") : t("submit")}

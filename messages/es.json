@@ -467,7 +467,7 @@
     "licenseFront": "Carné de conducir – anverso",
     "licenseBack": "Carné de conducir – reverso",
     "taxNumber": "NIF o número comercial",
-    "taxPlaceholder": "Si aplica",
+    "taxPlaceholder": "Obligatorio",
     "personalPhoto": "Foto personal con fondo blanco",
     "languagesSpoken": "Idiomas que habla bien",
     "languagesPlaceholder": "ej. árabe, alemán, inglés",
@@ -533,12 +533,16 @@
       "faq2q": "¿Cómo paga TransPool24?",
       "faq2a": "Trabajamos por horas – según distancia y tiempos de carga/descarga, de forma transparente.",
       "faq3q": "Mi ciudad no está en la lista – ¿puedo solicitar?",
-      "faq3a": "Sí. Elige «Otra» e indica tu ciudad en las notas – te contactamos.",
+      "faq3a": "Sí. Elige «Otra» e indica el nombre de tu ciudad: aparecerá automáticamente en el mapa.",
       "faq4q": "¿Necesito vehículo propio?",
       "faq4a": "Puedes trabajar solo como conductor, con vehículo o con vehículo y ayudante – según el encargo.",
       "faq5q": "¿Cómo os contacto?",
       "faq5a": "Tras tu solicitud revisamos tus datos y te contactamos por correo o teléfono."
-    }
+    },
+    "cityOther": "Otra",
+    "cityCustom": "Nombre de la ciudad en la que vive",
+    "cityCustomPlaceholder": "p. ej. Heilbronn",
+    "missingFieldsIntro": "Aún debe completar:"
   },
   "driverShare": {
     "pageTitle": "Compartir ubicación",

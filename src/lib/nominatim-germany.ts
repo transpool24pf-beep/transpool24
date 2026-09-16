@@ -96,3 +96,22 @@ export async function geocodeGermanyOne(address: string): Promise<NominatimHit |
   const list = await nominatimSuggestGermany(trimmed, 5);
   return list[0] ?? null;
 }
+
+/** Place a city name on the map (city query first, then free-text). */
+export async function geocodeGermanyCity(city: string): Promise<NominatimHit | null> {
+  const q = city.trim();
+  if (q.length < 2) return null;
+  try {
+    const res = await fetch(
+      `${NOMINATIM_URL}?format=json&city=${encodeURIComponent(q)}&country=de&limit=1`,
+      { headers: NOMINATIM_HEADERS }
+    );
+    const data = await res.json();
+    if (Array.isArray(data) && data[0]?.lat && data[0]?.lon) {
+      return mapRow(data[0]);
+    }
+  } catch {
+    /* fall through */
+  }
+  return geocodeGermanyOne(q);
+}

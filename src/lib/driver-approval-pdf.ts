@@ -13,6 +13,7 @@ export type DriverAppForPdf = {
   email: string;
   phone: string;
   city: string;
+  tax_or_commercial_number?: string | null;
   vehicle_plate: string | null;
   languages_spoken: string | null;
   approved_at: string;
@@ -149,6 +150,17 @@ export async function generateDriverApprovalPdf(app: DriverAppForPdf): Promise<U
   y = drawText(page, font, fontBold, `E-Mail: ${toWinAnsiSafe(app.email)}`, { y, size: 10, x: margin });
   y = drawText(page, font, fontBold, `Telefon / WhatsApp: ${toWinAnsiSafe(app.phone)}`, { y, size: 10, x: margin });
   y = drawText(page, font, fontBold, `Stadt: ${toWinAnsiSafe(app.city)}`, { y, size: 10, x: margin });
+  y = drawText(
+    page,
+    font,
+    fontBold,
+    `Steuer-/Handelsnummer: ${toWinAnsiSafe(app.tax_or_commercial_number?.trim() || "—")}`,
+    {
+      y,
+      size: 10,
+      x: margin,
+    }
+  );
   if (app.vehicle_plate) {
     y = drawText(page, font, fontBold, `Kennzeichen: ${toWinAnsiSafe(app.vehicle_plate)}`, { y, size: 10, x: margin });
   }

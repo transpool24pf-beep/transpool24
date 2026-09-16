@@ -466,7 +466,7 @@
     "licenseFront": "Prawo jazdy – przód",
     "licenseBack": "Prawo jazdy – powrót",
     "taxNumber": "Numer podatkowy lub numer handlowy",
-    "taxPlaceholder": "Jeśli ma to zastosowanie",
+    "taxPlaceholder": "Wymagane",
     "personalPhoto": "Osobiste zdjęcie z białym tłem",
     "languagesSpoken": "Języki, w których mówisz dobrze",
     "languagesPlaceholder": "np. Arabski, niemiecki, angielski",
@@ -532,12 +532,16 @@
       "faq2q": "Jak płaci TransPool24?",
       "faq2a": "We work on an hourly basis – depending on distance and loading/unloading time, transparent and traceable.",
       "faq3q": "Mojego miasta nie ma na liście – czy nadal mogę złożyć wniosek?",
-      "faq3a": "Tak. Wybierz „Inne” i wpisz w komentarzu swoje miasto – skontaktujemy się z Tobą.",
+      "faq3a": "Tak. Wybierz „Inne” i wpisz nazwę miasta — pojawi się automatycznie na mapie.",
       "faq4q": "Czy potrzebuję własnego pojazdu?",
       "faq4a": "Możesz pracować jako sam kierowca, z pojazdem lub z pojazdem i asystentem – w zależności od zadania.",
       "faq5q": "Jak mogę się z Tobą skontaktować?",
       "faq5a": "Po przesłaniu aplikacji sprawdzimy Twoje dane i skontaktujemy się z Tobą e-mailem lub telefonicznie."
-    }
+    },
+    "cityOther": "Inne",
+    "cityCustom": "Nazwa miasta, w którym mieszkasz",
+    "cityCustomPlaceholder": "np. Heilbronn",
+    "missingFieldsIntro": "Uzupełnij jeszcze:"
   },
   "driverShare": {
     "pageTitle": "Udostępnij swoją lokalizację",

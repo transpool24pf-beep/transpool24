@@ -611,7 +611,7 @@
     "licenseFront": "Führerschein – Vorderseite",
     "licenseBack": "Führerschein – Rückseite",
     "taxNumber": "Steuer- oder Handelsnummer",
-    "taxPlaceholder": "Falls vorhanden",
+    "taxPlaceholder": "Pflichtfeld",
     "personalPhoto": "Personalfoto mit weißem Hintergrund",
     "languagesSpoken": "Sprachen, die Sie gut sprechen",
     "languagesPlaceholder": "z. B. Arabisch, Deutsch, Englisch",
@@ -677,12 +677,16 @@
       "faq2q": "Wie wird bei TransPool24 bezahlt?",
       "faq2a": "Wir arbeiten stundenweise – abhängig von Distanz sowie Lade- und Entladezeit, transparent und nachvollziehbar.",
       "faq3q": "Meine Stadt steht nicht in der Liste – kann ich mich bewerben?",
-      "faq3a": "Ja. Wählen Sie „Sonstige“ und nennen Sie Ihre Stadt in den Notizen – wir melden uns.",
+      "faq3a": "Ja. Wählen Sie „Sonstige“ und geben Sie den Namen Ihrer Stadt ein — sie erscheint automatisch auf der Karte.",
       "faq4q": "Brauche ich ein eigenes Fahrzeug?",
       "faq4a": "Sie können als reiner Fahrer, mit Fahrzeug oder mit Fahrzeug und Helfer arbeiten – je nach Einsatz.",
       "faq5q": "Wie erreiche ich Sie?",
       "faq5a": "Nach Ihrer Bewerbung prüfen wir Ihre Daten und kontaktieren Sie per E-Mail oder Telefon."
-    }
+    },
+    "cityOther": "Sonstige",
+    "cityCustom": "Name der Stadt, in der Sie leben",
+    "cityCustomPlaceholder": "z. B. Heilbronn",
+    "missingFieldsIntro": "Bitte füllen Sie noch aus:"
   },
   "driverShare": {
     "pageTitle": "Standort teilen",

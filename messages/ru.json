@@ -465,7 +465,7 @@
     "licenseFront": "Водительское удостоверение – переднее",
     "licenseBack": "Водительские права – назад.",
     "taxNumber": "Налоговый или коммерческий номер",
-    "taxPlaceholder": "Если применимо",
+    "taxPlaceholder": "Обязательно",
     "personalPhoto": "Личное фото на белом фоне.",
     "languagesSpoken": "Языки, которыми вы хорошо владеете",
     "languagesPlaceholder": "например арабский, немецкий, английский",
@@ -531,12 +531,16 @@
       "faq2q": "Как платит TransPool24?",
       "faq2a": "We work on an hourly basis – depending on distance and loading/unloading time, transparent and traceable.",
       "faq3q": "My city is not listed – can I still apply?",
-      "faq3a": "Yes. Choose “Other” and note your city in the comments – we will get back to you.",
+      "faq3a": "Да. Выберите «Другой» и укажите название города — оно появится на карте автоматически.",
       "faq4q": "Нужен ли мне собственный автомобиль?",
       "faq4a": "Вы можете работать только водителем, с автомобилем или с автомобилем и помощником – в зависимости от должности.",
       "faq5q": "Как я могу связаться с вами?",
       "faq5a": "После подачи заявки мы проверим ваши данные и свяжемся с вами по электронной почте или телефону."
-    }
+    },
+    "cityOther": "Другой",
+    "cityCustom": "Название города, в котором вы живёте",
+    "cityCustomPlaceholder": "напр. Хайльбронн",
+    "missingFieldsIntro": "Заполните ещё:"
   },
   "driverShare": {
     "pageTitle": "Поделитесь своим местоположением",

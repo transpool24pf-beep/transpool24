@@ -607,7 +607,7 @@
     "licenseFront": "Driving licence – front",
     "licenseBack": "Driving licence – back",
     "taxNumber": "Tax or commercial number",
-    "taxPlaceholder": "If applicable",
+    "taxPlaceholder": "Required",
     "personalPhoto": "Personal photo with white background",
     "languagesSpoken": "Languages you speak well",
     "languagesPlaceholder": "e.g. Arabic, German, English",
@@ -673,12 +673,16 @@
       "faq2q": "How does TransPool24 pay?",
       "faq2a": "We work on an hourly basis – depending on distance and loading/unloading time, transparent and traceable.",
       "faq3q": "My city is not listed – can I still apply?",
-      "faq3a": "Yes. Choose “Other” and note your city in the comments – we will get back to you.",
+      "faq3a": "Yes. Choose “Other” and enter your city name — it will appear on the map automatically.",
       "faq4q": "Do I need my own vehicle?",
       "faq4a": "You can work as driver-only, with vehicle, or with vehicle and assistant – depending on the job.",
       "faq5q": "How can I reach you?",
       "faq5a": "After your application we review your details and contact you by email or phone."
-    }
+    },
+    "cityOther": "Other",
+    "cityCustom": "Name of the city you live in",
+    "cityCustomPlaceholder": "e.g. Heilbronn",
+    "missingFieldsIntro": "Please still fill in:"
   },
   "driverShare": {
     "pageTitle": "Share your location",

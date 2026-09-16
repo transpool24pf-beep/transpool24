@@ -33,8 +33,20 @@ export async function POST(req: Request) {
   const experience = body.experience ? String(body.experience).trim() : null;
   const note = body.note ? String(body.note).trim() : null;
 
-  if (!full_name || !email || !phone || !city) {
-    return NextResponse.json({ error: "Missing required fields (name, email, phone, city)" }, { status: 400 });
+  const missing: string[] = [];
+  if (!full_name) missing.push("fullName");
+  if (!email) missing.push("email");
+  if (!phone) missing.push("phone");
+  if (!city) missing.push("city");
+  if (/^(sonstige|other|autre|altra|otra|altele|inne|diğer|другое|інше|أخرى|yên din|__other__)$/i.test(city)) {
+    missing.push("cityCustom");
+  }
+  if (!tax_or_commercial_number) missing.push("taxOrCommercialNumber");
+  if (missing.length) {
+    return NextResponse.json(
+      { error: "Please fill in the missing required fields", missing },
+      { status: 400 }
+    );
   }
   if (!service_policy_accepted) {
     return NextResponse.json({ error: "Service policy consent required" }, { status: 400 });
@@ -63,7 +75,7 @@ export async function POST(req: Request) {
       id_document_back_url: id_document_back_url || null,
       license_front_url: license_front_url || null,
       license_back_url: license_back_url || null,
-      tax_or_commercial_number: tax_or_commercial_number || null,
+      tax_or_commercial_number,
       personal_photo_url: personal_photo_url || null,
       languages_spoken: languages_spoken || null,
       vehicle_plate: vehicle_plate || null,

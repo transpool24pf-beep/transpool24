@@ -16,7 +16,7 @@ export async function POST(req: Request) {
   const { data, error } = await supabase
     .from("driver_applications")
     .select(
-      "full_name, email, phone, city, languages_spoken, approved_at, status, driver_number, vehicle_plate, personal_photo_url, created_at, service_policy_accepted, work_policy_accepted"
+      "full_name, email, phone, city, tax_or_commercial_number, languages_spoken, approved_at, status, driver_number, vehicle_plate, personal_photo_url, created_at, service_policy_accepted, work_policy_accepted"
     )
     .eq("id", id)
     .single();
@@ -43,6 +43,7 @@ export async function POST(req: Request) {
       email: String(data.email ?? ""),
       phone: String(data.phone ?? ""),
       city: String(data.city ?? ""),
+      tax_or_commercial_number: data.tax_or_commercial_number != null ? String(data.tax_or_commercial_number) : null,
       vehicle_plate: data.vehicle_plate != null ? String(data.vehicle_plate) : null,
       languages_spoken: data.languages_spoken != null ? String(data.languages_spoken) : null,
       approved_at: approvedAt,
@@ -65,10 +66,13 @@ export async function POST(req: Request) {
     {
       full_name: String(data.full_name ?? ""),
       email: String(data.email ?? ""),
+      phone: data.phone != null ? String(data.phone) : null,
       driver_number: data.driver_number != null ? Number(data.driver_number) : null,
       approved_at: approvedAt,
       vehicle_plate: data.vehicle_plate ?? null,
       personal_photo_url: data.personal_photo_url ?? null,
+      city: data.city ?? null,
+      tax_or_commercial_number: data.tax_or_commercial_number ?? null,
     },
     { whatsAppLink, pdfBuffer }
   );

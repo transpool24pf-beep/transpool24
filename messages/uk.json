@@ -466,7 +466,7 @@
     "licenseFront": "Водійське посвідчення – спереду",
     "licenseBack": "Посвідчення водія – назад",
     "taxNumber": "Податковий чи комерційний номер",
-    "taxPlaceholder": "Якщо застосовно",
+    "taxPlaceholder": "Обов’язково",
     "personalPhoto": "Особисте фото з білим фоном",
     "languagesSpoken": "Мови, якими ви володієте добре",
     "languagesPlaceholder": "напр. арабська, німецька, англійська",
@@ -532,12 +532,16 @@
       "faq2q": "Як платить TransPool24?",
       "faq2a": "We work on an hourly basis – depending on distance and loading/unloading time, transparent and traceable.",
       "faq3q": "Мого міста немає в списку – чи можу я подати заявку?",
-      "faq3a": "так Виберіть «Інше» та вкажіть своє місто в коментарях – ми зв’яжемося з вами.",
+      "faq3a": "Так. Оберіть «Інше» і вкажіть назву міста — воно з’явиться на карті автоматично.",
       "faq4q": "Чи потрібен мені власний автомобіль?",
       "faq4a": "You can work as driver-only, with vehicle, or with vehicle and assistant – depending on the job.",
       "faq5q": "How can I reach you?",
       "faq5a": "After your application we review your details and contact you by email or phone."
-    }
+    },
+    "cityOther": "Інше",
+    "cityCustom": "Назва міста, в якому ви живете",
+    "cityCustomPlaceholder": "напр. Гайльбронн",
+    "missingFieldsIntro": "Будь ласка, заповніть ще:"
   },
   "driverShare": {
     "pageTitle": "Share your location",

@@ -6,6 +6,7 @@ export const DRIVER_WIZARD_STORAGE_KEY = "transpool24-driver-wizard-v1";
 
 export type DriverWizardFormSnapshot = {
   city: string;
+  cityCustom: string;
   fullName: string;
   email: string;
   phoneCountryCode: string;
@@ -26,6 +27,7 @@ export type DriverWizardFormSnapshot = {
 
 export const initialDriverWizardForm = (): DriverWizardFormSnapshot => ({
   city: "",
+  cityCustom: "",
   fullName: "",
   email: "",
   phoneCountryCode: "+49",
@@ -74,6 +76,7 @@ export function shouldOpenDriverFormFromDraft(): boolean {
   if (!f) return false;
   return Boolean(
     (f.city && String(f.city).trim()) ||
+      (f.cityCustom && String(f.cityCustom).trim()) ||
       (f.fullName && String(f.fullName).trim()) ||
       (f.email && String(f.email).trim()) ||
       (f.phone && String(f.phone).trim()) ||
@@ -91,6 +94,8 @@ export function mergeDriverWizardForm(
     ...base,
     ...saved,
     city: saved.city != null && String(saved.city).trim() !== "" ? saved.city : base.city,
+    cityCustom:
+      saved.cityCustom != null && String(saved.cityCustom).trim() !== "" ? saved.cityCustom : base.cityCustom,
     servicePolicyAccepted: Boolean(saved.servicePolicyAccepted),
     workPolicyAccepted: Boolean(saved.workPolicyAccepted),
     phoneCountryCode:
@@ -128,6 +133,7 @@ export function driverWizardHasProgress(form: DriverWizardFormSnapshot, step: nu
   if (step >= 2) return true;
   return Boolean(
     form.city.trim() ||
+      form.cityCustom.trim() ||
       form.fullName.trim() ||
       form.email.trim() ||
       form.phone.trim() ||

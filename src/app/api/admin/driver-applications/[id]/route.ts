@@ -261,7 +261,7 @@ export async function PATCH(
     const { data: appRow } = await supabase
       .from("driver_applications")
       .select(
-        "full_name, email, phone, city, approved_at, vehicle_plate, personal_photo_url, languages_spoken, created_at, service_policy_accepted, work_policy_accepted"
+        "full_name, email, phone, city, tax_or_commercial_number, approved_at, vehicle_plate, personal_photo_url, languages_spoken, created_at, service_policy_accepted, work_policy_accepted"
       )
       .eq("id", id)
       .single();
@@ -274,6 +274,7 @@ export async function PATCH(
           email: String(appRow.email ?? ""),
           phone: String(appRow.phone ?? ""),
           city: String(appRow.city ?? ""),
+          tax_or_commercial_number: appRow.tax_or_commercial_number ?? null,
           vehicle_plate: appRow.vehicle_plate ?? null,
           languages_spoken: appRow.languages_spoken ?? null,
           approved_at: appRow.approved_at ?? now,
@@ -295,10 +296,13 @@ export async function PATCH(
         {
           full_name: String(appRow.full_name ?? ""),
           email: String(appRow.email ?? ""),
+          phone: appRow.phone != null ? String(appRow.phone) : null,
           driver_number: driverNumber,
           approved_at: appRow.approved_at ?? now,
           vehicle_plate: appRow.vehicle_plate ?? null,
           personal_photo_url: appRow.personal_photo_url ?? null,
+          city: appRow.city ?? null,
+          tax_or_commercial_number: appRow.tax_or_commercial_number ?? null,
         },
         { whatsAppLink, pdfBuffer }
       );

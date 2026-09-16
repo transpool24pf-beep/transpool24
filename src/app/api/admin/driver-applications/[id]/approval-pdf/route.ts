@@ -14,7 +14,7 @@ export async function GET(
   const { data, error } = await supabase
     .from("driver_applications")
     .select(
-      "full_name, email, phone, city, vehicle_plate, languages_spoken, approved_at, status, driver_number, created_at, service_policy_accepted, work_policy_accepted"
+      "full_name, email, phone, city, tax_or_commercial_number, vehicle_plate, languages_spoken, approved_at, status, driver_number, created_at, service_policy_accepted, work_policy_accepted"
     )
     .eq("id", id)
     .single();
@@ -36,6 +36,7 @@ export async function GET(
       email: String(data.email ?? ""),
       phone: String(data.phone ?? ""),
       city: String(data.city ?? ""),
+      tax_or_commercial_number: data.tax_or_commercial_number != null ? String(data.tax_or_commercial_number) : null,
       vehicle_plate: data.vehicle_plate != null ? String(data.vehicle_plate) : null,
       languages_spoken: data.languages_spoken != null ? String(data.languages_spoken) : null,
       approved_at: approvedAt,

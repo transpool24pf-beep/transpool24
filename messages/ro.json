@@ -467,7 +467,7 @@
     "licenseFront": "Permis de conducere – fata",
     "licenseBack": "Permis de conducere – înapoi",
     "taxNumber": "Număr fiscal sau comercial",
-    "taxPlaceholder": "Dacă este cazul",
+    "taxPlaceholder": "Obligatoriu",
     "personalPhoto": "Fotografie personală cu fundal alb",
     "languagesSpoken": "Limbi pe care le vorbești bine",
     "languagesPlaceholder": "de ex. arabă, germană, engleză",
@@ -533,12 +533,16 @@
       "faq2q": "Cum plătește TransPool24?",
       "faq2a": "We work on an hourly basis – depending on distance and loading/unloading time, transparent and traceable.",
       "faq3q": "Orașul meu nu este listat – mai pot aplica?",
-      "faq3a": "Da. Alegeți „Altele” și notați orașul dvs. în comentarii - vă vom contacta.",
+      "faq3a": "Da. Alegeți „Altele” și scrieți numele orașului — apare automat pe hartă.",
       "faq4q": "Am nevoie de propriul meu vehicul?",
       "faq4a": "Puteți lucra doar ca șofer, cu vehicul sau cu vehicul și asistent – ​​în funcție de job.",
       "faq5q": "Cum pot ajunge la tine?",
       "faq5a": "După aplicarea dvs., vă examinăm detaliile și vă contactăm prin e-mail sau telefon."
-    }
+    },
+    "cityOther": "Altele",
+    "cityCustom": "Numele orașului în care locuiți",
+    "cityCustomPlaceholder": "ex. Heilbronn",
+    "missingFieldsIntro": "Completați încă:"
   },
   "driverShare": {
     "pageTitle": "Partajați locația dvs",

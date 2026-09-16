@@ -467,7 +467,7 @@
     "licenseFront": "Patente di guida – anteriore",
     "licenseBack": "Patente di guida – indietro",
     "taxNumber": "Codice fiscale o commerciale",
-    "taxPlaceholder": "Se applicabile",
+    "taxPlaceholder": "Obbligatorio",
     "personalPhoto": "Foto personale con sfondo bianco",
     "languagesSpoken": "Lingue che parli bene",
     "languagesPlaceholder": "per esempio. Arabo, tedesco, inglese",
@@ -533,12 +533,16 @@
       "faq2q": "Come paga TransPool24?",
       "faq2a": "We work on an hourly basis – depending on distance and loading/unloading time, transparent and traceable.",
       "faq3q": "La mia città non è nell'elenco: posso comunque candidarmi?",
-      "faq3a": "SÌ. Scegli \"Altro\" e scrivi la tua città nei commenti: ti ricontatteremo.",
+      "faq3a": "Sì. Scegli «Altro» e inserisci il nome della tua città: apparirà automaticamente sulla mappa.",
       "faq4q": "Ho bisogno del mio veicolo?",
       "faq4a": "Puoi lavorare come solo autista, con veicolo o con veicolo e assistente, a seconda del lavoro.",
       "faq5q": "Come posso raggiungerti?",
       "faq5a": "Dopo la tua richiesta esamineremo i tuoi dettagli e ti contatteremo via e-mail o telefono."
-    }
+    },
+    "cityOther": "Altro",
+    "cityCustom": "Nome della città in cui vivi",
+    "cityCustomPlaceholder": "es. Heilbronn",
+    "missingFieldsIntro": "Compila ancora:"
   },
   "driverShare": {
     "pageTitle": "Condividi la tua posizione",

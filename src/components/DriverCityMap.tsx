@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 
-// Fix default marker in Next.js
 if (typeof window !== "undefined") {
   const DefaultIcon = L.icon({
     iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -16,33 +15,83 @@ if (typeof window !== "undefined") {
   L.Marker.prototype.options.icon = DefaultIcon;
 }
 
-const PFORZHEIM: [number, number] = [49.0, 8.7];
+const PFORZHEIM: [number, number] = [48.8944, 8.7049];
 
-function FitView() {
+const CITY_COORDS: Record<string, [number, number]> = {
+  Pforzheim: [48.8944, 8.7049],
+  Stuttgart: [48.7758, 9.1829],
+  Karlsruhe: [49.0069, 8.4037],
+  Mannheim: [49.4875, 8.466],
+  Heidelberg: [49.3988, 8.6724],
+};
+
+const PLACEHOLDER_CITY =
+  /^(sonstige|other|autre|altra|otra|altele|inne|diğer|другое|інше|أخرى|yên din|__other__)$/i;
+
+function Recenter({
+  lat,
+  lng,
+  label,
+}: {
+  lat: number;
+  lng: number;
+  label: string;
+}) {
   const map = useMap();
   useEffect(() => {
-    map.setView(PFORZHEIM, 10);
-  }, [map]);
-  return null;
+    map.setView([lat, lng], 11);
+  }, [map, lat, lng]);
+  return (
+    <Marker position={[lat, lng]}>
+      <Popup>{label}</Popup>
+    </Marker>
+  );
 }
 
-export function DriverCityMap() {
+export function DriverCityMap({ city }: { city: string }) {
+  const trimmed = city.trim();
+  const fallback = (trimmed && CITY_COORDS[trimmed]) || PFORZHEIM;
+  const [position, setPosition] = useState<[number, number]>(fallback);
+  const [label, setLabel] = useState(trimmed || "Pforzheim");
+
+  useEffect(() => {
+    if (!trimmed || PLACEHOLDER_CITY.test(trimmed)) {
+      setPosition(PFORZHEIM);
+      setLabel("Pforzheim");
+      return;
+    }
+    const known = CITY_COORDS[trimmed];
+    if (known) {
+      setPosition(known);
+      setLabel(trimmed);
+    }
+    let cancelled = false;
+    const timer = window.setTimeout(() => {
+      fetch(`/api/geocode-city?q=${encodeURIComponent(trimmed)}`)
+        .then((r) => r.json())
+        .then((d: { lat?: number | null; lon?: number | null; label?: string | null }) => {
+          if (cancelled || d.lat == null || d.lon == null) return;
+          setPosition([d.lat, d.lon]);
+          setLabel(d.label?.trim() || trimmed);
+        })
+        .catch(() => {
+          /* keep fallback */
+        });
+    }, known ? 0 : 400);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [trimmed]);
+
   return (
     <div className="h-[320px] w-full overflow-hidden rounded-xl border border-[#0d2137]/15 bg-[#f8f9fa]">
-      <MapContainer
-        center={PFORZHEIM}
-        zoom={10}
-        className="h-full w-full"
-        scrollWheelZoom
-      >
+      <MapContainer center={position} zoom={11} className="h-full w-full" scrollWheelZoom>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <FitView />
-        <Marker position={PFORZHEIM}>
-          <Popup>Pforzheim – Einsatzgebiet</Popup>
-        </Marker>
+        <Recenter lat={position[0]} lng={position[1]} label={label} />
       </MapContainer>
     </div>
   );

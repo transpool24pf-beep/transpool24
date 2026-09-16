@@ -161,7 +161,7 @@ function buildConfirmationHtml(
 
 function addressHtmlForJob(job: Job, kind: "pickup" | "delivery"): string {
   const a = kind === "pickup" ? jobSenderAddress(job) : jobRecipientAddress(job);
-  const html = formatStructuredAddressHtml(a, escapeHtml);
+  const html = formatStructuredAddressHtml(a, escapeHtml, kind === "pickup" ? "load" : "unload");
   if (html) return html;
   const line =
     kind === "pickup"
@@ -782,10 +782,13 @@ const ORANGE = "#e85d04";
 export type DriverApprovalData = {
   full_name: string;
   email: string;
+  phone?: string | null;
   driver_number: number | null;
   approved_at: string;
   vehicle_plate?: string | null;
   personal_photo_url?: string | null;
+  city?: string | null;
+  tax_or_commercial_number?: string | null;
 };
 
 function buildDriverApprovalHtml(
@@ -841,6 +844,10 @@ function buildDriverApprovalHtml(
                 <table width="100%" cellpadding="4" cellspacing="0">
                   <tr><td style="text-align:left; font-weight:600; color:#0d2137;">Fahrernummer:</td><td style="text-align:right;">#${driverNum}</td></tr>
                   <tr><td style="text-align:left; font-weight:600; color:#0d2137;">Name:</td><td style="text-align:right;">${escapeHtml(data.full_name || "—")}</td></tr>
+                  <tr><td style="text-align:left; font-weight:600; color:#0d2137;">E-Mail:</td><td style="text-align:right;">${escapeHtml(data.email || "—")}</td></tr>
+                  <tr><td style="text-align:left; font-weight:600; color:#0d2137;">Telefon / WhatsApp:</td><td style="text-align:right;">${escapeHtml(data.phone?.trim() || "—")}</td></tr>
+                  <tr><td style="text-align:left; font-weight:600; color:#0d2137;">Stadt:</td><td style="text-align:right;">${escapeHtml(data.city?.trim() || "—")}</td></tr>
+                  <tr><td style="text-align:left; font-weight:600; color:#0d2137;">Steuer-/Handelsnummer:</td><td style="text-align:right;">${escapeHtml(data.tax_or_commercial_number?.trim() || "—")}</td></tr>
                   <tr><td style="text-align:left; font-weight:600; color:#0d2137;">Genehmigungsdatum:</td><td style="text-align:right;">${dateStr}</td></tr>
                   ${data.vehicle_plate ? `<tr><td style="text-align:left; font-weight:600; color:#0d2137;">Kennzeichen:</td><td style="text-align:right;">${escapeHtml(data.vehicle_plate)}</td></tr>` : ""}
                 </table>
