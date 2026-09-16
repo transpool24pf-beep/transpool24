@@ -11,8 +11,7 @@ import { HomeJsonLd } from "@/components/seo/HomeJsonLd";
 import { ContentAdBanner } from "@/components/ads/ContentAdBanner";
 import { getHomepageHero } from "@/lib/homepage-hero";
 import { localeAlternatesAndSocial } from "@/lib/locale-seo-metadata";
-
-const FALLBACK_IMAGE = "/images/5677.png";
+import { TRANSPOOL24_VAN_IMAGE } from "@/lib/brand-assets";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -37,7 +36,6 @@ export default async function HomePage({
   const t = await getTranslations("home");
   const hero = await getHomepageHero(locale);
 
-  const heroImage = hero.imageUrl || FALLBACK_IMAGE;
   const heroHeadline = hero.headline || t("heroHeadline");
   const heroSubtitle = hero.subtitle || t("subtitle");
   const heroCta = hero.cta || t("cta");
@@ -47,58 +45,58 @@ export default async function HomePage({
       <HomeJsonLd locale={locale} />
       <Header />
       <main className="min-h-[calc(100vh-8rem)]">
-        {/* Hero — CMS-driven (classic homepage; logistics cover lives on /blog) */}
-        <section className="relative min-h-[min(90vh,42rem)] overflow-hidden">
-          <div className="absolute inset-0">
-            <Image
-              src={heroImage}
-              alt=""
-              fill
-              className="object-cover object-center"
-              priority
-              quality={100}
-              sizes="100vw"
-              unoptimized={heroImage.startsWith("http")}
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent rtl:bg-gradient-to-l rtl:from-black/70 rtl:via-black/40 rtl:to-transparent" />
-          </div>
-          <div className="relative flex min-h-[min(90vh,42rem)] flex-col justify-center px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
-            <div className="mx-auto w-full max-w-7xl">
-              <div className="max-w-2xl">
-                <div
-                  className="relative inline-block max-w-full rounded-xl border-2 border-white/55 bg-[var(--accent)] px-5 py-4 sm:px-8 sm:py-6 md:px-9 md:py-7"
-                  style={{
-                    boxShadow:
-                      "0 8px 32px rgba(232,93,4,0.4), inset 0 0 0 1px rgba(255,255,255,0.3), 0 0 0 3px rgba(255,255,255,0.12)",
-                  }}
-                >
-                  <div className="absolute left-2 top-2 h-5 w-5 rounded-tl border-l-2 border-t-2 border-white/60" aria-hidden />
-                  <div className="absolute right-2 top-2 h-5 w-5 rounded-tr border-r-2 border-t-2 border-white/60" aria-hidden />
-                  <div className="absolute bottom-2 left-2 h-5 w-5 rounded-bl border-b-2 border-l-2 border-white/60" aria-hidden />
-                  <div className="absolute bottom-2 right-2 h-5 w-5 rounded-br border-b-2 border-r-2 border-white/60" aria-hidden />
-                  <h1 className="relative text-2xl font-bold leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl">
-                    {heroHeadline}
-                  </h1>
-                </div>
-                <p className="mt-6 max-w-2xl text-xl font-semibold leading-snug text-white/95 drop-shadow-sm sm:text-2xl md:text-2xl">
-                  {heroSubtitle}
-                </p>
-                <Link
-                  href={`/${locale}/order`}
-                  className="mt-10 inline-flex items-center gap-2 rounded-xl border-2 border-white/50 bg-[var(--accent)] px-10 py-4 text-lg font-bold text-white shadow-[0_4px_20px_rgba(0,0,0,0.3),inset_0_0_0_1px_rgba(255,255,255,0.2)] transition hover:brightness-110"
-                >
-                  {heroCta}
-                  <svg
-                    className="h-5 w-5 rtl:rotate-180"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    aria-hidden
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </Link>
+        <section className="relative overflow-hidden bg-gradient-to-b from-[#f3f5f7] via-white to-white">
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[var(--accent)]/35 to-transparent" />
+          <div className="mx-auto max-w-7xl px-4 pb-16 pt-8 sm:px-6 sm:pb-20 sm:pt-10 lg:px-8">
+            <div className="relative mx-auto max-w-5xl">
+              <div className="rounded-[2rem] bg-[#e8ecf0] px-4 py-6 sm:px-10 sm:py-8">
+                <Image
+                  src={TRANSPOOL24_VAN_IMAGE}
+                  alt="TransPool24"
+                  width={1024}
+                  height={620}
+                  priority
+                  quality={95}
+                  className="mx-auto h-auto w-full max-h-[min(58vh,520px)] object-contain object-center"
+                  sizes="(max-width: 1280px) 92vw, 1024px"
+                  style={{ filter: "drop-shadow(0 22px 36px rgba(13,33,55,0.28))" }}
+                />
               </div>
+            </div>
+            <div className="mx-auto mt-8 max-w-3xl text-center sm:mt-10">
+              <div
+                className="relative inline-block max-w-full rounded-xl border-2 border-white/55 bg-[var(--accent)] px-5 py-4 sm:px-8 sm:py-6 md:px-9 md:py-7"
+                style={{
+                  boxShadow:
+                    "0 8px 32px rgba(232,93,4,0.4), inset 0 0 0 1px rgba(255,255,255,0.3), 0 0 0 3px rgba(255,255,255,0.12)",
+                }}
+              >
+                <div className="absolute left-2 top-2 h-5 w-5 rounded-tl border-l-2 border-t-2 border-white/60" aria-hidden />
+                <div className="absolute right-2 top-2 h-5 w-5 rounded-tr border-r-2 border-t-2 border-white/60" aria-hidden />
+                <div className="absolute bottom-2 left-2 h-5 w-5 rounded-bl border-b-2 border-l-2 border-white/60" aria-hidden />
+                <div className="absolute bottom-2 right-2 h-5 w-5 rounded-br border-b-2 border-r-2 border-white/60" aria-hidden />
+                <h1 className="relative text-2xl font-bold leading-tight text-white sm:text-3xl md:text-4xl lg:text-5xl">
+                  {heroHeadline}
+                </h1>
+              </div>
+              <p className="mt-6 text-lg font-semibold leading-snug text-[#0d2137]/90 sm:text-xl md:text-2xl">
+                {heroSubtitle}
+              </p>
+              <Link
+                href={`/${locale}/order`}
+                className="mt-8 inline-flex items-center gap-2 rounded-xl border-2 border-white/50 bg-[var(--accent)] px-10 py-4 text-lg font-bold text-white shadow-[0_8px_24px_rgba(232,93,4,0.35)] transition hover:brightness-110"
+              >
+                {heroCta}
+                <svg
+                  className="h-5 w-5 rtl:rotate-180"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </Link>
             </div>
           </div>
         </section>
@@ -199,43 +197,45 @@ export default async function HomePage({
             <h2 className="mt-2 max-w-3xl text-3xl font-bold tracking-tight text-[#0d2137] sm:text-4xl">
               {t("driverCta.sectionTitle")}
             </h2>
-            <div className="relative mt-10 min-h-[min(32rem,85vh)] overflow-hidden rounded-3xl shadow-[0_24px_60px_-12px_rgba(0,0,0,0.35)] ring-1 ring-black/10 sm:min-h-[28rem]">
-              <div className="absolute inset-0">
-                <Image
-                  src="/images/5677.png"
-                  alt=""
-                  fill
-                  className="object-cover object-center"
-                  sizes="(max-width: 1280px) 100vw, 1280px"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/88 via-black/55 to-black/30" />
-                <div className="absolute inset-0 bg-gradient-to-r from-black/45 to-transparent rtl:bg-gradient-to-l" />
-              </div>
-              <div className="relative z-10 flex min-h-[min(32rem,85vh)] flex-col justify-end gap-12 px-8 py-12 sm:min-h-[28rem] sm:px-12 sm:py-14 lg:flex-row lg:items-end lg:justify-between lg:gap-16">
-                <div className="max-w-2xl border-s-4 border-[var(--accent)] ps-5 sm:ps-6">
-                  <h3 className="text-3xl font-bold leading-[1.15] text-white drop-shadow-sm sm:text-4xl lg:text-[2.35rem]">
-                    {t("driverCta.headline")}
-                  </h3>
-                  <p className="mt-5 max-w-xl text-base leading-relaxed text-white/92 sm:text-lg">
-                    {t("driverCta.body")}
-                  </p>
+            <div className="relative mt-10 overflow-hidden rounded-3xl bg-[#0d2137] shadow-[0_24px_60px_-12px_rgba(0,0,0,0.35)] ring-1 ring-black/10">
+              <div className="grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.95fr)]">
+                <div className="flex items-center justify-center bg-gradient-to-b from-[#f4f6f8] to-white px-4 py-8 sm:px-8 sm:py-10">
+                  <Image
+                    src={TRANSPOOL24_VAN_IMAGE}
+                    alt=""
+                    width={1024}
+                    height={620}
+                    className="h-auto w-full max-h-[22rem] object-contain"
+                    sizes="(max-width: 1024px) 92vw, 640px"
+                    style={{ filter: "drop-shadow(0 18px 32px rgba(13,33,55,0.18))" }}
+                  />
                 </div>
-                <div className="flex flex-col items-center gap-6 pb-1 lg:items-end">
-                  <div className="relative h-36 w-36 shrink-0 overflow-hidden rounded-full ring-[3px] ring-white/45 shadow-[0_8px_32px_rgba(0,0,0,0.4)] sm:h-40 sm:w-40">
-                    <Image
-                      src="/4566.png"
-                      alt={t("driverCta.logoAlt")}
-                      fill
-                      className="object-cover object-center"
-                      sizes="160px"
-                    />
+                <div className="flex flex-col justify-center gap-10 px-8 py-12 sm:px-12 sm:py-14">
+                  <div className="max-w-2xl border-s-4 border-[var(--accent)] ps-5 sm:ps-6">
+                    <h3 className="text-3xl font-bold leading-[1.15] text-white sm:text-4xl lg:text-[2.35rem]">
+                      {t("driverCta.headline")}
+                    </h3>
+                    <p className="mt-5 max-w-xl text-base leading-relaxed text-white/92 sm:text-lg">
+                      {t("driverCta.body")}
+                    </p>
                   </div>
-                  <Link
-                    href={`/${locale}/driver`}
-                    className="inline-flex w-full min-w-[min(100%,16rem)] max-w-xs items-center justify-center rounded-xl bg-[var(--accent)] px-10 py-4 text-center text-base font-bold text-white shadow-lg transition hover:brightness-110 sm:text-lg"
-                  >
-                    {t("driverSignup")}
-                  </Link>
+                  <div className="flex flex-col items-center gap-6 lg:items-end">
+                    <div className="relative h-36 w-36 shrink-0 overflow-hidden rounded-full ring-[3px] ring-white/45 shadow-[0_8px_32px_rgba(0,0,0,0.4)] sm:h-40 sm:w-40">
+                      <Image
+                        src="/4566.png"
+                        alt={t("driverCta.logoAlt")}
+                        fill
+                        className="object-cover object-center"
+                        sizes="160px"
+                      />
+                    </div>
+                    <Link
+                      href={`/${locale}/driver`}
+                      className="inline-flex w-full min-w-[min(100%,16rem)] max-w-xs items-center justify-center rounded-xl bg-[var(--accent)] px-10 py-4 text-center text-base font-bold text-white shadow-lg transition hover:brightness-110 sm:text-lg"
+                    >
+                      {t("driverSignup")}
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>

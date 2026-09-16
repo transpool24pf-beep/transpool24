@@ -6,8 +6,7 @@ import { useTranslations } from "next-intl";
 import { shouldOpenDriverFormFromDraft } from "@/lib/driver-wizard-storage";
 import { DriverWizardForm } from "./DriverWizardForm";
 import { OrderRouteLottie } from "./OrderRouteLottie";
-
-const HERO_IMAGE = "/images/5677.png";
+import { TRANSPOOL24_VAN_IMAGE } from "@/lib/brand-assets";
 
 export function DriverPageClient({ locale }: { locale: string }) {
   const t = useTranslations("driver.landing");
@@ -75,14 +74,16 @@ export function DriverPageClient({ locale }: { locale: string }) {
                 <p className="mt-4 text-sm text-[#0d2137]/70">{t("heroFootnote")}</p>
               </div>
               <div className="relative">
-                <div className="overflow-hidden rounded-[2rem] bg-[#ff8a00] p-4 shadow-2xl">
+                <div className="overflow-hidden rounded-[2rem] bg-[#e8ecf0] p-4 shadow-2xl ring-1 ring-[#0d2137]/10 sm:p-6">
                   <Image
-                    src={HERO_IMAGE}
+                    src={TRANSPOOL24_VAN_IMAGE}
                     alt={t("vanAlt")}
-                    width={900}
+                    width={1024}
                     height={620}
-                    className="h-[360px] w-full rounded-[1.5rem] object-cover"
+                    className="h-auto w-full object-contain"
                     priority
+                    sizes="(max-width: 1024px) 92vw, 560px"
+                    style={{ filter: "drop-shadow(0 16px 28px rgba(13,33,55,0.16))" }}
                   />
                 </div>
               </div>

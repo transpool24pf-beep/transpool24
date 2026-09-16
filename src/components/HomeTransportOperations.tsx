@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { TRANSPOOL24_VAN_IMAGE } from "@/lib/brand-assets";
 
 type Tile = { id: number; title: string; imageUrl: string; driverPhotoUrl?: string };
 
@@ -35,9 +36,9 @@ export function HomeTransportOperations() {
   const demoTiles: Tile[] = useMemo(
     () => [
       { id: -1, title: t("d1_title"), imageUrl: "/images/445.png" },
-      { id: -2, title: t("d2_title"), imageUrl: "/images/5677.png" },
+      { id: -2, title: t("d2_title"), imageUrl: TRANSPOOL24_VAN_IMAGE },
       { id: -3, title: t("d3_title"), imageUrl: "/images/445.png" },
-      { id: -4, title: t("d4_title"), imageUrl: "/images/5677.png" },
+      { id: -4, title: t("d4_title"), imageUrl: TRANSPOOL24_VAN_IMAGE },
     ],
     [t],
   );

@@ -596,7 +596,7 @@ export function DriverWizardForm({
                 label={t("vehiclePhoto")}
                 value={form.vehiclePhotoUrl}
                 onChange={(url) => update("vehiclePhotoUrl", url)}
-                exampleSrc="/images/5677.png"
+                exampleSrc="/images/transpool24-van.jpg"
                 exampleLabel={t("examplePhoto")}
                 chooseFileOrDrag={t("chooseFileOrDrag")}
                 remove={t("remove")}
