@@ -2,6 +2,7 @@ import { Resend } from "resend";
 import { loadTransactionalEmailBranding } from "@/lib/email";
 import { transactionalEmailSendOptions } from "@/lib/email-addresses";
 import { getPublicSiteUrl } from "@/lib/public-site-url";
+import { buildEmailFooterOrderBlock, loadEmailFooterSocial } from "@/lib/email-footer";
 
 export async function sendOpsStatusReminderEmail(
   to: string,
@@ -15,7 +16,7 @@ export async function sendOpsStatusReminderEmail(
     ? `${site}/de/order/track?job_id=${encodeURIComponent(job.id)}&token=${encodeURIComponent(job.confirmation_token)}`
     : null;
   const resend = new Resend(apiKey);
-  const branding = await loadTransactionalEmailBranding();
+  const [branding, footer] = await Promise.all([loadTransactionalEmailBranding(), loadEmailFooterSocial()]);
   const html = `<!DOCTYPE html>
 <html lang="de"><head><meta charset="utf-8" /></head>
 <body style="margin:0;font-family:'Segoe UI',Tahoma,sans-serif;background:#f4f4f4;">
@@ -32,7 +33,7 @@ ${branding.headerHtml}
         ? `<p style="margin:16px 0 0;font-size:15px;"><a href="${escapeHtml(trackUrl)}" style="color:#0f766e;font-weight:600;">Sendung verfolgen</a></p>`
         : ""
     }
-    <p style="margin:20px 0 0;font-size:13px;color:#64748b;">TransPool24 · Pforzheim &amp; Region</p>
+    ${buildEmailFooterOrderBlock(footer)}
   </div>
 </div>
 </body></html>`;

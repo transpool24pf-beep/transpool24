@@ -350,7 +350,8 @@ function buildDeliveryConfirmationHtml(
     podPhotoUrl: string | null;
     deliveredAtDe: string;
   },
-  branding: TransactionalEmailBranding
+  branding: TransactionalEmailBranding,
+  footer: ResolvedEmailFooter
 ): string {
   const orderRef = job.order_number != null ? String(job.order_number) : job.id.slice(0, 8);
   const companyName = (job.company_name || "").trim() || "Kunde";
@@ -394,6 +395,7 @@ function buildDeliveryConfirmationHtml(
         ${trackBlock}
         ${rateBlock}
         <p style="margin:28px 0 0 0; font-size:13px; color:#94a3b8;">— TransPool24</p>
+        ${buildEmailFooterOrderBlock(footer)}
       </div>
     </td></tr>
   </table>
@@ -428,7 +430,7 @@ export async function sendDeliveryConfirmationEmail(
   const resend = new Resend(apiKey);
   const att = options.podPhotoAttachment;
   try {
-    const branding = await loadTransactionalEmailBranding();
+    const [branding, footer] = await Promise.all([loadTransactionalEmailBranding(), loadEmailFooterSocial()]);
     const podAtt: Attachment[] | undefined =
       att && att.contentBase64.length > 0
         ? [{ filename: att.filename, content: att.contentBase64 }]
@@ -443,7 +445,7 @@ export async function sendDeliveryConfirmationEmail(
         rateDriverUrl: options.rateDriverUrl,
         podPhotoUrl: options.podPhotoUrl,
         deliveredAtDe,
-      }, branding),
+      }, branding, footer),
       ...(mergedAtt?.length ? { attachments: mergedAtt } : {}),
     });
     if (error) {
@@ -499,7 +501,8 @@ Ihr digitaler Logistikpartner in Pforzheim &amp; Region`;
 function buildThankYouDeliveryHtml(
   job: Job,
   options: { deliveryPhotoUrl: string; rateDriverUrl: string },
-  branding: TransactionalEmailBranding
+  branding: TransactionalEmailBranding,
+  footer: ResolvedEmailFooter
 ): string {
   const company = (job.company_name || "").trim();
   const greeting = company
@@ -548,6 +551,7 @@ function buildThankYouDeliveryHtml(
         </div>
         <p style="margin:20px 0 0 0; font-size:15px; line-height:1.6; color:#334155;">${thankYouEmailSignoffHtml()}</p>
         <p style="margin:28px 0 0 0; font-size:13px; color:#94a3b8;">— TransPool24</p>
+        ${buildEmailFooterOrderBlock(footer)}
       </div>
     </td></tr>
   </table>
@@ -574,7 +578,7 @@ export async function sendThankYouDeliveryEmail(
   const resend = new Resend(apiKey);
   const att = options.photoAttachment;
   try {
-    const branding = await loadTransactionalEmailBranding();
+    const [branding, footer] = await Promise.all([loadTransactionalEmailBranding(), loadEmailFooterSocial()]);
     const photoAtt: Attachment[] | undefined =
       att && att.contentBase64.length > 0
         ? [{ filename: att.filename, content: att.contentBase64 }]
@@ -587,7 +591,7 @@ export async function sendThankYouDeliveryEmail(
       html: buildThankYouDeliveryHtml(job, {
         deliveryPhotoUrl: options.deliveryPhotoUrl,
         rateDriverUrl: options.rateDriverUrl,
-      }, branding),
+      }, branding, footer),
       ...(mergedAtt?.length ? { attachments: mergedAtt } : {}),
     });
     if (error) {
@@ -618,7 +622,8 @@ function buildTrackingUpdateHtml(
     googleMapsDirectionsUrl?: string;
     driver?: OrderEmailDriverInfo | null;
   },
-  branding: TransactionalEmailBranding
+  branding: TransactionalEmailBranding,
+  footer: ResolvedEmailFooter
 ): string {
   const headerBlue = "#0d2137";
   const orderRef = job.order_number != null ? String(job.order_number) : job.id.slice(0, 8);
@@ -707,7 +712,7 @@ function buildTrackingUpdateHtml(
             Jetzt live verfolgen
           </a>
         </p>
-        <p style="margin:16px 0 0 0; font-size:12px; color:#94a3b8; text-align:center;">TransPool24 · Pforzheim &amp; Region · Diese E-Mail enthält keinen PDF-Anhang.</p>
+        ${buildEmailFooterOrderBlock(footer)}
       </div>
     </td></tr>
   </table>
@@ -731,13 +736,13 @@ export async function sendTrackingUpdateEmail(
   const orderRef = job.order_number != null ? String(job.order_number) : job.id.slice(0, 8);
   const resend = new Resend(apiKey);
   try {
-    const branding = await loadTransactionalEmailBranding();
+    const [branding, footer] = await Promise.all([loadTransactionalEmailBranding(), loadEmailFooterSocial()]);
     const mergedAtt = mergeAttachmentsWithLogo(branding.logoAttachment);
     const { error } = await resend.emails.send({
       ...transactionalEmailSendOptions(),
       to: [to],
       subject: `TransPool24 – Live-Tracking Auftrag #${orderRef}`,
-      html: buildTrackingUpdateHtml(job, options, branding),
+      html: buildTrackingUpdateHtml(job, options, branding, footer),
       ...(mergedAtt?.length ? { attachments: mergedAtt } : {}),
     });
     if (error) {
