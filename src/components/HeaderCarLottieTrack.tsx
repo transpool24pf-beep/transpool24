@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import type { AnimationItem } from "lottie-web";
 
 const HEADER_VAN_JSON = "/lottie/header-van.json";
 const LOOP_MS = 18000;
@@ -16,14 +17,14 @@ export function HeaderCarLottieTrack() {
   useEffect(() => {
     const host = hostRef.current;
     if (!host) return;
-    let anim: { destroy: () => void; addEventListener: (name: string, cb: () => void) => void } | null = null;
+    let anim: AnimationItem | null = null;
     let cancelled = false;
 
     (async () => {
       const lottie = (await import("lottie-web")).default;
       if (cancelled || !hostRef.current) return;
       host.innerHTML = "";
-      anim = lottie.loadAnimation({
+      const loaded = lottie.loadAnimation({
         container: host,
         renderer: "svg",
         loop: true,
@@ -34,7 +35,8 @@ export function HeaderCarLottieTrack() {
           preserveAspectRatio: "xMidYMax meet",
         },
       });
-      anim.addEventListener("DOMLoaded", () => {
+      anim = loaded;
+      loaded.addEventListener("DOMLoaded", () => {
         const svg = host.querySelector("svg");
         if (!svg) return;
         svg.setAttribute("preserveAspectRatio", "xMidYMax meet");
