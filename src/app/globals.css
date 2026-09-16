@@ -75,78 +75,7 @@ body {
   will-change: transform;
 }
 
-/* Header: same Lottie van LTR. translate3d — iOS Safari often will not animate `left`. */
-@keyframes header-bar-car-ltr {
-  0% {
-    transform: translate3d(-320px, 0, 0);
-  }
-  100% {
-    transform: translate3d(100vw, 0, 0);
-  }
-}
-
-.header-bar-car-mount {
-  width: 300px;
-  height: 300px;
-}
-
-/* Shift artwork down inside the square canvas (van is drawn toward the top of the frame) */
-.header-bar-car-nudge {
-  width: 300px;
-  height: 300px;
-  transform: translateY(104px);
-  transform-origin: top center;
-}
-
-.header-bar-car-inner {
-  width: 300px;
-  height: 300px;
-  flex-shrink: 0;
-  transform: scale(0.42);
-  transform-origin: bottom center;
-  backface-visibility: hidden;
-}
-
-.header-bar-car-rider {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  margin-top: 0;
-  width: 300px;
-  height: auto;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  animation: header-bar-car-ltr 18s linear infinite;
-  -webkit-animation: header-bar-car-ltr 18s linear infinite;
-  will-change: transform;
-  opacity: 1;
-  z-index: 1;
-}
-
-/* Phone header is short and full of buttons: sit the van in the bottom strip and draw it above the nav. */
-@media (max-width: 1023px) {
-  .header-bar-car-layer {
-    z-index: 20;
-  }
-  .header-bar-car-inner {
-    transform: scale(0.34);
-  }
-  .header-bar-car-nudge {
-    transform: translateY(198px);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .header-bar-car-rider {
-    animation: none;
-    -webkit-animation: none;
-    transform: translate3d(calc(50vw - 150px), 0, 0);
-  }
-}
-
-/* Customer tracking: live driver position = round photo filling the pin (no gaps / no Leaflet div border) */
+/* Header van crop/slide is driven in HeaderCarLottieTrack (lottie-web + rAF). *//* Customer tracking: live driver position = round photo filling the pin (no gaps / no Leaflet div border) */
 .leaflet-driver-photo-marker.leaflet-div-icon {
   background: transparent !important;
   border: none !important;

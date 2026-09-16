@@ -1,74 +1,66 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import {
-  ensureDotlottieScript,
-  HEADER_CAR_LOTTIE_SRC,
-  waitForDotlottieWcRegistered,
-} from "@/lib/dotlottie-wc-script";
+
+const HEADER_VAN_JSON = "/lottie/header-van.json";
+const LOOP_MS = 18000;
 
 /**
- * Same Lottie van as desktop: crosses the header bar left → right.
- * Position is driven with requestAnimationFrame so iOS Safari moves it
- * (CSS `left` / sometimes even CSS transform on sticky headers will not).
+ * Same header van as desktop, drawn with lottie-web SVG (works on iOS).
+ * Slides left → right over the toolbar, including across the phone buttons.
  */
 export function HeaderCarLottieTrack() {
-  const mountRef = useRef<HTMLDivElement>(null);
+  const hostRef = useRef<HTMLDivElement>(null);
   const riderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const host = mountRef.current;
+    const host = hostRef.current;
     if (!host) return;
-    let el: HTMLElement | null = null;
+    let anim: { destroy: () => void } | null = null;
     let cancelled = false;
 
     (async () => {
-      try {
-        await ensureDotlottieScript();
-        const ok = await waitForDotlottieWcRegistered();
-        if (cancelled || !ok || !host) return;
-        el = document.createElement("dotlottie-wc") as HTMLElement;
-        el.setAttribute("src", HEADER_CAR_LOTTIE_SRC);
-        el.setAttribute("autoplay", "");
-        el.setAttribute("loop", "");
-        el.setAttribute("background", "transparent");
-        el.style.width = "300px";
-        el.style.height = "300px";
-        el.style.display = "block";
-        host.appendChild(el);
-      } catch {
-        /* optional decoration */
-      }
+      const lottie = (await import("lottie-web")).default;
+      if (cancelled || !hostRef.current) return;
+      host.innerHTML = "";
+      anim = lottie.loadAnimation({
+        container: host,
+        renderer: "svg",
+        loop: true,
+        autoplay: true,
+        path: HEADER_VAN_JSON,
+        rendererSettings: {
+          preserveAspectRatio: "xMidYMid meet",
+        },
+      });
     })();
 
     return () => {
       cancelled = true;
-      if (el && host.contains(el)) host.removeChild(el);
+      anim?.destroy();
     };
   }, []);
 
   useEffect(() => {
     const rider = riderRef.current;
     if (!rider) return;
+
+    const widthOf = () => rider.parentElement?.clientWidth || window.innerWidth;
+    const carW = () => rider.offsetWidth || 112;
+
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      rider.style.transform = `translate3d(${Math.round(window.innerWidth * 0.35)}px,0,0)`;
+      rider.style.transform = `translate3d(${Math.max(0, (widthOf() - carW()) / 2)}px,-50%,0)`;
       return;
     }
 
-    rider.style.animation = "none";
-    rider.style.webkitAnimation = "none";
-
     let raf = 0;
     let start: number | null = null;
-    const duration = 18000;
-
     const tick = (now: number) => {
       if (start == null) start = now;
-      const p = ((now - start) % duration) / duration;
-      const track = rider.parentElement;
-      const w = track?.clientWidth || window.innerWidth;
-      const x = -280 + p * (w + 560);
-      rider.style.transform = `translate3d(${x}px,0,0)`;
+      const p = ((now - start) % LOOP_MS) / LOOP_MS;
+      const w = widthOf();
+      const x = -carW() + p * (w + carW());
+      rider.style.transform = `translate3d(${x}px,-50%,0)`;
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
@@ -77,17 +69,15 @@ export function HeaderCarLottieTrack() {
 
   return (
     <div
-      className="header-bar-car-layer pointer-events-none absolute inset-0 z-20 overflow-hidden lg:z-0"
+      className="pointer-events-none absolute inset-0 z-[40] overflow-hidden"
       dir="ltr"
       aria-hidden
     >
-      <div className="header-bar-car-rider" ref={riderRef}>
-        <div className="header-bar-car-inner">
-          {/* Lottie art sits high in the 300×300 frame; nudge down so wheels sit on header bottom line */}
-          <div className="header-bar-car-nudge">
-            <div className="header-bar-car-mount" ref={mountRef} />
-          </div>
-        </div>
+      <div
+        ref={riderRef}
+        className="absolute top-1/2 h-9 w-[6.5rem] will-change-transform sm:h-10 sm:w-32 md:h-11 md:w-36"
+      >
+        <div ref={hostRef} className="h-full w-full" />
       </div>
     </div>
   );
