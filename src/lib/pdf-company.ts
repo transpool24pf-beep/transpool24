@@ -18,7 +18,9 @@ export const PDF_COMPANY = {
   websiteUrl: "https://www.transpool24.com/de",
   email: "transpool24pf@gmail.com",
   phone: "+49 176 29767442",
-  bankName: "TARGOBANK",
+  /** Invoice template (Numbers / CSV) */
+  invoicePhone: "17622624264",
+  bankName: "Trago Bank",
   iban: "DE64 3002 0900 5321 0926 15",
   bic: "CMCIDEDD",
 } as const;

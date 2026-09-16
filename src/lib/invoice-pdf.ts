@@ -111,6 +111,26 @@ function drawCentered(
   page.drawText(safe, { x: centerX - w / 2, y, size, font, color });
 }
 
+function drawLabelValue(
+  page: PDFPage,
+  font: PDFFont,
+  _fontBold: PDFFont,
+  x: number,
+  y: number,
+  label: string,
+  value: string,
+  labelW: number,
+  valueW: number
+): number {
+  if (label) drawSafe(page, font, label, x, y, 8, MUTED);
+  const lines = wrapLines(value || "", font, 8, valueW);
+  const shown = lines.slice(0, 3);
+  shown.forEach((ln, i) => {
+    drawSafe(page, font, ln, x + (label ? labelW : 0), y - i * 11, 8, TEXT);
+  });
+  return 11 * Math.max(1, shown.length || 1);
+}
+
 function tealBar(page: PDFPage, x: number, yTop: number, w: number, h: number, title: string, fontBold: PDFFont) {
   page.drawRectangle({ x, y: yTop - h, width: w, height: h, color: TEAL });
   drawSafe(page, fontBold, title, x + 8, yTop - h + 5, 8, WHITE);
@@ -200,45 +220,30 @@ export async function generateInvoicePdf(
 
   tealBar(page, leftX, y, colW, 16, "RECHNUNGSEMPFÄNGER", fontBold);
   tealBar(page, rightX, y, colW, 16, "RECHNUNGSAUSSTELLER", fontBold);
-  y -= 22;
+  y -= 24;
 
-  const leftLines: [string, string][] = [
-    ["Kundenname / Firma:", job.company_name || "—"],
-    ["Straße Hausnummer:", addr.street || "—"],
+  const labelW = 118;
+  const valueW = colW - labelW - 8;
+  const leftPairs: [string, string][] = [
+    ["Kundenname / Firma:", job.company_name || ""],
+    ["Straße Hausnummer:", addr.street || ""],
     ["PLZ Ort:", plzOrt],
     ["", "Deutschland"],
     ["Kundennummer (optional):", job.order_number != null ? String(job.order_number) : ""],
   ];
-  const rightLines: [string, string][] = [
+  const rightPairs: [string, string][] = [
     ["", PDF_COMPANY.name],
     ["", PDF_COMPANY.street],
     ["", `${PDF_COMPANY.postalCode} ${PDF_COMPANY.city}`],
     ["", PDF_COMPANY.country],
     ["Steuernummer:", PDF_COMPANY.taxNumber],
   ];
-
-  const rowCount = Math.max(leftLines.length, rightLines.length);
-  for (let i = 0; i < rowCount; i++) {
-    const [ll, lv] = leftLines[i] ?? ["", ""];
-    const [rl, rv] = rightLines[i] ?? ["", ""];
-    if (ll) {
-      drawSafe(page, font, ll, leftX, y, 8, MUTED);
-      const lw = font.widthOfTextAtSize(sanitizeTextForStandardPdfFont(ll), 8);
-      const valLines = wrapLines(lv, font, 8, colW - lw - 10);
-      drawSafe(page, font, valLines[0] || "", leftX + lw + 6, y, 8, TEXT);
-    } else if (lv) {
-      drawSafe(page, font, lv, leftX, y, 8, TEXT);
-    }
-    if (rl) {
-      drawSafe(page, font, rl, rightX, y, 8, MUTED);
-      const lw = font.widthOfTextAtSize(sanitizeTextForStandardPdfFont(rl), 8);
-      drawSafe(page, font, rv, rightX + lw + 6, y, 8, TEXT);
-    } else if (rv) {
-      drawSafe(page, font, rv, rightX, y, 8, TEXT);
-    }
-    y -= 12;
+  for (let i = 0; i < leftPairs.length; i++) {
+    const h1 = drawLabelValue(page, font, fontBold, leftX, y, leftPairs[i][0], leftPairs[i][1], labelW, valueW);
+    const h2 = drawLabelValue(page, font, fontBold, rightX, y, rightPairs[i][0], rightPairs[i][1], 90, colW - 98);
+    y -= Math.max(h1, h2);
   }
-  y -= 10;
+  y -= 12;
 
   drawSafe(
     page,
@@ -394,31 +399,21 @@ export async function generateInvoicePdf(
   ];
   const contactRows: [string, string][] = [
     ["E-Mail:", PDF_COMPANY.email],
-    ["Telefon:", PDF_COMPANY.phone],
-    ["Webseite:", "www.transpool24.com/de"],
+    ["Telefon:", PDF_COMPANY.invoicePhone],
+    ["Webseite:", PDF_COMPANY.websiteUrl],
   ];
   const pairN = Math.max(bankRows.length, contactRows.length);
-  const blockTop = y;
+  let blockY = y;
   for (let i = 0; i < pairN; i++) {
-    const rowY = blockTop - i * 12;
     if (bankRows[i]) {
-      drawSafe(page, fontBold, bankRows[i][0], leftX, rowY, 8, MUTED);
-      drawSafe(page, font, bankRows[i][1], leftX + 88, rowY, 8, TEXT);
+      drawLabelValue(page, font, fontBold, leftX, blockY, bankRows[i][0], bankRows[i][1], 88, colW - 96);
     }
     if (contactRows[i]) {
-      drawSafe(page, fontBold, contactRows[i][0], rightX, rowY, 8, MUTED);
-      drawSafe(page, font, contactRows[i][1], rightX + 58, rowY, 8, TEXT);
+      drawLabelValue(page, font, fontBold, rightX, blockY, contactRows[i][0], contactRows[i][1], 58, colW - 66);
     }
+    blockY -= 13;
   }
-  y = blockTop - pairN * 12 - 18;
-
-  if (type === "customer") {
-    const ps = job.payment_status;
-    const payLabel =
-      ps === "paid" ? "Bezahlt" : ps === "pending" ? "Ausstehend" : ps === "refunded" ? "Erstattet" : ps === "failed" ? "Fehlgeschlagen" : String(ps ?? "—");
-    drawSafe(page, font, `Zahlungsstatus: ${payLabel}`, margin, y, 8, MUTED);
-    y -= 16;
-  }
+  y = blockY - 14;
 
   const thanksLines = wrapLines(
     "Vielen Dank für Ihr Vertrauen in TransPool24 - Ihr zuverlässiger Partner für Transport & Logistik.",
@@ -430,7 +425,7 @@ export async function generateInvoicePdf(
     drawCentered(page, font, ln, pageMid, y, 8, TEAL);
     y -= 12;
   }
-  drawCentered(page, fontBold, "TransPool24  |  Transport & Logistik", pageMid, y, 8, TEAL_DARK);
+  drawCentered(page, fontBold, "TransPool24 · Transport & Logistik", pageMid, y, 8, TEAL_DARK);
 
   return doc.save();
 }
