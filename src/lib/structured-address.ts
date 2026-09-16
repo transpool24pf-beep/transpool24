@@ -75,26 +75,61 @@ export function formatStructuredAddressHtml(a: StructuredAddress, escapeHtml: (s
   return parts.join("<br />");
 }
 
+export function splitStreetHouse(streetPart: string): { street: string; houseNumber: string } {
+  const s = streetPart.trim();
+  const m = s.match(/^(.*\S)\s+(\d+[a-zA-Z]?)$/);
+  if (m) return { street: m[1].trim(), houseNumber: m[2].trim() };
+  return { street: s, houseNumber: "" };
+}
+
 /** Best-effort parse of a one-line German address into structured fields. */
 export function parseStructuredAddressFromLine(line: string): StructuredAddress {
   const t = (line ?? "").trim();
   const base = { ...EMPTY_STRUCTURED_ADDRESS };
   if (!t) return base;
-  const cleaned = t.replace(/,?\s*Deutschland\s*$/i, "").trim();
-  const m = cleaned.match(/^(.*?)[,\s]+(\d{5})\s+(.+)$/);
-  if (m) {
-    const streetPart = m[1].trim().replace(/,$/, "");
-    const hn = streetPart.match(/^(.*\S)\s+(\d+\s*[a-zA-Z]?)$/);
+  let cleaned = t.replace(/,?\s*(Deutschland|Germany|DE)\s*$/i, "").trim();
+
+  let houseNumber = "";
+  const trailingHn = cleaned.match(/,\s*(\d+[a-zA-Z]?)\s*$/);
+  const plzInLine = cleaned.match(/\b(\d{5})\b/)?.[1] ?? "";
+  if (trailingHn && trailingHn[1] !== plzInLine) {
+    houseNumber = trailingHn[1];
+    cleaned = cleaned.slice(0, trailingHn.index).trim();
+  }
+
+  const classic = cleaned.match(/^(.*?)[,\s]+(\d{5})\s*,?\s*(.+)$/);
+  if (classic) {
+    const split = splitStreetHouse(classic[1].trim().replace(/,$/, ""));
+    const city = classic[3].split(",")[0].trim();
     return {
       ...base,
-      street: hn ? hn[1].trim() : streetPart,
-      houseNumber: hn ? hn[2].trim() : "",
-      postalCode: m[2],
-      city: m[3].trim().replace(/,$/, ""),
+      street: split.street,
+      houseNumber: houseNumber || split.houseNumber,
+      postalCode: classic[2],
+      city,
       country: "Deutschland",
     };
   }
-  return { ...base, street: cleaned };
+
+  if (plzInLine) {
+    const parts = cleaned.split(",").map((p) => p.trim()).filter(Boolean);
+    const plzIdx = parts.findIndex((p) => p === plzInLine || p.startsWith(`${plzInLine} `));
+    const before = (plzIdx >= 0 ? parts.slice(0, plzIdx) : parts).join(", ");
+    const after = plzIdx >= 0 ? parts.slice(plzIdx + 1) : [];
+    const cityPart = after.find((p) => !/baden-w(?:ü|u)rttemberg|bayern|hessen|nrw|sachsen/i.test(p)) ?? "";
+    const split = splitStreetHouse(before);
+    return {
+      ...base,
+      street: split.street,
+      houseNumber: houseNumber || split.houseNumber,
+      postalCode: plzInLine,
+      city: cityPart.replace(plzInLine, "").trim(),
+      country: "Deutschland",
+    };
+  }
+
+  const split = splitStreetHouse(cleaned);
+  return { ...base, street: split.street, houseNumber: split.houseNumber };
 }
 
 type JobLike = {
