@@ -161,7 +161,7 @@ function buildConfirmationHtml(
 
 function addressHtmlForJob(job: Job, kind: "pickup" | "delivery"): string {
   const a = kind === "pickup" ? jobSenderAddress(job) : jobRecipientAddress(job);
-  const html = formatStructuredAddressHtml(a, escapeHtml, kind === "pickup" ? "load" : "unload");
+  const html = formatStructuredAddressHtml(a, escapeHtml);
   if (html) return html;
   const line =
     kind === "pickup"
