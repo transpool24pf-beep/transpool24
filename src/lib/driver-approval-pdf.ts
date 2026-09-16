@@ -154,7 +154,7 @@ export async function generateDriverApprovalPdf(app: DriverAppForPdf): Promise<U
     page,
     font,
     fontBold,
-    `Steuer-/Handelsnummer: ${toWinAnsiSafe(app.tax_or_commercial_number?.trim() || "—")}`,
+    `Steuer-/Handelsnummer: ${toWinAnsiSafe(app.tax_or_commercial_number?.trim() || "-")}`,
     {
       y,
       size: 10,

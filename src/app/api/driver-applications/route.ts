@@ -38,9 +38,7 @@ export async function POST(req: Request) {
   if (!email) missing.push("email");
   if (!phone) missing.push("phone");
   if (!city) missing.push("city");
-  if (/^(sonstige|other|autre|altra|otra|altele|inne|diğer|другое|інше|أخرى|yên din|__other__)$/i.test(city)) {
-    missing.push("cityCustom");
-  }
+  else if (/^(sonstige|other|__other__)$/i.test(city)) missing.push("cityCustom");
   if (!tax_or_commercial_number) missing.push("taxOrCommercialNumber");
   if (missing.length) {
     return NextResponse.json(

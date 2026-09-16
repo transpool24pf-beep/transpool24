@@ -31,15 +31,13 @@ export function HeaderCarLottieTrack() {
         autoplay: true,
         path: HEADER_VAN_JSON,
         rendererSettings: {
-          // Pin wheels to the bottom of the box = the header border / road
           preserveAspectRatio: "xMidYMax meet",
         },
-      });
+      }) as AnimationItem & { addEventListener?: (name: string, cb: () => void) => void };
       anim = loaded;
-      loaded.addEventListener("DOMLoaded", () => {
+      loaded.addEventListener?.("DOMLoaded", () => {
         const svg = host.querySelector("svg");
         if (!svg) return;
-        // Crop empty sky/ground in the 1920×1080 comp so wheels sit on the road line
         svg.setAttribute("viewBox", "40 210 1840 620");
         svg.setAttribute("preserveAspectRatio", "xMidYMax meet");
         svg.style.display = "block";
