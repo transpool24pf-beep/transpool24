@@ -205,6 +205,28 @@
       "paletteDesc": "Marchandises palettisées pour le commerce et la production — empilées, étiquetées, prêtes au départ.",
       "teilTitle": "Charges partielles",
       "teilDesc": "Sacs, cartons et lots partiels — regroupés de façon économique sans camion complet."
+    },
+    "speedOptions": {
+      "titleBefore": "Transports et courses courrier adaptés à votre planning :",
+      "titleHighlight": "Efficiency ou Express",
+      "titleAfter": "",
+      "subtitle": "Chez TransPool24, chaque envoi est unique et mérite le bon traitement. Découvrez l’option qui correspond à votre délai.",
+      "more": "afficher plus",
+      "less": "afficher moins",
+      "efficiencyTitle": "Efficiency",
+      "efficiencyLead": "L’option Efficiency est une solution flexible et économique pour les envois planifiables — durabilité et coût en équilibre.",
+      "efficiencyP1": "Plus économique grâce à plus de flexibilité",
+      "efficiencyP2": "Plus de planification et de créneaux",
+      "efficiencyP3": "Plus écologique et durable",
+      "efficiencyMore": "Idéal lorsque l’enlèvement et la livraison peuvent être planifiés. Vous économisez sans renoncer à la fiabilité — à Pforzheim et dans toute l’Allemagne.",
+      "efficiencyCta": "Réserver Efficiency",
+      "expressTitle": "Express",
+      "expressLead": "Avec Express, nous garantissons des courses directes pour vos envois les plus urgents — rapidité et fiabilité d’abord.",
+      "expressP1": "Conçu pour les transports urgents",
+      "expressP2": "Enlèvement et livraison le jour même possibles",
+      "expressP3": "Créneaux horaires fixes disponibles",
+      "expressMore": "Quand il faut partir tout de suite : tournée directe, priorité claire et remise à l’heure. Réservez Express quand chaque heure compte.",
+      "expressCta": "Réserver Express"
     }
   },
   "order": {

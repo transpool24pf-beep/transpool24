@@ -341,6 +341,28 @@
       "paletteDesc": "Palletised goods for trade and production — stacked safely, clearly labelled, ready to roll.",
       "teilTitle": "Partial loads",
       "teilDesc": "Sacks, cartons and mixed partial loads — bundled efficiently when you do not need a full truck."
+    },
+    "speedOptions": {
+      "titleBefore": "Transport and courier runs that fit your schedule:",
+      "titleHighlight": "Efficiency or Express",
+      "titleAfter": "",
+      "subtitle": "At TransPool24 we know every shipment is unique and deserves the right handling. Explore the options that match your timing.",
+      "more": "show more",
+      "less": "show less",
+      "efficiencyTitle": "Efficiency",
+      "efficiencyLead": "Our Efficiency option is a flexible, cost-effective solution for planned shipments — balancing sustainability and cost.",
+      "efficiencyP1": "Cost-efficient through greater flexibility",
+      "efficiencyP2": "More planning certainty and time windows",
+      "efficiencyP3": "More environmentally friendly and sustainable",
+      "efficiencyMore": "Best when pickup and delivery can be scheduled in advance. You save without giving up reliability — in Pforzheim and across Germany.",
+      "efficiencyCta": "Book Efficiency",
+      "expressTitle": "Express",
+      "expressLead": "With Express we guarantee direct courier runs for your most urgent shipments — speed and reliability first.",
+      "expressP1": "Built for time-critical transports",
+      "expressP2": "Same-day pickup and delivery possible",
+      "expressP3": "Fixed appointment availability",
+      "expressMore": "When it has to move now: a direct tour, clear priority and on-time handover. Book Express when every hour counts.",
+      "expressCta": "Book Express"
     }
   },
   "order": {

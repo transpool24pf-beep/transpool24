@@ -205,6 +205,28 @@
       "paletteDesc": "Marfă paletizată pentru comerț și producție — stivuită sigur, gata de plecare.",
       "teilTitle": "Încărcături parțiale",
       "teilDesc": "Saci, cutii și loturi parțiale — grupate economic fără un camion întreg."
+    },
+    "speedOptions": {
+      "titleBefore": "Transporturi și curse de curierat care se potrivesc programului tău:",
+      "titleHighlight": "Efficiency sau Express",
+      "titleAfter": "",
+      "subtitle": "La TransPool24 știm că fiecare livrare e unică și merită tratamentul potrivit. Descoperă opțiunea pentru termenul tău.",
+      "more": "afișează mai mult",
+      "less": "afișează mai puțin",
+      "efficiencyTitle": "Efficiency",
+      "efficiencyLead": "Opțiunea Efficiency este o soluție flexibilă și economică pentru livrări planificabile — sustenabilitate și cost în echilibru.",
+      "efficiencyP1": "Mai economic prin mai multă flexibilitate",
+      "efficiencyP2": "Mai multă planificare și ferestre orare",
+      "efficiencyP3": "Mai prietenos cu mediul și mai durabil",
+      "efficiencyMore": "Ideal când ridicarea și livrarea se pot programa. Economisești fără să renunți la fiabilitate — în Pforzheim și în toată Germania.",
+      "efficiencyCta": "Rezervă Efficiency",
+      "expressTitle": "Express",
+      "expressLead": "Cu Express garantăm curse directe pentru cele mai urgente livrări — viteză și fiabilitate pe primul loc.",
+      "expressP1": "Potrivit pentru transporturi critice ca timp",
+      "expressP2": "Ridicare și livrare în aceeași zi posibile",
+      "expressP3": "Termene fixe disponibile",
+      "expressMore": "Când trebuie să plece imediat: tură directă, prioritate clară și predare la timp. Rezervă Express când fiecare oră contează.",
+      "expressCta": "Rezervă Express"
     }
   },
   "order": {

@@ -205,6 +205,28 @@
       "paletteDesc": "Merce su pallet per commercio e produzione — impilata in sicurezza, pronta a partire.",
       "teilTitle": "Carichi parziali",
       "teilDesc": "Sacchi, cartoni e carichi parziali misti — raggruppati in modo economico senza un camion intero."
+    },
+    "speedOptions": {
+      "titleBefore": "Trasporti e corse corriere che si adattano al tuo orario:",
+      "titleHighlight": "Efficiency o Express",
+      "titleAfter": "",
+      "subtitle": "In TransPool24 ogni spedizione è unica e merita il trattamento giusto. Scopri l’opzione adatta ai tuoi tempi.",
+      "more": "mostra di più",
+      "less": "mostra meno",
+      "efficiencyTitle": "Efficiency",
+      "efficiencyLead": "L’opzione Efficiency è una soluzione flessibile ed economica per spedizioni pianificabili — sostenibilità e costi in equilibrio.",
+      "efficiencyP1": "Più conveniente grazie a maggiore flessibilità",
+      "efficiencyP2": "Più pianificazione e fasce orarie",
+      "efficiencyP3": "Più sostenibile e rispettoso dell’ambiente",
+      "efficiencyMore": "Ideale quando ritiro e consegna si possono pianificare. Risparmi senza rinunciare all’affidabilità — a Pforzheim e in tutta Germania.",
+      "efficiencyCta": "Prenota Efficiency",
+      "expressTitle": "Express",
+      "expressLead": "Con Express garantiamo corse corriere dirette per le spedizioni più urgenti — velocità e affidabilità al primo posto.",
+      "expressP1": "Adatto a trasporti a tempo",
+      "expressP2": "Ritiro e consegna in giornata possibili",
+      "expressP3": "Appuntamenti fissi disponibili",
+      "expressMore": "Quando deve partire subito: giro diretto, priorità chiara e consegna puntuale. Prenota Express quando ogni ora conta.",
+      "expressCta": "Prenota Express"
     }
   },
   "order": {

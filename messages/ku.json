@@ -205,6 +205,28 @@
       "paletteDesc": "Malên paletkirî ji bo bazirganî û hilberînê — ewle hatine danîn, amade ne.",
       "teilTitle": "Barkirinên qismî",
       "teilDesc": "Çewal, qutî û barkirinên qismî — aborî, gava kamyonek temam ne hewce ye."
+    },
+    "speedOptions": {
+      "titleBefore": "Veguhastin û seferên kuryeyê yên li gor dema we:",
+      "titleHighlight": "Efficiency an Express",
+      "titleAfter": "",
+      "subtitle": "Li TransPool24 em dizanin her barkirin taybet e û pêdivî bi nêzîkbûna rast heye. Vebijarka li gor dema xwe bibînin.",
+      "more": "zêdetir nîşan bide",
+      "less": "kêmtir nîşan bide",
+      "efficiencyTitle": "Efficiency",
+      "efficiencyLead": "Vebijarka Efficiency ji bo barkirinên plansaz çareseriyeke nerm û aborî ye — hevsengiya lêçûn û domdariyê.",
+      "efficiencyP1": "Bi nermbûna zêde lêçûn kêm dibe",
+      "efficiencyP2": "Plansazî û paceyên demê zêdetir",
+      "efficiencyP3": "Dostê jîngehê û domdartir",
+      "efficiencyMore": "Gava stendin û teslîmkirin dikarin pêşî werin plansazkirin. Bê windakirina pêbaweriyê teserûf dikin — li Pforzheim û hemû Almanya.",
+      "efficiencyCta": "Efficiency rezerv bike",
+      "expressTitle": "Express",
+      "expressLead": "Bi Express em seferên kuryeyê yên rasterast ji bo barkirinên herî lezgîn garantî dikin — lez û pêbawerî pêşî.",
+      "expressP1": "Ji bo veguhastinên dem-krîtîk guncan",
+      "expressP2": "Stendin û teslîmkirina heman rojê gengaz e",
+      "expressP3": "Demên sabît hene",
+      "expressMore": "Gava pêwîst e niha here: sefereke rasterast, pêşîniya zelal û teslîmkirina di wext de. Express rezerv bikin gava her saet girîng e.",
+      "expressCta": "Express rezerv bike"
     }
   },
   "order": {

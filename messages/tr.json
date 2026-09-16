@@ -204,6 +204,28 @@
       "paletteDesc": "Ticaret ve üretim için paletlenmiş mallar — güvenli istif, net etiket, yola hazır.",
       "teilTitle": "Kısmi yükler",
       "teilDesc": "Çuvallar, kartonlar ve karışık kısmi yükler — tam kamyon gerekmediğinde ekonomik birleştirme."
+    },
+    "speedOptions": {
+      "titleBefore": "Programınıza uyan nakliye ve kurye seferleri:",
+      "titleHighlight": "Efficiency veya Express",
+      "titleAfter": "",
+      "subtitle": "TransPool24 olarak her gönderinin benzersiz olduğunu ve doğru işlemi hak ettiğini biliyoruz. Zamanınıza uyan seçeneği keşfedin.",
+      "more": "daha fazla göster",
+      "less": "daha az göster",
+      "efficiencyTitle": "Efficiency",
+      "efficiencyLead": "Efficiency seçeneği, planlanabilir gönderiler için esnek ve uygun maliyetli bir çözümdür — sürdürülebilirlik ve maliyet dengesi.",
+      "efficiencyP1": "Daha fazla esneklikle daha uygun maliyet",
+      "efficiencyP2": "Daha fazla planlama ve zaman aralıkları",
+      "efficiencyP3": "Daha çevre dostu ve sürdürülebilir",
+      "efficiencyMore": "Alım ve teslimat önceden planlanabildiğinde idealdir. Güvenilirlikten ödün vermeden tasarruf edin — Pforzheim ve tüm Almanya’da.",
+      "efficiencyCta": "Efficiency rezervasyonu",
+      "expressTitle": "Express",
+      "expressLead": "Express ile en acil gönderileriniz için doğrudan kurye seferleri — hız ve güvenilirlik önde.",
+      "expressP1": "Zaman kritik taşımalar için uygun",
+      "expressP2": "Aynı gün alım ve teslim mümkün",
+      "expressP3": "Sabit randevu imkânı",
+      "expressMore": "Hemen gitmesi gerekiyorsa: doğrudan tur, net öncelik ve zamanında teslim. Her saat önemliyse Express rezervasyonu yapın.",
+      "expressCta": "Express rezervasyonu"
     }
   },
   "order": {

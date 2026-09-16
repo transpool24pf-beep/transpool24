@@ -345,6 +345,28 @@
       "paletteDesc": "Palettierte Ware für Handel und Produktion — sicher gestapelt, klar etikettiert, bereit zur Tour.",
       "teilTitle": "Teilladungen",
       "teilDesc": "Säcke, Kartons und gemischte Teilladungen — wirtschaftlich gebündelt, wenn Sie keine volle Lkw-Ladung brauchen."
+    },
+    "speedOptions": {
+      "titleBefore": "Transporte und Kurierfahrten, die zu Ihrem Zeitplan passen:",
+      "titleHighlight": "Efficiency oder Express",
+      "titleAfter": "",
+      "subtitle": "Bei TransPool24 wissen wir, dass jede Sendung einzigartig ist und die passende Behandlung verdient. Entdecken Sie unsere Leistungsoptionen.",
+      "more": "mehr anzeigen",
+      "less": "weniger anzeigen",
+      "efficiencyTitle": "Efficiency",
+      "efficiencyLead": "Unsere Efficiency-Option bietet eine flexible und kosteneffiziente Lösung für planbare Sendungen — Nachhaltigkeit und Kosten im Einklang.",
+      "efficiencyP1": "Kosteneffizient durch mehr Flexibilität",
+      "efficiencyP2": "Mehr Planbarkeit und Zeitfenster",
+      "efficiencyP3": "Umweltfreundlicher und nachhaltiger",
+      "efficiencyMore": "Ideal, wenn Abholung und Zustellung im Voraus geplant werden können. Sie sparen, ohne auf Zuverlässigkeit zu verzichten — in Pforzheim und ganz Deutschland.",
+      "efficiencyCta": "Efficiency buchen",
+      "expressTitle": "Express",
+      "expressLead": "Mit unserer Express-Option garantieren wir direkte Kurierfahrten für Ihre dringendsten Sendungen — Schnelligkeit und Zuverlässigkeit im Vordergrund.",
+      "expressP1": "Geeignet für zeitkritische Transporte",
+      "expressP2": "Taggleiche Abholung und Zustellung möglich",
+      "expressP3": "Verfügbarkeit von Fixterminen",
+      "expressMore": "Wenn es schnell gehen muss: direkte Tour, klare Priorität und pünktliche Übergabe. Buchen Sie Express, wenn jede Stunde zählt.",
+      "expressCta": "Express buchen"
     }
   },
   "order": {

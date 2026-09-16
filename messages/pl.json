@@ -204,6 +204,28 @@
       "paletteDesc": "Towar na paletach dla handlu i produkcji — bezpiecznie ułożony, gotowy do drogi.",
       "teilTitle": "Ładunki częściowe",
       "teilDesc": "Worki, kartony i mieszane ładunki częściowe — ekonomicznie, gdy nie potrzebujesz całej ciężarówki."
+    },
+    "speedOptions": {
+      "titleBefore": "Transport i kursy kurierskie dopasowane do Twojego grafiku:",
+      "titleHighlight": "Efficiency lub Express",
+      "titleAfter": "",
+      "subtitle": "W TransPool24 wiemy, że każda przesyłka jest wyjątkowa i zasługuje na właściwą obsługę. Wybierz opcję dopasowaną do terminu.",
+      "more": "pokaż więcej",
+      "less": "pokaż mniej",
+      "efficiencyTitle": "Efficiency",
+      "efficiencyLead": "Opcja Efficiency to elastyczne i oszczędne rozwiązanie dla planowanych przesyłek — zrównoważenie kosztów i zrównoważonego rozwoju.",
+      "efficiencyP1": "Niższy koszt dzięki większej elastyczności",
+      "efficiencyP2": "Lepsze planowanie i okna czasowe",
+      "efficiencyP3": "Bardziej ekologicznie i zrównoważenie",
+      "efficiencyMore": "Idealne, gdy odbiór i dostawę można zaplanować. Oszczędzasz bez utraty niezawodności — w Pforzheim i w całych Niemczech.",
+      "efficiencyCta": "Zarezerwuj Efficiency",
+      "expressTitle": "Express",
+      "expressLead": "Z Express gwarantujemy bezpośrednie kursy kurierskie dla najpilniejszych przesyłek — szybkość i niezawodność na pierwszym miejscu.",
+      "expressP1": "Dla transportów krytycznych czasowo",
+      "expressP2": "Odbiór i dostawa tego samego dnia możliwe",
+      "expressP3": "Dostępne stałe terminy",
+      "expressMore": "Gdy trzeba ruszyć od razu: bezpośrednia trasa, jasny priorytet i punktualne przekazanie. Zarezerwuj Express, gdy liczy się każda godzina.",
+      "expressCta": "Zarezerwuj Express"
     }
   },
   "order": {

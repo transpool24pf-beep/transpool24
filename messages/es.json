@@ -205,6 +205,28 @@
       "paletteDesc": "Mercancía paletizada para comercio y producción — apilada con seguridad y lista para salir.",
       "teilTitle": "Cargas parciales",
       "teilDesc": "Sacos, cajas y cargas parciales mixtas — agrupadas de forma económica sin un camión completo."
+    },
+    "speedOptions": {
+      "titleBefore": "Transportes y envíos de mensajería que encajan en su agenda:",
+      "titleHighlight": "Efficiency o Express",
+      "titleAfter": "",
+      "subtitle": "En TransPool24 sabemos que cada envío es único y merece el trato adecuado. Descubra la opción que encaja con su plazo.",
+      "more": "mostrar más",
+      "less": "mostrar menos",
+      "efficiencyTitle": "Efficiency",
+      "efficiencyLead": "La opción Efficiency es una solución flexible y económica para envíos planificables, equilibrando sostenibilidad y coste.",
+      "efficiencyP1": "Más económico gracias a mayor flexibilidad",
+      "efficiencyP2": "Más planificación y ventanas horarias",
+      "efficiencyP3": "Más respetuoso con el medio ambiente",
+      "efficiencyMore": "Ideal cuando la recogida y la entrega se pueden planificar. Ahorra sin renunciar a la fiabilidad — en Pforzheim y en toda Alemania.",
+      "efficiencyCta": "Reservar Efficiency",
+      "expressTitle": "Express",
+      "expressLead": "Con Express garantizamos rutas de mensajería directas para sus envíos más urgentes — rapidez y fiabilidad primero.",
+      "expressP1": "Pensado para transportes con plazo crítico",
+      "expressP2": "Recogida y entrega el mismo día posibles",
+      "expressP3": "Citas fijas disponibles",
+      "expressMore": "Cuando hay que moverlo ya: ruta directa, prioridad clara y entrega puntual. Reserve Express cuando cada hora cuenta.",
+      "expressCta": "Reservar Express"
     }
   },
   "order": {
