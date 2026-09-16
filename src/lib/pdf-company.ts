@@ -1,4 +1,4 @@
-/** Shared company data for all PDFs (invoices, driver approval). Logo: 345remov.png */
+/** Shared company data for all PDFs (invoices, driver approval). */
 
 export const PDF_COMPANY = {
   name: "TransPool24",
@@ -45,33 +45,29 @@ export function pdfCompanyFooterLine(): string {
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com";
 
-/** Load logo for PDFs: local transparent file first, then env, then public URL. */
+import { INVOICE_LOGO_PNG_BASE64 } from "./invoice-logo-png";
+
+/** Load logo for PDFs. Prefer the bundled PNG so deploys never keep a stale CDN/env file. */
 export async function getPdfLogoBytes(): Promise<Uint8Array | null> {
+  try {
+    if (INVOICE_LOGO_PNG_BASE64) {
+      return new Uint8Array(Buffer.from(INVOICE_LOGO_PNG_BASE64, "base64"));
+    }
+  } catch {
+    /* fallback */
+  }
   try {
     const { existsSync, readFileSync } = await import("node:fs");
     const { join } = await import("node:path");
-    const candidates = [
-      join(process.cwd(), "public", "invoice-logo.png"),
-      join(process.cwd(), "public", "345remov.png"),
-    ];
-    for (const local of candidates) {
-      if (existsSync(local)) {
-        return new Uint8Array(readFileSync(local));
-      }
+    const local = join(process.cwd(), "public", "invoice-logo.png");
+    if (existsSync(local)) {
+      return new Uint8Array(readFileSync(local));
     }
   } catch {
     /* fallback */
   }
   try {
-    const base64 = process.env.INVOICE_LOGO_BASE64;
-    if (base64 && typeof base64 === "string") {
-      return new Uint8Array(Buffer.from(base64, "base64"));
-    }
-  } catch {
-    /* fallback */
-  }
-  try {
-    const res = await fetch(`${SITE_URL}/invoice-logo.png`);
+    const res = await fetch(`${SITE_URL}/invoice-logo.png?v=20260916c`);
     if (res.ok) {
       const buf = await res.arrayBuffer();
       return new Uint8Array(buf);

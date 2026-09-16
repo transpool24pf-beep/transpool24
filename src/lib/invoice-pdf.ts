@@ -4,10 +4,9 @@ import { getPdfLogoBytes, PDF_COMPANY } from "./pdf-company";
 
 export type InvoiceType = "customer" | "driver";
 
-/** Fill colors from the Numbers Rechnung template */
-/** Header fill from Numbers Vorlage (sampled teal bar). */
-const TEAL = rgb(61 / 255, 137 / 255, 160 / 255);
-const TEAL_DARK = rgb(45 / 255, 105 / 255, 125 / 255);
+/** Header fill: turquoise like the Numbers Vorlage bars (RECHNUNGSEMPFÄNGER). */
+const TEAL = rgb(55 / 255, 186 / 255, 196 / 255);
+const TEAL_DARK = rgb(28 / 255, 130 / 255, 142 / 255);
 const ORANGE = rgb(0.95, 0.48, 0.12);
 const LINE = rgb(0.78, 0.88, 0.87);
 const ROW_BG = rgb(0.94, 0.97, 0.97);
