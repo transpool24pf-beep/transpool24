@@ -723,7 +723,9 @@
     "cityOther": "Sonstige",
     "cityCustom": "Name der Stadt, in der Sie leben",
     "cityCustomPlaceholder": "z. B. Heilbronn",
-    "missingFieldsIntro": "Bitte füllen Sie noch aus:"
+    "missingFieldsIntro": "Bitte füllen Sie noch aus:",
+    "citySearchPlaceholder": "Stadt oder Ort suchen…",
+    "cityNoResults": "Keine Treffer — bitte anders suchen oder Sonstige wählen."
   },
   "driverShare": {
     "pageTitle": "Standort teilen",

@@ -579,7 +579,9 @@
     "cityOther": "Yên din",
     "cityCustom": "Navê bajêr ê ku hûn lê dijîn",
     "cityCustomPlaceholder": "mînak Heilbronn",
-    "missingFieldsIntro": "Ji kerema xwe van qadan tijî bikin:"
+    "missingFieldsIntro": "Ji kerema xwe van qadan tijî bikin:",
+    "citySearchPlaceholder": "Bajar an bajarok bigere…",
+    "cityNoResults": "Encamek nîne — nivîsê biguherînin an Din hilbijêrin."
   },
   "driverShare": {
     "pageTitle": "Cihê xwe parve bikin",

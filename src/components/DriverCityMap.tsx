@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
+import { GERMANY_CITY_COORDS } from "@/lib/germany-cities";
 
 if (typeof window !== "undefined") {
   const DefaultIcon = L.icon({
@@ -16,14 +17,6 @@ if (typeof window !== "undefined") {
 }
 
 const PFORZHEIM: [number, number] = [48.8944, 8.7049];
-
-const CITY_COORDS: Record<string, [number, number]> = {
-  Pforzheim: [48.8944, 8.7049],
-  Stuttgart: [48.7758, 9.1829],
-  Karlsruhe: [49.0069, 8.4037],
-  Mannheim: [49.4875, 8.466],
-  Heidelberg: [49.3988, 8.6724],
-};
 
 const PLACEHOLDER_CITY = /^(sonstige|other|autre|altra|otra|altele|inne|__other__)$/i;
 
@@ -50,7 +43,7 @@ function Recenter({
 export function DriverCityMap({ city }: { city: string }) {
   const trimmed = city.trim();
   const isPlaceholder = !trimmed || PLACEHOLDER_CITY.test(trimmed);
-  const known = !isPlaceholder ? CITY_COORDS[trimmed] : undefined;
+  const known = !isPlaceholder ? GERMANY_CITY_COORDS[trimmed] : undefined;
   const [geo, setGeo] = useState<{
     city: string;
     pos: [number, number];

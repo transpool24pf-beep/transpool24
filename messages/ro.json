@@ -579,7 +579,9 @@
     "cityOther": "Altele",
     "cityCustom": "Numele orașului în care locuiți",
     "cityCustomPlaceholder": "ex. Heilbronn",
-    "missingFieldsIntro": "Completați încă:"
+    "missingFieldsIntro": "Completați încă:",
+    "citySearchPlaceholder": "Caută oraș sau localitate…",
+    "cityNoResults": "Niciun rezultat — încearcă altă scriere sau alege Altele."
   },
   "driverShare": {
     "pageTitle": "Partajați locația dvs",

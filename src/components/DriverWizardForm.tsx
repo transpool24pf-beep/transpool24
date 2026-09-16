@@ -16,14 +16,12 @@ import {
   parseDriverWizardDraft,
   saveDriverWizardDraft,
 } from "@/lib/driver-wizard-storage";
+import { DriverCitySelect, CITY_OTHER } from "@/components/DriverCitySelect";
 
 const DriverCityMap = dynamic(
   () => import("@/components/DriverCityMap").then((m) => m.DriverCityMap),
   { ssr: false }
 );
-
-const LIST_CITIES = ["Pforzheim", "Stuttgart", "Karlsruhe", "Mannheim", "Heidelberg"];
-const CITY_OTHER = "Sonstige";
 /** 3 steps: basics → documents + vehicle → review */
 const STEP_ICONS = ["📋", "🪪", "✓"];
 
@@ -420,22 +418,16 @@ export function DriverWizardForm({
           <div className="space-y-4">
             <div>
               <label className="mb-1 block text-sm font-medium text-[#0d2137]">{t("city")} *</label>
-              <select
+              <DriverCitySelect
                 value={form.city}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  setForm((f) => ({ ...f, city: v, cityCustom: v === CITY_OTHER ? f.cityCustom : "" }));
-                }}
-                className="w-full rounded-xl border border-[#0d2137]/20 bg-white px-4 py-3"
-              >
-                <option value="">{t("cityPlaceholder")}</option>
-                {LIST_CITIES.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-                <option value={CITY_OTHER}>{t("cityOther")}</option>
-              </select>
+                onChange={(v) =>
+                  setForm((f) => ({ ...f, city: v, cityCustom: v === CITY_OTHER ? f.cityCustom : "" }))
+                }
+                placeholder={t("cityPlaceholder")}
+                searchPlaceholder={t("citySearchPlaceholder")}
+                otherLabel={t("cityOther")}
+                noResults={t("cityNoResults")}
+              />
             </div>
             {form.city === CITY_OTHER && (
               <div>

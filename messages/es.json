@@ -579,7 +579,9 @@
     "cityOther": "Otra",
     "cityCustom": "Nombre de la ciudad en la que vive",
     "cityCustomPlaceholder": "p. ej. Heilbronn",
-    "missingFieldsIntro": "Aún debe completar:"
+    "missingFieldsIntro": "Aún debe completar:",
+    "citySearchPlaceholder": "Buscar ciudad o pueblo…",
+    "cityNoResults": "Sin resultados — pruebe otra grafía o elija Otro."
   },
   "driverShare": {
     "pageTitle": "Compartir ubicación",

@@ -577,7 +577,9 @@
     "cityOther": "Другой",
     "cityCustom": "Название города, в котором вы живёте",
     "cityCustomPlaceholder": "напр. Хайльбронн",
-    "missingFieldsIntro": "Заполните ещё:"
+    "missingFieldsIntro": "Заполните ещё:",
+    "citySearchPlaceholder": "Поиск города…",
+    "cityNoResults": "Нет совпадений — попробуйте другое написание или выберите Другое."
   },
   "driverShare": {
     "pageTitle": "Поделитесь своим местоположением",

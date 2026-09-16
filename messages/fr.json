@@ -579,7 +579,9 @@
     "cityOther": "Autre",
     "cityCustom": "Nom de la ville où vous habitez",
     "cityCustomPlaceholder": "ex. Heilbronn",
-    "missingFieldsIntro": "Veuillez encore renseigner :"
+    "missingFieldsIntro": "Veuillez encore renseigner :",
+    "citySearchPlaceholder": "Rechercher une ville…",
+    "cityNoResults": "Aucun résultat — essayez une autre orthographe ou choisissez Autre."
   },
   "driverShare": {
     "pageTitle": "Partager votre position",

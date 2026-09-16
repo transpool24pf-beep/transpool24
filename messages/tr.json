@@ -578,7 +578,9 @@
     "cityOther": "Diğer",
     "cityCustom": "Yaşadığınız şehrin adı",
     "cityCustomPlaceholder": "örn. Heilbronn",
-    "missingFieldsIntro": "Lütfen eksikleri doldurun:"
+    "missingFieldsIntro": "Lütfen eksikleri doldurun:",
+    "citySearchPlaceholder": "Şehir veya kasaba ara…",
+    "cityNoResults": "Sonuç yok — başka yazım deneyin veya Diğer’i seçin."
   },
   "driverShare": {
     "pageTitle": "Konumu paylaş",

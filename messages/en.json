@@ -719,7 +719,9 @@
     "cityOther": "Other",
     "cityCustom": "Name of the city you live in",
     "cityCustomPlaceholder": "e.g. Heilbronn",
-    "missingFieldsIntro": "Please still fill in:"
+    "missingFieldsIntro": "Please still fill in:",
+    "citySearchPlaceholder": "Search city or town…",
+    "cityNoResults": "No matches — try another spelling or choose Other."
   },
   "driverShare": {
     "pageTitle": "Share your location",

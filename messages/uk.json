@@ -578,7 +578,9 @@
     "cityOther": "Інше",
     "cityCustom": "Назва міста, в якому ви живете",
     "cityCustomPlaceholder": "напр. Гайльбронн",
-    "missingFieldsIntro": "Будь ласка, заповніть ще:"
+    "missingFieldsIntro": "Будь ласка, заповніть ще:",
+    "citySearchPlaceholder": "Пошук міста…",
+    "cityNoResults": "Немає збігів — спробуйте інше написання або оберіть Інше."
   },
   "driverShare": {
     "pageTitle": "Share your location",

@@ -585,7 +585,9 @@
     "cityOther": "أخرى",
     "cityCustom": "اسم المدينة التي تعيش فيها",
     "cityCustomPlaceholder": "مثال: هايلبرون",
-    "missingFieldsIntro": "يرجى تعبئة الحقول الناقصة:"
+    "missingFieldsIntro": "يرجى تعبئة الحقول الناقصة:",
+    "citySearchPlaceholder": "ابحث عن مدينة أو بلدة…",
+    "cityNoResults": "لا نتائج — جرّب كتابة أخرى أو اختر أخرى."
   },
   "driverShare": {
     "pageTitle": "مشاركة موقعك",

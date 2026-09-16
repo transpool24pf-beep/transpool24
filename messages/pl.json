@@ -578,7 +578,9 @@
     "cityOther": "Inne",
     "cityCustom": "Nazwa miasta, w którym mieszkasz",
     "cityCustomPlaceholder": "np. Heilbronn",
-    "missingFieldsIntro": "Uzupełnij jeszcze:"
+    "missingFieldsIntro": "Uzupełnij jeszcze:",
+    "citySearchPlaceholder": "Szukaj miasta lub miejscowości…",
+    "cityNoResults": "Brak wyników — spróbuj innej pisowni lub wybierz Inne."
   },
   "driverShare": {
     "pageTitle": "Udostępnij swoją lokalizację",
