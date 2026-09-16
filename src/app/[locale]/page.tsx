@@ -13,8 +13,6 @@ import { getHomepageHero } from "@/lib/homepage-hero";
 import { localeAlternatesAndSocial } from "@/lib/locale-seo-metadata";
 import { TRANSPOOL24_VAN_IMAGE } from "@/lib/brand-assets";
 
-const FALLBACK_IMAGE = "/images/5677.png";
-
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "siteMetadata" });
@@ -38,7 +36,6 @@ export default async function HomePage({
   const t = await getTranslations("home");
   const hero = await getHomepageHero(locale);
 
-  const heroImage = hero.imageUrl || FALLBACK_IMAGE;
   const heroHeadline = hero.headline || t("heroHeadline");
   const heroSubtitle = hero.subtitle || t("subtitle");
   const heroCta = hero.cta || t("cta");
@@ -48,24 +45,23 @@ export default async function HomePage({
       <HomeJsonLd locale={locale} />
       <Header />
       <main className="min-h-[calc(100vh-8rem)]">
-        {/* Hero — full-bleed photo with overlay text (classic homepage) */}
-        <section className="relative min-h-[min(90vh,42rem)] overflow-hidden">
-          <div className="absolute inset-0">
+        <section className="relative isolate min-h-[min(92vh,46rem)] overflow-hidden bg-gradient-to-br from-[#d9e0e8] via-[#eef1f5] to-[#f8f9fb]">
+          <div className="pointer-events-none absolute inset-0 flex items-end justify-center sm:items-center sm:justify-end">
             <Image
-              src={heroImage}
-              alt=""
-              fill
-              className="object-cover object-center"
+              src={TRANSPOOL24_VAN_IMAGE}
+              alt="TransPool24"
+              width={1024}
+              height={620}
               priority
-              quality={100}
-              sizes="100vw"
-              unoptimized={heroImage.startsWith("http")}
+              quality={95}
+              className="h-auto w-[min(100%,72rem)] max-h-[min(88%,40rem)] object-contain object-center sm:me-[-4%] sm:max-h-[92%] sm:w-[min(78%,58rem)] sm:object-right rtl:sm:me-0 rtl:sm:ms-[-4%]"
+              sizes="(max-width: 640px) 100vw, 78vw"
+              style={{ filter: "drop-shadow(0 32px 48px rgba(13,33,55,0.2))" }}
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent rtl:bg-gradient-to-l rtl:from-black/70 rtl:via-black/40 rtl:to-transparent" />
           </div>
-          <div className="relative flex min-h-[min(90vh,42rem)] flex-col justify-center px-4 py-24 sm:px-6 sm:py-32 lg:px-8">
+          <div className="relative z-10 flex min-h-[min(92vh,46rem)] flex-col justify-start px-4 pb-16 pt-10 sm:justify-center sm:px-6 sm:py-24 lg:px-8">
             <div className="mx-auto w-full max-w-7xl">
-              <div className="max-w-2xl">
+              <div className="max-w-xl rounded-3xl bg-white/80 p-5 shadow-[0_18px_50px_-24px_rgba(13,33,55,0.35)] ring-1 ring-white/80 backdrop-blur-md sm:max-w-[32rem] sm:p-8">
                 <div
                   className="relative inline-block max-w-full rounded-xl border-2 border-white/55 bg-[var(--accent)] px-5 py-4 sm:px-8 sm:py-6 md:px-9 md:py-7"
                   style={{
@@ -81,12 +77,12 @@ export default async function HomePage({
                     {heroHeadline}
                   </h1>
                 </div>
-                <p className="mt-6 max-w-2xl text-xl font-semibold leading-snug text-white/95 drop-shadow-sm sm:text-2xl md:text-2xl">
+                <p className="mt-6 max-w-xl text-lg font-semibold leading-snug text-[#0d2137] sm:text-xl md:text-2xl">
                   {heroSubtitle}
                 </p>
                 <Link
                   href={`/${locale}/order`}
-                  className="mt-10 inline-flex items-center gap-2 rounded-xl border-2 border-white/50 bg-[var(--accent)] px-10 py-4 text-lg font-bold text-white shadow-[0_4px_20px_rgba(0,0,0,0.3),inset_0_0_0_1px_rgba(255,255,255,0.2)] transition hover:brightness-110"
+                  className="mt-8 inline-flex items-center gap-2 rounded-xl border-2 border-white/50 bg-[var(--accent)] px-10 py-4 text-lg font-bold text-white shadow-[0_8px_24px_rgba(232,93,4,0.35)] transition hover:brightness-110"
                 >
                   {heroCta}
                   <svg
