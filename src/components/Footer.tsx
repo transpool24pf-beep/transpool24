@@ -6,13 +6,10 @@ import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { locales, type Locale } from "@/i18n/routing";
-import type { SiteSocialMediaPayload } from "@/lib/site-social-media";
+import { resolvedSocialUrls, type SiteSocialMediaPayload } from "@/lib/site-social-media";
 import { LOCALE_NATIVE_LABEL } from "@/lib/locale-display";
 import { LocaleFlagIcon } from "@/components/LocaleFlagIcon";
 import { getPublicContactEmail, getPublicContactMailto } from "@/lib/site-contact";
-
-const FALLBACK_LINKEDIN = "https://www.linkedin.com/in/trans-pool-1235803b8";
-const FALLBACK_INSTAGRAM = "https://www.instagram.com/transpool24/";
 
 function GlobeLayers({ shellInset }: { shellInset: string }) {
   return (
@@ -150,19 +147,14 @@ export function Footer() {
   const basePath = pathWithoutLocale || "/";
 
   type SocialRow = { href: string; label: string; icon: "ig" | "tt" | "li" | "fb" | "yt" };
-  const cmsRows: SocialRow[] = [];
-  if (social?.instagramUrl) cmsRows.push({ href: social.instagramUrl, label: t("socialInstagram"), icon: "ig" });
-  if (social?.tiktokUrl) cmsRows.push({ href: social.tiktokUrl, label: t("socialTiktok"), icon: "tt" });
-  if (social?.linkedinUrl) cmsRows.push({ href: social.linkedinUrl, label: t("socialLinkedin"), icon: "li" });
-  if (social?.facebookUrl) cmsRows.push({ href: social.facebookUrl, label: t("socialFacebook"), icon: "fb" });
-  if (social?.youtubeUrl) cmsRows.push({ href: social.youtubeUrl, label: t("socialYoutube"), icon: "yt" });
-  const socialRows: SocialRow[] =
-    cmsRows.length > 0
-      ? cmsRows
-      : [
-          { href: FALLBACK_LINKEDIN, label: t("socialLinkedin"), icon: "li" },
-          { href: FALLBACK_INSTAGRAM, label: t("socialInstagram"), icon: "ig" },
-        ];
+  const u = resolvedSocialUrls(social);
+  const socialRows: SocialRow[] = [
+    { href: u.instagramUrl, label: t("socialInstagram"), icon: "ig" },
+    { href: u.linkedinUrl, label: t("socialLinkedin"), icon: "li" },
+    { href: u.facebookUrl, label: t("socialFacebook"), icon: "fb" },
+  ];
+  if (u.tiktokUrl) socialRows.push({ href: u.tiktokUrl, label: t("socialTiktok"), icon: "tt" });
+  if (u.youtubeUrl) socialRows.push({ href: u.youtubeUrl, label: t("socialYoutube"), icon: "yt" });
 
   return (
     <div className="w-full" dir={rtl ? "rtl" : "ltr"}>

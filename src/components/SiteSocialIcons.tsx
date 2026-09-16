@@ -1,10 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { SiteSocialMediaPayload } from "@/lib/site-social-media";
-
-const FALLBACK_LINKEDIN = "https://www.linkedin.com/in/trans-pool-1235803b8";
-const FALLBACK_INSTAGRAM = "https://www.instagram.com/transpool24/";
+import { resolvedSocialUrls, type SiteSocialMediaPayload } from "@/lib/site-social-media";
 
 type Kind = "ig" | "tt" | "li" | "fb" | "yt";
 type Row = { href: string; label: string; icon: Kind };
@@ -45,17 +42,15 @@ function glyph(kind: Kind, className: string) {
 }
 
 function rowsFromSocial(social: SiteSocialMediaPayload | null): Row[] {
-  const cms: Row[] = [];
-  if (social?.instagramUrl) cms.push({ href: social.instagramUrl, label: "Instagram", icon: "ig" });
-  if (social?.tiktokUrl) cms.push({ href: social.tiktokUrl, label: "TikTok", icon: "tt" });
-  if (social?.linkedinUrl) cms.push({ href: social.linkedinUrl, label: "LinkedIn", icon: "li" });
-  if (social?.facebookUrl) cms.push({ href: social.facebookUrl, label: "Facebook", icon: "fb" });
-  if (social?.youtubeUrl) cms.push({ href: social.youtubeUrl, label: "YouTube", icon: "yt" });
-  if (cms.length > 0) return cms;
-  return [
-    { href: FALLBACK_LINKEDIN, label: "LinkedIn", icon: "li" },
-    { href: FALLBACK_INSTAGRAM, label: "Instagram", icon: "ig" },
+  const u = resolvedSocialUrls(social);
+  const rows: Row[] = [
+    { href: u.instagramUrl, label: "Instagram", icon: "ig" },
+    { href: u.linkedinUrl, label: "LinkedIn", icon: "li" },
+    { href: u.facebookUrl, label: "Facebook", icon: "fb" },
   ];
+  if (u.tiktokUrl) rows.push({ href: u.tiktokUrl, label: "TikTok", icon: "tt" });
+  if (u.youtubeUrl) rows.push({ href: u.youtubeUrl, label: "YouTube", icon: "yt" });
+  return rows;
 }
 
 export function SiteSocialIcons({
