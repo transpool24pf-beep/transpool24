@@ -49,7 +49,7 @@ export function WebsiteSocialLinksClient() {
       });
       const data = await parseFetchJson<{ error?: string }>(res);
       if (!res.ok) throw new Error(data.error || "فشل الحفظ");
-      setMessage("تم الحفظ. تظهر الروابط في تذييل الموقع.");
+      setMessage("تم الحفظ. تظهر الروابط في تذييل الموقع وفي كل الإيميلات.");
     } catch (e) {
       setMessage(e instanceof Error ? e.message : "فشل الحفظ");
     } finally {
@@ -74,7 +74,7 @@ export function WebsiteSocialLinksClient() {
     <div>
       <h1 className="mb-2 text-2xl font-semibold text-[#0d2137]">وسائل التواصل (التذييل)</h1>
       <p className="mb-6 text-sm text-[#0d2137]/70">
-        روابط إنستغرام وتيك توك ولينكدإن وفيسبوك ويوتيوب. الحقول الفارغة لا تظهر في التذييل. إن لزم الأمر نفّذ جدول{" "}
+        روابط إنستغرام وتيك توك ولينكدإن وفيسبوك ويوتيوب. الحقل الفارغ لا يظهر. الروابط المحفوظة تظهر في تذييل الموقع وفي إيميلات «Folgen Sie uns». إن لزم الأمر نفّذ جدول{" "}
         <code className="rounded bg-[#0d2137]/5 px-1">site_social_media</code> في Supabase (
         <code className="rounded bg-[#0d2137]/5 px-1">supabase/site_social_media.sql</code>).
       </p>

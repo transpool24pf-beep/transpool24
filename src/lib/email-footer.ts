@@ -2,11 +2,14 @@ import { DEFAULT_PUBLIC_CONTACT_EMAIL, getPublicContactEmail } from "@/lib/site-
 import { createServerSupabase } from "@/lib/supabase";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com";
+const ICON_PX = 36;
+const ICON_CACHE = "20260916e";
 
 export type ResolvedEmailFooter = {
   instagramHref: string;
   linkedinHref: string;
   tiktokHref: string;
+  facebookHref: string;
   mailtoPrimary: string;
   mailtoSecondary: string;
   emailDisplayPrimary: string;
@@ -14,9 +17,10 @@ export type ResolvedEmailFooter = {
 };
 
 const DEFAULT: ResolvedEmailFooter = {
-  instagramHref: "https://www.instagram.com/transpool24/",
-  linkedinHref: "https://www.linkedin.com/in/trans-pool-1235803b8",
-  tiktokHref: "https://www.tiktok.com/@transpool24",
+  instagramHref: "",
+  linkedinHref: "",
+  tiktokHref: "",
+  facebookHref: "",
   mailtoPrimary: `mailto:${DEFAULT_PUBLIC_CONTACT_EMAIL}`,
   mailtoSecondary: "mailto:transpool24pf@gmail.com",
   emailDisplayPrimary: DEFAULT_PUBLIC_CONTACT_EMAIL,
@@ -35,14 +39,18 @@ function escapeHref(u: string): string {
   return u.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
 }
 
-function normalizeHttpUrl(raw: string | null | undefined, fallback: string): string {
+function normalizeHttpUrl(raw: string | null | undefined): string {
   const t = (raw ?? "").trim();
-  if (!t) return fallback;
+  if (!t) return "";
   if (/^https?:\/\//i.test(t)) return t;
   return `https://${t}`;
 }
 
-function normalizeEmail(raw: string | null | undefined, fallbackDisplay: string, fallbackMailto: string): { display: string; mailto: string } {
+function normalizeEmail(
+  raw: string | null | undefined,
+  fallbackDisplay: string,
+  fallbackMailto: string
+): { display: string; mailto: string } {
   const t = (raw ?? "").trim();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(t)) {
     return { display: fallbackDisplay, mailto: fallbackMailto };
@@ -54,18 +62,19 @@ type SocialRow = {
   instagram_url: string | null;
   tiktok_url: string | null;
   linkedin_url: string | null;
+  facebook_url: string | null;
   email_footer_email_primary: string | null;
   email_footer_email_secondary: string | null;
 };
 
-/** Load footer links for transactional emails (Supabase + safe fallbacks). */
+/** Load footer links from the same CMS row as /website/social. Empty URL = icon hidden. */
 export async function loadEmailFooterSocial(): Promise<ResolvedEmailFooter> {
   try {
     const supabase = createServerSupabase();
     const { data, error } = await supabase
       .from("site_social_media")
       .select(
-        "instagram_url, tiktok_url, linkedin_url, email_footer_email_primary, email_footer_email_secondary",
+        "instagram_url, tiktok_url, linkedin_url, facebook_url, email_footer_email_primary, email_footer_email_secondary",
       )
       .eq("id", 1)
       .maybeSingle();
@@ -78,9 +87,10 @@ export async function loadEmailFooterSocial(): Promise<ResolvedEmailFooter> {
     );
     const s = normalizeEmail(row.email_footer_email_secondary, DEFAULT.emailDisplaySecondary, DEFAULT.mailtoSecondary);
     return {
-      instagramHref: normalizeHttpUrl(row.instagram_url, DEFAULT.instagramHref),
-      linkedinHref: normalizeHttpUrl(row.linkedin_url, DEFAULT.linkedinHref),
-      tiktokHref: normalizeHttpUrl(row.tiktok_url, DEFAULT.tiktokHref),
+      instagramHref: normalizeHttpUrl(row.instagram_url),
+      linkedinHref: normalizeHttpUrl(row.linkedin_url),
+      tiktokHref: normalizeHttpUrl(row.tiktok_url),
+      facebookHref: normalizeHttpUrl(row.facebook_url),
       mailtoPrimary: p.mailto,
       mailtoSecondary: s.mailto,
       emailDisplayPrimary: p.display,
@@ -91,40 +101,64 @@ export async function loadEmailFooterSocial(): Promise<ResolvedEmailFooter> {
   }
 }
 
-/** Order confirmation card: “Folgen Sie uns” + icons (no email address line) */
+type FooterIcon = { href: string; src: string; alt: string };
+
+function iconList(footer: ResolvedEmailFooter): FooterIcon[] {
+  const items: FooterIcon[] = [];
+  if (footer.instagramHref) {
+    items.push({ href: footer.instagramHref, src: "instagram.png", alt: "Instagram" });
+  }
+  if (footer.tiktokHref) {
+    items.push({ href: footer.tiktokHref, src: "tiktok.png", alt: "TikTok" });
+  }
+  if (footer.linkedinHref) {
+    items.push({ href: footer.linkedinHref, src: "linkedin.png", alt: "LinkedIn" });
+  }
+  if (footer.facebookHref) {
+    items.push({ href: footer.facebookHref, src: "facebook.png", alt: "Facebook" });
+  }
+  if (footer.mailtoPrimary) {
+    items.push({ href: footer.mailtoPrimary, src: "gmail.png", alt: "Gmail" });
+  }
+  return items;
+}
+
+function iconSrc(file: string): string {
+  return `${SITE_URL}/icons/${file}?v=${ICON_CACHE}`;
+}
+
+function followUsIconsTableHtml(footer: ResolvedEmailFooter): string {
+  const icons = iconList(footer);
+  if (icons.length === 0) return "";
+  const cells = icons
+    .map((ic) => {
+      const href = escapeHref(ic.href);
+      const src = escapeHref(iconSrc(ic.src));
+      const alt = escapeHtml(ic.alt);
+      return `<td style="padding:0 8px;vertical-align:middle;"><a href="${href}" target="_blank" rel="noopener" style="display:inline-block;width:${ICON_PX}px;height:${ICON_PX}px;line-height:0;"><img src="${src}" alt="${alt}" width="${ICON_PX}" height="${ICON_PX}" style="display:block;width:${ICON_PX}px;height:${ICON_PX}px;border:0;object-fit:contain;" /></a></td>`;
+    })
+    .join("");
+  return `<table cellpadding="0" cellspacing="0" align="center" role="presentation" style="margin:0 auto;border-collapse:collapse;"><tr>${cells}</tr></table>`;
+}
+
+/** Order confirmation / custom customer mail: “Folgen Sie uns” + CMS icons */
 export function buildEmailFooterOrderBlock(footer: ResolvedEmailFooter): string {
-  const ig = escapeHref(footer.instagramHref);
-  const li = escapeHref(footer.linkedinHref);
-  const tt = escapeHref(footer.tiktokHref);
-  const m1 = escapeHref(footer.mailtoPrimary);
-  const m2 = escapeHref(footer.mailtoSecondary);
+  const table = followUsIconsTableHtml(footer);
+  if (!table) return "";
   return `
         <div style="margin-top: 28px; padding: 24px; background: #ffffff; border-radius: 0 0 12px 12px; text-align: center;">
           <p style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600; color: #0d2137;">Folgen Sie uns</p>
-          <table cellpadding="0" cellspacing="0" align="center" style="margin: 0 auto;">
-            <tr>
-              <td style="padding: 0 10px;"><a href="${ig}" target="_blank" rel="noopener" style="display:inline-block;"><img src="${SITE_URL}/icons/instagram.png" alt="Instagram" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
-              <td style="padding: 0 10px;"><a href="${li}" target="_blank" rel="noopener" style="display:inline-block;"><img src="${SITE_URL}/icons/linkedin.png" alt="LinkedIn" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
-              <td style="padding: 0 10px;"><a href="${tt}" target="_blank" rel="noopener" style="display:inline-block;"><img src="${SITE_URL}/icons/tiktok.png" alt="TikTok" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
-              <td style="padding: 0 10px;"><a href="${m1}" style="display:inline-block;"><img src="${SITE_URL}/icons/gmail.svg" alt="Gmail" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
-              <td style="padding: 0 10px;"><a href="${m2}" style="display:inline-block;"><img src="${SITE_URL}/icons/email.svg" alt="Email" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
-            </tr>
-          </table>
+          ${table}
         </div>`;
 }
 
-/** Driver approval: three network icons only */
+/** Driver approval: same icon set as other mails */
 export function buildEmailFooterApprovalBlock(footer: ResolvedEmailFooter): string {
-  const ig = escapeHref(footer.instagramHref);
-  const li = escapeHref(footer.linkedinHref);
-  const tt = escapeHref(footer.tiktokHref);
+  const table = followUsIconsTableHtml(footer);
+  if (!table) return "";
   return `
             <p style="margin:0 0 12px 0; font-size:12px; color:#0d2137;">Folgen Sie uns</p>
-            <p style="margin:0; font-size:0; line-height:0;">
-              <a href="${ig}" target="_blank" rel="noopener" style="display:inline-block; margin:0 14px; vertical-align:middle;"><img src="${SITE_URL}/icons/instagram.png" alt="Instagram" width="32" height="32" style="display:block; width:32px; height:32px;" /></a>
-              <a href="${li}" target="_blank" rel="noopener" style="display:inline-block; margin:0 14px; vertical-align:middle;"><img src="${SITE_URL}/icons/linkedin.png" alt="LinkedIn" width="32" height="32" style="display:block; width:32px; height:32px;" /></a>
-              <a href="${tt}" target="_blank" rel="noopener" style="display:inline-block; margin:0 14px; vertical-align:middle;"><img src="${SITE_URL}/icons/tiktok.png" alt="TikTok" width="32" height="32" style="display:block; width:32px; height:32px;" /></a>
-            </p>`;
+            ${table}`;
 }
 
 /** Driver payment invoice: icon row + support copy uses secondary email */
@@ -133,19 +167,11 @@ export function buildEmailFooterInvoiceBlock(footer: ResolvedEmailFooter): {
   linkedinLineHtml: string;
   followUsTableHtml: string;
 } {
-  const ig = escapeHref(footer.instagramHref);
-  const li = escapeHref(footer.linkedinHref);
-  const tt = escapeHref(footer.tiktokHref);
   const sec = escapeHtml(footer.emailDisplaySecondary);
   const supportLineHtml = `<p style="margin: 20px 0 0 0; font-size: 14px; color: #666;">Benötigen Sie Unterstützung? TransPool24 Kundenservice – Telefonnummer: +49 176 29767442 – E-Mail: ${sec}</p>`;
-  const linkedinLineHtml = `<p style="margin: 12px 0 0 0; font-size: 13px;"><a href="${li}" style="color:#0d2137;">LinkedIn</a> · Servicezeiten: rund um die Uhr</p>`;
-  const followUsTableHtml = `
-        <table cellpadding="0" cellspacing="0" align="center" style="margin: 0 auto;">
-          <tr>
-            <td style="padding: 0 10px;"><a href="${tt}" target="_blank" rel="noopener"><img src="${SITE_URL}/icons/tiktok.png" alt="TikTok" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
-            <td style="padding: 0 10px;"><a href="${li}" target="_blank" rel="noopener"><img src="${SITE_URL}/icons/linkedin.png" alt="LinkedIn" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
-            <td style="padding: 0 10px;"><a href="${ig}" target="_blank" rel="noopener"><img src="${SITE_URL}/icons/instagram.png" alt="Instagram" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
-          </tr>
-        </table>`;
-  return { supportLineHtml, linkedinLineHtml, followUsTableHtml };
+  const li = escapeHref(footer.linkedinHref);
+  const linkedinLineHtml = footer.linkedinHref
+    ? `<p style="margin: 12px 0 0 0; font-size: 13px;"><a href="${li}" style="color:#0d2137;">LinkedIn</a> · Servicezeiten: rund um die Uhr</p>`
+    : `<p style="margin: 12px 0 0 0; font-size: 13px;">Servicezeiten: rund um die Uhr</p>`;
+  return { supportLineHtml, linkedinLineHtml, followUsTableHtml: followUsIconsTableHtml(footer) };
 }
