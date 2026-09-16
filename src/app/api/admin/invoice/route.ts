@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/admin-api";
-import { generateInvoicePdf } from "@/lib/invoice-pdf";
+import { generateInvoicePdf, invoiceNumberForJob } from "@/lib/invoice-pdf";
 import type { InvoiceType } from "@/lib/invoice-pdf";
 
 export async function GET(req: Request) {
@@ -24,9 +24,10 @@ export async function GET(req: Request) {
   }
   try {
     const pdf = await generateInvoicePdf(job, { type });
+    const invoiceNo = invoiceNumberForJob(job);
     const filename = type === "driver"
-      ? `TransPool24-Gruppe-${String(jobId).slice(0, 8)}.pdf`
-      : `TransPool24-Rechnung-${String(jobId).slice(0, 8)}.pdf`;
+      ? `TransPool24-Gruppe-${invoiceNo}.pdf`
+      : `TransPool24-Rechnung-${invoiceNo}.pdf`;
     return new NextResponse(Buffer.from(pdf), {
       headers: {
         "Content-Type": "application/pdf",

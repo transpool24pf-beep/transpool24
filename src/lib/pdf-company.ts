@@ -5,7 +5,7 @@ export const PDF_COMPANY = {
   /** Registered sole proprietor (Gewerbe-Anmeldung Pforzheim) */
   legalOwner: "Omar Mdeik",
   legalForm: "Einzelunternehmen",
-  street: "Kaiser-Friedrich-Str. 139",
+  street: "Kaiser-Friedrich-Straße 139",
   postalCode: "75172",
   city: "Pforzheim",
   country: "Deutschland",
@@ -15,8 +15,12 @@ export const PDF_COMPANY = {
   /** Steuerliche Identifikationsnummer (IdNr.) */
   taxIdentificationNumber: "28 087 154 391",
   website: "www.transpool24.com",
+  websiteUrl: "https://www.transpool24.com/de",
   email: "transpool24pf@gmail.com",
   phone: "+49 176 29767442",
+  bankName: "TARGOBANK",
+  iban: "DE64 3002 0900 5321 0926 15",
+  bic: "CMCIDEDD",
 } as const;
 
 /** Branding block lines (name, legal entity, address, tax, contact). */
