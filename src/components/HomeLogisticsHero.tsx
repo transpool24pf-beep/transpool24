@@ -31,6 +31,7 @@ function HeroOverlapCard({
   href,
   imageUrl,
   overlay = "brand",
+  imageFit = "cover",
 }: {
   title: string;
   description: string;
@@ -38,6 +39,7 @@ function HeroOverlapCard({
   href: string;
   imageUrl: string;
   overlay?: "brand" | "clear";
+  imageFit?: "cover" | "contain";
 }) {
   const overlayClass =
     overlay === "clear"
@@ -52,13 +54,13 @@ function HeroOverlapCard({
   return (
     <Link
       href={href}
-      className="group relative flex min-h-[200px] w-[min(100%,280px)] flex-col justify-end overflow-hidden rounded-xl shadow-[0_20px_50px_-24px_rgba(0,0,0,0.45)] ring-1 ring-white/20 transition hover:-translate-y-0.5 sm:min-h-[220px] sm:w-[260px]"
+      className={`group relative flex min-h-[200px] w-[min(100%,280px)] flex-col justify-end overflow-hidden rounded-xl shadow-[0_20px_50px_-24px_rgba(0,0,0,0.45)] ring-1 ring-white/20 transition hover:-translate-y-0.5 sm:min-h-[220px] sm:w-[260px] ${imageFit === "contain" ? "bg-white" : ""}`}
     >
       <Image
         src={imageUrl}
         alt=""
         fill
-        className="object-cover transition duration-500 group-hover:scale-105"
+        className={`${imageFit === "contain" ? "object-contain p-3 pb-16" : "object-cover"} transition duration-500 group-hover:scale-105`}
         sizes="280px"
         unoptimized={imageUrl.startsWith("http")}
       />
@@ -94,9 +96,8 @@ export async function HomeLogisticsHero({
   /** Land-freight overlap card, DO Spaces (sharp photo; `overlay="clear"` avoids orange wash). */
   const cardImgRoad =
     "https://sk-bucket.sgp1.cdn.digitaloceanspaces.com/2022/04/24234214/shutterstock_637016899_censored.jpg";
-  /** Second land-service card (no sea/air), loading / last-mile visual */
-  const cardImgLand2 =
-    "https://images.unsplash.com/photo-1616432043562-7a89e2f4e936?w=600&q=80&auto=format&fit=crop";
+  /** Second land-service card: last-mile / express handover */
+  const cardImgLand2 = "/images/blog-card-regional-express.png";
 
   return (
     <section className="relative overflow-visible bg-white">
@@ -169,6 +170,8 @@ export async function HomeLogisticsHero({
               readMore={t("logisticsHero.cardReadMore")}
               href={`/${locale}/order`}
               imageUrl={cardImgLand2}
+              overlay="clear"
+              imageFit="contain"
             />
           </div>
 
