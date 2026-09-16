@@ -75,13 +75,13 @@ body {
   will-change: transform;
 }
 
-/* Header: car crosses left → right (physical), full toolbar width */
+/* Header: same Lottie van LTR. translate3d — iOS Safari often will not animate `left`. */
 @keyframes header-bar-car-ltr {
   0% {
-    left: -320px;
+    transform: translate3d(-320px, 0, 0);
   }
   100% {
-    left: 100%;
+    transform: translate3d(100vw, 0, 0);
   }
 }
 
@@ -119,19 +119,24 @@ body {
   flex-direction: column;
   justify-content: flex-end;
   animation: header-bar-car-ltr 18s linear infinite;
-  will-change: left;
+  will-change: transform;
   opacity: 1;
   z-index: 1;
+}
+
+@media (max-width: 639px) {
+  .header-bar-car-inner {
+    transform: scale(0.28);
+  }
+  .header-bar-car-nudge {
+    transform: translateY(128px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .header-bar-car-rider {
     animation: none;
-    left: 45%;
-    margin-left: -150px;
-    top: 0;
-    bottom: 0;
-    margin-top: 0;
+    transform: translate3d(calc(50vw - 150px), 0, 0);
   }
 }
 

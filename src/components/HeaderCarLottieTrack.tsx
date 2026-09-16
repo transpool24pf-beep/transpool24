@@ -8,8 +8,8 @@ import {
 } from "@/lib/dotlottie-wc-script";
 
 /**
- * Car crosses the header bar left → right (physical), under semi-transparent toolbar.
- * Imperative <dotlottie-wc> — React may not upgrade custom elements from JSX reliably.
+ * Same Lottie van as desktop: crosses the header bar left → right.
+ * Motion uses translate3d so iOS Safari actually runs the track (it often ignores `left`).
  */
 export function HeaderCarLottieTrack() {
   const mountRef = useRef<HTMLDivElement>(null);
@@ -29,6 +29,7 @@ export function HeaderCarLottieTrack() {
         el.setAttribute("src", HEADER_CAR_LOTTIE_SRC);
         el.setAttribute("autoplay", "");
         el.setAttribute("loop", "");
+        el.setAttribute("background", "transparent");
         el.style.width = "300px";
         el.style.height = "300px";
         el.style.display = "block";
