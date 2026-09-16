@@ -130,8 +130,163 @@ export function isCargoCategoryId(id: unknown): id is CargoCategoryId {
 /** Label for PDF, emails, admin — German. */
 export function cargoCategoryLabelDe(id: string | null | undefined): string {
   if (id == null || id === "") return "—";
+  if (isLoadCarrierId(id)) return LOAD_CARRIER_LABEL_DE[id];
   if (isCargoCategoryId(id)) return CARGO_CATEGORY_LABEL_DE[id];
   return LEGACY_CARGO_CATEGORY_LABEL_DE[id] ?? id;
+}
+
+/** Load-carrier types (booking form Loads row — emails/PDF use German labels). */
+export type LoadCarrierId =
+  | "carton"
+  | "container"
+  | "dusseldorf_pallet"
+  | "europallet"
+  | "ftl_mega"
+  | "ftl_semi_trailer"
+  | "glt_long"
+  | "industrial_pallet"
+  | "klt"
+  | "lattice_box"
+  | "non_palletized_custom"
+  | "palletized_custom"
+  | "roll_container"
+  | "twinpallet";
+
+export const LOAD_CARRIER_LABEL_DE: Record<LoadCarrierId, string> = {
+  carton: "Karton",
+  container: "Container",
+  dusseldorf_pallet: "Düsseldorfer Palette",
+  europallet: "Europalette",
+  ftl_mega: "FTL (Mega)",
+  ftl_semi_trailer: "FTL (Sattelauflieger)",
+  glt_long: "GLT lang",
+  industrial_pallet: "Industriepalette",
+  klt: "KLT",
+  lattice_box: "Gitterbox",
+  non_palletized_custom: "nicht palettiert, Sondermaße",
+  palletized_custom: "palettiert, Sondermaße",
+  roll_container: "Rollcontainer",
+  twinpallet: "Twinpalette",
+};
+
+export const LOAD_CARRIERS: { id: LoadCarrierId; labelKey: string }[] = (
+  Object.keys(LOAD_CARRIER_LABEL_DE) as LoadCarrierId[]
+).map((id) => ({
+  id,
+  labelKey: `loadCarrier_${id}`,
+}));
+
+export function isLoadCarrierId(id: unknown): id is LoadCarrierId {
+  return typeof id === "string" && id in LOAD_CARRIER_LABEL_DE;
+}
+
+export type CargoLoadLine = {
+  quantity: number;
+  loadCarrier: LoadCarrierId | "";
+  content: string;
+  lengthCm: number;
+  widthCm: number;
+  heightCm: number;
+  kgPerUnit: number;
+  stackable: boolean;
+  dangerousGoods: boolean;
+};
+
+export function emptyCargoLoadLine(): CargoLoadLine {
+  return {
+    quantity: 1,
+    loadCarrier: "",
+    content: "",
+    lengthCm: 100,
+    widthCm: 20,
+    heightCm: 20,
+    kgPerUnit: 0,
+    stackable: true,
+    dangerousGoods: false,
+  };
+}
+
+function asFiniteNumber(v: unknown, fallback = 0): number {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+export function normalizeCargoLoadLine(raw: unknown): CargoLoadLine {
+  const o = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
+  const carrier = typeof o.loadCarrier === "string" ? o.loadCarrier : "";
+  return {
+    quantity: Math.max(0, Math.floor(asFiniteNumber(o.quantity))),
+    loadCarrier: isLoadCarrierId(carrier) ? carrier : "",
+    content: typeof o.content === "string" ? o.content.trim() : "",
+    lengthCm: Math.max(0, asFiniteNumber(o.lengthCm)),
+    widthCm: Math.max(0, asFiniteNumber(o.widthCm)),
+    heightCm: Math.max(0, asFiniteNumber(o.heightCm)),
+    kgPerUnit: Math.max(0, asFiniteNumber(o.kgPerUnit)),
+    stackable: o.stackable !== false,
+    dangerousGoods: o.dangerousGoods === true,
+  };
+}
+
+export function isCargoLoadLineComplete(line: CargoLoadLine): boolean {
+  return (
+    line.quantity >= 1 &&
+    isLoadCarrierId(line.loadCarrier) &&
+    line.lengthCm > 0 &&
+    line.widthCm > 0 &&
+    line.heightCm > 0 &&
+    line.kgPerUnit > 0
+  );
+}
+
+export function parseCargoLoads(cd: Record<string, unknown> | null | undefined): CargoLoadLine[] {
+  if (!cd || !Array.isArray(cd.loads) || cd.loads.length === 0) return [];
+  return cd.loads.map(normalizeCargoLoadLine);
+}
+
+export function summarizeCargoLoads(loads: CargoLoadLine[]): {
+  packageCount: number;
+  weightKg: number;
+  cargoCategory: LoadCarrierId | "";
+  cargoLengthCm: number;
+  cargoWidthCm: number;
+  cargoHeightCm: number;
+  stackable: boolean;
+  dangerousGoods: boolean;
+} {
+  const complete = loads.filter(isCargoLoadLineComplete);
+  const list = complete.length > 0 ? complete : loads;
+  const packageCount = list.reduce((s, l) => s + Math.max(0, l.quantity), 0);
+  const weightKg = list.reduce((s, l) => s + Math.max(0, l.quantity) * Math.max(0, l.kgPerUnit), 0);
+  const first = list[0];
+  return {
+    packageCount,
+    weightKg: Math.round(weightKg * 100) / 100,
+    cargoCategory: first && isLoadCarrierId(first.loadCarrier) ? first.loadCarrier : "",
+    cargoLengthCm: first?.lengthCm ?? 0,
+    cargoWidthCm: first?.widthCm ?? 0,
+    cargoHeightCm: first?.heightCm ?? 0,
+    stackable: list.every((l) => l.stackable),
+    dangerousGoods: list.some((l) => l.dangerousGoods),
+  };
+}
+
+export function cargoLoadLinePlainDe(line: CargoLoadLine, index?: number, total?: number): string {
+  const prefix = total != null && total > 1 && index != null ? `Ladung ${index + 1}: ` : "";
+  const carrier = isLoadCarrierId(line.loadCarrier)
+    ? LOAD_CARRIER_LABEL_DE[line.loadCarrier]
+    : cargoCategoryLabelDe(line.loadCarrier || null);
+  const content = line.content ? ` | Inhalt: ${line.content}` : "";
+  const dims =
+    line.lengthCm > 0 || line.widthCm > 0 || line.heightCm > 0
+      ? ` | Maße: ${line.lengthCm} × ${line.widthCm} × ${line.heightCm} cm`
+      : "";
+  return `${prefix}${line.quantity}× ${carrier}${content}${dims} | ${line.kgPerUnit} kg/Einheit | Stapelbar: ${line.stackable ? "Ja" : "Nein"} | Gefahrgut: ${line.dangerousGoods ? "Ja" : "Nein"}`;
+}
+
+export function formatCargoLoadsPlainDe(cd: Record<string, unknown> | null | undefined): string {
+  const loads = parseCargoLoads(cd).filter((l) => l.quantity >= 1);
+  if (loads.length === 0) return "";
+  return loads.map((l, i) => cargoLoadLinePlainDe(l, i, loads.length)).join("\n");
 }
 
 export function getCargoCategory(id: CargoCategoryId | string | null) {

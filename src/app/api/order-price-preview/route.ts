@@ -3,7 +3,7 @@ import { rateLimitResponse } from "@/lib/rate-limit";
 import { getBookingsSettings } from "@/lib/bookings-settings";
 import { getPricingSettings } from "@/lib/settings";
 import { computeOrderPricingFromAddresses } from "@/lib/order-pricing-compute";
-import { isCargoCategoryId } from "@/lib/cargo";
+import { isLoadCarrierId } from "@/lib/cargo";
 
 const VALID_CARGO = ["XS", "M", "L"] as const;
 const VALID_SERVICE = ["driver_only", "driver_car", "driver_car_assistant"] as const;
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
     if (!VALID_CARGO.includes(cargoSize)) {
       return NextResponse.json({ error: "Invalid cargo size" }, { status: 400 });
     }
-    if (!isCargoCategoryId(cargoCategory)) {
+    if (!isLoadCarrierId(cargoCategory)) {
       return NextResponse.json({ error: "Invalid category" }, { status: 400 });
     }
     if (!Number.isFinite(weightKg) || weightKg <= 0) {

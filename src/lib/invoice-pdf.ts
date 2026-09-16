@@ -1,7 +1,7 @@
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import type { Job } from "./supabase";
 import { getPdfLogoBytes, pdfCompanyBrandingLines, pdfCompanyFooterLine } from "./pdf-company";
-import { cargoCategoryLabelDe } from "./cargo";
+import { cargoCategoryLabelDe, formatCargoLoadsPlainDe } from "./cargo";
 import { splitGermanVatFromGross } from "./pricing";
 
 export type InvoiceType = "customer" | "driver";
@@ -166,22 +166,26 @@ export async function generateInvoicePdf(
   draw(`Lieferung: ${job.delivery_address}${job.delivery_city ? `, ${job.delivery_city}` : ""}`);
   draw(`Ladung: ${job.cargo_size}`);
   const cd = job.cargo_details as Record<string, unknown> | null;
-  if (cd?.cargoCategory) draw(`Kategorie: ${cargoCategoryLabelDe(String(cd.cargoCategory))}`);
-  if (cd?.cargoLengthCm != null || cd?.cargoWidthCm != null || cd?.cargoHeightCm != null) {
-    const l = cd.cargoLengthCm != null ? `${cd.cargoLengthCm}` : "-";
-    const w = cd.cargoWidthCm != null ? `${cd.cargoWidthCm}` : "-";
-    const h = cd.cargoHeightCm != null ? `${cd.cargoHeightCm}` : "-";
-    draw(`Maße (L×B×H cm): ${l} × ${w} × ${h}`);
-  }
-  const weightKg = cd?.cargoWeightKg ?? cd?.weightKg;
-  if (weightKg != null) draw(`Gewicht: ${weightKg} kg`);
-  if (cd?.packageCount != null && Number(cd.packageCount) >= 1) {
-    draw(`Pakete/Stück: ${cd.packageCount}`);
+  const loadsPlain = formatCargoLoadsPlainDe(cd);
+  if (loadsPlain) {
+    for (const line of loadsPlain.split("\n")) draw(line);
+  } else {
+    if (cd?.cargoCategory) draw(`Kategorie: ${cargoCategoryLabelDe(String(cd.cargoCategory))}`);
+    if (cd?.cargoLengthCm != null || cd?.cargoWidthCm != null || cd?.cargoHeightCm != null) {
+      const l = cd.cargoLengthCm != null ? `${cd.cargoLengthCm}` : "-";
+      const w = cd.cargoWidthCm != null ? `${cd.cargoWidthCm}` : "-";
+      const h = cd.cargoHeightCm != null ? `${cd.cargoHeightCm}` : "-";
+      draw(`Maße (L×B×H cm): ${l} × ${w} × ${h}`);
+    }
+    const weightKg = cd?.cargoWeightKg ?? cd?.weightKg;
+    if (weightKg != null) draw(`Gewicht: ${weightKg} kg`);
+    if (cd?.packageCount != null && Number(cd.packageCount) >= 1) {
+      draw(`Pakete/Stück: ${cd.packageCount}`);
+    }
+    if (cd?.stackable != null) draw(`Stapelbar: ${cd.stackable ? "Ja" : "Nein"}`);
   }
   const photoList = Array.isArray(cd?.photoUrls) ? (cd.photoUrls as unknown[]).filter((u) => typeof u === "string") : [];
   if (photoList.length > 0) draw(`Ladungsfotos: ${photoList.length} (URLs im System)`);
-  if (cd?.cargoType) draw(`Typ: ${String(cd.cargoType)}`);
-  if (cd?.stackable != null) draw(`Stapelbar: ${cd.stackable ? "Ja" : "Nein"}`);
   const st =
     job.service_type === "driver_only"
       ? "Fahrer nur"

@@ -10,7 +10,16 @@ import {
   type PricingOptions,
   type PriceBreakdown,
 } from "@/lib/pricing";
-import { CARGO_CATEGORIES, type CargoCategoryId, LOAD_UNLOAD_TOTAL_MINUTES } from "@/lib/cargo";
+import {
+  emptyCargoLoadLine,
+  isCargoLoadLineComplete,
+  LOAD_CARRIERS,
+  LOAD_UNLOAD_TOTAL_MINUTES,
+  normalizeCargoLoadLine,
+  summarizeCargoLoads,
+  type CargoLoadLine,
+  type LoadCarrierId,
+} from "@/lib/cargo";
 import {
   loadOrderAddressHistory,
   mergePersistedAddresses,
@@ -196,11 +205,9 @@ export type OrderFormData = {
   pickupDate: string;
   pickupTime: string;
   cargoSize: CargoSize;
-  cargoCategory: CargoCategoryId | "";
+  loads: CargoLoadLine[];
   serviceType: ServiceType | "";
   distanceKm: number;
-  cargoWeightKg: number;
-  packageCount: number;
 };
 
 const initial: OrderFormData = {
@@ -212,11 +219,9 @@ const initial: OrderFormData = {
   pickupDate: "",
   pickupTime: "",
   cargoSize: FIXED_CARGO_SIZE,
-  cargoCategory: "",
+  loads: [emptyCargoLoadLine()],
   serviceType: "",
   distanceKm: DEFAULT_KM,
-  cargoWeightKg: 0,
-  packageCount: 0,
 };
 
 export function OrderForm({
@@ -238,10 +243,8 @@ export function OrderForm({
   const phoneRef = useRef<HTMLInputElement>(null);
   const pickupAddressRef = useRef<HTMLInputElement>(null);
   const deliveryAddressRef = useRef<HTMLInputElement>(null);
-  const categoryRef = useRef<HTMLSelectElement>(null);
+  const loadsRef = useRef<HTMLDivElement>(null);
   const serviceTypeRef = useRef<HTMLDivElement>(null);
-  const weightInputRef = useRef<HTMLInputElement>(null);
-  const packageCountInputRef = useRef<HTMLInputElement>(null);
   const photosRef = useRef<HTMLDivElement>(null);
   const [step3Attempted, setStep3Attempted] = useState(false);
   const [step, setStep] = useState(1);
@@ -307,7 +310,15 @@ export function OrderForm({
     const d = loadOrderFormDraft();
     if (d) {
       setStep(Math.min(4, Math.max(1, d.step)));
-      setData({ ...d.data, cargoSize: FIXED_CARGO_SIZE });
+      setData({
+        ...d.data,
+        cargoSize: FIXED_CARGO_SIZE,
+        loads:
+          Array.isArray((d.data as { loads?: unknown }).loads) &&
+          ((d.data as { loads: unknown[] }).loads?.length ?? 0) > 0
+            ? (d.data as { loads: unknown[] }).loads.map(normalizeCargoLoadLine)
+            : [emptyCargoLoadLine()],
+      });
       setPickupDateField(maskPickupDateInput(d.pickupDateField));
       setCargoPhotoUrls(Array.isArray(d.cargoPhotoUrls) ? d.cargoPhotoUrls : []);
       setPhoneCountryCode(d.phoneCountryCode || "+49");
@@ -507,33 +518,39 @@ export function OrderForm({
     return `${countryCode}${digits}`;
   };
 
+  const loads = data.loads?.length ? data.loads : [emptyCargoLoadLine()];
+  const loadSummary = useMemo(() => summarizeCargoLoads(loads), [loads]);
+  const loadsComplete = loads.length > 0 && loads.every(isCargoLoadLineComplete);
+
+  const updateLoad = useCallback((index: number, patch: Partial<CargoLoadLine>) => {
+    setData((prev) => {
+      const next = [...(prev.loads?.length ? prev.loads : [emptyCargoLoadLine()])];
+      next[index] = { ...next[index], ...patch };
+      return { ...prev, loads: next };
+    });
+  }, []);
+
   const step1Complete = data.companyName.trim() !== "" && data.email.trim() !== "" && data.phone.trim() !== "";
   const step2Complete =
     addressCompleteEnoughForOrder(data.pickupAddressLine) && addressCompleteEnoughForOrder(data.deliveryAddressLine);
   const step3Complete =
     data.serviceType !== "" &&
     distanceFromRoute &&
-    data.cargoCategory !== "" &&
-    data.cargoWeightKg > 0 &&
-    data.packageCount >= 1 &&
+    loadsComplete &&
     cargoPhotoUrls.length >= 1;
 
   const step3MissingFields = useMemo(() => {
     const missing: string[] = [];
-    if (!data.cargoCategory) missing.push(t("cargoWhatToTransport"));
+    if (!loadsComplete) missing.push(t("cargoDetails"));
     if (!data.serviceType) missing.push(t("serviceType"));
-    if (data.cargoWeightKg <= 0) missing.push(t("cargoWeightKg"));
-    if (data.packageCount < 1) missing.push(t("packageCount"));
     if (cargoPhotoUrls.length < 1) missing.push(t("cargoPhotosLabel"));
     if (!distanceFromRoute) missing.push(t("distanceRoute"));
     return missing;
   }, [
     cargoPhotoUrls.length,
-    data.cargoCategory,
-    data.cargoWeightKg,
-    data.packageCount,
     data.serviceType,
     distanceFromRoute,
+    loadsComplete,
     t,
   ]);
 
@@ -545,42 +562,16 @@ export function OrderForm({
     [step3Attempted],
   );
 
-  const readPackageCountFromField = useCallback((): number => {
-    const raw = packageCountInputRef.current?.value?.trim();
-    if (raw) {
-      const parsed = Math.floor(Number(raw));
-      if (parsed >= 1) return parsed;
-    }
-    return data.packageCount;
-  }, [data.packageCount]);
-
   const focusStep3FirstMissing = useCallback((): boolean => {
     setStep3Attempted(true);
-    const packageCount = readPackageCountFromField();
-    if (packageCount >= 1 && packageCount !== data.packageCount) {
-      setData((prev) => ({ ...prev, packageCount }));
-    }
-    if (!data.cargoCategory) {
+    if (!loadsComplete) {
       setError(t("step3Incomplete"));
-      categoryRef.current?.focus();
-      categoryRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      loadsRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       return false;
     }
     if (!data.serviceType) {
       setError(t("step3Incomplete"));
       serviceTypeRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-      return false;
-    }
-    if (data.cargoWeightKg <= 0) {
-      setError(t("step3Incomplete"));
-      weightInputRef.current?.focus();
-      weightInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-      return false;
-    }
-    if (packageCount < 1) {
-      setError(t("step3Incomplete"));
-      packageCountInputRef.current?.focus();
-      packageCountInputRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       return false;
     }
     if (cargoPhotoUrls.length < 1) {
@@ -598,12 +589,9 @@ export function OrderForm({
     return true;
   }, [
     cargoPhotoUrls.length,
-    data.cargoCategory,
-    data.cargoWeightKg,
-    data.packageCount,
     data.serviceType,
     distanceFromRoute,
-    readPackageCountFromField,
+    loadsComplete,
     t,
   ]);
 
@@ -643,8 +631,8 @@ export function OrderForm({
                 data.pickupDate && data.pickupTime ? `${data.pickupDate}T${data.pickupTime}` : null,
               cargoSize: FIXED_CARGO_SIZE,
               serviceType: data.serviceType || "driver_car",
-              weightKg: data.cargoWeightKg,
-              cargoCategory: data.cargoCategory,
+              weightKg: loadSummary.weightKg,
+              cargoCategory: loadSummary.cargoCategory,
               distanceKm: distanceFromRoute ? data.distanceKm : undefined,
               durationMinutes: distanceFromRoute ? routeDurationMinutes : undefined,
             }),
@@ -681,8 +669,8 @@ export function OrderForm({
     data.pickupTime,
     data.cargoSize,
     data.serviceType,
-    data.cargoWeightKg,
-    data.cargoCategory,
+    loadSummary.weightKg,
+    loadSummary.cargoCategory,
     data.distanceKm,
     distanceFromRoute,
     routeDurationMinutes,
@@ -1002,17 +990,24 @@ export function OrderForm({
           distanceKm: data.distanceKm,
           priceCents,
           cargoDetails: {
-            weightKg: data.cargoWeightKg,
-            packageCount: data.packageCount,
+            loads,
+            weightKg: loadSummary.weightKg,
+            packageCount: loadSummary.packageCount,
             photoUrls: cargoPhotoUrls,
-            cargoCategory: data.cargoCategory || null,
+            cargoCategory: loadSummary.cargoCategory || null,
+            cargoLengthCm: loadSummary.cargoLengthCm,
+            cargoWidthCm: loadSummary.cargoWidthCm,
+            cargoHeightCm: loadSummary.cargoHeightCm,
+            stackable: loadSummary.stackable,
+            dangerousGoods: loadSummary.dangerousGoods,
           },
         }),
       });
       const json = await res.json();
       if (!res.ok) {
         const err = json.error as string | undefined;
-        if (err === "CARGO_CATEGORY_REQUIRED") throw new Error(t("cargoCategoryRequired"));
+        if (err === "CARGO_LOADS_REQUIRED") throw new Error(t("cargoLoadsRequired"));
+        if (err === "CARGO_CATEGORY_REQUIRED") throw new Error(t("cargoLoadsRequired"));
         if (err === "CARGO_WEIGHT_REQUIRED") throw new Error(t("cargoWeightRequired"));
         if (err === "CARGO_PACKAGES_REQUIRED") throw new Error(t("cargoPackagesRequired"));
         if (err === "CARGO_PHOTOS_REQUIRED") throw new Error(t("cargoPhotosRequired"));
@@ -1462,27 +1457,6 @@ export function OrderForm({
           </h2>
           <div>
             <label className="mb-2 block text-sm font-medium text-[var(--foreground)]">
-              {t("cargoWhatToTransport")}
-            </label>
-            <select
-              ref={categoryRef}
-              value={data.cargoCategory || ""}
-              onChange={(e) => {
-                const id = (e.target.value || "") as CargoCategoryId | "";
-                update({ cargoCategory: id });
-              }}
-              className={`w-full rounded-lg border px-4 py-2.5 text-[var(--foreground)] focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] ${step3FieldWarn(!data.cargoCategory)}`}
-            >
-              <option value="">— {t("cargoSelectCategory")}</option>
-              {CARGO_CATEGORIES.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {t(c.labelKey)}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="mb-2 block text-sm font-medium text-[var(--foreground)]">
               {t("serviceType")}
             </label>
             <div
@@ -1515,50 +1489,156 @@ export function OrderForm({
               <p className="mt-1 text-sm text-amber-700">{t("serviceTypeRequired")}</p>
             )}
           </div>
-          <div className="rounded-lg border border-[#0d2137]/15 bg-[#0d2137]/5 p-4">
+          <div ref={loadsRef} className="rounded-lg border border-[#0d2137]/15 bg-[#0d2137]/5 p-4">
             <p className="mb-1 text-sm font-medium text-[var(--foreground)]">{t("cargoDetails")}</p>
             <p className="mb-3 text-xs text-amber-800">{t("cargoDetailsMandatoryHint")}</p>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <div>
-                <label className="mb-1 block text-xs font-medium text-[var(--foreground)]/80">{t("cargoWeightKg")} *</label>
-                <input
-                  ref={weightInputRef}
-                  type="number"
-                  min={1}
-                  step={1}
-                  inputMode="numeric"
-                  value={data.cargoWeightKg > 0 ? data.cargoWeightKg : ""}
-                  onChange={(e) => update({ cargoWeightKg: Math.max(0, Number(e.target.value) || 0) })}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") e.preventDefault();
-                  }}
-                  placeholder="250"
-                  className={`w-full rounded border px-2 py-1.5 text-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] ${step3FieldWarn(data.cargoWeightKg <= 0)}`}
-                />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-medium text-[var(--foreground)]/80">{t("packageCount")} *</label>
-                <input
-                  ref={packageCountInputRef}
-                  type="number"
-                  min={1}
-                  step={1}
-                  inputMode="numeric"
-                  value={data.packageCount > 0 ? data.packageCount : ""}
-                  onChange={(e) =>
-                    update({ packageCount: Math.max(0, Math.floor(Number(e.target.value) || 0)) })
-                  }
-                  onBlur={() => {
-                    if (data.packageCount < 1) update({ packageCount: 1 });
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") e.preventDefault();
-                  }}
-                  placeholder="1"
-                  className={`w-full rounded border px-2 py-1.5 text-sm focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)] ${step3FieldWarn(data.packageCount < 1)}`}
-                />
-              </div>
+            <div className="space-y-4">
+              {loads.map((line, idx) => (
+                <div
+                  key={idx}
+                  className={`rounded-lg border bg-white p-3 ${step3FieldWarn(!isCargoLoadLineComplete(line))}`}
+                >
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <p className="text-xs font-semibold text-[var(--foreground)]/70">
+                      {t("loadRowLabel")} {idx + 1}
+                    </p>
+                    {loads.length > 1 ? (
+                      <button
+                        type="button"
+                        className="text-xs font-medium text-red-700 hover:underline"
+                        onClick={() =>
+                          setData((prev) => ({
+                            ...prev,
+                            loads: prev.loads.filter((_, i) => i !== idx),
+                          }))
+                        }
+                      >
+                        {t("loadRemove")}
+                      </button>
+                    ) : null}
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+                    <div>
+                      <label className="mb-1 block text-xs font-medium">{t("loadQuantity")} *</label>
+                      <input
+                        type="number"
+                        min={1}
+                        step={1}
+                        inputMode="numeric"
+                        value={line.quantity > 0 ? line.quantity : ""}
+                        onChange={(e) =>
+                          updateLoad(idx, { quantity: Math.max(0, Math.floor(Number(e.target.value) || 0)) })
+                        }
+                        className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
+                      />
+                    </div>
+                    <div className="col-span-2 sm:col-span-2 lg:col-span-2">
+                      <label className="mb-1 block text-xs font-medium">{t("loadCarrier")} *</label>
+                      <select
+                        value={line.loadCarrier}
+                        onChange={(e) =>
+                          updateLoad(idx, { loadCarrier: (e.target.value || "") as LoadCarrierId | "" })
+                        }
+                        className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
+                      >
+                        <option value="">— {t("loadCarrierPlaceholder")}</option>
+                        {LOAD_CARRIERS.map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {t(c.labelKey)}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="col-span-2 sm:col-span-3 lg:col-span-3">
+                      <label className="mb-1 block text-xs font-medium">{t("loadContent")}</label>
+                      <input
+                        type="text"
+                        value={line.content}
+                        onChange={(e) => updateLoad(idx, { content: e.target.value })}
+                        placeholder={t("loadContentPlaceholder")}
+                        className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-medium">{t("cargoLengthCm")} *</label>
+                      <input
+                        type="number"
+                        min={1}
+                        value={line.lengthCm > 0 ? line.lengthCm : ""}
+                        onChange={(e) => updateLoad(idx, { lengthCm: Math.max(0, Number(e.target.value) || 0) })}
+                        className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-medium">{t("cargoWidthCm")} *</label>
+                      <input
+                        type="number"
+                        min={1}
+                        value={line.widthCm > 0 ? line.widthCm : ""}
+                        onChange={(e) => updateLoad(idx, { widthCm: Math.max(0, Number(e.target.value) || 0) })}
+                        className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-medium">{t("cargoHeightCm")} *</label>
+                      <input
+                        type="number"
+                        min={1}
+                        value={line.heightCm > 0 ? line.heightCm : ""}
+                        onChange={(e) => updateLoad(idx, { heightCm: Math.max(0, Number(e.target.value) || 0) })}
+                        className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-medium">{t("loadKgPerUnit")} *</label>
+                      <input
+                        type="number"
+                        min={1}
+                        step={0.1}
+                        value={line.kgPerUnit > 0 ? line.kgPerUnit : ""}
+                        onChange={(e) => updateLoad(idx, { kgPerUnit: Math.max(0, Number(e.target.value) || 0) })}
+                        className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-medium">{t("loadStackable")}</label>
+                      <select
+                        value={line.stackable ? "yes" : "no"}
+                        onChange={(e) => updateLoad(idx, { stackable: e.target.value === "yes" })}
+                        className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
+                      >
+                        <option value="yes">{t("loadYes")}</option>
+                        <option value="no">{t("loadNo")}</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-xs font-medium">{t("loadDangerousGoods")}</label>
+                      <select
+                        value={line.dangerousGoods ? "yes" : "no"}
+                        onChange={(e) => updateLoad(idx, { dangerousGoods: e.target.value === "yes" })}
+                        className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
+                      >
+                        <option value="no">{t("loadNo")}</option>
+                        <option value="yes">{t("loadYes")}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
+            <button
+              type="button"
+              className="mt-3 inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--accent)] text-lg font-bold text-white hover:opacity-90"
+              aria-label={t("loadAdd")}
+              onClick={() =>
+                setData((prev) => ({
+                  ...prev,
+                  loads: [...(prev.loads?.length ? prev.loads : [emptyCargoLoadLine()]), emptyCargoLoadLine()],
+                }))
+              }
+            >
+              +
+            </button>
             <div ref={photosRef} className="mt-4">
               <label
                 htmlFor={cargoPhotoInputId}
@@ -1742,14 +1822,21 @@ export function OrderForm({
                 {data.pickupTime ? data.pickupTime : ""}
               </p>
             )}
-            <p><strong>{t("serviceType")}:</strong> {data.serviceType ? t(SERVICE_OPTIONS.find((o) => o.value === data.serviceType)?.key ?? "serviceDriverCar") : "—"}</p>
-            {data.cargoCategory && (
-              <p><strong>{t("cargoWhatToTransport")}:</strong> {t(CARGO_CATEGORIES.find((c) => c.id === data.cargoCategory)?.labelKey ?? "cargoCatGeneralOther")}</p>
-            )}
+            <p><strong>{t("serviceType")}:</strong>             {data.serviceType ? t(SERVICE_OPTIONS.find((o) => o.value === data.serviceType)?.key ?? "serviceDriverCar") : "—"}</p>
+            {loads.map((line, idx) => (
+              <p key={idx}>
+                <strong>
+                  {t("loadRowLabel")} {idx + 1}:
+                </strong>{" "}
+                {line.quantity}× {line.loadCarrier ? t(`loadCarrier_${line.loadCarrier}`) : "—"}
+                {line.content ? ` · ${line.content}` : ""} · {line.lengthCm}×{line.widthCm}×{line.heightCm} cm ·{" "}
+                {line.kgPerUnit} kg · {t("loadStackable")}: {line.stackable ? t("loadYes") : t("loadNo")} ·{" "}
+                {t("loadDangerousGoods")}: {line.dangerousGoods ? t("loadYes") : t("loadNo")}
+              </p>
+            ))}
             <p><strong>{t("cargoSize")}:</strong> {t("cargoL")}</p>
             <p>
-              <strong>{t("cargoDetails")}:</strong> {data.cargoWeightKg} kg · {t("packageCount")}: {data.packageCount} ·{" "}
-              {t("cargoPhotosLabel")}: {cargoPhotoUrls.length}
+              <strong>{t("cargoPhotosLabel")}:</strong> {cargoPhotoUrls.length}
             </p>
             <p><strong>{t("distance")}:</strong> {data.distanceKm} km</p>
             <div className="pt-2">

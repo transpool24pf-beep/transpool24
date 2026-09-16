@@ -3,7 +3,13 @@ import { createServerSupabase } from "@/lib/supabase";
 import { rateLimitResponse } from "@/lib/rate-limit";
 import { getBookingsSettings } from "@/lib/bookings-settings";
 import { getPricingSettings } from "@/lib/settings";
-import { isCargoCategoryId } from "@/lib/cargo";
+import {
+  isCargoLoadLineComplete,
+  isLoadCarrierId,
+  parseCargoLoads,
+  summarizeCargoLoads,
+  formatCargoLoadsPlainDe,
+} from "@/lib/cargo";
 import { computeOrderPricingFromAddresses } from "@/lib/order-pricing-compute";
 import { addGermanVat19 } from "@/lib/pricing";
 import { randomBytes, randomInt } from "crypto";
@@ -59,14 +65,15 @@ export async function POST(req: Request) {
       );
     }
 
-    const cargoCat = cargoDetails && typeof cargoDetails === "object" ? (cargoDetails as { cargoCategory?: unknown }).cargoCategory : undefined;
-    if (cargoCat == null || cargoCat === "" || !isCargoCategoryId(cargoCat)) {
-      return NextResponse.json({ error: "CARGO_CATEGORY_REQUIRED" }, { status: 400 });
-    }
-
     const cd = cargoDetails && typeof cargoDetails === "object" ? (cargoDetails as Record<string, unknown>) : null;
-    const weightKgRaw = cd?.weightKg != null ? Number(cd.weightKg) : NaN;
-    const packageCountRaw = cd?.packageCount != null ? Number(cd.packageCount) : NaN;
+    const loads = parseCargoLoads(cd).filter(isCargoLoadLineComplete);
+    if (loads.length < 1 || loads.some((l) => !isLoadCarrierId(l.loadCarrier))) {
+      return NextResponse.json({ error: "CARGO_LOADS_REQUIRED" }, { status: 400 });
+    }
+    const loadSummary = summarizeCargoLoads(loads);
+    const weightKgRaw = loadSummary.weightKg;
+    const packageCountRaw = loadSummary.packageCount;
+    const cargoCat = loadSummary.cargoCategory;
     const photoUrlsRaw = Array.isArray(cd?.photoUrls) ? (cd!.photoUrls as unknown[]) : [];
     const photoUrls = photoUrlsRaw.filter(
       (u): u is string => typeof u === "string" && /^https?:\/\//i.test(u.trim())
@@ -164,9 +171,15 @@ export async function POST(req: Request) {
           cargoDetails && typeof cargoDetails === "object"
             ? {
                 ...cargoDetails,
-                cargoCategory: cargoDetails.cargoCategory ?? null,
+                loads,
+                cargoCategory: cargoCat || cargoDetails.cargoCategory || null,
                 weightKg,
                 packageCount: Math.round(packageCountRaw),
+                cargoLengthCm: loadSummary.cargoLengthCm,
+                cargoWidthCm: loadSummary.cargoWidthCm,
+                cargoHeightCm: loadSummary.cargoHeightCm,
+                stackable: loadSummary.stackable,
+                dangerousGoods: loadSummary.dangerousGoods,
                 photoUrls,
                 routeTerrain: p.routeTerrain,
                 routeWeather: p.routeWeather,
@@ -259,7 +272,9 @@ export async function POST(req: Request) {
       `Abholung: ${pickupAddress}`,
       `Lieferung: ${deliveryAddress}`,
       `Ladung: ${cargoSize} | ${distanceKm} km`,
-      `Gewicht: ${weightKg} kg | Stück/Pakete: ${Math.round(packageCountRaw)} | Fotos: ${photoUrls.length}`,
+      formatCargoLoadsPlainDe({ loads }) ||
+        `Gewicht: ${weightKg} kg | Stück/Pakete: ${Math.round(packageCountRaw)}`,
+      `Fotos: ${photoUrls.length}`,
       `Betrag: ${(priceCents / 100).toFixed(2)} EUR`,
       `Ref: ${job.id}`,
     ].join("\n");

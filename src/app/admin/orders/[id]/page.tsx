@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useAdminLocale } from "@/contexts/AdminLocaleContext";
-import { cargoCategoryLabelDe } from "@/lib/cargo";
+import { cargoCategoryLabelDe, formatCargoLoadsPlainDe, parseCargoLoads } from "@/lib/cargo";
 import { odMailT, cargoCategoryAdminLabel, odT } from "@/lib/admin-order-detail-i18n";
 import { serviceTypeLabel } from "@/lib/admin-ui-strings";
 
@@ -66,6 +66,10 @@ function serviceTypeLabelDe(st: string | undefined): string {
 
 /** Ladungsmaße aus cargo_details */
 function cargoVolumeStr(cd: Record<string, unknown> | null): string | null {
+  const loads = parseCargoLoads(cd).filter((l) => l.lengthCm > 0 || l.widthCm > 0 || l.heightCm > 0);
+  if (loads.length > 0) {
+    return loads.map((l) => `${l.lengthCm} × ${l.widthCm} × ${l.heightCm} cm`).join("; ");
+  }
   if (!cd) return null;
   const l = cd.cargoLengthCm ?? cd.lengthCm;
   const w = cd.cargoWidthCm ?? cd.widthCm;
@@ -133,13 +137,17 @@ function buildWhatsAppMessage(o: Job): string {
     `${IC.ruler} Distanz: ${distanceStr}`,
     "",
     `${IC.truck} Ladung (Größe): ${o.cargo_size}`,
-    ...(typeof (o.cargo_details as { cargoCategory?: unknown } | null)?.cargoCategory === "string" &&
-    String((o.cargo_details as { cargoCategory: string }).cargoCategory).length > 0
-      ? [`${IC.clipboard} Warenkategorie: ${cargoCategoryLabelDe((o.cargo_details as { cargoCategory: string }).cargoCategory)}`]
-      : []),
-    ...(volumeStr ? [`${IC.package} Maße (L×B×H): ${volumeStr}`] : []),
-    ...(weightKg != null ? [`${IC.scale} Gewicht: ${weightKg} kg`] : []),
-    ...(packageCount != null ? [`${IC.package} Pakete/Stück: ${packageCount}`] : []),
+    ...(formatCargoLoadsPlainDe(o.cargo_details)
+      ? formatCargoLoadsPlainDe(o.cargo_details).split("\n").map((line) => `${IC.package} ${line}`)
+      : [
+          ...(typeof (o.cargo_details as { cargoCategory?: unknown } | null)?.cargoCategory === "string" &&
+          String((o.cargo_details as { cargoCategory: string }).cargoCategory).length > 0
+            ? [`${IC.clipboard} Warenkategorie: ${cargoCategoryLabelDe((o.cargo_details as { cargoCategory: string }).cargoCategory)}`]
+            : []),
+          ...(volumeStr ? [`${IC.package} Maße (L×B×H): ${volumeStr}`] : []),
+          ...(weightKg != null ? [`${IC.scale} Gewicht: ${weightKg} kg`] : []),
+          ...(packageCount != null ? [`${IC.package} Pakete/Stück: ${packageCount}`] : []),
+        ]),
     ...(photoUrls.length > 0 ? [`📷 Fotos: ${photoUrls.length}`] : []),
     `${IC.lorry} Leistung: ${serviceLabel}`,
     `${IC.building} Firma: ${o.company_name}`,
@@ -654,7 +662,17 @@ export default function AdminOrderDetailPage({
               <dt className="text-[#0d2137]/60">{odT(locale, "od.serviceType")}</dt>
               <dd>{serviceTypeLabel(locale, order.service_type)}</dd>
             </div>
-            {order.cargo_details &&
+            {(() => {
+              const loadsText = formatCargoLoadsPlainDe(order.cargo_details);
+              if (!loadsText) return null;
+              return (
+                <div>
+                  <dt className="text-[#0d2137]/60">{odT(locale, "od.loads")}</dt>
+                  <dd className="whitespace-pre-line">{loadsText}</dd>
+                </div>
+              );
+            })()}
+            {!formatCargoLoadsPlainDe(order.cargo_details) && order.cargo_details &&
               typeof (order.cargo_details as { cargoCategory?: unknown }).cargoCategory === "string" &&
               String((order.cargo_details as { cargoCategory: string }).cargoCategory).length > 0 && (
                 <div>
@@ -664,13 +682,13 @@ export default function AdminOrderDetailPage({
                   </dd>
                 </div>
               )}
-            {(order.cargo_details && (typeof (order.cargo_details as { weightKg?: number }).weightKg === "number" || typeof (order.cargo_details as { cargoWeightKg?: number }).cargoWeightKg === "number")) && (
+            {!formatCargoLoadsPlainDe(order.cargo_details) && (order.cargo_details && (typeof (order.cargo_details as { weightKg?: number }).weightKg === "number" || typeof (order.cargo_details as { cargoWeightKg?: number }).cargoWeightKg === "number")) && (
               <div>
                 <dt className="text-[#0d2137]/60">{odT(locale, "od.weight")}</dt>
                 <dd>{(order.cargo_details as { weightKg?: number; cargoWeightKg?: number }).weightKg ?? (order.cargo_details as { cargoWeightKg?: number }).cargoWeightKg} kg</dd>
               </div>
             )}
-            {order.cargo_details && typeof (order.cargo_details as { packageCount?: unknown }).packageCount === "number" && (
+            {!formatCargoLoadsPlainDe(order.cargo_details) && order.cargo_details && typeof (order.cargo_details as { packageCount?: unknown }).packageCount === "number" && (
               <div>
                 <dt className="text-[#0d2137]/60">{odT(locale, "od.packages")}</dt>
                 <dd>{(order.cargo_details as { packageCount: number }).packageCount}</dd>
