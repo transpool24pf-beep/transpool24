@@ -50,9 +50,14 @@ export async function getPdfLogoBytes(): Promise<Uint8Array | null> {
   try {
     const { existsSync, readFileSync } = await import("node:fs");
     const { join } = await import("node:path");
-    const local = join(process.cwd(), "public", "345remov.png");
-    if (existsSync(local)) {
-      return new Uint8Array(readFileSync(local));
+    const candidates = [
+      join(process.cwd(), "public", "invoice-logo.png"),
+      join(process.cwd(), "public", "345remov.png"),
+    ];
+    for (const local of candidates) {
+      if (existsSync(local)) {
+        return new Uint8Array(readFileSync(local));
+      }
     }
   } catch {
     /* fallback */
@@ -66,7 +71,7 @@ export async function getPdfLogoBytes(): Promise<Uint8Array | null> {
     /* fallback */
   }
   try {
-    const res = await fetch(`${SITE_URL}/345remov.png`);
+    const res = await fetch(`${SITE_URL}/invoice-logo.png`);
     if (res.ok) {
       const buf = await res.arrayBuffer();
       return new Uint8Array(buf);

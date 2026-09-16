@@ -4,15 +4,17 @@ import { getPdfLogoBytes, PDF_COMPANY } from "./pdf-company";
 
 export type InvoiceType = "customer" | "driver";
 
-/** Teal from the Numbers Rechnung template */
-const TEAL = rgb(0.09, 0.62, 0.62);
-const TEAL_DARK = rgb(0.06, 0.42, 0.45);
-const LINE = rgb(0.78, 0.86, 0.86);
-const ROW_BG = rgb(0.95, 0.97, 0.97);
-const GREEN_BG = rgb(0.88, 0.95, 0.88);
+/** Fill colors from the Numbers Rechnung template */
+const TEAL = rgb(0.102, 0.667, 0.651);
+const TEAL_DARK = rgb(0.05, 0.42, 0.42);
+const ORANGE = rgb(0.95, 0.48, 0.12);
+const LINE = rgb(0.78, 0.88, 0.87);
+const ROW_BG = rgb(0.94, 0.97, 0.97);
+const GREEN_BG = rgb(0.89, 0.96, 0.89);
 const TEXT = rgb(0.12, 0.14, 0.18);
 const MUTED = rgb(0.32, 0.38, 0.42);
 const WHITE = rgb(1, 1, 1);
+const LINE_GAP = 16;
 
 /**
  * Standard PDF fonts (Helvetica) use WinAnsi; Arabic, emoji, etc. throw at draw time.
@@ -122,18 +124,18 @@ function drawLabelValue(
   labelW: number,
   valueW: number
 ): number {
-  if (label) drawSafe(page, font, label, x, y, 8, MUTED);
+  if (label) drawSafe(page, font, label, x, y, 9, MUTED);
   const lines = wrapLines(value || "", font, 8, valueW);
   const shown = lines.slice(0, 3);
   shown.forEach((ln, i) => {
-    drawSafe(page, font, ln, x + (label ? labelW : 0), y - i * 11, 8, TEXT);
+    drawSafe(page, font, ln, x + (label ? labelW : 0), y - i * LINE_GAP, 9, TEXT);
   });
-  return 11 * Math.max(1, shown.length || 1);
+  return LINE_GAP * Math.max(1, shown.length || 1);
 }
 
 function tealBar(page: PDFPage, x: number, yTop: number, w: number, h: number, title: string, fontBold: PDFFont) {
   page.drawRectangle({ x, y: yTop - h, width: w, height: h, color: TEAL });
-  drawSafe(page, fontBold, title, x + 8, yTop - h + 5, 8, WHITE);
+  drawSafe(page, fontBold, title, x + 10, yTop - h + 7, 9, WHITE);
 }
 
 export async function generateInvoicePdf(
@@ -176,8 +178,8 @@ export async function generateInvoicePdf(
     };
     try {
       const img = await embed();
-      const imgW = 210;
-      const imgH = Math.min(58, (img.height / img.width) * imgW);
+      const imgW = 236;
+      const imgH = Math.min(78, (img.height / img.width) * imgW);
       logoH = imgH;
       page.drawImage(img, { x: margin, y: y - imgH, width: imgW, height: imgH });
     } catch {
@@ -200,13 +202,13 @@ export async function generateInvoicePdf(
     ["Leistungsdatum:", leistungDate],
   ];
   for (const [k, v] of meta) {
-    drawSafe(page, font, k, metaLabelX, metaY, 8, MUTED);
-    drawRight(page, fontBold, v, metaRight, metaY, 8, TEXT);
-    metaY -= 12;
+    drawSafe(page, font, k, metaLabelX, metaY, 9, MUTED);
+    drawRight(page, fontBold, v, metaRight, metaY, 9, TEXT);
+    metaY -= LINE_GAP;
   }
 
-  drawSafe(page, font, "Transport & Logistik", margin, y - logoH - 12, 9, TEAL);
-  y = Math.min(y - logoH - 22, metaY - 8);
+  drawSafe(page, font, "Transport & Logistik", margin, y - logoH - 14, 11, ORANGE);
+  y = Math.min(y - logoH - 36, metaY - 14);
 
   const colGap = 10;
   const colW = (contentW - colGap) / 2;
@@ -218,9 +220,9 @@ export async function generateInvoicePdf(
     addr.plzOrt ||
     (job.pickup_city ? `${job.pickup_city}` : "—");
 
-  tealBar(page, leftX, y, colW, 16, "RECHNUNGSEMPFÄNGER", fontBold);
-  tealBar(page, rightX, y, colW, 16, "RECHNUNGSAUSSTELLER", fontBold);
-  y -= 24;
+  tealBar(page, leftX, y, colW, 20, "RECHNUNGSEMPFÄNGER", fontBold);
+  tealBar(page, rightX, y, colW, 20, "RECHNUNGSAUSSTELLER", fontBold);
+  y -= 32;
 
   const labelW = 118;
   const valueW = colW - labelW - 8;
@@ -241,9 +243,9 @@ export async function generateInvoicePdf(
   for (let i = 0; i < leftPairs.length; i++) {
     const h1 = drawLabelValue(page, font, fontBold, leftX, y, leftPairs[i][0], leftPairs[i][1], labelW, valueW);
     const h2 = drawLabelValue(page, font, fontBold, rightX, y, rightPairs[i][0], rightPairs[i][1], 90, colW - 98);
-    y -= Math.max(h1, h2);
+    y -= Math.max(h1, h2) + 2;
   }
-  y -= 12;
+  y -= 16;
 
   drawSafe(
     page,
@@ -251,9 +253,9 @@ export async function generateInvoicePdf(
     "Hiermit berechnen wir Ihnen folgende Transportdienstleistung:",
     margin,
     y,
-    9
+    10
   );
-  y -= 14;
+  y -= 18;
 
   type LineItem = { pos: number; art: string; name: string; qty: string; unit: string; unitCents: number };
   const items: LineItem[] = [
@@ -289,20 +291,20 @@ export async function generateInvoicePdf(
   const tableW = cols.reduce((s, c) => s + c.w, 0);
   const headers = ["Pos.", "Art.-Nr.", "Bezeichnung", "Anzahl", "Einheit", "Einzelpreis", "Gesamtpreis"];
 
-  page.drawRectangle({ x: margin, y: y - 16, width: tableW, height: 16, color: TEAL });
+  page.drawRectangle({ x: margin, y: y - 20, width: tableW, height: 20, color: TEAL });
   let hx = margin;
   headers.forEach((h, i) => {
     const c = cols[i];
-    const tw = fontBold.widthOfTextAtSize(h, 7.5);
+    const tw = fontBold.widthOfTextAtSize(h, 8);
     const tx =
       c.align === "right" ? hx + c.w - 5 - tw : c.align === "center" ? hx + (c.w - tw) / 2 : hx + 4;
-    drawSafe(page, fontBold, h, tx, y - 11, 7.5, WHITE);
+    drawSafe(page, fontBold, h, tx, y - 13, 8, WHITE);
     hx += c.w;
   });
-  y -= 16;
+  y -= 20;
 
   items.forEach((item, idx) => {
-    const rowH = 22;
+    const rowH = 26;
     page.drawRectangle({
       x: margin,
       y: y - rowH,
@@ -326,10 +328,10 @@ export async function generateInvoicePdf(
       const c = cols[i];
       const f = i >= 5 ? fontBold : font;
       const safe = sanitizeTextForStandardPdfFont(val);
-      const tw = f.widthOfTextAtSize(safe, 8);
+      const tw = f.widthOfTextAtSize(safe, 9);
       const tx =
         c.align === "right" ? cx + c.w - 5 - tw : c.align === "center" ? cx + (c.w - tw) / 2 : cx + 4;
-      drawSafe(page, f, val, tx, y - 14, 8);
+      drawSafe(page, f, val, tx, y - 16, 9);
       cx += c.w;
     });
     y -= rowH;
@@ -338,59 +340,59 @@ export async function generateInvoicePdf(
   const totalCents = type === "driver" && hasAssistant ? amountCents + assistantCents : amountCents;
   const sumW = 200;
   const sumX = margin + tableW - sumW;
-  y -= 2;
+  y -= 8;
   page.drawLine({
     start: { x: sumX, y },
     end: { x: margin + tableW, y },
-    thickness: 1.2,
+    thickness: 1.4,
     color: TEAL,
   });
-  y -= 16;
-  drawSafe(page, fontBold, "Gesamtsumme", sumX + 8, y, 9, TEAL_DARK);
-  drawRight(page, fontBold, formatEur(totalCents), margin + tableW - 4, y, 9, TEAL_DARK);
+  y -= 18;
+  drawSafe(page, fontBold, "Gesamtsumme", sumX + 8, y, 10, TEAL);
+  drawRight(page, fontBold, formatEur(totalCents), margin + tableW - 4, y, 10, TEAL);
   page.drawLine({
-    start: { x: sumX, y: y - 6 },
-    end: { x: margin + tableW, y: y - 6 },
-    thickness: 1.2,
+    start: { x: sumX, y: y - 8 },
+    end: { x: margin + tableW, y: y - 8 },
+    thickness: 1.4,
     color: TEAL,
   });
-  y -= 22;
+  y -= 28;
 
   page.drawRectangle({
     x: margin,
-    y: y - 22,
+    y: y - 28,
     width: contentW,
-    height: 22,
+    height: 28,
     color: GREEN_BG,
   });
   drawSafe(
     page,
     font,
     "Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.",
-    margin + 8,
-    y - 14,
-    8,
+    margin + 10,
+    y - 17,
+    9,
     TEAL_DARK
   );
-  y -= 34;
+  y -= 44;
 
-  tealBar(page, margin, y, contentW, 16, "ZAHLUNGSBEDINGUNGEN", fontBold);
-  y -= 28;
+  tealBar(page, margin, y, contentW, 20, "ZAHLUNGSBEDINGUNGEN", fontBold);
+  y -= 34;
   const payLines = wrapLines(
     "Bitte überweisen Sie den Gesamtbetrag innerhalb von 7 Tagen nach Rechnungserhalt auf das unten angegebene Konto.",
     font,
-    8,
+    9,
     contentW
   );
   for (const ln of payLines) {
-    drawSafe(page, font, ln, margin, y, 8);
-    y -= 11;
+    drawSafe(page, font, ln, margin, y, 9);
+    y -= LINE_GAP;
   }
-  y -= 10;
+  y -= 16;
 
-  tealBar(page, leftX, y, colW, 16, "BANKVERBINDUNG", fontBold);
-  tealBar(page, rightX, y, colW, 16, "KONTAKT", fontBold);
-  y -= 20;
+  tealBar(page, leftX, y, colW, 20, "BANKVERBINDUNG", fontBold);
+  tealBar(page, rightX, y, colW, 20, "KONTAKT", fontBold);
+  y -= 28;
   const bankRows: [string, string][] = [
     ["Kontoinhaber:", PDF_COMPANY.legalOwner],
     ["Bank:", PDF_COMPANY.bankName],
@@ -411,21 +413,22 @@ export async function generateInvoicePdf(
     if (contactRows[i]) {
       drawLabelValue(page, font, fontBold, rightX, blockY, contactRows[i][0], contactRows[i][1], 58, colW - 66);
     }
-    blockY -= 13;
+    blockY -= LINE_GAP;
   }
-  y = blockY - 14;
+  y = blockY - 20;
 
   const thanksLines = wrapLines(
     "Vielen Dank für Ihr Vertrauen in TransPool24 - Ihr zuverlässiger Partner für Transport & Logistik.",
     font,
-    8,
+    9,
     contentW - 20
   );
   for (const ln of thanksLines) {
-    drawCentered(page, font, ln, pageMid, y, 8, TEAL);
-    y -= 12;
+    drawCentered(page, font, ln, pageMid, y, 9, TEAL);
+    y -= LINE_GAP;
   }
-  drawCentered(page, fontBold, "TransPool24 · Transport & Logistik", pageMid, y, 8, TEAL_DARK);
+  y -= 4;
+  drawCentered(page, fontBold, "TransPool24 · Transport & Logistik", pageMid, y, 9, TEAL_DARK);
 
   return doc.save();
 }
