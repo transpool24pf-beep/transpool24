@@ -38,7 +38,7 @@ export function HomeCargoTypes() {
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="text-2xl font-semibold leading-snug tracking-tight text-[#1a1a1a] sm:text-3xl sm:leading-snug">
             {t("titleBefore")}{" "}
-            <span className="inline-block rounded-full bg-[#f3c4ce] px-3 py-0.5 font-semibold text-[#1a1a1a]">
+            <span className="inline-block rounded-full bg-[#e85d04]/22 px-3 py-0.5 font-semibold text-[#1a1a1a]">
               {t("titleHighlight")}
             </span>
             {t("titleAfter") ? ` ${t("titleAfter")}` : ""}
@@ -49,7 +49,7 @@ export function HomeCargoTypes() {
         <ul className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-7">
           {cards.map((card) => (
             <li key={card.src}>
-              <article className="flex h-full flex-col rounded-2xl border border-[#f0c9d2]/70 bg-gradient-to-b from-[#f7f7f8] to-[#ececee] px-8 pb-8 pt-10 shadow-[0_1px_0_rgba(255,255,255,0.8)_inset,0_18px_40px_-28px_rgba(13,33,55,0.18)]">
+              <article className="flex h-full flex-col rounded-2xl border border-[#e85d04]/18 bg-gradient-to-b from-[#f7f7f8] to-[#ececee] px-8 pb-8 pt-10 shadow-[0_1px_0_rgba(255,255,255,0.8)_inset,0_18px_40px_-28px_rgba(13,33,55,0.18)]">
                 <div className="relative mx-auto flex h-44 w-full max-w-[260px] items-center justify-center overflow-hidden rounded-xl bg-[#0c0c0c] ring-1 ring-black/20 sm:h-48">
                   <Image
                     src={card.src}
