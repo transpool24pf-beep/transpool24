@@ -188,6 +188,38 @@ export default function AdminOrderDetailPage({
   }, [params]);
 
   useEffect(() => {
+    if (!id) return;
+    const tick = () => {
+      fetch(`/api/admin/orders/${id}`)
+        .then((r) => r.json())
+        .then((data: Job) => {
+          if (!data?.id) return;
+          setOrder((prev) => {
+            if (!prev || prev.id !== data.id) return prev ?? data;
+            if (
+              prev.pod_photo_url === data.pod_photo_url &&
+              prev.pod_completed_at === data.pod_completed_at &&
+              prev.logistics_status === data.logistics_status
+            ) {
+              return prev;
+            }
+            return {
+              ...prev,
+              pod_photo_url: data.pod_photo_url,
+              pod_completed_at: data.pod_completed_at,
+              logistics_status: data.logistics_status,
+            };
+          });
+        })
+        .catch(() => {
+          /* keep current order */
+        });
+    };
+    const interval = window.setInterval(tick, 4000);
+    return () => window.clearInterval(interval);
+  }, [id]);
+
+  useEffect(() => {
     fetch("/api/admin/drivers")
       .then((r) => r.json())
       .then(
@@ -423,7 +455,7 @@ export default function AdminOrderDetailPage({
 
   const sendDeliveryPhotoEmail = async () => {
     if (!order) return;
-    if (!thankYouFile) {
+    if (!thankYouFile && !order.pod_photo_url) {
       alert(odT(locale, "od.thankYouNoFile"));
       return;
     }
@@ -433,12 +465,21 @@ export default function AdminOrderDetailPage({
     }
     setSendingThankYou(true);
     try {
-      const fd = new FormData();
-      fd.append("file", thankYouFile);
-      const res = await fetch(`/api/admin/orders/${order.id}/send-thankyou-delivery`, {
-        method: "POST",
-        body: fd,
-      });
+      let res: Response;
+      if (thankYouFile) {
+        const fd = new FormData();
+        fd.append("file", thankYouFile);
+        res = await fetch(`/api/admin/orders/${order.id}/send-thankyou-delivery`, {
+          method: "POST",
+          body: fd,
+        });
+      } else {
+        res = await fetch(`/api/admin/orders/${order.id}/send-thankyou-delivery`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ use_existing_pod: true }),
+        });
+      }
       const data = (await res.json()) as { error?: string; sentTo?: string; photoUrl?: string };
       if (!res.ok) {
         alert(data?.error ?? odT(locale, "od.thankYouFail"));
@@ -868,7 +909,7 @@ export default function AdminOrderDetailPage({
 
         {order.pod_photo_url ? (
           <div className="mb-4 space-y-2">
-            <p className="text-xs font-medium text-emerald-800">{odT(locale, "od.podPhotoLabel")}</p>
+            <p className="text-sm font-medium text-emerald-800">{odT(locale, "od.podDriverReady")}</p>
             <a
               href={order.pod_photo_url}
               target="_blank"
@@ -879,12 +920,17 @@ export default function AdminOrderDetailPage({
               <img
                 src={order.pod_photo_url}
                 alt={odT(locale, "od.podPhotoAlt")}
-                className="max-h-56 w-auto max-w-full object-contain"
+                className="max-h-80 w-auto max-w-full object-contain"
               />
             </a>
           </div>
-        ) : null}
+        ) : (
+          <p className="mb-4 rounded-lg border border-dashed border-amber-300 bg-amber-50/70 px-3 py-3 text-sm text-amber-950">
+            {odT(locale, "od.podWaitingDriver")}
+          </p>
+        )}
 
+        <p className="mb-2 text-xs font-medium text-[#0d2137]/70">{odT(locale, "od.thankYouPickFile")}</p>
         <input
           ref={thankYouFileInputRef}
           type="file"
@@ -910,7 +956,11 @@ export default function AdminOrderDetailPage({
           <button
             type="button"
             onClick={() => void sendDeliveryPhotoEmail()}
-            disabled={sendingThankYou || !thankYouFile || !order.customer_email?.trim()}
+            disabled={
+              sendingThankYou ||
+              (!thankYouFile && !order.pod_photo_url) ||
+              !order.customer_email?.trim()
+            }
             className="rounded-xl bg-teal-700 px-5 py-2.5 text-sm font-semibold text-white hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {sendingThankYou ? odT(locale, "od.thankYouSending") : odT(locale, "od.thankYouSendBtn")}
