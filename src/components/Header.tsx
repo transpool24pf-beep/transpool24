@@ -208,11 +208,11 @@ export function Header({ hideLogo }: HeaderProps) {
   return (
     <header
       dir={rtl ? "rtl" : "ltr"}
-      className="sticky top-0 z-50 relative min-h-[3.35rem] overflow-hidden border-b border-[#0d2137]/10 bg-[var(--background)] sm:min-h-[3.5rem]"
+      className="sticky top-0 z-50 relative overflow-hidden border-b border-[#0d2137]/10 bg-[var(--background)]"
     >
       <HeaderCarLottieTrack />
       {/* No backdrop-blur / frosted layer — it blurs the DotLottie behind this row */}
-      <div className="relative z-10 max-lg:pb-9">
+      <div className="relative z-10">
         {hideLogo ? (
           <div className="mx-auto flex max-w-6xl items-center justify-end gap-2 px-4 py-0.5 sm:px-6 sm:py-1">
             {navWithLang}

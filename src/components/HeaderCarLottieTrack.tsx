@@ -75,7 +75,7 @@ export function HeaderCarLottieTrack() {
     >
       <div
         ref={riderRef}
-        className="absolute bottom-0 h-8 w-[6.25rem] will-change-transform sm:h-9 sm:w-28 md:h-10 md:w-32"
+        className="absolute bottom-0 h-7 w-[5.5rem] will-change-transform sm:h-8 sm:w-24 md:h-10 md:w-32"
       >
         <div ref={hostRef} className="h-full w-full" />
       </div>
