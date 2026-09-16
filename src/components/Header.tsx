@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations, useLocale } from "next-intl";
@@ -146,46 +145,19 @@ export function Header({ hideLogo }: HeaderProps) {
   const navCtaClass =
     "relative shrink-0 overflow-hidden whitespace-nowrap rounded-lg border border-[#b84702]/35 bg-gradient-to-b from-[#ffa64d] via-[#e85d04] to-[#c24a03] px-3 py-1 text-[13px] font-semibold leading-none text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.4),0_2px_10px_rgba(232,93,4,0.42),0_1px_0_rgba(0,0,0,0.12)_inset] ring-1 ring-white/20 transition hover:brightness-[1.06] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.5),0_4px_16px_rgba(232,93,4,0.48)] active:translate-y-px active:brightness-[0.98] sm:px-3 sm:py-0.5 sm:text-sm";
 
-  /** Order / driver / blog: prominent centered logo (intrinsic size + max bounds, no short letterbox strip). */
-  const centerLogoImgClass =
-    "h-auto w-auto max-h-[2.35rem] max-w-[min(70vw,12rem)] object-contain object-center sm:max-h-[2.6rem] sm:max-w-[14rem] md:max-h-[2.75rem] md:max-w-[16rem]";
-
   const homePath = isLocaleHomePath(pathname, locale);
 
-  /** Corner rows: no fixed-height box (avoids empty band above/below wide logo with object-contain). */
-  const cornerLogoImgClass = homePath
-    ? "h-auto w-auto max-h-[2.15rem] max-w-[8.75rem] object-contain object-start rtl:object-right sm:max-h-[2.35rem] sm:max-w-[12rem] md:max-h-[2.5rem] md:max-w-[14rem]"
-    : "h-auto w-auto max-h-[2rem] max-w-[min(52vw,8rem)] object-contain object-start rtl:object-right sm:max-h-[2.2rem] sm:max-w-[9rem] md:max-h-[2.35rem]";
-
-  const logoImageCenter = (
-    <Image
-      src="/5439.png"
-      alt="TransPool24"
-      width={1024}
-      height={558}
-      quality={100}
-      className={centerLogoImgClass}
-      priority={showLargeCenterLogo}
-      sizes="(max-width: 640px) 90vw, (max-width: 1024px) 25rem, 30rem"
-    />
+  const headerWordmark = (sizeClass: string) => (
+    <span
+      className={`select-none whitespace-nowrap font-extrabold italic leading-none tracking-tight ${sizeClass}`}
+    >
+      <span className="text-[#1e4a7a]">TransPool</span>
+      <span className="text-[#e85d04]">24</span>
+    </span>
   );
 
-  const logoImageCorner = (
-    <Image
-      src="/5439.png"
-      alt="TransPool24"
-      width={1024}
-      height={558}
-      quality={100}
-      className={cornerLogoImgClass}
-      priority={homePath}
-      sizes={
-        homePath
-          ? "(max-width: 640px) 90vw, (max-width: 1024px) 20rem, 24rem"
-          : "(max-width: 640px) 56vw, (max-width: 1024px) 10rem, 11rem"
-      }
-    />
-  );
+  const logoImageCenter = headerWordmark("text-[1.45rem] sm:text-[1.65rem] md:text-[1.85rem]");
+  const logoImageCorner = headerWordmark("text-[1.4rem] sm:text-[1.6rem] md:text-[1.75rem]");
 
   const navWithLang = (
     <div
