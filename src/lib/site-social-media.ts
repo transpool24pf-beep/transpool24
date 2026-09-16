@@ -36,16 +36,22 @@ export const EMPTY_SOCIAL: SiteSocialMediaPayload = {
 
 export const FALLBACK_SOCIAL = {
   instagramUrl: "https://www.instagram.com/transpool24/",
-  linkedinUrl: "https://www.linkedin.com/in/trans-pool-1235803b8",
-  facebookUrl: "https://www.facebook.com/transpool24",
+  facebookUrl: "https://www.facebook.com/Transpool24",
+  linkedinUrl: "https://www.linkedin.com/in/trans-pool-1235803b8/",
+  pinterestUrl: "https://de.pinterest.com/transpool24/",
 } as const;
 
-export function resolvedSocialUrls(social: SiteSocialMediaPayload | null | undefined): SiteSocialMediaPayload {
+export type ResolvedSocialUrls = SiteSocialMediaPayload & {
+  pinterestUrl: string;
+};
+
+export function resolvedSocialUrls(social: SiteSocialMediaPayload | null | undefined): ResolvedSocialUrls {
   return {
     instagramUrl: social?.instagramUrl?.trim() || FALLBACK_SOCIAL.instagramUrl,
     tiktokUrl: social?.tiktokUrl?.trim() || "",
     linkedinUrl: social?.linkedinUrl?.trim() || FALLBACK_SOCIAL.linkedinUrl,
     facebookUrl: social?.facebookUrl?.trim() || FALLBACK_SOCIAL.facebookUrl,
     youtubeUrl: social?.youtubeUrl?.trim() || "",
+    pinterestUrl: FALLBACK_SOCIAL.pinterestUrl,
   };
 }

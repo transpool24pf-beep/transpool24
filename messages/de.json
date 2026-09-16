@@ -618,7 +618,8 @@
     "languageLabel": "Sprache",
     "socialTiktok": "TikTok",
     "socialFacebook": "Facebook",
-    "socialYoutube": "YouTube"
+    "socialYoutube": "YouTube",
+    "socialPinterest": "Pinterest"
   },
   "driver": {
     "step1Name": "Grunddaten",
