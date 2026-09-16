@@ -6,7 +6,7 @@ export const whyPageRo: WhyPagePayload = {
   heroBadge: "Pforzheim · Baden-Württemberg · Germania",
   headline: "De ce afacerile și partenerii comerciali aleg TransPool24",
   heroSub:
-    "Organizăm transport rutier pentru companii, angro, supermarketuri și ateliere între Pforzheim, Karlsruhe și regiune — prețuri clare, șoferi de încredere și rezervare online. Mutările private și mobila nu sunt focusul nostru principal.",
+    "Organizăm transport rutier pentru companii, angro, supermarketuri și ateliere între Pforzheim, Karlsruhe și regiune — prețuri clare, șoferi de încredere și rezervare online. Transportăm și mutări private și mobilă.",
   sidebarTitle: "Ce apreciază clienții comerciali",
   sidebar: [
     {
@@ -25,15 +25,15 @@ export const whyPageRo: WhyPagePayload = {
       body: "Șoferi care cunosc Pforzheim, regiunea auto și Karlsruhe — inclusiv acces la dealeri, depozite en-gros și zone industriale.",
     },
   ],
-  introTitle: "Focus pe afaceri și comerț — nu pe mutări private",
+  introTitle: "Afaceri și comerț — și mutări private și mobilă",
   introLead:
-    "TransPool24 este pentru companii: fabrici, en-gros, supermarketuri, dealeri, tipografii și furnizori. Mutările private de mobilă nu sunt centrul produsului.\n\nTe potrivim cu vehiculul și șoferul potriviți pentru paleți, piese de mașini, cutii uscate alimentare și multe altele — transparent și rezervabil ca o platformă logistică modernă.",
+    "TransPool24 este pentru companii: fabrici, en-gros, supermarketuri, dealeri, tipografii și furnizori. Transportăm și mutări private, mobilă și electrocasnice.\n\nTe potrivim cu vehiculul și șoferul potriviți pentru paleți, piese de mașini, cutii uscate alimentare și bunuri de mutare — transparent și rezervabil ca o platformă logistică modernă.",
   h2_1: "Ce este TransPool24?",
   p1: "Platformă digitală de rezervare pentru transport rutier comercial în și în jurul Pforzheim, cu acoperire în Baden-Württemberg și Germania. Descrii ruta, marfa și nivelul serviciului (doar șofer, cu vehicul, cu asistent) și plătești online — coordonăm execuția cu șoferi profesioniști.\n\nPotrivit pentru expedieri B2B: de la paleți pentru stivuitor la livrări sensibile de piese.",
   h2_2: "Regiunea ca spațiu economic",
   p2: "Pforzheim (Goldstadt) înseamnă aur, ceasuri și inginerie de precizie. Baden-Württemberg este inima auto — Mercedes, Porsche și o rețea densă de dealeri și depozite de piese.\n\nÎntre ele: en-gros pentru restaurante și retail în Karlsruhe, tipografii și ambalaje. Acestea sunt coridoarele pe care le susținem — între fabrică, depozit, atelier și magazin.",
   h2_3: "De ce companiile expediază cu noi",
-  p3: "• Fiabilitate: contacte clare, ferestre de timp realiste, predări documentate unde e nevoie.\n• Paleți și stivuitor: multe încărcături sunt paleți întregi — încărcare/descărcare rapidă cu stivuitor (Stapler).\n• Preț corect înainte de cumpărare: distanța, categoria și nivelul serviciului — fără taxe ascunse după plată.\n• Nu marketplace de mutări: expeditorul tipic este afacerea, nu o canapea privată.",
+  p3: "• Fiabilitate: contacte clare, ferestre de timp realiste, predări documentate unde e nevoie.\n• Paleți și stivuitor: multe încărcături sunt paleți întregi — încărcare/descărcare rapidă cu stivuitor (Stapler).\n• Preț corect înainte de cumpărare: distanța, categoria și nivelul serviciului — fără taxe ascunse după plată.\n• Mutări private și mobilă: apartamente, mobilier și electrocasnice — rezervă online ca orice altă expediere, cu ajutor opțional la încărcare.",
   tipsTitle: "Cinci sfaturi pentru rezervări comerciale",
   tipsIntro: "Practice pentru depozit, atelier și expediere — adaptate TransPool24.",
   tips: [
@@ -118,7 +118,7 @@ export const whyPageRo: WhyPagePayload = {
   faqs: [
     {
       q: "Face TransPool24 mutări private?",
-      a: "Focusul nostru: expeditori comerciali — afaceri, angro, retail, ateliere, industrie. Mutările private nu sunt produsul central — contactați-ne pentru excepții.",
+      a: "Da. Transportăm mutări private, mobilă și electrocasnice — pe lângă expedierile comerciale. Rezervă online ca orice altă cursă; ajutor opțional la încărcare și descărcare.",
     },
     {
       q: "Acoperiți zona mea?",

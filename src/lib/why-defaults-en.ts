@@ -1,12 +1,12 @@
 import type { WhyPagePayload } from "./why-transpool24-types";
 
-/** B2B focus: companies, wholesale, retail, workshops — not private flat moves as core offer */
+/** Business, trade — and private home moves & furniture */
 export const whyPageEn: WhyPagePayload = {
   metaTitle: "Why TransPool24? | B2B transport Pforzheim & region",
   heroBadge: "Pforzheim · Baden-Württemberg · Germany",
   headline: "Why businesses and trade partners choose TransPool24",
   heroSub:
-    "We organise road transport for companies, wholesalers, supermarkets and workshops between Pforzheim, Karlsruhe and the wider region — with clear pricing, reliable drivers and online booking. Private home moves and furniture are not our core focus.",
+    "We organise road transport for companies, wholesalers, supermarkets and workshops between Pforzheim, Karlsruhe and the wider region — with clear pricing, reliable drivers and online booking. We also move private homes and furniture.",
   sidebarTitle: "What commercial customers value",
   sidebar: [
     {
@@ -25,15 +25,15 @@ export const whyPageEn: WhyPagePayload = {
       body: "Drivers who know Pforzheim, the automotive region and Karlsruhe — including access to dealerships, wholesale depots and industrial estates.",
     },
   ],
-  introTitle: "Focus on business & trade — not private moves",
+  introTitle: "Business & trade — and private homes and furniture",
   introLead:
-    "TransPool24 is built for companies: factories, wholesalers, supermarkets, dealerships, printers and suppliers. Private furniture or flat moves are not what we centre the product on.\n\nWe match you with the right vehicle and driver for pallets, machine parts, dry grocery cartons and more — transparent and bookable like a modern logistics platform.",
+    "TransPool24 is built for companies: factories, wholesalers, supermarkets, dealerships, printers and suppliers. We also transport private home moves, furniture and household appliances.\n\nWe match you with the right vehicle and driver for pallets, machine parts, dry grocery cartons and household moves — transparent and bookable like a modern logistics platform.",
   h2_1: "What is TransPool24?",
   p1: "A digital booking platform for commercial road transport in and around Pforzheim, with reach across Baden-Württemberg and Germany. You describe route, cargo and service level (driver only, driver with vehicle, with assistant) and pay online — we coordinate execution with professional drivers.\n\nSuited to B2B shipments: from forklift-friendly pallet jobs to sensitive spare-part deliveries.",
   h2_2: "The region as an economic area",
   p2: "Pforzheim (Goldstadt) stands for jewellery, watches and precision engineering. Baden-Württemberg is the heart of the automotive industry — Mercedes, Porsche and a dense network of dealerships and parts warehouses.\n\nIn between: wholesale supplying restaurants and retail in Karlsruhe, printing and packaging plants. Those are the lanes we support — between plant, warehouse, workshop and store.",
   h2_3: "Why companies ship with us",
-  p3: "• Reliability: clear contacts, realistic time windows, documented handovers where needed.\n• Pallets & forklifts: many loads are full pallets — efficient load/unload with a forklift.\n• Fair price before purchase: distance, category and service level set the price — no hidden post-capture fees.\n• Not a furniture-move marketplace: our typical shipper is business, not a private sofa relocation.",
+  p3: "• Reliability: clear contacts, realistic time windows, documented handovers where needed.\n• Pallets & forklifts: many loads are full pallets — efficient load/unload with a forklift.\n• Fair price before purchase: distance, category and service level set the price — no hidden post-capture fees.\n• Private homes and furniture: flats, furniture and appliances — book online like any other shipment, optionally with a helper for loading and unloading.",
   tipsTitle: "Five tips for commercial bookings",
   tipsIntro: "Practical for warehouse, workshop and dispatch — tailored to TransPool24.",
   tips: [
@@ -65,8 +65,12 @@ export const whyPageEn: WhyPagePayload = {
   ],
   servicesTitle: "Examples: sectors we work with",
   servicesIntro:
-    "A sample from the region — not exhaustive. Your sector fits too if it is B2B road transport.",
+    "A sample from the region — not exhaustive. We serve businesses and also private home moves and furniture.",
   serviceTypes: [
+    {
+      name: "Private home moves & furniture",
+      body: "We move flats, houses, furniture and household appliances in Pforzheim, the region and across Germany.\n\nTypical loads: wardrobes, beds, appliances, moving boxes and bulky furniture.\n\nThe upside: online booking with a clear price before payment and a professional driver — optionally with a helper for loading and unloading.",
+    },
     {
       name: "Jewellery, watches & precision (Goldstadt Pforzheim)",
       body: "Pforzheim is known for gold, jewellery and precision machinery.\n\nWhat we typically move: spare parts for machines, non-precious raw materials in shipping cartons, or large B2B drops from manufacturers to distributors and into Karlsruhe.\n\nThe upside: these firms pay for reliability — sensitive goods need a trusted carrier, not a parcel operator that loses shipments.",
@@ -86,7 +90,7 @@ export const whyPageEn: WhyPagePayload = {
   ],
   platformTitle: "How your company uses TransPool24",
   platformBody:
-    "You enter pickup and destination, category (XS/M/L), weight and service level. You see the price before payment and book online. We assign a suitable driver — you can follow progress and contact support if plans change.\n\nBookings are aimed at commercial and institutional shippers; ask our team about special cases.",
+    "You enter pickup and destination, category (XS/M/L), weight and service level. You see the price before payment and book online. We assign a suitable driver — you can follow progress and contact support if plans change.\n\nBookings for businesses and private customers: commercial road transport as well as home moves and furniture.",
   completingTitle: "Closing the delivery professionally",
   completingP1:
     "Before pickup, agree who hands over the goods and photograph condition if useful — that simplifies any follow-up questions.",
@@ -118,7 +122,7 @@ export const whyPageEn: WhyPagePayload = {
   faqs: [
     {
       q: "Does TransPool24 do private home moves?",
-      a: "Our focus is commercial shippers: businesses, wholesale, retail, workshops and industry. Private flat moves are not the core product — contact us first for exceptions.",
+      a: "Yes. We transport private home moves, furniture and household appliances — in addition to commercial shipments. Book online like any other job; optionally add a helper for loading and unloading.",
     },
     {
       q: "Do you deliver in my area?",

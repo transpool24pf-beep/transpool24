@@ -1,12 +1,12 @@
 import type { WhyPagePayload } from "./why-transpool24-types";
 
-/** B2B focus: companies, wholesale, retail, workshops — no private flat moves as core offer */
+/** Gewerbe und Handel — inklusive Privatumzüge und Möbel */
 export const whyPageDe: WhyPagePayload = {
   metaTitle: "Warum TransPool24? | B2B-Transport Pforzheim & Region",
   heroBadge: "Pforzheim · Baden-Württemberg · Deutschland",
   headline: "Warum Unternehmen und gewerbliche Partner TransPool24 nutzen",
   heroSub:
-    "Wir organisieren Straßentransporte für Betriebe, Großhandel, Märkte und Werkstätten zwischen Pforzheim, Karlsruhe und der Region — mit klaren Preisen, verlässlichen Fahrern und digitaler Buchung. Kein Fokus auf private Wohnungsumzüge oder Möbeltransport als Kerngeschäft.",
+    "Wir organisieren Straßentransporte für Betriebe, Großhandel, Märkte und Werkstätten zwischen Pforzheim, Karlsruhe und der Region — mit klaren Preisen, verlässlichen Fahrern und digitaler Buchung. Wir transportieren auch private Wohnungsumzüge und Möbel.",
   sidebarTitle: "Was Gewerbekunden schätzen",
   sidebar: [
     {
@@ -25,15 +25,15 @@ export const whyPageDe: WhyPagePayload = {
       body: "Fahrer, die Pforzheim, die Autoland-Region und Karlsruhe kennen — inkl. Zufahrten zu Autohäusern, Großmarkt und Industriegebieten.",
     },
   ],
-  introTitle: "Fokus auf Gewerbe & Handel — keine Privatumzüge",
+  introTitle: "Gewerbe & Handel — und Privatumzüge sowie Möbel",
   introLead:
-    "TransPool24 richtet sich an Unternehmen: Fabriken, Großhändler, Supermärkte, Autohäuser, Druckereien und Zulieferer. Private Möbel- oder Wohnungsumzüge sind nicht unser Kerngeschäft.\n\nWir verbinden Sie mit passendem Fahrzeug und Fahrer für Paletten, Maschinenteile, trockene Lebensmittelkartons und mehr — transparent und buchbar wie eine moderne Logistikplattform.",
+    "TransPool24 richtet sich an Unternehmen: Fabriken, Großhändler, Supermärkte, Autohäuser, Druckereien und Zulieferer. Zusätzlich transportieren wir private Wohnungsumzüge, Möbel und Haushaltsgeräte.\n\nWir verbinden Sie mit passendem Fahrzeug und Fahrer für Paletten, Maschinenteile, trockene Lebensmittelkartons und Umzugsgut — transparent und buchbar wie eine moderne Logistikplattform.",
   h2_1: "Was ist TransPool24?",
   p1: "Eine digitale Buchungsplattform für gewerblichen Straßentransport in und um Pforzheim mit Reichweite in Baden-Württemberg und deutschlandweit. Sie beschreiben Strecke, Ladung und Leistungsstufe (nur Fahrer, Fahrer mit Fahrzeug, mit Helfer) und zahlen online — wir koordinieren die Ausführung mit professionellen Fahrern.\n\nGeeignet für B2B-Sendungen: vom Stapler-tauglichen Palettenauftrag bis zu sensiblen Ersatzteillieferungen.",
   h2_2: "Die Region als Wirtschaftsraum",
   p2: "Pforzheim (Goldstadt) steht für Schmuck, Uhren und Präzisionsmechanik. Baden-Württemberg ist Herzstück der Automobilindustrie — Mercedes, Porsche und ein dichtes Netz aus Autohäusern und Ersatzteillagern.\n\nDazwischen: Großhandel für Gastronomie und Einzelhandel in Karlsruhe, Druckereien und Verpackungsbetriebe. Genau dort entstehen die Touren, die wir unterstützen — zwischen Werk, Lager, Werkstatt und Markt.",
   h2_3: "Warum Firmen mit uns fahren",
-  p3: "• Zuverlässigkeit: feste Ansprechpartner, klare Zeitfenster, dokumentierte Übergaben wo nötig.\n• Paletten & Stapler: viele Sendungen sind volle Paletten — effizientes Be- und Entladen mit Stapler möglich.\n• Faire Preise vor dem Kauf: Entfernung, Kategorie und Leistungsstufe bestimmen den Preis — ohne versteckte Post-Capture-Gebühren.\n• Kein Möbel-Umzugsportal: unser Auftraggeber ist typischerweise das Gewerbe, nicht der private Sofa-Umzug.",
+  p3: "• Zuverlässigkeit: feste Ansprechpartner, klare Zeitfenster, dokumentierte Übergaben wo nötig.\n• Paletten & Stapler: viele Sendungen sind volle Paletten — effizientes Be- und Entladen mit Stapler möglich.\n• Faire Preise vor dem Kauf: Entfernung, Kategorie und Leistungsstufe bestimmen den Preis — ohne versteckte Post-Capture-Gebühren.\n• Privatumzüge & Möbel: Wohnungen, Möbel und Haushaltsgeräte — online buchen wie jede andere Sendung, optional mit Helfer zum Be- und Entladen.",
   tipsTitle: "Fünf Tipps für gewerbliche Buchungen",
   tipsIntro: "Praxisnah für Lager, Werkstätten und Disposition — angepasst an TransPool24.",
   tips: [
@@ -65,8 +65,12 @@ export const whyPageDe: WhyPagePayload = {
   ],
   servicesTitle: "Beispiele: Branchen, mit denen wir arbeiten",
   servicesIntro:
-    "Auszug aus der Region — kein Anspruch auf Vollständigkeit. Ihre Branche passt auch, wenn es um B2B-Transport auf der Straße geht.",
+    "Auszug aus der Region — kein Anspruch auf Vollständigkeit. Wir fahren für Gewerbe und auch Privatumzüge sowie Möbel.",
   serviceTypes: [
+    {
+      name: "Privatumzüge & Möbel",
+      body: "Wir transportieren Wohnungen, Häuser, Möbel und Haushaltsgeräte in Pforzheim, der Region und deutschlandweit.\n\nTypische Ladung: Schränke, Betten, Haushaltsgeräte, Umzugskartons und sperrige Möbelstücke.\n\nVorteil: Online-Buchung mit klarem Preis vor der Zahlung und professionellem Fahrer — optional mit Helfer zum Be- und Entladen.",
+    },
     {
       name: "Schmuck, Uhren & Präzision (Goldstadt Pforzheim)",
       body: "Pforzheim ist für Gold, Schmuck und feinmechanische Anlagen bekannt.\n\nWas wir typischerweise fahren: Ersatzteile für Maschinen, nicht-wertvolle Rohstoffe in Versandkartons, oder große Lieferungen von Herstellern zu Händlern und nach Karlsruhe.\n\nVorteil: Diese Unternehmen zahlen für Zuverlässigkeit — sensible Ladung braucht einen vertrauenswürdigen Carrier, nicht einen Paketdienst, bei dem Sendungen verloren gehen.",
@@ -86,7 +90,7 @@ export const whyPageDe: WhyPagePayload = {
   ],
   platformTitle: "So nutzen Sie TransPool24 als Firma",
   platformBody:
-    "Sie tragen Abholung und Ziel, Kategorie (XS/M/L), Gewicht und Leistungsstufe ein. Sie sehen den Preis vor der Zahlung und buchen online. Wir weisen einen passenden Fahrer zu — Sie können den Ablauf verfolgen und den Support bei Änderungen erreichen.\n\nBuchungen richten sich an gewerbliche und institutionelle Auftraggeber; bei Fragen zu Sonderfällen hilft unser Team.",
+    "Sie tragen Abholung und Ziel, Kategorie (XS/M/L), Gewicht und Leistungsstufe ein. Sie sehen den Preis vor der Zahlung und buchen online. Wir weisen einen passenden Fahrer zu — Sie können den Ablauf verfolgen und den Support bei Änderungen erreichen.\n\nBuchungen für Gewerbe und Privat: Straßentransport sowie Wohnungsumzüge und Möbel.",
   completingTitle: "Zustellung professionell abschließen",
   completingP1:
     "Klären Sie vor Abholung, wer die Ware übergibt, und dokumentieren Sie bei Bedarf den Zustand (Fotos) — das erleichtert Rückfragen.",
@@ -118,7 +122,7 @@ export const whyPageDe: WhyPagePayload = {
   faqs: [
     {
       q: "Führt TransPool24 Privatumzüge durch?",
-      a: "Unser Fokus liegt auf gewerblichen Auftraggebern: Betriebe, Großhandel, Märkte, Werkstätten und Industrie. Private Wohnungsumzüge sind nicht das Kerngeschäft — bei Ausnahmefällen kontaktieren Sie uns bitte vorab.",
+      a: "Ja. Wir transportieren private Wohnungsumzüge, Möbel und Haushaltsgeräte — zusätzlich zu gewerblichen Sendungen. Buchen Sie online wie jede andere Tour; optional mit Helfer zum Be- und Entladen.",
     },
     {
       q: "Liefert TransPool24 in meiner Region?",

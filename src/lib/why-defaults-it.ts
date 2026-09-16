@@ -6,7 +6,7 @@ export const whyPageIt: WhyPagePayload = {
   heroBadge: "Pforzheim · Baden-Württemberg · Germania",
   headline: "Perché aziende e partner commerciali scelgono TransPool24",
   heroSub:
-    "Organizziamo trasporto stradale per aziende, grossisti, supermercati e officine tra Pforzheim, Karlsruhe e la regione — prezzi chiari, autisti affidabili e prenotazione online. Traslochi privati e mobili non sono il nostro focus principale.",
+    "Organizziamo trasporto stradale per aziende, grossisti, supermercati e officine tra Pforzheim, Karlsruhe e la regione — prezzi chiari, autisti affidabili e prenotazione online. Trasportiamo anche traslochi privati e mobili.",
   sidebarTitle: "Cosa apprezzano i clienti commerciali",
   sidebar: [
     {
@@ -25,15 +25,15 @@ export const whyPageIt: WhyPagePayload = {
       body: "Autisti che conoscono Pforzheim, la regione automotive e Karlsruhe — inclusi accessi a concessionarie, depositi all’ingrosso e aree industriali.",
     },
   ],
-  introTitle: "Focus su business e commercio — non su traslochi privati",
+  introTitle: "Business e commercio — e traslochi privati e mobili",
   introLead:
-    "TransPool24 è per le aziende: fabbriche, grossisti, supermercati, concessionarie, tipografie e fornitori. Traslochi di mobili privati non sono al centro del prodotto.\n\nAbbiniamo veicolo e autista giusti per pallet, parti di macchina, scatole alimentari secche e altro — in modo trasparente e prenotabile come una piattaforma logistica moderna.",
+    "TransPool24 è per le aziende: fabbriche, grossisti, supermercati, concessionarie, tipografie e fornitori. Trasportiamo anche traslochi privati, mobili ed elettrodomestici.\n\nAbbiniamo veicolo e autista giusti per pallet, parti di macchina, scatole alimentari secche e beni da trasloco — in modo trasparente e prenotabile come una piattaforma logistica moderna.",
   h2_1: "Cos’è TransPool24?",
   p1: "Piattaforma digitale di prenotazione per trasporto stradale commerciale a Pforzheim e dintorni, con copertura in Baden-Württemberg e Germania. Descrivi percorso, carico e livello servizio (solo autista, con veicolo, con assistente) e paghi online — coordiniamo l’esecuzione con autisti professionisti.\n\nAdatto a spedizioni B2B: da pallet compatibili con muletto a consegne sensibili di ricambi.",
   h2_2: "La regione come spazio economico",
   p2: "Pforzheim (Goldstadt) è oro, orologi e ingegneria di precisione. Il Baden-Württemberg è il cuore automotive — Mercedes, Porsche e una rete fitta di concessionarie e magazzini ricambi.\n\nIn mezzo: grossisti per ristoranti e retail a Karlsruhe, tipografie e imballaggio. Sono questi i flussi che supportiamo — tra stabilimento, magazzino, officina e punto vendita.",
   h2_3: "Perché le aziende spediscono con noi",
-  p3: "• Affidabilità: contatti chiari, finestre temporali realistiche, consegne documentate se serve.\n• Pallet e muletto: molti carichi sono pallet interi — carico/scarico rapido con muletto (Stapler).\n• Prezzo equo prima dell’acquisto: distanza, categoria e livello servizio — nessun costo nascosto dopo il pagamento.\n• Non un marketplace di traslochi: il mittente tipico è l’azienda, non un divano privato.",
+  p3: "• Affidabilità: contatti chiari, finestre temporali realistiche, consegne documentate se serve.\n• Pallet e muletto: molti carichi sono pallet interi — carico/scarico rapido con muletto (Stapler).\n• Prezzo equo prima dell’acquisto: distanza, categoria e livello servizio — nessun costo nascosto dopo il pagamento.\n• Traslochi privati e mobili: appartamenti, arredi ed elettrodomestici — prenota online come qualsiasi altro invio, con aiutante opzionale per carico e scarico.",
   tipsTitle: "Cinque consigli per prenotazioni commerciali",
   tipsIntro: "Pratici per magazzino, officina e spedizione — su misura per TransPool24.",
   tips: [
@@ -118,7 +118,7 @@ export const whyPageIt: WhyPagePayload = {
   faqs: [
     {
       q: "TransPool24 fa traslochi privati?",
-      a: "Il nostro focus sono mittenti commerciali: aziende, grosso, retail, officine, industria. I traslochi privati non sono il prodotto centrale — contattateci per eccezioni.",
+      a: "Sì. Trasportiamo traslochi privati, mobili ed elettrodomestici — oltre alle spedizioni commerciali. Prenota online come qualsiasi altro lavoro; aiutante opzionale per carico e scarico.",
     },
     {
       q: "Coprite la mia zona?",

@@ -6,7 +6,7 @@ export const whyPageTr: WhyPagePayload = {
   heroBadge: "Pforzheim · Baden-Württemberg · Almanya",
   headline: "İşletmeler ve ticari ortaklar neden TransPool24 kullanıyor",
   heroSub:
-    "Pforzheim, Karlsruhe ve çevresinde şirketler, toptancılar, süpermarketler ve atölyeler için karayolu taşıması düzenliyoruz — net fiyat, güvenilir sürücüler ve online rezervasyon. Özel ev veya mobilya taşıma odak noktamız değil.",
+    "Pforzheim, Karlsruhe ve çevresinde şirketler, toptancılar, süpermarketler ve atölyeler için karayolu taşıması düzenliyoruz — net fiyat, güvenilir sürücüler ve online rezervasyon. Özel ev ve mobilya taşıması da yapıyoruz.",
   sidebarTitle: "Ticari müşterilerin değer verdiği şeyler",
   sidebar: [
     {
@@ -25,15 +25,15 @@ export const whyPageTr: WhyPagePayload = {
       body: "Pforzheim’ı, otomotiv bölgesini ve Karlsruhe’yi bilen sürücüler — bayi, toptan depo ve sanayi bölgelerine erişim dahil.",
     },
   ],
-  introTitle: "İş ve ticaret odağı — özel taşınma değil",
+  introTitle: "İş ve ticaret — ve özel ev ile mobilya taşıması",
   introLead:
-    "TransPool24 şirketler içindir: fabrikalar, toptancılar, süpermarketler, bayiler, matbaalar ve tedarikçiler. Özel mobilya veya daire taşıma ürünün merkezinde değildir.\n\nPaletler, makine parçaları, kuru gıda kolileri ve daha fazlası için doğru araç ve sürücüyü eşleştiriyoruz — modern bir lojistik platformu gibi şeffaf ve rezerve edilebilir.",
+    "TransPool24 şirketler içindir: fabrikalar, toptancılar, süpermarketler, bayiler, matbaalar ve tedarikçiler. Ayrıca özel ev taşıması, mobilya ve ev aletleri taşıyoruz.\n\nPaletler, makine parçaları, kuru gıda kolileri ve ev eşyası için doğru araç ve sürücüyü eşleştiriyoruz — modern bir lojistik platformu gibi şeffaf ve rezerve edilebilir.",
   h2_1: "TransPool24 nedir?",
   p1: "Pforzheim ve çevresinde ticari karayolu taşıması için dijital rezervasyon platformu; Baden-Württemberg ve Almanya genelinde erişim. Rota, yük ve hizmet seviyesini (yalnız sürücü, araçlı sürücü, yardımcılı) tanımlayıp çevrimiçi ödüyorsunuz — profesyonel sürücülerle koordinasyonu biz yapıyoruz.\n\nB2B gönderilere uygundur: forklift uyumlu palet işlerinden hassas yedek parça teslimatına kadar.",
   h2_2: "Bölge bir ekonomik alan olarak",
   p2: "Pforzheim (Goldstadt) mücevher, saat ve hassas mühendislikle bilinir. Baden-Württemberg otomotivin kalbidir — Mercedes, Porsche ve yoğun bayi ve yedek parça ağı.\n\nArada: Karlsruhe’deki restoran ve perakendeyi besleyen toptan, matbaa ve ambalaj tesisleri. Desteklediğimiz hatlar bunlar — fabrika, depo, atölye ve mağaza arasında.",
   h2_3: "Şirketler neden bizimle gönderiyor",
-  p3: "• Güvenilirlik: net muhataplar, gerçekçi zaman pencereleri, gerektiğinde belgelenmiş teslim.\n• Palet ve forklift: birçok yük tam palet — forklift ile hızlı yükleme/boşaltma.\n• Satın almadan önce adil fiyat: mesafe, kategori ve hizmet seviyesi fiyatı belirler — gizli ek ücret yok.\n• Mobilya taşıma pazarı değil: tipik göndericimiz işletme, özel koltuk taşıması değil.",
+  p3: "• Güvenilirlik: net muhataplar, gerçekçi zaman pencereleri, gerektiğinde belgelenmiş teslim.\n• Palet ve forklift: birçok yük tam palet — forklift ile hızlı yükleme/boşaltma.\n• Satın almadan önce adil fiyat: mesafe, kategori ve hizmet seviyesi fiyatı belirler — gizli ek ücret yok.\n• Özel ev ve mobilya taşıması: daireler, mobilya ve ev aletleri — diğer gönderiler gibi çevrimiçi rezerve edin, yükleme için isteğe bağlı yardımcı.",
   tipsTitle: "Ticari rezervasyon için beş ipucu",
   tipsIntro: "Depo, atölye ve sevkiyat için — TransPool24’e göre.",
   tips: [
@@ -118,7 +118,7 @@ export const whyPageTr: WhyPagePayload = {
   faqs: [
     {
       q: "TransPool24 özel ev taşıması yapıyor mu?",
-      a: "Odak noktamız ticari göndericiler: işletmeler, toptan, perakende, atölye ve sanayi. Özel daire taşıması çekirdek ürün değildir — istisnalar için önce iletişime geçin.",
+      a: "Evet. Ticari gönderilere ek olarak özel ev, mobilya ve ev aleti taşıması yapıyoruz. Diğer işler gibi çevrimiçi rezerve edin; yükleme ve boşaltma için isteğe bağlı yardımcı.",
     },
     {
       q: "Bölgeme hizmet veriyor musunuz?",

@@ -6,7 +6,7 @@ export const whyPageKu: WhyPagePayload = {
   heroBadge: "Pforzheim · Baden-Württemberg · Almanya",
   headline: "Çima karsazî û hevkarên bazirganî TransPool24 hilbijêrin",
   heroSub:
-    "Em ji bo şirketan, grossîstan, supermarketan û werkstattan di navbera Pforzheim, Karlsruhe û herêmê de rêwîtiya rêyê rêk dixin — bi bihayên zelal, şofêrên pêbawer û rezervasyona serhêl. Koçberiya malên taybet û mobîlya ne navenda sereke ya me ye.",
+    "Em ji bo şirketan, grossîstan, supermarketan û werkstattan di navbera Pforzheim, Karlsruhe û herêmê de rêwîtiya rêyê rêk dixin — bi bihayên zelal, şofêrên pêbawer û rezervasyona serhêl. Em koçberiya malên taybet û mobîlyayê jî dikin.",
   sidebarTitle: "Tiştên ku xerîdarên karsazî bi nirxînin",
   sidebar: [
     {
@@ -25,15 +25,15 @@ export const whyPageKu: WhyPagePayload = {
       body: "Şofêrên ku Pforzheim, herêma otomobîl û Karlsruhe nas dikin — di nav de gihîştina salonan, depoyên gross û herêmên pîşesaziyê.",
     },
   ],
-  introTitle: "Baldarî li karsazî û bazirganî — ne li koçberiya taybet",
+  introTitle: "Karsazî û bazirganî — û koçberiya malên taybet û mobîlya",
   introLead:
-    "TransPool24 ji bo şirketan hatiye çêkirin: fabrîqeyan, grossîstan, supermarketan, salonan, çapkirin û dabingêran. Koçberiya mobîlyaya taybet navenda berhemê nîne.\n\nEm we bi wesayît û şofêrê guncand re dikin girê bidin ji bo paletan, parçeyên makîne, qutiyên xwarinê yên zuwa û zêdetir — bi şeffafî û wek platforma lojîstîka nûjen.",
+    "TransPool24 ji bo şirketan hatiye çêkirin: fabrîqeyan, grossîstan, supermarketan, salonan, çapkirin û dabingêran. Em koçberiya malên taybet, mobîlya û amûrên malê jî dikin.\n\nEm we bi wesayît û şofêrê guncand re dikin girê bidin ji bo paletan, parçeyên makîne, qutiyên xwarinê yên zuwa û tiştên koçberiyê — bi şeffafî û wek platforma lojîstîka nûjen.",
   h2_1: "TransPool24 çi ye?",
   p1: "Platforma rezervasyona dîjîtal ji bo veguhestina rêyê ya karsazî li Pforzheim û derdorê, bi gihîştina Baden-Württemberg û Almanya. Hûn rê, bar û asta xizmetê (tenê şofêr, bi wesayît, bi alîkar) diyar dikin û serhêl didin — em bi şofêrên profesyonel re rêveberiya bicîhkirinê dikin.\n\nJi bo şandinên B2B guncan e: ji karên paletê yên forklift heta radestkirina parçeyên hesas.",
   h2_2: "Herêm wek cîhê aborî",
   p2: "Pforzheim (Goldstadt) bi zêr, saet û endezyariya rast tê nasîn. Baden-Württemberg dilê otomobîlê ye — Mercedes, Porsche û torê qelebalix a salonan û depoyên parçeyan.\n\nDi nav de: gross ji bo restoran û firotanê li Karlsruhe, çapkirin û pakêt. Ev rêyên ku em piştgiriyê didin — di navbera fabrîqe, depo, werkstatt û firoşgehê de.",
   h2_3: "Çima şirket bi me re şandin dikin",
-  p3: "• Pêbawerî: têkiliyên zelal, çarçoveyên demê yên rastîn, radestkirina belgekirî gava pêwîst be.\n• Palet û forklift: gelek bar tevahiya paletê ye — barkirin/barkirinê bilez bi forkliftê (Stapler).\n• Bihayê dadilî berî kirînê: mesafe, pol û asta xizmetê — bê xercên veşartî piştî dayînê.\n• Ne sûka koçberiya mobîlyayê: şandîkarê tipîk karsazî ye, ne kanepeya taybet.",
+  p3: "• Pêbawerî: têkiliyên zelal, çarçoveyên demê yên rastîn, radestkirina belgekirî gava pêwîst be.\n• Palet û forklift: gelek bar tevahiya paletê ye — barkirin/barkirinê bilez bi forkliftê (Stapler).\n• Bihayê dadilî berî kirînê: mesafe, pol û asta xizmetê — bê xercên veşartî piştî dayînê.\n• Koçberiya malên taybet û mobîlya: mal, mobîlya û amûrên malê — wek her şandinekê serhêl rezerv bikin, bi alîkarê vebijarkî ji bo barkirinê.",
   tipsTitle: "Pênc şîret ji bo rezervasyona karsazî",
   tipsIntro: "Pratîk ji bo depo, werkstatt û şandinê — li gor TransPool24.",
   tips: [
@@ -118,7 +118,7 @@ export const whyPageKu: WhyPagePayload = {
   faqs: [
     {
       q: "TransPool24 koçberiya taybet dikin?",
-      a: "Baldarî me li şandîkarên karsazî ye: karsazî, gross, firotin, werkstatt, pîşesazî. Koçberiya taybet ne berhema sereke ye — ji bo istisnayan pêşî têkilî daynin.",
+      a: "Erê. Em koçberiya malên taybet, mobîlya û amûrên malê jî dikin — li gel şandinên karsazî. Wek her karê din serhêl rezerv bikin; alîkarê vebijarkî ji bo barkirin û dakêşanê.",
     },
     {
       q: "Ma herêma min digirin?",

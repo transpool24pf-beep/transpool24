@@ -6,7 +6,7 @@ export const whyPagePl: WhyPagePayload = {
   heroBadge: "Pforzheim · Badenia-Wirtembergia · Niemcy",
   headline: "Dlaczego firmy i partnerzy handlowi wybierają TransPool24",
   heroSub:
-    "Organizujemy transport drogowy dla firm, hurtowni, supermarketów i warsztatów między Pforzheim, Karlsruhe i regionem — jasne ceny, niezawodni kierowcy i rezerwacja online. Prywatne przeprowadzki i meble nie są naszym głównym celem.",
+    "Organizujemy transport drogowy dla firm, hurtowni, supermarketów i warsztatów między Pforzheim, Karlsruhe i regionem — jasne ceny, niezawodni kierowcy i rezerwacja online. Przewozimy też prywatne przeprowadzki i meble.",
   sidebarTitle: "Co cenią klienci biznesowi",
   sidebar: [
     {
@@ -25,15 +25,15 @@ export const whyPagePl: WhyPagePayload = {
       body: "Kierowcy znający Pforzheim, region motoryzacyjny i Karlsruhe — w tym dojazdy do salonów, hurtowni i stref przemysłowych.",
     },
   ],
-  introTitle: "Skupienie na biznesie i handlu — nie na prywatnych przeprowadzkach",
+  introTitle: "Biznes i handel — oraz prywatne przeprowadzki i meble",
   introLead:
-    "TransPool24 jest dla firm: fabryk, hurtowni, supermarketów, dealerów, drukarni i dostawców. Prywatne przeprowadzki mebli nie są centrum produktu.\n\nDobieramy odpowiedni pojazd i kierowcę do palet, części maszyn, suchych kartonów spożywczych i więcej — przejrzyście i z możliwością rezerwacji jak nowoczesna platforma logistyczna.",
+    "TransPool24 jest dla firm: fabryk, hurtowni, supermarketów, dealerów, drukarni i dostawców. Przewozimy także prywatne przeprowadzki, meble i sprzęt AGD.\n\nDobieramy odpowiedni pojazd i kierowcę do palet, części maszyn, suchych kartonów spożywczych i mienia przeprowadzkowego — przejrzyście i z możliwością rezerwacji jak nowoczesna platforma logistyczna.",
   h2_1: "Czym jest TransPool24?",
   p1: "Cyfrowa platforma rezerwacji komercyjnego transportu drogowego w Pforzheim i okolicach, z zasięgiem w Badenii-Wirtembergii i Niemczech. Opisujesz trasę, ładunek i poziom usługi (tylko kierowca, z pojazdem, z pomocnikiem) i płacisz online — koordynujemy wykonanie z profesjonalnymi kierowcami.\n\nDopasowane do B2B: od palet pod wózek po wrażliwe dostawy części.",
   h2_2: "Region jako przestrzeń gospodarcza",
   p2: "Pforzheim (Goldstadt) to złoto, zegarki i precyzyjna mechanika. Badenia-Wirtembergia to serce motoryzacji — Mercedes, Porsche i gęsta sieć salonów i magazynów części.\n\nPomiędzy: hurt zaopatrujący gastronomię i handel w Karlsruhe, drukarnie i opakowania. To te szlaki wspieramy — między zakładem, magazynem, warsztatem a sklepem.",
   h2_3: "Dlaczego firmy wysyłają z nami",
-  p3: "• Niezawodność: jasne kontakty, realistyczne okna czasowe, udokumentowane przekazania gdy trzeba.\n• Palety i wózek: wiele ładunków to pełne palety — szybkie załadunki/rozładunki wózkiem (Stapler).\n• Uczciwa cena przed zakupem: dystans, kategoria i poziom usługi — bez ukrytych opłat po płatności.\n• Nie marketplace przeprowadzek: typowy nadawca to firma, nie prywatna kanapa.",
+  p3: "• Niezawodność: jasne kontakty, realistyczne okna czasowe, udokumentowane przekazania gdy trzeba.\n• Palety i wózek: wiele ładunków to pełne palety — szybkie załadunki/rozładunki wózkiem (Stapler).\n• Uczciwa cena przed zakupem: dystans, kategoria i poziom usługi — bez ukrytych opłat po płatności.\n• Prywatne przeprowadzki i meble: mieszkania, meble i AGD — rezerwacja online jak każda inna przesyłka, opcjonalnie z pomocnikiem przy załadunku.",
   tipsTitle: "Pięć wskazówek do rezerwacji biznesowych",
   tipsIntro: "Praktyczne dla magazynu, warsztatu i dyspozycji — pod TransPool24.",
   tips: [
@@ -118,7 +118,7 @@ export const whyPagePl: WhyPagePayload = {
   faqs: [
     {
       q: "Czy TransPool24 robi prywatne przeprowadzki?",
-      a: "Skupiamy się na nadawcach biznesowych: firmy, hurt, detal, warsztaty, przemysł. Prywatne przeprowadzki nie są rdzeniem produktu — wyjątki po wcześniejszym kontakcie.",
+      a: "Tak. Przewozimy prywatne przeprowadzki, meble i sprzęt AGD — obok przesyłek biznesowych. Rezerwuj online jak każdą inną jazdę; opcjonalny pomocnik przy załadunku i rozładunku.",
     },
     {
       q: "Czy obsługujecie mój region?",

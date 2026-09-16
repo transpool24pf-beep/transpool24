@@ -6,7 +6,7 @@ export const whyPageFr: WhyPagePayload = {
   heroBadge: "Pforzheim · Bade-Wurtemberg · Allemagne",
   headline: "Pourquoi les entreprises et partenaires commerciaux choisissent TransPool24",
   heroSub:
-    "Nous organisons le transport routier pour les entreprises, grossistes, supermarchés et ateliers entre Pforzheim, Karlsruhe et la région — tarifs clairs, chauffeurs fiables et réservation en ligne. Les déménagements privés et le mobilier ne sont pas notre cœur de métier.",
+    "Nous organisons le transport routier pour les entreprises, grossistes, supermarchés et ateliers entre Pforzheim, Karlsruhe et la région — tarifs clairs, chauffeurs fiables et réservation en ligne. Nous transportons aussi les déménagements privés et le mobilier.",
   sidebarTitle: "Ce que les clients professionnels apprécient",
   sidebar: [
     {
@@ -25,15 +25,15 @@ export const whyPageFr: WhyPagePayload = {
       body: "Chauffeurs qui connaissent Pforzheim, la région automobile et Karlsruhe — y compris l’accès aux concessions, dépôts de gros et zones industrielles.",
     },
   ],
-  introTitle: "Priorité aux entreprises et au commerce — pas aux déménagements privés",
+  introTitle: "Entreprises et commerce — et déménagements privés ainsi que mobilier",
   introLead:
-    "TransPool24 s’adresse aux entreprises : usines, grossistes, supermarchés, concessions, imprimeries et fournisseurs. Le déménagement privé de meubles n’est pas le centre du produit.\n\nNous vous mettons en relation avec le bon véhicule et chauffeur pour palettes, pièces de machines, cartons secs d’épicerie, etc. — de façon transparente et réservable comme une plateforme logistique moderne.",
+    "TransPool24 s’adresse aux entreprises : usines, grossistes, supermarchés, concessions, imprimeries et fournisseurs. Nous transportons aussi les déménagements privés, le mobilier et les appareils ménagers.\n\nNous vous mettons en relation avec le bon véhicule et chauffeur pour palettes, pièces de machines, cartons secs d’épicerie et biens de déménagement — de façon transparente et réservable comme une plateforme logistique moderne.",
   h2_1: "Qu’est-ce que TransPool24 ?",
   p1: "Une plateforme de réservation numérique pour le transport routier professionnel à Pforzheim et alentours, avec une portée sur le Bade-Wurtemberg et l’Allemagne. Vous décrivez l’itinéraire, la marchandise et le niveau de service (chauffeur seul, avec véhicule, avec aide) et payez en ligne — nous coordonnons l’exécution avec des chauffeurs professionnels.\n\nAdapté aux envois B2B : des missions palettes compatibles chariot élévateur aux livraisons de pièces sensibles.",
   h2_2: "La région comme espace économique",
   p2: "Pforzheim (Goldstadt) est réputée pour l’or, les montres et la mécanique de précision. Le Bade-Wurtemberg est le cœur de l’automobile — Mercedes, Porsche et un maillage dense de concessions et de stocks de pièces.\n\nEntre les deux : le gros alimentant restaurants et commerce à Karlsruhe, imprimeries et emballage. Ce sont ces flux que nous soutenons — entre usine, entrepôt, atelier et point de vente.",
   h2_3: "Pourquoi les entreprises nous font confiance",
-  p3: "• Fiabilité : interlocuteurs clairs, créneaux réalistes, remises documentées si besoin.\n• Palettes et chariot : beaucoup de charges sont des palettes complètes — chargement/déchargement rapide au chariot élévateur (Stapler).\n• Prix équitable avant achat : distance, catégorie et niveau de service fixent le prix — sans frais cachés après paiement.\n• Pas une place de marché de déménagement : notre expéditeur type est une entreprise, pas un canapé particulier.",
+  p3: "• Fiabilité : interlocuteurs clairs, créneaux réalistes, remises documentées si besoin.\n• Palettes et chariot : beaucoup de charges sont des palettes complètes — chargement/déchargement rapide au chariot élévateur (Stapler).\n• Prix équitable avant achat : distance, catégorie et niveau de service fixent le prix — sans frais cachés après paiement.\n• Déménagements privés et mobilier : appartements, meubles et appareils — réservez en ligne comme tout autre envoi, avec aide optionnelle au chargement.",
   tipsTitle: "Cinq conseils pour les réservations professionnelles",
   tipsIntro: "Pratique pour entrepôt, atelier et expédition — adapté à TransPool24.",
   tips: [
@@ -118,7 +118,7 @@ export const whyPageFr: WhyPagePayload = {
   faqs: [
     {
       q: "TransPool24 fait-il des déménagements privés ?",
-      a: "Notre priorité : expéditeurs professionnels — entreprises, gros, commerce, ateliers, industrie. Le déménagement de particuliers n’est pas le produit central ; contactez-nous pour les exceptions.",
+      a: "Oui. Nous transportons les déménagements privés, le mobilier et les appareils ménagers — en plus des envois professionnels. Réservez en ligne comme toute autre tournée ; aide optionnelle au chargement et déchargement.",
     },
     {
       q: "Couvrez-vous ma zone ?",

@@ -6,7 +6,7 @@ export const whyPageEs: WhyPagePayload = {
   heroBadge: "Pforzheim · Baden-Wurtemberg · Alemania",
   headline: "Por qué empresas y socios comerciales eligen TransPool24",
   heroSub:
-    "Organizamos transporte por carretera para empresas, mayoristas, supermercados y talleres entre Pforzheim, Karlsruhe y la región — precios claros, conductores fiables y reserva online. Mudanzas privadas y muebles no son nuestro foco principal.",
+    "Organizamos transporte por carretera para empresas, mayoristas, supermercados y talleres entre Pforzheim, Karlsruhe y la región — precios claros, conductores fiables y reserva online. También hacemos mudanzas privadas y transporte de muebles.",
   sidebarTitle: "Lo que valoran los clientes comerciales",
   sidebar: [
     {
@@ -25,15 +25,15 @@ export const whyPageEs: WhyPagePayload = {
       body: "Conductores que conocen Pforzheim, la región del automóvil y Karlsruhe — incluido acceso a concesionarios, depósitos mayoristas y polígonos.",
     },
   ],
-  introTitle: "Enfoque en negocio y comercio — no en mudanzas privadas",
+  introTitle: "Negocio y comercio — y mudanzas privadas y muebles",
   introLead:
-    "TransPool24 está pensado para empresas: fábricas, mayoristas, supermercados, concesionarios, imprentas y proveedores. Mudanzas de muebles o pisos particulares no centran el producto.\n\nTe emparejamos con el vehículo y conductor adecuados para palés, piezas de maquinaria, cajas secas de alimentación y más — transparente y reservable como una plataforma logística moderna.",
+    "TransPool24 está pensado para empresas: fábricas, mayoristas, supermercados, concesionarios, imprentas y proveedores. También transportamos mudanzas privadas, muebles y electrodomésticos.\n\nTe emparejamos con el vehículo y conductor adecuados para palés, piezas de maquinaria, cajas secas de alimentación y mudanzas del hogar — transparente y reservable como una plataforma logística moderna.",
   h2_1: "¿Qué es TransPool24?",
   p1: "Plataforma digital de reserva para transporte comercial por carretera en Pforzheim y alrededores, con alcance en Baden-Wurtemberg y Alemania. Describes ruta, carga y nivel de servicio (solo conductor, con vehículo, con ayudante) y pagas online — coordinamos la ejecución con conductores profesionales.\n\nAdecuado para envíos B2B: desde trabajos con palé y carretilla hasta entregas de repuestos sensibles.",
   h2_2: "La región como espacio económico",
   p2: "Pforzheim (Goldstadt) es sinónimo de oro, relojes y ingeniería de precisión. Baden-Wurtemberg es el corazón del automóvil — Mercedes, Porsche y una red densa de concesionarios y almacenes de piezas.\n\nEntre medias: mayoristas que abastecen restaurantes y comercio en Karlsruhe, imprentas y embalaje. Esos son los corredores que apoyamos — entre planta, almacén, taller y tienda.",
   h2_3: "Por qué las empresas envían con nosotros",
-  p3: "• Fiabilidad: contactos claros, ventanas horarias realistas, entregas documentadas si hace falta.\n• Palés y carretilla: muchas cargas son palés completos — carga/descarga eficiente con carretilla elevadora.\n• Precio justo antes de comprar: distancia, categoría y nivel de servicio fijan el precio — sin cargos ocultos tras el pago.\n• No somos marketplace de mudanzas: nuestro expedidor típico es una empresa, no un sofá particular.",
+  p3: "• Fiabilidad: contactos claros, ventanas horarias realistas, entregas documentadas si hace falta.\n• Palés y carretilla: muchas cargas son palés completos — carga/descarga eficiente con carretilla elevadora.\n• Precio justo antes de comprar: distancia, categoría y nivel de servicio fijan el precio — sin cargos ocultos tras el pago.\n• Mudanzas privadas y muebles: pisos, mobiliario y electrodomésticos — reserva online como cualquier envío, con ayudante opcional para carga y descarga.",
   tipsTitle: "Cinco consejos para reservas comerciales",
   tipsIntro: "Práctico para almacén, taller y expedición — adaptado a TransPool24.",
   tips: [
@@ -118,7 +118,7 @@ export const whyPageEs: WhyPagePayload = {
   faqs: [
     {
       q: "¿TransPool24 hace mudanzas privadas?",
-      a: "Nuestro foco son remitentes comerciales: empresas, mayoristas, comercio, talleres e industria. Mudanzas de particulares no son el producto central — contáctenos antes para excepciones.",
+      a: "Sí. Transportamos mudanzas privadas, muebles y electrodomésticos — además de envíos comerciales. Reserve online como cualquier otro trabajo; ayudante opcional para carga y descarga.",
     },
     {
       q: "¿Cubren mi zona?",
