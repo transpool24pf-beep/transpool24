@@ -37,6 +37,7 @@ import {
   parseStructuredAddressFromLine,
   type StructuredAddress,
 } from "@/lib/structured-address";
+import { localeToHtmlLang } from "@/lib/locale-html-lang";
 import { GOOGLE_WRITE_REVIEW_URL } from "@/lib/google-review";
 import {
   formatIsoDateForOrderInput,

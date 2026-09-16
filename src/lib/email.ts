@@ -18,6 +18,7 @@ import {
   jobRecipientAddress,
   jobSenderAddress,
 } from "./structured-address";
+import { manualCustomerEmailSendOptions, transactionalEmailSendOptions } from "@/lib/email-addresses";
 
 /** Driver info for order confirmation email (from driver_applications) */
 export type OrderEmailDriverInfo = {
