@@ -187,6 +187,8 @@ export default async function HomePage({
         {/* Drivers Carousel Section */}
         <DriversCarousel />
 
+        <HomeSpeedOptions />
+
         <HomeTransportOperations />
 
         <GermanyConnectSection locale={locale} />
@@ -246,8 +248,6 @@ export default async function HomePage({
         </section>
 
         <HomeCargoTypes />
-
-        <HomeSpeedOptions />
 
         <HomepageDriverLogisticsLottie />
 
