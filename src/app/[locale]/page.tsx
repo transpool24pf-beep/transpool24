@@ -204,15 +204,13 @@ export default async function HomePage({
             </h2>
             <div className="relative mt-10 overflow-hidden rounded-3xl bg-[#0d2137] shadow-[0_24px_60px_-12px_rgba(0,0,0,0.35)] ring-1 ring-black/10">
               <div className="grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.95fr)]">
-                <div className="flex items-center justify-center bg-gradient-to-b from-[#f4f6f8] to-white px-4 py-8 sm:px-8 sm:py-10">
+                <div className="relative min-h-[16rem] overflow-hidden bg-[#1a1a1a] sm:min-h-[22rem] lg:min-h-[28rem]">
                   <Image
-                    src={TRANSPOOL24_VAN_IMAGE}
+                    src="/images/driver-cta-cabin.jpg"
                     alt=""
-                    width={1024}
-                    height={620}
-                    className="h-auto w-full max-h-[22rem] object-contain"
-                    sizes="(max-width: 1024px) 92vw, 640px"
-                    style={{ filter: "drop-shadow(0 18px 32px rgba(13,33,55,0.18))" }}
+                    fill
+                    className="object-cover object-[48%_42%]"
+                    sizes="(max-width: 1024px) 100vw, 58vw"
                   />
                 </div>
                 <div className="flex flex-col justify-center gap-10 px-8 py-12 sm:px-12 sm:py-14">
