@@ -82,7 +82,7 @@ export function HeaderCarLottieTrack() {
 
   return (
     <div
-      className="pointer-events-none absolute inset-x-0 bottom-0 top-0 z-0 overflow-visible"
+      className="pointer-events-none absolute inset-x-0 bottom-0 top-0 z-0 overflow-x-hidden overflow-y-visible [&_*]:pointer-events-none"
       dir="ltr"
       aria-hidden
     >
