@@ -1,6 +1,7 @@
 import { PDFDocument, rgb, StandardFonts, type PDFFont, type PDFPage } from "pdf-lib";
 import type { Job } from "./supabase";
 import { getPdfLogoBytes, PDF_COMPANY } from "./pdf-company";
+import { jobRecipientAddress } from "./structured-address";
 
 export type InvoiceType = "customer" | "driver";
 
@@ -215,9 +216,11 @@ export async function generateInvoicePdf(
   const leftX = margin;
   const rightX = margin + colW + colGap;
 
-  const addr = parseDeAddress(job.pickup_address || "");
+  const recipient = jobRecipientAddress(job);
+  const addrStreet = `${recipient.street} ${recipient.houseNumber}`.trim() || parseDeAddress(job.pickup_address || "").street;
   const plzOrt =
-    addr.plzOrt ||
+    `${recipient.postalCode} ${recipient.city}`.trim() ||
+    parseDeAddress(job.pickup_address || "").plzOrt ||
     (job.pickup_city ? `${job.pickup_city}` : "—");
 
   tealBar(page, leftX, y, colW, 20, "RECHNUNGSEMPFÄNGER", fontBold);
@@ -227,12 +230,15 @@ export async function generateInvoicePdf(
   const labelW = 118;
   const valueW = colW - labelW - 8;
   const leftPairs: [string, string][] = [
-    ["Kundenname / Firma:", job.company_name || ""],
-    ["Straße Hausnummer:", addr.street || ""],
+    ["Kundenname / Firma:", recipient.company || job.company_name || ""],
+    ["Straße Hausnummer:", addrStreet],
     ["PLZ Ort:", plzOrt],
-    ["", "Deutschland"],
+    ["", recipient.country || "Deutschland"],
     ["Kundennummer (optional):", job.order_number != null ? String(job.order_number) : ""],
   ];
+  if (recipient.notes.trim()) {
+    leftPairs.push(["Hinweis Entladung:", recipient.notes]);
+  }
   const rightPairs: [string, string][] = [
     ["", PDF_COMPANY.name],
     ["", PDF_COMPANY.street],
@@ -242,7 +248,8 @@ export async function generateInvoicePdf(
   ];
   for (let i = 0; i < leftPairs.length; i++) {
     const h1 = drawLabelValue(page, font, fontBold, leftX, y, leftPairs[i][0], leftPairs[i][1], labelW, valueW);
-    const h2 = drawLabelValue(page, font, fontBold, rightX, y, rightPairs[i][0], rightPairs[i][1], 90, colW - 98);
+    const rp = rightPairs[i] ?? ["", ""];
+    const h2 = drawLabelValue(page, font, fontBold, rightX, y, rp[0], rp[1], 90, colW - 98);
     y -= Math.max(h1, h2) + 6;
   }
   y -= 20;

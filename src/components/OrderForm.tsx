@@ -27,7 +27,16 @@ import {
   appendOrderAddressLine,
   saveOrderAddressHistory,
 } from "@/lib/order-address-history";
-import { localeToHtmlLang } from "@/lib/locale-html-lang";
+import { OrderFullAddressFields } from "@/components/OrderFullAddressFields";
+import {
+  EMPTY_STRUCTURED_ADDRESS,
+  formatStructuredAddressLine,
+  formatStructuredAddressPlain,
+  isStructuredAddressComplete,
+  normalizeStructuredAddress,
+  parseStructuredAddressFromLine,
+  type StructuredAddress,
+} from "@/lib/structured-address";
 import { GOOGLE_WRITE_REVIEW_URL } from "@/lib/google-review";
 import {
   formatIsoDateForOrderInput,
@@ -71,6 +80,8 @@ type PlaceDetailsJson = {
   street?: string | null;
   houseNumber?: string | null;
   postcode?: string | null;
+  city?: string | null;
+  country?: string | null;
 };
 type RouteGeo = {
   from: { lat: number; lon: number };
@@ -98,23 +109,21 @@ function addressLineForGeocode(raw: string): string {
   return `${t}, Deutschland`;
 }
 
+function structuredFromPlaceDetails(j: PlaceDetailsJson, prev: StructuredAddress): StructuredAddress {
+  const street = j.street?.trim() || prev.street;
+  const houseNumber = j.houseNumber?.trim() || prev.houseNumber;
+  const postalCode = (j.postcode?.trim().replace(/\D/g, "").slice(0, 5) || prev.postalCode);
+  const city = j.city?.trim() || prev.city;
+  const country = j.country?.trim() || prev.country || "Deutschland";
+  return { ...prev, street, houseNumber, postalCode, city, country };
+}
+
 function lineFromPlaceDetails(j: PlaceDetailsJson, displayFallback: string): string {
-  const street = j.street?.trim() || "";
-  const hn = j.houseNumber?.trim() || "";
-  const pc = j.postcode?.trim().replace(/\D/g, "").slice(0, 5) || "";
-  if (street && hn && /^\d{5}$/.test(pc)) {
-    return `${street} ${hn}, ${pc}, Deutschland`;
-  }
+  const filled = structuredFromPlaceDetails(j, EMPTY_STRUCTURED_ADDRESS);
+  if (isStructuredAddressComplete(filled)) return formatStructuredAddressLine(filled);
   const fa = j.formatted_address?.trim();
   if (fa) return fa;
   return displayFallback;
-}
-
-/** Street + number + German PLZ in one line (minimum bar before continuing) */
-function addressCompleteEnoughForOrder(value: string): boolean {
-  const t = value.trim();
-  if (t.length < 10) return false;
-  return /\b\d{5}\b/.test(t);
 }
 
 type OrderPricePreview = {
@@ -202,6 +211,8 @@ export type OrderFormData = {
   /** Full pickup line: street, house no., postcode (and city) — one field */
   pickupAddressLine: string;
   deliveryAddressLine: string;
+  pickupAddr: StructuredAddress;
+  deliveryAddr: StructuredAddress;
   pickupDate: string;
   pickupTime: string;
   cargoSize: CargoSize;
@@ -216,6 +227,8 @@ const initial: OrderFormData = {
   phone: "",
   pickupAddressLine: "",
   deliveryAddressLine: "",
+  pickupAddr: { ...EMPTY_STRUCTURED_ADDRESS },
+  deliveryAddr: { ...EMPTY_STRUCTURED_ADDRESS },
   pickupDate: "",
   pickupTime: "",
   cargoSize: FIXED_CARGO_SIZE,
@@ -310,13 +323,23 @@ export function OrderForm({
     const d = loadOrderFormDraft();
     if (d) {
       setStep(Math.min(4, Math.max(1, d.step)));
+      const rawData = d.data as OrderFormData & { pickupAddr?: unknown; deliveryAddr?: unknown };
+      const pickupAddr = rawData.pickupAddr
+        ? normalizeStructuredAddress(rawData.pickupAddr)
+        : parseStructuredAddressFromLine(rawData.pickupAddressLine || "");
+      const deliveryAddr = rawData.deliveryAddr
+        ? normalizeStructuredAddress(rawData.deliveryAddr)
+        : parseStructuredAddressFromLine(rawData.deliveryAddressLine || "");
       setData({
-        ...d.data,
+        ...rawData,
         cargoSize: FIXED_CARGO_SIZE,
+        pickupAddr,
+        deliveryAddr,
+        pickupAddressLine: formatStructuredAddressLine(pickupAddr) || rawData.pickupAddressLine || "",
+        deliveryAddressLine: formatStructuredAddressLine(deliveryAddr) || rawData.deliveryAddressLine || "",
         loads:
-          Array.isArray((d.data as { loads?: unknown }).loads) &&
-          ((d.data as { loads: unknown[] }).loads?.length ?? 0) > 0
-            ? (d.data as { loads: unknown[] }).loads.map(normalizeCargoLoadLine)
+          Array.isArray(rawData.loads) && rawData.loads.length > 0
+            ? rawData.loads.map(normalizeCargoLoadLine)
             : [emptyCargoLoadLine()],
       });
       setPickupDateField(maskPickupDateInput(d.pickupDateField));
@@ -476,7 +499,8 @@ export function OrderForm({
             ? crypto.randomUUID()
             : `tp24-${Date.now()}`;
       };
-      const key = field === "pickup" ? "pickupAddressLine" : "deliveryAddressLine";
+      const keyLine = field === "pickup" ? "pickupAddressLine" : "deliveryAddressLine";
+      const keyAddr = field === "pickup" ? "pickupAddr" : "deliveryAddr";
       let stored = (s.display_name || "").trim();
       try {
         if (s.place_id) {
@@ -486,19 +510,30 @@ export function OrderForm({
           const j = (await res.json()) as PlaceDetailsJson;
           rotateSession();
           stored = lineFromPlaceDetails(j, stored).trim() || stored;
-          setData((prev) => ({ ...prev, [key]: stored }));
+          setData((prev) => {
+            const nextAddr = structuredFromPlaceDetails(j, field === "pickup" ? prev.pickupAddr : prev.deliveryAddr);
+            return {
+              ...prev,
+              [keyAddr]: nextAddr,
+              [keyLine]: formatStructuredAddressLine(nextAddr) || stored,
+            };
+          });
           setError(null);
         } else {
+          const parsed = parseStructuredAddressFromLine(stored);
           setData((prev) => ({
             ...prev,
-            [key]: stored || (field === "pickup" ? prev.pickupAddressLine : prev.deliveryAddressLine),
+            [keyAddr]: parsed,
+            [keyLine]: stored || (field === "pickup" ? prev.pickupAddressLine : prev.deliveryAddressLine),
           }));
           setError(null);
         }
       } catch {
+        const parsed = parseStructuredAddressFromLine(stored);
         setData((prev) => ({
           ...prev,
-          [key]: stored || (field === "pickup" ? prev.pickupAddressLine : prev.deliveryAddressLine),
+          [keyAddr]: parsed,
+          [keyLine]: stored || (field === "pickup" ? prev.pickupAddressLine : prev.deliveryAddressLine),
         }));
         setError(null);
       }
@@ -532,7 +567,7 @@ export function OrderForm({
 
   const step1Complete = data.companyName.trim() !== "" && data.email.trim() !== "" && data.phone.trim() !== "";
   const step2Complete =
-    addressCompleteEnoughForOrder(data.pickupAddressLine) && addressCompleteEnoughForOrder(data.deliveryAddressLine);
+    isStructuredAddressComplete(data.pickupAddr) && isStructuredAddressComplete(data.deliveryAddr);
   const step3Complete =
     data.serviceType !== "" &&
     distanceFromRoute &&
@@ -921,7 +956,7 @@ export function OrderForm({
     if (step === 2) {
       if (!step2Complete) {
         setError(t("step2Incomplete"));
-        if (!addressCompleteEnoughForOrder(data.pickupAddressLine)) {
+        if (!isStructuredAddressComplete(data.pickupAddr)) {
           pickupAddressRef.current?.focus();
           pickupAddressRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
         } else {
@@ -1000,6 +1035,8 @@ export function OrderForm({
             cargoHeightCm: loadSummary.cargoHeightCm,
             stackable: loadSummary.stackable,
             dangerousGoods: loadSummary.dangerousGoods,
+            senderAddress: data.pickupAddr,
+            recipientAddress: data.deliveryAddr,
           },
         }),
       });
@@ -1200,172 +1237,158 @@ export function OrderForm({
           <h2 className="text-lg font-semibold text-[var(--primary)]">
             {t("step2")}
           </h2>
-          <div className="space-y-2">
-            <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
-              {t("pickup")}
-            </label>
-            <div className={`relative ${suggestionsOpen === "pickup" ? "z-30" : ""}`}>
-              <input
-                ref={pickupAddressRef}
-                type="text"
-                autoComplete="off"
-                name={addressLineInputNamesRef.current.pickup}
-                value={data.pickupAddressLine}
-                onChange={(e) => {
-                  update({ pickupAddressLine: e.target.value });
-                  setSuggestionsOpen("pickup");
-                }}
-                onMouseDown={() => {
-                  setAddressHistory(loadOrderAddressHistory());
-                  setSuggestionsOpen("pickup");
-                }}
-                onFocus={() => {
-                  setAddressHistory(loadOrderAddressHistory());
-                  setSuggestionsOpen("pickup");
-                }}
-                onBlur={() => {
-                  persistAddressLine(data.pickupAddressLine);
-                  setTimeout(() => {
-                    setSuggestionsOpen((open) => (open === "pickup" ? null : open));
-                  }, 200);
-                }}
-                placeholder={t("addressOneLinePlaceholder")}
-                className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-              />
-              {suggestionsOpen === "pickup" &&
-                (pickupHistoryMatches.length > 0 || pickupApiSuggestionsDeduped.length > 0) && (
-                  <ul className="absolute z-30 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-[#0d2137]/20 bg-white py-1 shadow-lg">
-                    {pickupHistoryMatches.length > 0 && (
-                      <>
-                        <li className="pointer-events-none px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--foreground)]/50">
-                          {t("addressHistorySection")}
+          <OrderFullAddressFields
+            title={t("senderFullTitle")}
+            value={data.pickupAddr}
+            notesLabel={t("addressLoadingNotes")}
+            streetInputRef={pickupAddressRef}
+            streetName={addressLineInputNamesRef.current.pickup}
+            onStreetFocus={() => {
+              setAddressHistory(loadOrderAddressHistory());
+              setSuggestionsOpen("pickup");
+            }}
+            onChange={(next) => {
+              update({ pickupAddr: next, pickupAddressLine: formatStructuredAddressLine(next) });
+              if (next.street !== data.pickupAddr.street) setSuggestionsOpen("pickup");
+            }}
+            labels={{
+              company: t("addressCompany"),
+              street: t("addressStreet"),
+              streetPlaceholder: t("addressStreetPlaceholder"),
+              houseNumber: t("addressHouseNumber"),
+              houseNumberPlaceholder: t("addressHouseNumberPlaceholder"),
+              postalCode: t("addressPostalCode"),
+              city: t("addressCity"),
+              country: t("addressCountry"),
+            }}
+            streetSuggestions={
+              suggestionsOpen === "pickup" &&
+              (pickupHistoryMatches.length > 0 || pickupApiSuggestionsDeduped.length > 0) ? (
+                <ul className="absolute z-30 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-[#0d2137]/20 bg-white py-1 shadow-lg">
+                  {pickupHistoryMatches.length > 0 && (
+                    <>
+                      <li className="pointer-events-none px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--foreground)]/50">
+                        {t("addressHistorySection")}
+                      </li>
+                      {pickupHistoryMatches.map((line, i) => (
+                        <li key={`hist-pu-${i}-${line.slice(0, 24)}`}>
+                          <button
+                            type="button"
+                            className="w-full px-4 py-2 text-left text-sm hover:bg-[#0d2137]/5"
+                            onMouseDown={(ev) => {
+                              ev.preventDefault();
+                              applyAddressLineSuggestion("pickup", { display_name: line });
+                            }}
+                          >
+                            {line}
+                          </button>
                         </li>
-                        {pickupHistoryMatches.map((line, i) => (
-                          <li key={`hist-pu-${i}-${line.slice(0, 24)}`}>
-                            <button
-                              type="button"
-                              className="w-full px-4 py-2 text-left text-sm hover:bg-[#0d2137]/5"
-                              onMouseDown={(ev) => {
-                                ev.preventDefault();
-                                applyAddressLineSuggestion("pickup", { display_name: line });
-                              }}
-                            >
-                              {line}
-                            </button>
-                          </li>
-                        ))}
-                      </>
-                    )}
-                    {pickupApiSuggestionsDeduped.length > 0 && (
-                      <>
-                        {pickupHistoryMatches.length > 0 && (
-                          <li className="pointer-events-none border-t border-[#0d2137]/10 px-3 py-1 pt-2 text-[10px] font-semibold uppercase tracking-wide text-[var(--foreground)]/50">
-                            {t("addressSuggestionsSection")}
-                          </li>
-                        )}
-                        {pickupApiSuggestionsDeduped.map((s, i) => (
-                          <li key={s.place_id || `api-pu-${i}`}>
-                            <button
-                              type="button"
-                              className="w-full px-4 py-2 text-left text-sm hover:bg-[#0d2137]/5"
-                              onMouseDown={(ev) => {
-                                ev.preventDefault();
-                                applyAddressLineSuggestion("pickup", s);
-                              }}
-                            >
-                              {s.display_name}
-                            </button>
-                          </li>
-                        ))}
-                      </>
-                    )}
-                  </ul>
-                )}
-            </div>
-          </div>
-          <div className="space-y-2">
-            <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
-              {t("delivery")}
-            </label>
-            <div className={`relative ${suggestionsOpen === "delivery" ? "z-30" : ""}`}>
-              <input
-                ref={deliveryAddressRef}
-                type="text"
-                autoComplete="off"
-                name={addressLineInputNamesRef.current.delivery}
-                value={data.deliveryAddressLine}
-                onChange={(e) => {
-                  update({ deliveryAddressLine: e.target.value });
-                  setSuggestionsOpen("delivery");
-                }}
-                onMouseDown={() => {
-                  setAddressHistory(loadOrderAddressHistory());
-                  setSuggestionsOpen("delivery");
-                }}
-                onFocus={() => {
-                  setAddressHistory(loadOrderAddressHistory());
-                  setSuggestionsOpen("delivery");
-                }}
-                onBlur={() => {
-                  persistAddressLine(data.deliveryAddressLine);
-                  setTimeout(() => {
-                    setSuggestionsOpen((open) => (open === "delivery" ? null : open));
-                  }, 200);
-                }}
-                placeholder={t("addressOneLinePlaceholder")}
-                className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-              />
-              {suggestionsOpen === "delivery" &&
-                (deliveryHistoryMatches.length > 0 || deliveryApiSuggestionsDeduped.length > 0) && (
-                  <ul className="absolute z-30 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-[#0d2137]/20 bg-white py-1 shadow-lg">
-                    {deliveryHistoryMatches.length > 0 && (
-                      <>
-                        <li className="pointer-events-none px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--foreground)]/50">
-                          {t("addressHistorySection")}
+                      ))}
+                    </>
+                  )}
+                  {pickupApiSuggestionsDeduped.length > 0 && (
+                    <>
+                      {pickupHistoryMatches.length > 0 && (
+                        <li className="pointer-events-none border-t border-[#0d2137]/10 px-3 py-1 pt-2 text-[10px] font-semibold uppercase tracking-wide text-[var(--foreground)]/50">
+                          {t("addressSuggestionsSection")}
                         </li>
-                        {deliveryHistoryMatches.map((line, i) => (
-                          <li key={`hist-de-${i}-${line.slice(0, 24)}`}>
-                            <button
-                              type="button"
-                              className="w-full px-4 py-2 text-left text-sm hover:bg-[#0d2137]/5"
-                              onMouseDown={(ev) => {
-                                ev.preventDefault();
-                                applyAddressLineSuggestion("delivery", { display_name: line });
-                              }}
-                            >
-                              {line}
-                            </button>
-                          </li>
-                        ))}
-                      </>
-                    )}
-                    {deliveryApiSuggestionsDeduped.length > 0 && (
-                      <>
-                        {deliveryHistoryMatches.length > 0 && (
-                          <li className="pointer-events-none border-t border-[#0d2137]/10 px-3 py-1 pt-2 text-[10px] font-semibold uppercase tracking-wide text-[var(--foreground)]/50">
-                            {t("addressSuggestionsSection")}
-                          </li>
-                        )}
-                        {deliveryApiSuggestionsDeduped.map((s, i) => (
-                          <li key={s.place_id || `api-de-${i}`}>
-                            <button
-                              type="button"
-                              className="w-full px-4 py-2 text-left text-sm hover:bg-[#0d2137]/5"
-                              onMouseDown={(ev) => {
-                                ev.preventDefault();
-                                applyAddressLineSuggestion("delivery", s);
-                              }}
-                            >
-                              {s.display_name}
-                            </button>
-                          </li>
-                        ))}
-                      </>
-                    )}
-                  </ul>
-                )}
-            </div>
-          </div>
+                      )}
+                      {pickupApiSuggestionsDeduped.map((s, i) => (
+                        <li key={s.place_id || `api-pu-${i}`}>
+                          <button
+                            type="button"
+                            className="w-full px-4 py-2 text-left text-sm hover:bg-[#0d2137]/5"
+                            onMouseDown={(ev) => {
+                              ev.preventDefault();
+                              applyAddressLineSuggestion("pickup", s);
+                            }}
+                          >
+                            {s.display_name}
+                          </button>
+                        </li>
+                      ))}
+                    </>
+                  )}
+                </ul>
+              ) : null
+            }
+          />
+          <OrderFullAddressFields
+            title={t("recipientFullTitle")}
+            value={data.deliveryAddr}
+            notesLabel={t("addressUnloadingNotes")}
+            streetInputRef={deliveryAddressRef}
+            streetName={addressLineInputNamesRef.current.delivery}
+            onStreetFocus={() => {
+              setAddressHistory(loadOrderAddressHistory());
+              setSuggestionsOpen("delivery");
+            }}
+            onChange={(next) => {
+              update({ deliveryAddr: next, deliveryAddressLine: formatStructuredAddressLine(next) });
+              if (next.street !== data.deliveryAddr.street) setSuggestionsOpen("delivery");
+            }}
+            labels={{
+              company: t("addressCompany"),
+              street: t("addressStreet"),
+              streetPlaceholder: t("addressStreetPlaceholder"),
+              houseNumber: t("addressHouseNumber"),
+              houseNumberPlaceholder: t("addressHouseNumberPlaceholder"),
+              postalCode: t("addressPostalCode"),
+              city: t("addressCity"),
+              country: t("addressCountry"),
+            }}
+            streetSuggestions={
+              suggestionsOpen === "delivery" &&
+              (deliveryHistoryMatches.length > 0 || deliveryApiSuggestionsDeduped.length > 0) ? (
+                <ul className="absolute z-30 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-[#0d2137]/20 bg-white py-1 shadow-lg">
+                  {deliveryHistoryMatches.length > 0 && (
+                    <>
+                      <li className="pointer-events-none px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--foreground)]/50">
+                        {t("addressHistorySection")}
+                      </li>
+                      {deliveryHistoryMatches.map((line, i) => (
+                        <li key={`hist-de-${i}-${line.slice(0, 24)}`}>
+                          <button
+                            type="button"
+                            className="w-full px-4 py-2 text-left text-sm hover:bg-[#0d2137]/5"
+                            onMouseDown={(ev) => {
+                              ev.preventDefault();
+                              applyAddressLineSuggestion("delivery", { display_name: line });
+                            }}
+                          >
+                            {line}
+                          </button>
+                        </li>
+                      ))}
+                    </>
+                  )}
+                  {deliveryApiSuggestionsDeduped.length > 0 && (
+                    <>
+                      {deliveryHistoryMatches.length > 0 && (
+                        <li className="pointer-events-none border-t border-[#0d2137]/10 px-3 py-1 pt-2 text-[10px] font-semibold uppercase tracking-wide text-[var(--foreground)]/50">
+                          {t("addressSuggestionsSection")}
+                        </li>
+                      )}
+                      {deliveryApiSuggestionsDeduped.map((s, i) => (
+                        <li key={s.place_id || `api-de-${i}`}>
+                          <button
+                            type="button"
+                            className="w-full px-4 py-2 text-left text-sm hover:bg-[#0d2137]/5"
+                            onMouseDown={(ev) => {
+                              ev.preventDefault();
+                              applyAddressLineSuggestion("delivery", s);
+                            }}
+                          >
+                            {s.display_name}
+                          </button>
+                        </li>
+                      ))}
+                    </>
+                  )}
+                </ul>
+              ) : null
+            }
+          />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
@@ -1805,8 +1828,8 @@ export function OrderForm({
             <p><strong>{t("companyName")}:</strong> {data.companyName}</p>
             <p><strong>{t("email")}:</strong> {data.email}</p>
             <p><strong>{t("whatsapp")}:</strong> {data.phone.trim() ? normalizePhone(data.phone) : data.phone}</p>
-            <p><strong>{t("pickup")}:</strong> {pickupAddress}</p>
-            <p><strong>{t("delivery")}:</strong> {deliveryAddress}</p>
+            <p className="whitespace-pre-line"><strong>{t("pickup")}:</strong>{" "}{formatStructuredAddressPlain(data.pickupAddr) || pickupAddress}</p>
+            <p className="whitespace-pre-line"><strong>{t("delivery")}:</strong>{" "}{formatStructuredAddressPlain(data.deliveryAddr) || deliveryAddress}</p>
             {(data.pickupDate || data.pickupTime) && (
               <p>
                 <strong>

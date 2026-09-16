@@ -400,7 +400,15 @@
     "loadCarrier_non_palletized_custom": "non palletized, custom dimensions",
     "loadCarrier_palletized_custom": "palletized, custom dimensions",
     "loadCarrier_roll_container": "Roll Container",
-    "loadCarrier_twinpallet": "Twinpallet"
+    "loadCarrier_twinpallet": "Twinpallet",
+    "recipientFullTitle": "Navnîşana wergir ya tevahî",
+    "senderFullTitle": "Navnîşana standinê ya tevahî",
+    "addressCompany": "Şîrket",
+    "addressPostalCode": "Koda postê",
+    "addressCity": "Bajar",
+    "addressCountry": "Welat",
+    "addressUnloadingNotes": "Têbînîyên xala daxistinê",
+    "addressLoadingNotes": "Têbînîyên xala barkirinê"
   },
   "footer": {
     "rights": "Hemû maf parastî ne.",

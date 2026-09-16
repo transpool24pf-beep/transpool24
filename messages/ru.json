@@ -398,7 +398,15 @@
     "loadCarrier_non_palletized_custom": "non palletized, custom dimensions",
     "loadCarrier_palletized_custom": "palletized, custom dimensions",
     "loadCarrier_roll_container": "Roll Container",
-    "loadCarrier_twinpallet": "Twinpallet"
+    "loadCarrier_twinpallet": "Twinpallet",
+    "recipientFullTitle": "Полный адрес получателя",
+    "senderFullTitle": "Полный адрес забора",
+    "addressCompany": "Компания",
+    "addressPostalCode": "Индекс",
+    "addressCity": "Город",
+    "addressCountry": "Страна",
+    "addressUnloadingNotes": "Примечания к разгрузке",
+    "addressLoadingNotes": "Примечания к погрузке"
   },
   "footer": {
     "rights": "Все права защищены.",

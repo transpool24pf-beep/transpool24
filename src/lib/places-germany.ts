@@ -24,24 +24,42 @@ export type GooglePlaceDetailsResult = {
   street: string | null;
   houseNumber: string | null;
   postcode: string | null;
+  city: string | null;
+  country: string | null;
 };
 
 function parseAddressComponents(
   components: { long_name: string; types: string[] }[] | undefined
-): { street: string | null; houseNumber: string | null; postcode: string | null } {
-  if (!components?.length) return { street: null, houseNumber: null, postcode: null };
+): {
+  street: string | null;
+  houseNumber: string | null;
+  postcode: string | null;
+  city: string | null;
+  country: string | null;
+} {
+  if (!components?.length) {
+    return { street: null, houseNumber: null, postcode: null, city: null, country: null };
+  }
   let street = "";
   let houseNumber = "";
   let postcode = "";
+  let city = "";
+  let country = "";
   for (const c of components) {
     if (c.types.includes("street_number")) houseNumber = c.long_name;
     if (c.types.includes("route")) street = c.long_name;
     if (c.types.includes("postal_code")) postcode = c.long_name;
+    if (c.types.includes("locality")) city = c.long_name;
+    if (!city && c.types.includes("postal_town")) city = c.long_name;
+    if (!city && c.types.includes("administrative_area_level_3")) city = c.long_name;
+    if (c.types.includes("country")) country = c.long_name;
   }
   return {
     street: street || null,
     houseNumber: houseNumber || null,
     postcode: postcode || null,
+    city: city || null,
+    country: country || null,
   };
 }
 
@@ -120,6 +138,8 @@ export async function googlePlaceDetailsGermany(
       street: parsed.street,
       houseNumber: parsed.houseNumber,
       postcode: parsed.postcode,
+      city: parsed.city,
+      country: parsed.country,
     };
   }
 
@@ -130,6 +150,8 @@ export async function googlePlaceDetailsGermany(
     street: parsed.street,
     houseNumber: parsed.houseNumber,
     postcode: parsed.postcode,
+    city: parsed.city,
+    country: parsed.country,
   };
 }
 

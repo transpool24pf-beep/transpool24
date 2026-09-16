@@ -544,7 +544,15 @@
     "loadCarrier_non_palletized_custom": "nicht palettiert, Sondermaße",
     "loadCarrier_palletized_custom": "palettiert, Sondermaße",
     "loadCarrier_roll_container": "Rollcontainer",
-    "loadCarrier_twinpallet": "Twinpalette"
+    "loadCarrier_twinpallet": "Twinpalette",
+    "recipientFullTitle": "Vollständige Empfängeradresse",
+    "senderFullTitle": "Vollständige Abholadresse",
+    "addressCompany": "Firma",
+    "addressPostalCode": "Postleitzahl",
+    "addressCity": "Ort",
+    "addressCountry": "Land",
+    "addressUnloadingNotes": "Hinweise Entladestelle",
+    "addressLoadingNotes": "Hinweise Ladestelle"
   },
   "footer": {
     "rights": "Alle Rechte vorbehalten.",

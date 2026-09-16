@@ -399,7 +399,15 @@
     "loadCarrier_non_palletized_custom": "non palletized, custom dimensions",
     "loadCarrier_palletized_custom": "palletized, custom dimensions",
     "loadCarrier_roll_container": "Roll Container",
-    "loadCarrier_twinpallet": "Twinpallet"
+    "loadCarrier_twinpallet": "Twinpallet",
+    "recipientFullTitle": "Pełny adres odbiorcy",
+    "senderFullTitle": "Pełny adres odbioru",
+    "addressCompany": "Firma",
+    "addressPostalCode": "Kod pocztowy",
+    "addressCity": "Miasto",
+    "addressCountry": "Kraj",
+    "addressUnloadingNotes": "Uwagi punktu rozładunku",
+    "addressLoadingNotes": "Uwagi punktu załadunku"
   },
   "footer": {
     "rights": "Wszelkie prawa zastrzeżone.",

@@ -399,7 +399,15 @@
     "loadCarrier_non_palletized_custom": "non palletized, custom dimensions",
     "loadCarrier_palletized_custom": "palletized, custom dimensions",
     "loadCarrier_roll_container": "Roll Container",
-    "loadCarrier_twinpallet": "Twinpallet"
+    "loadCarrier_twinpallet": "Twinpallet",
+    "recipientFullTitle": "Tam alıcı adresi",
+    "senderFullTitle": "Tam teslim alma adresi",
+    "addressCompany": "Şirket",
+    "addressPostalCode": "Posta kodu",
+    "addressCity": "Şehir",
+    "addressCountry": "Ülke",
+    "addressUnloadingNotes": "Boşaltma noktası notları",
+    "addressLoadingNotes": "Yükleme noktası notları"
   },
   "footer": {
     "rights": "Tüm hakları saklıdır.",

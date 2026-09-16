@@ -540,7 +540,15 @@
     "loadCarrier_non_palletized_custom": "non palletized, custom dimensions",
     "loadCarrier_palletized_custom": "palletized, custom dimensions",
     "loadCarrier_roll_container": "Roll Container",
-    "loadCarrier_twinpallet": "Twinpallet"
+    "loadCarrier_twinpallet": "Twinpallet",
+    "recipientFullTitle": "Full recipient address",
+    "senderFullTitle": "Full pickup address",
+    "addressCompany": "Company",
+    "addressPostalCode": "Postcode",
+    "addressCity": "City",
+    "addressCountry": "Country",
+    "addressUnloadingNotes": "Unloading point notes",
+    "addressLoadingNotes": "Loading point notes"
   },
   "footer": {
     "rights": "All rights reserved.",

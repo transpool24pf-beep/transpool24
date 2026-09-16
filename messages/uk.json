@@ -399,7 +399,15 @@
     "loadCarrier_non_palletized_custom": "non palletized, custom dimensions",
     "loadCarrier_palletized_custom": "palletized, custom dimensions",
     "loadCarrier_roll_container": "Roll Container",
-    "loadCarrier_twinpallet": "Twinpallet"
+    "loadCarrier_twinpallet": "Twinpallet",
+    "recipientFullTitle": "Повна адреса отримувача",
+    "senderFullTitle": "Повна адреса завантаження",
+    "addressCompany": "Компанія",
+    "addressPostalCode": "Індекс",
+    "addressCity": "Місто",
+    "addressCountry": "Країна",
+    "addressUnloadingNotes": "Примітки до розвантаження",
+    "addressLoadingNotes": "Примітки до завантаження"
   },
   "footer": {
     "rights": "Всі права захищені.",

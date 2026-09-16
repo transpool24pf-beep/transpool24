@@ -10,6 +10,7 @@ import {
   summarizeCargoLoads,
   formatCargoLoadsPlainDe,
 } from "@/lib/cargo";
+import { normalizeStructuredAddress, formatStructuredAddressPlain } from "@/lib/structured-address";
 import { computeOrderPricingFromAddresses } from "@/lib/order-pricing-compute";
 import { addGermanVat19 } from "@/lib/pricing";
 import { randomBytes, randomInt } from "crypto";
@@ -110,6 +111,10 @@ export async function POST(req: Request) {
       load_unload_90min_cents: pricing.load_unload_90min_cents,
     };
 
+    const senderAddress = normalizeStructuredAddress(cd?.senderAddress);
+    const recipientAddress = normalizeStructuredAddress(cd?.recipientAddress);
+    const pickupCity = senderAddress.city || cityFromGermanAddress(pickupAddress);
+    const deliveryCity = recipientAddress.city || cityFromGermanAddress(deliveryAddress);
     const weightKg = weightKgRaw;
     const priced = await computeOrderPricingFromAddresses({
       pickupAddress,
@@ -163,9 +168,9 @@ export async function POST(req: Request) {
         customer_email: email || null,
         preferred_pickup_at: pickupTime || null,
         pickup_address: pickupAddress,
-        pickup_city: cityFromGermanAddress(pickupAddress),
+        pickup_city: pickupCity,
         delivery_address: deliveryAddress,
-        delivery_city: cityFromGermanAddress(deliveryAddress),
+        delivery_city: deliveryCity,
         cargo_size: cargoSize,
         cargo_details:
           cargoDetails && typeof cargoDetails === "object"
@@ -181,6 +186,8 @@ export async function POST(req: Request) {
                 stackable: loadSummary.stackable,
                 dangerousGoods: loadSummary.dangerousGoods,
                 photoUrls,
+                senderAddress,
+                recipientAddress,
                 routeTerrain: p.routeTerrain,
                 routeWeather: p.routeWeather,
                 routeDriveTimeMultiplier: p.routeDriveTimeMultiplier,
@@ -233,8 +240,8 @@ export async function POST(req: Request) {
       `Neuer bestätigter Auftrag: ${job.id}`,
       `Firma: ${companyName}`,
       `Telefon: ${phone}`,
-      `Abholung: ${pickupAddress}`,
-      `Lieferung: ${deliveryAddress}`,
+      `Abholung: ${formatStructuredAddressPlain(senderAddress) || pickupAddress}`,
+      `Lieferung: ${formatStructuredAddressPlain(recipientAddress) || deliveryAddress}`,
       `Ladung: ${cargoSize}, ${distanceKm} km`,
       `Betrag: ${(priceCents / 100).toFixed(2)} EUR`,
     ].join("\n");
@@ -269,8 +276,8 @@ export async function POST(req: Request) {
       "",
       `Firma: ${companyName}`,
       `Tel: ${phone}`,
-      `Abholung: ${pickupAddress}`,
-      `Lieferung: ${deliveryAddress}`,
+      `Abholung: ${formatStructuredAddressPlain(senderAddress) || pickupAddress}`,
+      `Lieferung: ${formatStructuredAddressPlain(recipientAddress) || deliveryAddress}`,
       `Ladung: ${cargoSize} | ${distanceKm} km`,
       formatCargoLoadsPlainDe({ loads }) ||
         `Gewicht: ${weightKg} kg | Stück/Pakete: ${Math.round(packageCountRaw)}`,

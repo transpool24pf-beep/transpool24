@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useAdminLocale } from "@/contexts/AdminLocaleContext";
 import { cargoCategoryLabelDe, formatCargoLoadsPlainDe, parseCargoLoads } from "@/lib/cargo";
+import { formatStructuredAddressPlain, jobRecipientAddress, jobSenderAddress } from "@/lib/structured-address";
 import { odMailT, cargoCategoryAdminLabel, odT } from "@/lib/admin-order-detail-i18n";
 import { serviceTypeLabel } from "@/lib/admin-ui-strings";
 
@@ -648,11 +649,11 @@ export default function AdminOrderDetailPage({
             </div>
             <div>
               <dt className="text-[#0d2137]/60">{odT(locale, "od.pickup")}</dt>
-              <dd>{order.pickup_address}</dd>
+              <dd className="whitespace-pre-line">{formatStructuredAddressPlain(jobSenderAddress(order)) || order.pickup_address}</dd>
             </div>
             <div>
               <dt className="text-[#0d2137]/60">{odT(locale, "od.delivery")}</dt>
-              <dd>{order.delivery_address}</dd>
+              <dd className="whitespace-pre-line">{formatStructuredAddressPlain(jobRecipientAddress(order)) || order.delivery_address}</dd>
             </div>
             <div>
               <dt className="text-[#0d2137]/60">{odT(locale, "od.cargoSize")}</dt>

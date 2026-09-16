@@ -406,7 +406,15 @@
     "loadCarrier_non_palletized_custom": "بدون منصة، مقاسات خاصة",
     "loadCarrier_palletized_custom": "على منصة، مقاسات خاصة",
     "loadCarrier_roll_container": "حاوية بعجلات",
-    "loadCarrier_twinpallet": "منصة مزدوجة"
+    "loadCarrier_twinpallet": "منصة مزدوجة",
+    "recipientFullTitle": "عنوان المستلم الكامل",
+    "senderFullTitle": "عنوان الاستلام الكامل",
+    "addressCompany": "شركة",
+    "addressPostalCode": "رمز بريدي",
+    "addressCity": "مدينة",
+    "addressCountry": "دولة",
+    "addressUnloadingNotes": "ملاحظات نقطة تفريغ",
+    "addressLoadingNotes": "ملاحظات نقطة تحميل"
   },
   "footer": {
     "rights": "جميع الحقوق محفوظة.",

@@ -13,7 +13,11 @@ import {
   buildEmailFooterInvoiceBlock,
   type ResolvedEmailFooter,
 } from "@/lib/email-footer";
-import { manualCustomerEmailSendOptions, transactionalEmailSendOptions } from "@/lib/email-addresses";
+import {
+  formatStructuredAddressHtml,
+  jobRecipientAddress,
+  jobSenderAddress,
+} from "./structured-address";
 
 /** Driver info for order confirmation email (from driver_applications) */
 export type OrderEmailDriverInfo = {
@@ -129,8 +133,8 @@ function buildConfirmationHtml(
         <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse: collapse; font-size: 14px; border: 1px solid #e2e8f0; border-radius: 8px;">
           <tr style="background: #f8fafc;"><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Auftragsnummer</td><td style="border-bottom: 1px solid #e2e8f0;">${orderRef}</td></tr>
           <tr><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Datum</td><td style="border-bottom: 1px solid #e2e8f0;">${date}</td></tr>
-          <tr style="background: #f8fafc;"><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Abholung</td><td style="border-bottom: 1px solid #e2e8f0;">${escapeHtml(job.pickup_address)}${job.pickup_city ? `, ${job.pickup_city}` : ""}</td></tr>
-          <tr><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Lieferung</td><td style="border-bottom: 1px solid #e2e8f0;">${escapeHtml(job.delivery_address)}${job.delivery_city ? `, ${job.delivery_city}` : ""}</td></tr>
+          <tr style="background: #f8fafc;"><td style="border-bottom: 1px solid #e2e8f0; color: #64748b; vertical-align:top;">Abholung</td><td style="border-bottom: 1px solid #e2e8f0;">${addressHtmlForJob(job, "pickup")}</td></tr>
+          <tr><td style="border-bottom: 1px solid #e2e8f0; color: #64748b; vertical-align:top;">Lieferung (Empfänger)</td><td style="border-bottom: 1px solid #e2e8f0;">${addressHtmlForJob(job, "delivery")}</td></tr>
           <tr style="background: #f8fafc;"><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Ladung / Distanz</td><td style="border-bottom: 1px solid #e2e8f0;">${job.cargo_size}, ${job.distance_km ?? "—"} km</td></tr>
           ${cargoLoadsRows}
           ${cargoCategoryDe ? `<tr><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Warenkategorie</td><td style="border-bottom: 1px solid #e2e8f0;">${escapeHtml(cargoCategoryDe)}</td></tr>` : ""}
@@ -152,6 +156,17 @@ function buildConfirmationHtml(
 </body>
 </html>
   `.trim();
+}
+
+function addressHtmlForJob(job: Job, kind: "pickup" | "delivery"): string {
+  const a = kind === "pickup" ? jobSenderAddress(job) : jobRecipientAddress(job);
+  const html = formatStructuredAddressHtml(a, escapeHtml);
+  if (html) return html;
+  const line =
+    kind === "pickup"
+      ? `${job.pickup_address}${job.pickup_city ? `, ${job.pickup_city}` : ""}`
+      : `${job.delivery_address}${job.delivery_city ? `, ${job.delivery_city}` : ""}`;
+  return escapeHtml(line);
 }
 
 function escapeHtml(s: string): string {
@@ -388,8 +403,8 @@ function buildDeliveryConfirmationHtml(
           Die Zustellung Ihrer Sendung wurde abgeschlossen. Zeitpunkt (laut System): <strong>${escapeHtml(options.deliveredAtDe)}</strong>.
         </p>
         <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse:collapse; font-size:14px; border:1px solid #e2e8f0; border-radius:8px;">
-          <tr style="background:#f8fafc;"><td style="color:#64748b; width:32%;">Lieferadresse</td><td>${escapeHtml(job.delivery_address)}${job.delivery_city ? `, ${escapeHtml(job.delivery_city)}` : ""}</td></tr>
-          <tr><td style="color:#64748b;">Abholung</td><td>${escapeHtml(job.pickup_address)}</td></tr>
+          <tr style="background:#f8fafc;"><td style="color:#64748b; width:32%; vertical-align:top;">Lieferadresse (Empfänger)</td><td>${addressHtmlForJob(job, "delivery")}</td></tr>
+          <tr><td style="color:#64748b; vertical-align:top;">Abholung</td><td>${addressHtmlForJob(job, "pickup")}</td></tr>
         </table>
         ${podBlock}
         ${trackBlock}
@@ -704,8 +719,8 @@ function buildTrackingUpdateHtml(
         ${etaDe ? `<p style="margin:-12px 0 18px 0; font-size:14px; color:#0f766e;">Voraussichtliche Ankunft: <strong>${escapeHtml(etaDe)}</strong></p>` : ""}
         ${driverBlock}
         <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse:collapse; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:18px;">
-          <tr style="background:#f8fafc;"><td style="color:#64748b; width:32%;">Abholung</td><td>${escapeHtml(job.pickup_address)}</td></tr>
-          <tr><td style="color:#64748b;">Zustellung</td><td>${escapeHtml(job.delivery_address)}</td></tr>
+          <tr style="background:#f8fafc;"><td style="color:#64748b; width:32%; vertical-align:top;">Abholung</td><td>${addressHtmlForJob(job, "pickup")}</td></tr>
+          <tr><td style="color:#64748b; vertical-align:top;">Zustellung (Empfänger)</td><td>${addressHtmlForJob(job, "delivery")}</td></tr>
         </table>
         <p style="margin:0 0 14px 0; text-align:center;">
           <a href="${escapeHref(options.trackOrderUrl)}" style="display:inline-block; padding:16px 28px; background:linear-gradient(135deg,#e85d04 0%,#f48c06 100%); color:#fff !important; text-decoration:none; border-radius:12px; font-weight:bold; font-size:17px; box-shadow:0 4px 18px rgba(232,93,4,0.35);">

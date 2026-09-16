@@ -400,7 +400,15 @@
     "loadCarrier_non_palletized_custom": "non palletized, custom dimensions",
     "loadCarrier_palletized_custom": "palletized, custom dimensions",
     "loadCarrier_roll_container": "Roll Container",
-    "loadCarrier_twinpallet": "Twinpallet"
+    "loadCarrier_twinpallet": "Twinpallet",
+    "recipientFullTitle": "Indirizzo completo del destinatario",
+    "senderFullTitle": "Indirizzo completo di ritiro",
+    "addressCompany": "Azienda",
+    "addressPostalCode": "CAP",
+    "addressCity": "Città",
+    "addressCountry": "Paese",
+    "addressUnloadingNotes": "Note punto di scarico",
+    "addressLoadingNotes": "Note punto di carico"
   },
   "footer": {
     "rights": "Tutti i diritti riservati.",

@@ -26,5 +26,7 @@ export async function GET(req: Request) {
     street: details.street,
     houseNumber: details.houseNumber,
     postcode: details.postcode,
+    city: details.city,
+    country: details.country,
   });
 }
