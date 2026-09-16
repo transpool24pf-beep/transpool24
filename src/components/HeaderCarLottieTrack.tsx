@@ -9,10 +9,12 @@ import {
 
 /**
  * Same Lottie van as desktop: crosses the header bar left → right.
- * Motion uses translate3d so iOS Safari actually runs the track (it often ignores `left`).
+ * Position is driven with requestAnimationFrame so iOS Safari moves it
+ * (CSS `left` / sometimes even CSS transform on sticky headers will not).
  */
 export function HeaderCarLottieTrack() {
   const mountRef = useRef<HTMLDivElement>(null);
+  const riderRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const host = mountRef.current;
@@ -45,13 +47,41 @@ export function HeaderCarLottieTrack() {
     };
   }, []);
 
+  useEffect(() => {
+    const rider = riderRef.current;
+    if (!rider) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      rider.style.transform = `translate3d(${Math.round(window.innerWidth * 0.35)}px,0,0)`;
+      return;
+    }
+
+    rider.style.animation = "none";
+    rider.style.webkitAnimation = "none";
+
+    let raf = 0;
+    let start: number | null = null;
+    const duration = 18000;
+
+    const tick = (now: number) => {
+      if (start == null) start = now;
+      const p = ((now - start) % duration) / duration;
+      const track = rider.parentElement;
+      const w = track?.clientWidth || window.innerWidth;
+      const x = -280 + p * (w + 560);
+      rider.style.transform = `translate3d(${x}px,0,0)`;
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+
   return (
     <div
-      className="header-bar-car-layer pointer-events-none absolute inset-0 z-0 overflow-hidden"
+      className="header-bar-car-layer pointer-events-none absolute inset-0 z-20 overflow-hidden lg:z-0"
       dir="ltr"
       aria-hidden
     >
-      <div className="header-bar-car-rider">
+      <div className="header-bar-car-rider" ref={riderRef}>
         <div className="header-bar-car-inner">
           {/* Lottie art sits high in the 300×300 frame; nudge down so wheels sit on header bottom line */}
           <div className="header-bar-car-nudge">

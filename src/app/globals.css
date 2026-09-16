@@ -119,23 +119,29 @@ body {
   flex-direction: column;
   justify-content: flex-end;
   animation: header-bar-car-ltr 18s linear infinite;
+  -webkit-animation: header-bar-car-ltr 18s linear infinite;
   will-change: transform;
   opacity: 1;
   z-index: 1;
 }
 
-@media (max-width: 639px) {
+/* Phone header is short and full of buttons: sit the van in the bottom strip and draw it above the nav. */
+@media (max-width: 1023px) {
+  .header-bar-car-layer {
+    z-index: 20;
+  }
   .header-bar-car-inner {
-    transform: scale(0.28);
+    transform: scale(0.34);
   }
   .header-bar-car-nudge {
-    transform: translateY(128px);
+    transform: translateY(198px);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .header-bar-car-rider {
     animation: none;
+    -webkit-animation: none;
     transform: translate3d(calc(50vw - 150px), 0, 0);
   }
 }

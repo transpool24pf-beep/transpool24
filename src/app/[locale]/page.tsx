@@ -45,23 +45,23 @@ export default async function HomePage({
       <HomeJsonLd locale={locale} />
       <Header />
       <main className="min-h-[calc(100vh-8rem)]">
-        <section className="relative overflow-hidden bg-[#dfe5ec] lg:min-h-[min(90vh,44rem)]">
-          <div className="relative mx-auto aspect-[4/3] w-full max-h-[min(46vh,20rem)] sm:aspect-[16/10] sm:max-h-[min(48vh,24rem)] md:aspect-[16/9] md:max-h-[min(50vh,28rem)] lg:absolute lg:inset-0 lg:mx-0 lg:aspect-auto lg:h-full lg:max-h-none">
+        <section className="relative min-h-[min(58vh,26rem)] overflow-hidden bg-[#dfe5ec] sm:min-h-[min(70vh,36rem)] lg:min-h-[min(90vh,44rem)]">
+          <div className="absolute inset-0">
             <Image
               src={TRANSPOOL24_VAN_IMAGE}
               alt="TransPool24"
               fill
               priority
               quality={95}
-              className="object-contain object-center lg:scale-[1.04] lg:object-cover lg:object-[58%_50%]"
+              className="object-cover object-[52%_48%] sm:object-[56%_50%] lg:scale-[1.04] lg:object-[58%_50%]"
               sizes="100vw"
             />
           </div>
           <div
-            className="pointer-events-none absolute inset-0 hidden bg-gradient-to-r from-[#dfe5ec]/75 via-[#dfe5ec]/25 to-transparent lg:block rtl:bg-gradient-to-l rtl:from-[#dfe5ec]/75 rtl:via-[#dfe5ec]/25 rtl:to-transparent"
+            className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#dfe5ec]/80 via-[#dfe5ec]/35 to-transparent rtl:bg-gradient-to-l rtl:from-[#dfe5ec]/80 rtl:via-[#dfe5ec]/35 rtl:to-transparent"
             aria-hidden
           />
-          <div className="relative z-10 px-4 pb-10 pt-3 sm:px-6 sm:pb-12 sm:pt-4 lg:absolute lg:inset-0 lg:flex lg:min-h-[min(90vh,44rem)] lg:flex-col lg:justify-center lg:px-8 lg:py-28">
+          <div className="relative z-10 flex min-h-[min(58vh,26rem)] flex-col justify-end px-4 pb-8 pt-14 sm:min-h-[min(70vh,36rem)] sm:justify-center sm:px-6 sm:py-28 lg:min-h-[min(90vh,44rem)] lg:px-8">
             <div className="mx-auto w-full max-w-7xl">
               <div className="max-w-xl lg:max-w-2xl">
                 <div

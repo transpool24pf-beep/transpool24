@@ -208,7 +208,7 @@ export function Header({ hideLogo }: HeaderProps) {
   return (
     <header
       dir={rtl ? "rtl" : "ltr"}
-      className="sticky top-0 z-50 relative border-b border-[#0d2137]/10 bg-[var(--background)]"
+      className="sticky top-0 z-50 relative min-h-[3.35rem] overflow-hidden border-b border-[#0d2137]/10 bg-[var(--background)] sm:min-h-[3.5rem]"
     >
       <HeaderCarLottieTrack />
       {/* No backdrop-blur / frosted layer — it blurs the DotLottie behind this row */}
