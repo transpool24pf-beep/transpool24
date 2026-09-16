@@ -39,10 +39,13 @@ export function HeaderCarLottieTrack() {
       loaded.addEventListener("DOMLoaded", () => {
         const svg = host.querySelector("svg");
         if (!svg) return;
+        // Crop empty sky/ground in the 1920×1080 comp so wheels sit on the road line
+        svg.setAttribute("viewBox", "40 210 1840 620");
         svg.setAttribute("preserveAspectRatio", "xMidYMax meet");
         svg.style.display = "block";
         svg.style.width = "100%";
         svg.style.height = "100%";
+        svg.style.overflow = "visible";
       });
     })();
 
@@ -58,8 +61,7 @@ export function HeaderCarLottieTrack() {
 
     const widthOf = () => rider.parentElement?.clientWidth || window.innerWidth;
     const carW = () => rider.offsetWidth || 128;
-    /** Sit 2px onto the 2px border so wheels rest on the road line. */
-    const roadY = 2;
+    const roadY = 1;
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       rider.style.transform = `translate3d(${Math.max(0, (widthOf() - carW()) / 2)}px,${roadY}px,0)`;
@@ -88,7 +90,7 @@ export function HeaderCarLottieTrack() {
     >
       <div
         ref={riderRef}
-        className="absolute bottom-0 h-10 w-[7.25rem] will-change-transform sm:h-11 sm:w-32 md:h-12 md:w-40"
+        className="absolute bottom-px h-8 w-[6.75rem] will-change-transform sm:h-9 sm:w-[7.75rem] md:h-9 md:w-32"
       >
         <div ref={hostRef} className="h-full w-full" />
       </div>

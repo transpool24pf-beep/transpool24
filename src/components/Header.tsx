@@ -148,14 +148,14 @@ export function Header({ hideLogo }: HeaderProps) {
 
   /** Order / driver / blog: prominent centered logo (intrinsic size + max bounds, no short letterbox strip). */
   const centerLogoImgClass =
-    "h-auto w-auto max-h-[3.75rem] max-w-[min(90vw,18rem)] object-contain object-center sm:max-h-[4.5rem] sm:max-w-[21rem] md:max-h-[5.35rem] md:max-w-[25rem] lg:max-h-[6rem] lg:max-w-[28rem] xl:max-h-[6.5rem] xl:max-w-[30rem]";
+    "h-auto w-auto max-h-[2.35rem] max-w-[min(70vw,12rem)] object-contain object-center sm:max-h-[2.6rem] sm:max-w-[14rem] md:max-h-[2.75rem] md:max-w-[16rem]";
 
   const homePath = isLocaleHomePath(pathname, locale);
 
   /** Corner rows: no fixed-height box (avoids empty band above/below wide logo with object-contain). */
   const cornerLogoImgClass = homePath
-    ? "h-auto w-auto max-h-[2.55rem] max-w-[9.25rem] object-contain object-start rtl:object-right sm:max-h-[3.35rem] sm:max-w-[min(90vw,17rem)] md:max-h-[3.85rem] md:max-w-[19rem] lg:max-h-[4.35rem] lg:max-w-[21.5rem] xl:max-h-[4.75rem] xl:max-w-[24rem]"
-    : "h-auto w-auto max-h-[2.2rem] max-w-[min(56vw,8.75rem)] object-contain object-start rtl:object-right sm:max-h-[2.4rem] sm:max-w-[9.75rem] md:max-h-[2.55rem]";
+    ? "h-auto w-auto max-h-[2.15rem] max-w-[8.75rem] object-contain object-start rtl:object-right sm:max-h-[2.35rem] sm:max-w-[12rem] md:max-h-[2.5rem] md:max-w-[14rem]"
+    : "h-auto w-auto max-h-[2rem] max-w-[min(52vw,8rem)] object-contain object-start rtl:object-right sm:max-h-[2.2rem] sm:max-w-[9rem] md:max-h-[2.35rem]";
 
   const logoImageCenter = (
     <Image
@@ -208,7 +208,7 @@ export function Header({ hideLogo }: HeaderProps) {
   return (
     <header
       dir={rtl ? "rtl" : "ltr"}
-      className="sticky top-0 z-50 relative overflow-x-hidden overflow-y-visible border-b-2 border-[#0d2137]/18 bg-[var(--background)]"
+      className="sticky top-0 z-50 relative overflow-x-hidden overflow-y-visible border-b-2 border-[#0d2137]/25 bg-[var(--background)]"
     >
       <HeaderCarLottieTrack />
       {/* No backdrop-blur / frosted layer — it blurs the DotLottie behind this row */}
@@ -219,7 +219,7 @@ export function Header({ hideLogo }: HeaderProps) {
           </div>
         ) : showLargeCenterLogo ? (
           <div
-            className={`mx-auto grid w-full max-w-6xl items-center gap-2 px-4 py-1 sm:gap-3 sm:px-6 sm:py-1.5 md:py-2 ${
+            className={`mx-auto grid w-full max-w-6xl items-center gap-2 px-3 py-0.5 sm:gap-3 sm:px-6 ${
               hideNavOnMobileOrderDriver
                 ? "max-sm:grid-cols-1 max-sm:justify-items-center sm:grid-cols-[1fr_auto_1fr]"
                 : "grid-cols-[1fr_auto_1fr]"
@@ -246,8 +246,8 @@ export function Header({ hideLogo }: HeaderProps) {
           <div
             className={`flex w-full min-w-0 items-center justify-between gap-2 sm:gap-3 ${
               homePath
-                ? "py-1 ps-1.5 pe-2 sm:py-1.5 sm:ps-2 sm:pe-4 md:pe-5"
-                : "mx-auto max-w-6xl px-4 py-0 sm:px-6 sm:py-0.5"
+                ? "py-0.5 ps-1.5 pe-2 sm:ps-2 sm:pe-4 md:pe-5"
+                : "mx-auto max-w-6xl px-4 py-0 sm:px-6"
             }`}
           >
             <Link
