@@ -106,9 +106,13 @@ export async function geocodeGermanyCity(city: string): Promise<NominatimHit | n
       `${NOMINATIM_URL}?format=json&city=${encodeURIComponent(q)}&country=de&limit=1`,
       { headers: NOMINATIM_HEADERS }
     );
-    const data = await res.json();
-    if (Array.isArray(data) && data[0]?.lat && data[0]?.lon) {
-      return mapRow(data[0]);
+    const data: unknown = await res.json();
+    const row = Array.isArray(data) ? data[0] : null;
+    if (row && typeof row === "object" && "lat" in row && "lon" in row && "display_name" in row) {
+      const lat = String((row as { lat: unknown }).lat);
+      const lon = String((row as { lon: unknown }).lon);
+      const display_name = String((row as { display_name: unknown }).display_name ?? "");
+      if (lat && lon && display_name) return mapRow({ display_name, lat, lon });
     }
   } catch {
     /* fall through */

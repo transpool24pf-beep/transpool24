@@ -300,7 +300,7 @@ function readTransactionalEmailLogoFile(): Buffer | null {
 
 /** Logo bytes for inline CID: local public/ first, then HTTPS (covers Vercel when fs has no public/). */
 async function loadTransactionalEmailLogoBytes(): Promise<Buffer | null> {
-  let buf = readTransactionalEmailLogoFile();
+  const buf = readTransactionalEmailLogoFile();
   if (buf?.length) return buf;
   try {
     const res = await fetch(EMAIL_HEADER_LOGO_URL, { cache: "no-store" });

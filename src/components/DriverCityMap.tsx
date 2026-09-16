@@ -25,8 +25,7 @@ const CITY_COORDS: Record<string, [number, number]> = {
   Heidelberg: [49.3988, 8.6724],
 };
 
-const PLACEHOLDER_CITY =
-  /^(sonstige|other|autre|altra|otra|altele|inne|diğer|другое|інше|أخرى|yên din|__other__)$/i;
+const PLACEHOLDER_CITY = /^(sonstige|other|autre|altra|otra|altele|inne|__other__)$/i;
 
 function Recenter({
   lat,
@@ -50,29 +49,27 @@ function Recenter({
 
 export function DriverCityMap({ city }: { city: string }) {
   const trimmed = city.trim();
-  const fallback = (trimmed && CITY_COORDS[trimmed]) || PFORZHEIM;
-  const [position, setPosition] = useState<[number, number]>(fallback);
-  const [label, setLabel] = useState(trimmed || "Pforzheim");
+  const isPlaceholder = !trimmed || PLACEHOLDER_CITY.test(trimmed);
+  const known = !isPlaceholder ? CITY_COORDS[trimmed] : undefined;
+  const [geo, setGeo] = useState<{
+    city: string;
+    pos: [number, number];
+    label: string;
+  } | null>(null);
 
   useEffect(() => {
-    if (!trimmed || PLACEHOLDER_CITY.test(trimmed)) {
-      setPosition(PFORZHEIM);
-      setLabel("Pforzheim");
-      return;
-    }
-    const known = CITY_COORDS[trimmed];
-    if (known) {
-      setPosition(known);
-      setLabel(trimmed);
-    }
+    if (isPlaceholder) return;
     let cancelled = false;
     const timer = window.setTimeout(() => {
       fetch(`/api/geocode-city?q=${encodeURIComponent(trimmed)}`)
         .then((r) => r.json())
         .then((d: { lat?: number | null; lon?: number | null; label?: string | null }) => {
           if (cancelled || d.lat == null || d.lon == null) return;
-          setPosition([d.lat, d.lon]);
-          setLabel(d.label?.trim() || trimmed);
+          setGeo({
+            city: trimmed,
+            pos: [d.lat, d.lon],
+            label: d.label?.trim() || trimmed,
+          });
         })
         .catch(() => {
           /* keep fallback */
@@ -82,7 +79,11 @@ export function DriverCityMap({ city }: { city: string }) {
       cancelled = true;
       window.clearTimeout(timer);
     };
-  }, [trimmed]);
+  }, [trimmed, isPlaceholder, known]);
+
+  const position = (geo?.city === trimmed ? geo.pos : null) ?? known ?? PFORZHEIM;
+  const markerLabel =
+    (geo?.city === trimmed ? geo.label : null) ?? (trimmed && !isPlaceholder ? trimmed : "Pforzheim");
 
   return (
     <div className="h-[320px] w-full overflow-hidden rounded-xl border border-[#0d2137]/15 bg-[#f8f9fa]">
@@ -91,7 +92,7 @@ export function DriverCityMap({ city }: { city: string }) {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <Recenter lat={position[0]} lng={position[1]} label={label} />
+        <Recenter lat={position[0]} lng={position[1]} label={markerLabel} />
       </MapContainer>
     </div>
   );

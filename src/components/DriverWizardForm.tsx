@@ -48,27 +48,6 @@ type FormData = {
   workPolicyAccepted: boolean;
 };
 
-const initialForm: FormData = {
-  city: "",
-  cityCustom: "",
-  fullName: "",
-  email: "",
-  phoneCountryCode: "+49",
-  phone: "",
-  servicePolicyAccepted: false,
-  idDocumentFrontUrl: "",
-  idDocumentBackUrl: "",
-  licenseFrontUrl: "",
-  licenseBackUrl: "",
-  taxOrCommercialNumber: "",
-  personalPhotoUrl: "",
-  languagesSpoken: "",
-  vehiclePlate: "",
-  vehicleDocumentsUrl: "",
-  vehiclePhotoUrl: "",
-  workPolicyAccepted: false,
-};
-
 async function uploadFile(base64: string, filename: string): Promise<string> {
   const res = await fetch("/api/driver-applications/upload", {
     method: "POST",
@@ -195,7 +174,7 @@ export function DriverWizardForm({
   const [draftRestored, setDraftRestored] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
-  const [missing, setMissing] = useState<string[]>([]);
+  const [missingArmed, setMissingArmed] = useState(false);
   const [countryCodeOpen, setCountryCodeOpen] = useState(false);
   const countryCodeRef = useRef<HTMLDivElement>(null);
   const saveDraftTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -299,17 +278,10 @@ export function DriverWizardForm({
     return missingStep3();
   };
 
-  useEffect(() => {
-    setMissing((prev) => {
-      if (prev.length === 0) return prev;
-      return missingForStep(step);
-    });
-    // Recompute only after the user already tried Continue/Submit on this step.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form, step]);
+  const missing = missingArmed ? missingForStep(step) : [];
 
   const showMissing = (items: string[]) => {
-    setMissing(items);
+    setMissingArmed(items.length > 0);
     if (items.length) {
       window.setTimeout(() => missingBoxRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 80);
     }
@@ -342,6 +314,7 @@ export function DriverWizardForm({
       showMissing(m);
       return;
     }
+    setMissingArmed(false);
     setSubmitError(null);
     setSubmitLoading(true);
     try {
@@ -562,6 +535,7 @@ export function DriverWizardForm({
                 const m = missingStep1();
                 showMissing(m);
                 if (m.length) return;
+                setMissingArmed(false);
                 setStep(2);
               }}
               className="rounded-xl bg-[var(--accent)] px-8 py-3 font-semibold text-white"
@@ -704,6 +678,7 @@ export function DriverWizardForm({
                 const m = missingStep2();
                 showMissing(m);
                 if (m.length) return;
+                setMissingArmed(false);
                 setStep(3);
               }}
               className="rounded-xl bg-[var(--accent)] px-8 py-3 font-semibold text-white"
