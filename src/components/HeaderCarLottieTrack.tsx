@@ -6,8 +6,8 @@ const HEADER_VAN_JSON = "/lottie/header-van.json";
 const LOOP_MS = 18000;
 
 /**
- * Same header van as desktop, drawn with lottie-web SVG (works on iOS).
- * Travels along the bar behind the toolbar (under the buttons, not over them).
+ * Van drives left → right on the header bottom border (the bar line = the road).
+ * Behind the buttons. lottie-web SVG so it also runs on iOS.
  */
 export function HeaderCarLottieTrack() {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -16,7 +16,7 @@ export function HeaderCarLottieTrack() {
   useEffect(() => {
     const host = hostRef.current;
     if (!host) return;
-    let anim: { destroy: () => void } | null = null;
+    let anim: { destroy: () => void; addEventListener: (name: string, cb: () => void) => void } | null = null;
     let cancelled = false;
 
     (async () => {
@@ -30,8 +30,17 @@ export function HeaderCarLottieTrack() {
         autoplay: true,
         path: HEADER_VAN_JSON,
         rendererSettings: {
-          preserveAspectRatio: "xMidYMid meet",
+          // Pin wheels to the bottom of the box = the header border / road
+          preserveAspectRatio: "xMidYMax meet",
         },
+      });
+      anim.addEventListener("DOMLoaded", () => {
+        const svg = host.querySelector("svg");
+        if (!svg) return;
+        svg.setAttribute("preserveAspectRatio", "xMidYMax meet");
+        svg.style.display = "block";
+        svg.style.width = "100%";
+        svg.style.height = "100%";
       });
     })();
 
@@ -46,10 +55,12 @@ export function HeaderCarLottieTrack() {
     if (!rider) return;
 
     const widthOf = () => rider.parentElement?.clientWidth || window.innerWidth;
-    const carW = () => rider.offsetWidth || 112;
+    const carW = () => rider.offsetWidth || 128;
+    /** Sit 2px onto the 2px border so wheels rest on the road line. */
+    const roadY = 2;
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      rider.style.transform = `translate3d(${Math.max(0, (widthOf() - carW()) / 2)}px,0,0)`;
+      rider.style.transform = `translate3d(${Math.max(0, (widthOf() - carW()) / 2)}px,${roadY}px,0)`;
       return;
     }
 
@@ -60,7 +71,7 @@ export function HeaderCarLottieTrack() {
       const p = ((now - start) % LOOP_MS) / LOOP_MS;
       const w = widthOf();
       const x = -carW() + p * (w + carW());
-      rider.style.transform = `translate3d(${x}px,0,0)`;
+      rider.style.transform = `translate3d(${x}px,${roadY}px,0)`;
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
@@ -69,13 +80,13 @@ export function HeaderCarLottieTrack() {
 
   return (
     <div
-      className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+      className="pointer-events-none absolute inset-x-0 bottom-0 top-0 z-0 overflow-visible"
       dir="ltr"
       aria-hidden
     >
       <div
         ref={riderRef}
-        className="absolute bottom-0 h-7 w-[5.5rem] will-change-transform sm:h-8 sm:w-24 md:h-10 md:w-32"
+        className="absolute bottom-0 h-10 w-[7.25rem] will-change-transform sm:h-11 sm:w-32 md:h-12 md:w-40"
       >
         <div ref={hostRef} className="h-full w-full" />
       </div>
