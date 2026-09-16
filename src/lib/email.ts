@@ -855,7 +855,7 @@ function buildDriverApprovalHtml(
           </td>
         </tr>
         <tr>
-          <td style="background:#0d2137; padding: 16px 24px 28px; text-align: center;">
+          <td style="background:#ffffff; padding: 16px 24px 28px; text-align: center;">
             ${buildEmailFooterApprovalBlock(footer)}
           </td>
         </tr>
@@ -926,11 +926,11 @@ function buildDriverPaymentInvoiceEmailHtml(
   </table>
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; padding: 0 20px 24px;">
     <tr><td>
-      <div style="background: ${headerBlue}; border-radius: 0 0 16px 16px; padding: 32px 24px; text-align: center;">
+      <div style="background: #ffffff; border-radius: 0 0 16px 16px; padding: 32px 24px; text-align: center;">
         <img src="${branding.brandImgSrc}" alt="TransPool24" width="${EMAIL_HEADER_LOGO_MAX_WIDTH_PX}" style="display:block; margin:0 auto 20px; width:100%; max-width:${EMAIL_HEADER_LOGO_MAX_WIDTH_PX}px; height:auto; object-fit:contain; object-position:center center; border:0; -ms-interpolation-mode:bicubic;" />
-        <p style="margin: 0 0 20px 0; font-size: 18px; font-weight: bold; color: #ffffff;">Ihr Weg ist sicher – und unser Team steht immer hinter Ihnen.</p>
+        <p style="margin: 0 0 20px 0; font-size: 18px; font-weight: bold; color: #0d2137;">Ihr Weg ist sicher – und unser Team steht immer hinter Ihnen.</p>
         <a href="${supportUrl}" style="display: inline-block; margin: 0 0 24px 0; padding: 14px 28px; background: #00BFFF; color: #fff; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 15px;">Wir sind an Ihrer Seite bei jedem Kilometer.</a>
-        <p style="margin: 0 0 12px 0; font-size: 13px; color: rgba(255,255,255,0.9);">Folgen Sie uns</p>
+        <p style="margin: 0 0 12px 0; font-size: 13px; color: #0d2137;">Folgen Sie uns</p>
         ${invoiceFooter.followUsTableHtml}
       </div>
     </td></tr>

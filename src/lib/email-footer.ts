@@ -91,18 +91,16 @@ export async function loadEmailFooterSocial(): Promise<ResolvedEmailFooter> {
   }
 }
 
-/** Order confirmation card: “Folgen Sie uns” + 5 icons + email line */
+/** Order confirmation card: “Folgen Sie uns” + icons (no email address line) */
 export function buildEmailFooterOrderBlock(footer: ResolvedEmailFooter): string {
   const ig = escapeHref(footer.instagramHref);
   const li = escapeHref(footer.linkedinHref);
   const tt = escapeHref(footer.tiktokHref);
   const m1 = escapeHref(footer.mailtoPrimary);
   const m2 = escapeHref(footer.mailtoSecondary);
-  const d1 = escapeHtml(footer.emailDisplayPrimary);
-  const d2 = escapeHtml(footer.emailDisplaySecondary);
   return `
-        <div style="margin-top: 28px; padding: 24px; background: #0d2137; border-radius: 0 0 12px 12px; text-align: center;">
-          <p style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600; color: #fff;">Folgen Sie uns</p>
+        <div style="margin-top: 28px; padding: 24px; background: #ffffff; border-radius: 0 0 12px 12px; text-align: center;">
+          <p style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600; color: #0d2137;">Folgen Sie uns</p>
           <table cellpadding="0" cellspacing="0" align="center" style="margin: 0 auto;">
             <tr>
               <td style="padding: 0 10px;"><a href="${ig}" target="_blank" rel="noopener" style="display:inline-block;"><img src="${SITE_URL}/icons/instagram.png" alt="Instagram" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
@@ -112,7 +110,6 @@ export function buildEmailFooterOrderBlock(footer: ResolvedEmailFooter): string 
               <td style="padding: 0 10px;"><a href="${m2}" style="display:inline-block;"><img src="${SITE_URL}/icons/email.svg" alt="Email" width="32" height="32" style="display:block; width:32px; height:32px;" /></a></td>
             </tr>
           </table>
-          <p style="margin: 12px 0 0 0; font-size: 12px; color: rgba(255,255,255,0.8);">${d1} · ${d2}</p>
         </div>`;
 }
 
@@ -122,7 +119,7 @@ export function buildEmailFooterApprovalBlock(footer: ResolvedEmailFooter): stri
   const li = escapeHref(footer.linkedinHref);
   const tt = escapeHref(footer.tiktokHref);
   return `
-            <p style="margin:0 0 12px 0; font-size:12px; color:rgba(255,255,255,0.8);">Folgen Sie uns</p>
+            <p style="margin:0 0 12px 0; font-size:12px; color:#0d2137;">Folgen Sie uns</p>
             <p style="margin:0; font-size:0; line-height:0;">
               <a href="${ig}" target="_blank" rel="noopener" style="display:inline-block; margin:0 14px; vertical-align:middle;"><img src="${SITE_URL}/icons/instagram.png" alt="Instagram" width="32" height="32" style="display:block; width:32px; height:32px;" /></a>
               <a href="${li}" target="_blank" rel="noopener" style="display:inline-block; margin:0 14px; vertical-align:middle;"><img src="${SITE_URL}/icons/linkedin.png" alt="LinkedIn" width="32" height="32" style="display:block; width:32px; height:32px;" /></a>
