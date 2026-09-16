@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { getPublicContactEmail, getPublicContactMailto } from "@/lib/site-contact";
+import { BrandWordmark } from "@/components/BrandWordmark";
 
 function SocialRow({ className }: { className?: string }) {
   return (
@@ -42,10 +43,9 @@ export function BlogFooter() {
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:py-16">
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-10">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="rounded-md bg-[var(--accent)] px-2 py-0.5 text-sm font-black text-white">T</span>
-              <span className="text-lg font-extrabold">{t("template.logoWordmark")}</span>
-            </div>
+            <Link href={`/${locale}`} className="inline-flex items-center" aria-label="TransPool24">
+              <BrandWordmark className="text-[1.45rem]" onDark />
+            </Link>
             <p className="mt-4 text-sm leading-relaxed text-white/75">{t("footerBlurb")}</p>
             <SocialRow className="mt-6" />
           </div>

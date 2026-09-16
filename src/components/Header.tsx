@@ -9,6 +9,7 @@ import { locales, type Locale } from "@/i18n/routing";
 import { LOCALE_NATIVE_LABEL, LOCALE_SHORT_CODE } from "@/lib/locale-display";
 import { LocaleFlagIcon } from "@/components/LocaleFlagIcon";
 import { HeaderCarLottieTrack } from "@/components/HeaderCarLottieTrack";
+import { BrandWordmark } from "@/components/BrandWordmark";
 
 type HeaderProps = { hideLogo?: boolean };
 
@@ -101,8 +102,7 @@ function HeaderLanguageDropdown({
       ref={menuRef}
       className="fixed z-[80] w-[min(19rem,calc(100vw-1.25rem))] rounded-xl border border-[#0d2137]/12 bg-gradient-to-b from-white via-[#f6f8fc] to-[#e8edf4] p-2 shadow-[0_18px_50px_-12px_rgba(13,33,55,0.32),inset_0_1px_0_rgba(255,255,255,0.92)] ring-1 ring-white/80"
       style={rtl ? { top: menuPos.top, left: menuPos.left } : { top: menuPos.top, right: menuPos.right }}
-      role="listbox"
-      aria-label={languageLabel}
+      onMouseDown={(e) => e.stopPropagation()}
     >
       <p className="mb-1.5 px-2 text-[10px] font-semibold uppercase tracking-wide text-[#0d2137]/48">
         {languageLabel}
@@ -183,17 +183,12 @@ export function Header({ hideLogo }: HeaderProps) {
 
   const homePath = isLocaleHomePath(pathname, locale);
 
-  const headerWordmark = (sizeClass: string) => (
-    <span
-      className={`select-none whitespace-nowrap font-extrabold italic leading-none tracking-tight ${sizeClass}`}
-    >
-      <span className="text-[#1e4a7a]">TransPool</span>
-      <span className="text-[#e85d04]">24</span>
-    </span>
+  const logoImageCenter = (
+    <BrandWordmark className="text-[1.45rem] sm:text-[1.65rem] md:text-[1.85rem]" />
   );
-
-  const logoImageCenter = headerWordmark("text-[1.45rem] sm:text-[1.65rem] md:text-[1.85rem]");
-  const logoImageCorner = headerWordmark("text-[1.4rem] sm:text-[1.6rem] md:text-[1.75rem]");
+  const logoImageCorner = (
+    <BrandWordmark className="text-[1.4rem] sm:text-[1.6rem] md:text-[1.75rem]" />
+  );
 
   const langDropdown = (
     <HeaderLanguageDropdown locale={locale} basePath={basePath} languageLabel={t("language")} rtl={rtl} />

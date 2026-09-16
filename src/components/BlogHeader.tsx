@@ -8,6 +8,7 @@ import type { Locale } from "@/i18n/routing";
 import { locales } from "@/i18n/routing";
 import { LOCALE_NATIVE_LABEL, LOCALE_SHORT_CODE } from "@/lib/locale-display";
 import { LocaleFlagIcon } from "@/components/LocaleFlagIcon";
+import { BrandWordmark } from "@/components/BrandWordmark";
 import { getPublicContactEmail, getPublicContactMailto } from "@/lib/site-contact";
 
 type NavPage = { slug: string; title: string; nav_order: number };
@@ -128,9 +129,8 @@ export function BlogHeader() {
       {/* Main navbar */}
       <div className="border-b border-black/[0.08] bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4">
-          <Link href={`/${locale}`} className="flex shrink-0 items-center gap-2 py-1" aria-label={t("template.logoWordmark")}>
-            <span className="rounded-md bg-[var(--accent)] px-2.5 py-1 text-lg font-black leading-none text-white">T</span>
-            <span className="text-lg font-extrabold tracking-tight text-[#1a1a1a]">{t("template.logoWordmark")}</span>
+          <Link href={`/${locale}`} className="flex shrink-0 items-center py-1" aria-label="TransPool24">
+            <BrandWordmark className="text-[1.4rem] sm:text-[1.6rem] md:text-[1.75rem]" />
           </Link>
 
           <nav className="hidden items-center gap-0.5 lg:flex" aria-label={t("navAria")}>
