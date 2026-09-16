@@ -7,7 +7,7 @@ const LOOP_MS = 18000;
 
 /**
  * Same header van as desktop, drawn with lottie-web SVG (works on iOS).
- * Slides left → right over the toolbar, including across the phone buttons.
+ * Travels along the bar behind the toolbar (under the buttons, not over them).
  */
 export function HeaderCarLottieTrack() {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -49,7 +49,7 @@ export function HeaderCarLottieTrack() {
     const carW = () => rider.offsetWidth || 112;
 
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      rider.style.transform = `translate3d(${Math.max(0, (widthOf() - carW()) / 2)}px,-50%,0)`;
+      rider.style.transform = `translate3d(${Math.max(0, (widthOf() - carW()) / 2)}px,0,0)`;
       return;
     }
 
@@ -60,7 +60,7 @@ export function HeaderCarLottieTrack() {
       const p = ((now - start) % LOOP_MS) / LOOP_MS;
       const w = widthOf();
       const x = -carW() + p * (w + carW());
-      rider.style.transform = `translate3d(${x}px,-50%,0)`;
+      rider.style.transform = `translate3d(${x}px,0,0)`;
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
@@ -69,13 +69,13 @@ export function HeaderCarLottieTrack() {
 
   return (
     <div
-      className="pointer-events-none absolute inset-0 z-[40] overflow-hidden"
+      className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
       dir="ltr"
       aria-hidden
     >
       <div
         ref={riderRef}
-        className="absolute top-1/2 h-9 w-[6.5rem] will-change-transform sm:h-10 sm:w-32 md:h-11 md:w-36"
+        className="absolute bottom-0 h-8 w-[6.25rem] will-change-transform sm:h-9 sm:w-28 md:h-10 md:w-32"
       >
         <div ref={hostRef} className="h-full w-full" />
       </div>

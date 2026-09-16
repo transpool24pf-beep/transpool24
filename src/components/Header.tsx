@@ -212,7 +212,7 @@ export function Header({ hideLogo }: HeaderProps) {
     >
       <HeaderCarLottieTrack />
       {/* No backdrop-blur / frosted layer — it blurs the DotLottie behind this row */}
-      <div className="relative z-10">
+      <div className="relative z-10 max-lg:pb-9">
         {hideLogo ? (
           <div className="mx-auto flex max-w-6xl items-center justify-end gap-2 px-4 py-0.5 sm:px-6 sm:py-1">
             {navWithLang}
