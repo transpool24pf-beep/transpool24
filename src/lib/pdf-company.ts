@@ -43,15 +43,25 @@ export function pdfCompanyFooterLine(): string {
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com";
 
-/** Load logo for PDFs: env base64 first, then fetch from site so logo always appears in production. */
+/** Load logo for PDFs: local transparent file first, then env, then public URL. */
 export async function getPdfLogoBytes(): Promise<Uint8Array | null> {
+  try {
+    const { existsSync, readFileSync } = await import("node:fs");
+    const { join } = await import("node:path");
+    const local = join(process.cwd(), "public", "345remov.png");
+    if (existsSync(local)) {
+      return new Uint8Array(readFileSync(local));
+    }
+  } catch {
+    /* fallback */
+  }
   try {
     const base64 = process.env.INVOICE_LOGO_BASE64;
     if (base64 && typeof base64 === "string") {
       return new Uint8Array(Buffer.from(base64, "base64"));
     }
   } catch {
-    // fallback below
+    /* fallback */
   }
   try {
     const res = await fetch(`${SITE_URL}/345remov.png`);
@@ -60,7 +70,7 @@ export async function getPdfLogoBytes(): Promise<Uint8Array | null> {
       return new Uint8Array(buf);
     }
   } catch {
-    // no logo
+    /* no logo */
   }
   return null;
 }
