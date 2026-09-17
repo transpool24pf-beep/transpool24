@@ -339,3 +339,28 @@ export async function PATCH(
   }
   return NextResponse.json({ ok: true, status: "rejected" });
 }
+
+export async function DELETE(
+  _req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const err = await requireAdmin();
+  if (err) return err;
+  const { id } = await params;
+  if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
+  const supabase = createServerSupabase();
+  const { data, error } = await supabase
+    .from("driver_applications")
+    .delete()
+    .eq("id", id)
+    .select("id")
+    .maybeSingle();
+  if (error) {
+    console.error("[admin/driver-applications DELETE]", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+  if (!data) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+  return NextResponse.json({ ok: true });
+}

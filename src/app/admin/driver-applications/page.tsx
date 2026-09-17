@@ -22,6 +22,7 @@ export default function AdminDriverApplicationsPage() {
   const [list, setList] = useState<DriverApp[]>([]);
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
 
   const statusLabel = (status: string) => {
     if (status === "new") return t("driverApps.status.new");
@@ -48,6 +49,23 @@ export default function AdminDriverApplicationsPage() {
       })
       .finally(() => setLoading(false));
   }, [t]);
+
+  const deleteApp = (app: DriverApp) => {
+    const msg = t("driverApps.deleteConfirm").replace("{name}", app.full_name || app.email || app.id.slice(0, 8));
+    if (!window.confirm(msg)) return;
+    setDeleting(app.id);
+    fetch(`/api/admin/driver-applications/${app.id}`, { method: "DELETE" })
+      .then(async (r) => {
+        if (!r.ok) {
+          const data = (await r.json().catch(() => ({}))) as { error?: string };
+          alert(data?.error ?? t("driverApps.deleteFailed"));
+          return;
+        }
+        setList((prev) => prev.filter((x) => x.id !== app.id));
+      })
+      .catch(() => alert(t("driverApps.deleteFailed")))
+      .finally(() => setDeleting(null));
+  };
 
   return (
     <div>
@@ -91,12 +109,26 @@ export default function AdminDriverApplicationsPage() {
                     {new Date(app.created_at).toLocaleDateString(dateLocale)}
                   </td>
                   <td className="p-3">
-                    <Link
-                      href={`/admin/driver-applications/${app.id}`}
-                      className="rounded-lg bg-[var(--accent)]/10 px-3 py-1.5 text-sm font-medium text-[var(--accent)] hover:bg-[var(--accent)]/20"
-                    >
-                      {t("common.open")}
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        href={`/admin/driver-applications/${app.id}`}
+                        className="rounded-lg bg-[var(--accent)]/10 px-3 py-1.5 text-sm font-medium text-[var(--accent)] hover:bg-[var(--accent)]/20"
+                      >
+                        {t("common.open")}
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={() => deleteApp(app)}
+                        disabled={deleting === app.id}
+                        title={t("driverApps.deleteAria")}
+                        aria-label={t("driverApps.deleteAria")}
+                        className="inline-flex h-8 min-w-8 items-center justify-center rounded-md border border-red-300 bg-red-50 text-lg font-bold leading-none text-red-700 shadow-sm transition hover:border-red-400 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-45"
+                      >
+                        <span aria-hidden className="-mt-px block">
+                          ×
+                        </span>
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

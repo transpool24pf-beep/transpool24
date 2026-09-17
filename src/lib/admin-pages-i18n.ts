@@ -132,6 +132,10 @@ export const ADMIN_PAGES_DE: Record<string, string> = {
   "driverApps.status.new": "Neu",
   "driverApps.status.approved": "Genehmigt",
   "driverApps.status.rejected": "Abgelehnt",
+  "driverApps.deleteAria": "Bewerbung endgültig löschen",
+  "driverApps.deleteConfirm":
+    "Bewerbung von {name} endgültig löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+  "driverApps.deleteFailed": "Löschen fehlgeschlagen",
 
   "blog.hubTitle": "Blog / Magazin",
   "blog.hubSubtitle":
@@ -334,6 +338,9 @@ export const ADMIN_PAGES_AR: Record<string, string> = {
   "driverApps.status.new": "جديد",
   "driverApps.status.approved": "موافق عليه",
   "driverApps.status.rejected": "مرفوض",
+  "driverApps.deleteAria": "حذف الطلب نهائياً",
+  "driverApps.deleteConfirm": "حذف طلب {name} نهائياً؟ لا يمكن التراجع عن هذا الإجراء.",
+  "driverApps.deleteFailed": "فشل الحذف",
 
   "blog.hubTitle": "مدونة / مجلة",
   "blog.hubSubtitle":
