@@ -164,9 +164,9 @@ const OD_DE: Record<string, string> = {
   "od.actionsColumn": "Aktionen",
   "od.driverActions": "Fahrer – Aktionen & Papiere",
   "od.customerActions": "Kunde – Aktionen & Rechnungen",
-  "od.printDriverSheet": "Fahrerblatt drucken (Auftrag + Sendung)",
+  "od.printDriverSheet": "Fahrerblatt drucken (Auftrag-Nr.)",
   "od.printDriverSheetHint":
-    "Automatisches Blatt mit Abholung, Zeit, Ladung, Packstücken, Zustellung, Kundenname, Auftrag-Nr. und Sendung-Nr. zum Mitgeben.",
+    "Blatt im Rechnungs-Layout: TransPool24 oben, Kundendaten, Adressen, Ladung, Service, Distanz, Auftrag-Nr.",
   "od.auftragNr": "Auftrag-Nr.",
   "od.sendungNr": "Sendung-Nr.",
   "od.dataTitle": "Auftragsdaten",
@@ -258,9 +258,9 @@ const OD_AR: Record<string, string> = {
   "od.actionsColumn": "إجراءات",
   "od.driverActions": "السائق – إجراءات وأوراق",
   "od.customerActions": "الزبون – إجراءات وفواتير",
-  "od.printDriverSheet": "طباعة ورقة السائق (Auftrag + Sendung)",
+  "od.printDriverSheet": "طباعة ورقة السائق (Auftrag-Nr.)",
   "od.printDriverSheetHint":
-    "ورقة تلقائية: أين يذهب، متى، ماذا يستلم، عدد الطرود، أين يسلّم، اسم العميل، رقم Auftrag ورقم Sendung.",
+    "نفس تصميم الفاتورة: معلومات TransPool24 في الأعلى، ثم بيانات الزبون والعناوين والحمولة ونوع الخدمة والمسافة ورقم Auftrag.",
   "od.auftragNr": "رقم Auftrag",
   "od.sendungNr": "رقم Sendung",
   "od.dataTitle": "بيانات الطلب",

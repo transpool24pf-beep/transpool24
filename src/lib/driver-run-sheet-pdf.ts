@@ -2,20 +2,22 @@ import { PDFDocument, rgb, StandardFonts, type PDFFont, type PDFPage } from "pdf
 import type { Job } from "./supabase";
 import { getPdfLogoBytes, PDF_COMPANY } from "./pdf-company";
 import { sanitizeTextForStandardPdfFont } from "./invoice-pdf";
-import { formatAuftragNumber, formatSendungNumber } from "./order-ref";
-import { formatCargoLoadsPlainDe, parseCargoLoads, summarizeCargoLoads } from "./cargo";
-import { formatStructuredAddressPlain, jobRecipientAddress, jobSenderAddress } from "./structured-address";
+import { formatAuftragNumber } from "./order-ref";
+import { cargoCategoryLabelDe, formatCargoLoadsPlainDe, parseCargoLoads, summarizeCargoLoads } from "./cargo";
+import { jobRecipientAddress, jobSenderAddress, type StructuredAddress } from "./structured-address";
 
-const NAVY = rgb(13 / 255, 33 / 255, 55 / 255);
-const ORANGE = rgb(0.91, 0.36, 0.02);
-const MUTED = rgb(0.32, 0.38, 0.42);
+const TEAL = rgb(24 / 255, 63 / 255, 104 / 255);
+const ORANGE = rgb(0.95, 0.48, 0.12);
 const LINE = rgb(0.82, 0.86, 0.90);
-const BOX = rgb(0.96, 0.97, 0.98);
+const ROW_BG = rgb(0.94, 0.95, 0.97);
+const TEXT = rgb(0.12, 0.14, 0.18);
+const MUTED = rgb(0.32, 0.38, 0.42);
 const WHITE = rgb(1, 1, 1);
+const LINE_GAP = 16;
 
 function wrapLines(text: string, font: PDFFont, size: number, maxWidth: number): string[] {
-  const safe = sanitizeTextForStandardPdfFont(text, 2000);
-  if (!safe) return ["-"];
+  const safe = sanitizeTextForStandardPdfFont(text, 2400);
+  if (!safe) return [""];
   if (font.widthOfTextAtSize(safe, size) <= maxWidth) return [safe];
   const words = safe.split(/\s+/).filter(Boolean);
   const lines: string[] = [];
@@ -29,65 +31,121 @@ function wrapLines(text: string, font: PDFFont, size: number, maxWidth: number):
     }
   }
   if (cur) lines.push(cur);
-  return lines.length ? lines : ["-"];
+  return lines.length ? lines : [""];
 }
 
-function drawLabelValue(
+function drawSafe(
   page: PDFPage,
   font: PDFFont,
-  fontBold: PDFFont,
-  label: string,
-  value: string,
+  text: string,
   x: number,
   y: number,
-  width: number,
-): number {
-  page.drawText(sanitizeTextForStandardPdfFont(label), {
-    x,
-    y,
-    size: 8,
-    font: fontBold,
-    color: MUTED,
-  });
-  y -= 14;
-  const lines = wrapLines(value, font, 11, width);
-  for (const line of lines) {
-    page.drawText(line, { x, y, size: 11, font, color: NAVY });
-    y -= 15;
-  }
-  return y;
+  size: number,
+  color = TEXT,
+): void {
+  page.drawText(sanitizeTextForStandardPdfFont(text), { x, y, size, font, color });
 }
 
-function packageCountForJob(job: Job): string {
+function drawRight(
+  page: PDFPage,
+  font: PDFFont,
+  text: string,
+  right: number,
+  y: number,
+  size: number,
+  color = TEXT,
+): void {
+  const safe = sanitizeTextForStandardPdfFont(text);
+  const w = font.widthOfTextAtSize(safe, size);
+  page.drawText(safe, { x: right - w, y, size, font, color });
+}
+
+function tealBar(page: PDFPage, x: number, yTop: number, w: number, h: number, title: string, fontBold: PDFFont) {
+  page.drawRectangle({ x, y: yTop - h, width: w, height: h, color: TEAL });
+  drawSafe(page, fontBold, title, x + 10, yTop - h + 6, 9, WHITE);
+}
+
+function serviceTypeDe(st: Job["service_type"] | undefined): string {
+  if (st === "driver_only") return "Nur Fahrer (Ihr Fahrzeug)";
+  if (st === "driver_car_assistant") return "Fahrer mit Fahrzeug + Helfer";
+  return "Fahrer mit Fahrzeug";
+}
+
+function formatDeDateTime(iso: string | Date | null | undefined): string {
+  if (!iso) return "-";
+  const d = iso instanceof Date ? iso : new Date(iso);
+  if (Number.isNaN(d.getTime())) return "-";
+  return d.toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" });
+}
+
+function formatDeDate(iso: string | Date | null | undefined): string {
+  if (!iso) return "-";
+  const d = iso instanceof Date ? iso : new Date(iso);
+  if (Number.isNaN(d.getTime())) return "-";
+  return d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+}
+
+function streetLine(a: StructuredAddress, fallback: string): string {
+  const s = `${a.street} ${a.houseNumber}`.trim();
+  return s || fallback || "-";
+}
+
+function plzOrt(a: StructuredAddress, fallbackCity: string | null): string {
+  const p = `${a.postalCode} ${a.city}`.trim();
+  if (p) return p;
+  return fallbackCity || "-";
+}
+
+function cargoRows(job: Job): [string, string][] {
   const cd = (job.cargo_details ?? null) as Record<string, unknown> | null;
-  const loads = parseCargoLoads(cd);
-  if (loads.length > 0) {
-    const n = summarizeCargoLoads(loads).packageCount;
-    return n > 0 ? String(n) : "-";
+  const rows: [string, string][] = [["Ladung (Groesse):", job.cargo_size || "-"]];
+  const loads = formatCargoLoadsPlainDe(cd).trim();
+  if (loads) {
+    rows.push(["Ladung (Loads):", loads.replace(/\n/g, " | ")]);
+  } else {
+    const cat = cd && typeof cd.cargoCategory === "string" ? cd.cargoCategory : "";
+    if (cat) rows.push(["Warenkategorie:", cargoCategoryLabelDe(cat)]);
+    const weight =
+      cd && typeof cd.weightKg === "number"
+        ? cd.weightKg
+        : cd && typeof cd.cargoWeightKg === "number"
+          ? cd.cargoWeightKg
+          : null;
+    if (weight != null) rows.push(["Gewicht:", `${weight} kg`]);
+    const pkg = cd && typeof cd.packageCount === "number" ? cd.packageCount : null;
+    if (pkg != null) rows.push(["Pakete / Stueck:", String(pkg)]);
   }
-  const n = cd && typeof cd.packageCount === "number" ? cd.packageCount : null;
-  return n != null && n > 0 ? String(n) : "-";
-}
-
-function cargoWhatForJob(job: Job): string {
-  const cd = (job.cargo_details ?? null) as Record<string, unknown> | null;
-  const loads = formatCargoLoadsPlainDe(cd);
-  if (loads.trim()) return loads;
-  const parts: string[] = [job.cargo_size].filter(Boolean);
-  if (cd && typeof cd.cargoCategory === "string" && cd.cargoCategory) parts.push(String(cd.cargoCategory));
-  const w = cd && (typeof cd.weightKg === "number" ? cd.weightKg : typeof cd.cargoWeightKg === "number" ? cd.cargoWeightKg : null);
-  if (w != null) parts.push(`${w} kg`);
-  return parts.filter(Boolean).join(" · ") || "-";
-}
-
-function whenForJob(job: Job): string {
-  if (job.preferred_pickup_at) {
-    const d = new Date(job.preferred_pickup_at);
-    if (!Number.isNaN(d.getTime())) {
-      return d.toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" });
+  const parsed = parseCargoLoads(cd);
+  if (parsed.length > 0) {
+    const n = summarizeCargoLoads(parsed).packageCount;
+    if (n > 0 && !rows.some((r) => r[0].startsWith("Pakete"))) {
+      rows.push(["Pakete / Stueck:", String(n)]);
     }
   }
-  return "-";
+  rows.push(["Distanz:", job.distance_km != null ? `${String(job.distance_km).replace(".", ",")} km` : "-"]);
+  return rows;
+}
+
+function drawPairColumn(
+  page: PDFPage,
+  font: PDFFont,
+  x: number,
+  y: number,
+  pairs: [string, string][],
+  colW: number,
+): number {
+  const labelW = 108;
+  const valueW = colW - labelW - 8;
+  let yy = y;
+  for (const [label, value] of pairs) {
+    if (label) drawSafe(page, font, label, x, yy, 8, MUTED);
+    const lines = wrapLines(value || "-", font, 9, valueW).slice(0, 6);
+    lines.forEach((ln, i) => {
+      drawSafe(page, font, ln, x + (label ? labelW : 0), yy - i * LINE_GAP, 9, TEXT);
+    });
+    yy -= LINE_GAP * Math.max(1, lines.length) + 4;
+  }
+  return yy;
 }
 
 export async function generateDriverRunSheetPdf(job: Job): Promise<Uint8Array> {
@@ -97,133 +155,138 @@ export async function generateDriverRunSheetPdf(job: Job): Promise<Uint8Array> {
   const page = doc.addPage([595, 842]);
   const { width, height } = page.getSize();
   const margin = 40;
+  const contentW = width - margin * 2;
   let y = height - 28;
 
-  page.drawRectangle({ x: 0, y: height - 72, width, height: 72, color: NAVY });
-
   const logoBytes = await getPdfLogoBytes();
+  let logoH = 0;
   if (logoBytes && logoBytes.length > 0) {
     try {
-      const img = await doc.embedPng(logoBytes);
-      const h = 40;
-      const w = (img.width / img.height) * h;
-      page.drawImage(img, { x: margin, y: height - 56, width: Math.min(w, 160), height: h });
+      const img = await (async () => {
+        try {
+          return await doc.embedPng(logoBytes);
+        } catch {
+          return await doc.embedJpg(logoBytes);
+        }
+      })();
+      const imgW = 236;
+      const imgH = Math.min(78, (img.height / img.width) * imgW);
+      logoH = imgH;
+      page.drawImage(img, { x: margin, y: y - imgH, width: imgW, height: imgH });
     } catch {
-      page.drawText("TransPool24", { x: margin, y: height - 48, size: 16, font: fontBold, color: WHITE });
+      logoH = 0;
     }
-  } else {
-    page.drawText("TransPool24", { x: margin, y: height - 48, size: 16, font: fontBold, color: WHITE });
   }
 
-  page.drawText("Fahrerblatt / Lieferschein", {
-    x: width - margin - 220,
-    y: height - 42,
-    size: 12,
-    font: fontBold,
-    color: WHITE,
-  });
-  page.drawText("Bitte dem Kunden aushaendigen + Kopie behalten", {
-    x: width - margin - 220,
-    y: height - 58,
-    size: 8,
-    font,
-    color: rgb(0.85, 0.88, 0.92),
-  });
+  drawRight(page, fontBold, "FAHRERBLATT", width - margin, y - 8, 22, TEAL);
 
-  y = height - 92;
   const auftrag = formatAuftragNumber(job);
-  const sendung = formatSendungNumber(job);
-
-  page.drawRectangle({ x: margin, y: y - 46, width: width - margin * 2, height: 52, color: BOX, borderColor: ORANGE, borderWidth: 1.5 });
-  page.drawText("Auftrag-Nr.", { x: margin + 12, y: y - 8, size: 8, font: fontBold, color: MUTED });
-  page.drawText(sanitizeTextForStandardPdfFont(auftrag), {
-    x: margin + 12,
-    y: y - 28,
-    size: 18,
-    font: fontBold,
-    color: NAVY,
-  });
-  page.drawText("Sendung-Nr.", { x: width / 2 + 8, y: y - 8, size: 8, font: fontBold, color: MUTED });
-  page.drawText(sanitizeTextForStandardPdfFont(sendung), {
-    x: width / 2 + 8,
-    y: y - 28,
-    size: 18,
-    font: fontBold,
-    color: NAVY,
-  });
-
-  y -= 72;
-  const pickup = formatStructuredAddressPlain(jobSenderAddress(job)) || job.pickup_address || "-";
-  const drop = formatStructuredAddressPlain(jobRecipientAddress(job)) || job.delivery_address || "-";
-  const colW = (width - margin * 2 - 12) / 2;
-
-  page.drawRectangle({ x: margin, y: y - 118, width: colW, height: 126, color: BOX, borderColor: LINE, borderWidth: 1 });
-  page.drawText("1. Wohin?  ABHOLUNG", { x: margin + 10, y: y - 14, size: 9, font: fontBold, color: ORANGE });
-  {
-    let ty = y - 32;
-    for (const line of wrapLines(pickup, font, 10, colW - 20).slice(0, 6)) {
-      page.drawText(line, { x: margin + 10, y: ty, size: 10, font, color: NAVY });
-      ty -= 13;
-    }
+  const metaRight = width - margin;
+  const metaLabelX = width - margin - 210;
+  let metaY = y - 32;
+  const meta: [string, string][] = [
+    ["Auftrag-Nr.:", auftrag],
+    ["Datum:", formatDeDate(job.created_at)],
+    ["Abholzeit:", formatDeDateTime(job.preferred_pickup_at)],
+  ];
+  for (const [k, v] of meta) {
+    drawSafe(page, font, k, metaLabelX, metaY, 9, MUTED);
+    drawRight(page, fontBold, v, metaRight, metaY, 9, TEXT);
+    metaY -= LINE_GAP;
   }
 
-  page.drawRectangle({
-    x: margin + colW + 12,
-    y: y - 118,
-    width: colW,
-    height: 126,
-    color: BOX,
-    borderColor: LINE,
-    borderWidth: 1,
-  });
-  page.drawText("5. Zustellung  ZIEL", {
-    x: margin + colW + 22,
-    y: y - 14,
-    size: 9,
-    font: fontBold,
-    color: ORANGE,
-  });
-  {
-    let ty = y - 32;
-    for (const line of wrapLines(drop, font, 10, colW - 20).slice(0, 6)) {
-      page.drawText(line, { x: margin + colW + 22, y: ty, size: 10, font, color: NAVY });
-      ty -= 13;
-    }
+  drawSafe(page, font, "Transport & Logistik", margin, y - logoH - 14, 11, ORANGE);
+  let companyY = y - logoH - 32;
+  const companyLines = [
+    PDF_COMPANY.name,
+    `${PDF_COMPANY.legalOwner} (${PDF_COMPANY.legalForm})`,
+    PDF_COMPANY.street,
+    `${PDF_COMPANY.postalCode} ${PDF_COMPANY.city}`,
+    `Tel: ${PDF_COMPANY.phone}`,
+    `E-Mail: ${PDF_COMPANY.email}`,
+    PDF_COMPANY.website,
+  ];
+  for (const line of companyLines) {
+    drawSafe(page, font, line, margin, companyY, 8, TEXT);
+    companyY -= 12;
   }
 
-  y -= 140;
-  y = drawLabelValue(page, font, fontBold, "2. Wann? (Abholung)", whenForJob(job), margin, y, width - margin * 2);
-  y -= 8;
-  y = drawLabelValue(page, font, fontBold, "Kunde / Name", job.company_name || "-", margin, y, width - margin * 2);
-  y -= 8;
-  y = drawLabelValue(page, font, fontBold, "Telefon", job.phone || "-", margin, y, width - margin * 2);
-  y -= 8;
-  y = drawLabelValue(page, font, fontBold, "3. Was abholen?", cargoWhatForJob(job), margin, y, width - margin * 2);
-  y -= 8;
-  y = drawLabelValue(page, font, fontBold, "4. Anzahl der Packstuecke / Pakete", packageCountForJob(job), margin, y, 200);
+  y = Math.min(companyY - 10, metaY - 18);
 
-  y -= 16;
-  page.drawRectangle({ x: margin, y: y - 90, width: width - margin * 2, height: 96, color: WHITE, borderColor: LINE, borderWidth: 1 });
-  page.drawText("Quittung Empfaenger (Unterschrift / Datum)", {
-    x: margin + 10,
-    y: y - 14,
-    size: 9,
-    font: fontBold,
-    color: MUTED,
-  });
-  page.drawText("Name: ____________________________    Unterschrift: ____________________    Datum: __________", {
-    x: margin + 10,
-    y: y - 48,
-    size: 9,
+  const colGap = 10;
+  const colW = (contentW - colGap) / 2;
+  const leftX = margin;
+  const rightX = margin + colW + colGap;
+  const pickup = jobSenderAddress(job);
+  const drop = jobRecipientAddress(job);
+
+  tealBar(page, leftX, y, colW, 20, "ABHOLUNG", fontBold);
+  tealBar(page, rightX, y, colW, 20, "ZUSTELLUNG", fontBold);
+  y -= 32;
+
+  const leftAddr: [string, string][] = [
+    ["Name / Firma:", pickup.company || job.company_name || "-"],
+    ["Straße Hausnummer:", streetLine(pickup, job.pickup_address)],
+    ["PLZ Ort:", plzOrt(pickup, job.pickup_city)],
+    ["", pickup.country || "Deutschland"],
+  ];
+  if (pickup.notes.trim()) leftAddr.push(["Hinweis Ladestelle:", pickup.notes]);
+
+  const rightAddr: [string, string][] = [
+    ["Name / Firma:", drop.company || "-"],
+    ["Straße Hausnummer:", streetLine(drop, job.delivery_address)],
+    ["PLZ Ort:", plzOrt(drop, job.delivery_city)],
+    ["", drop.country || "Deutschland"],
+  ];
+  if (drop.notes.trim()) rightAddr.push(["Hinweis Entladung:", drop.notes]);
+
+  const yLeft = drawPairColumn(page, font, leftX, y, leftAddr, colW);
+  const yRight = drawPairColumn(page, font, rightX, y, rightAddr, colW);
+  y = Math.min(yLeft, yRight) - 16;
+
+  tealBar(page, margin, y, contentW, 20, "KUNDENDATEN UND AUFTRAG", fontBold);
+  y -= 28;
+
+  const detailRows: [string, string][] = [
+    ["Kundenname / Firma:", job.company_name || "-"],
+    ["Telefon / WhatsApp:", job.phone || "-"],
+    ["E-Mail:", job.customer_email || "-"],
+    ["Leistung / Service:", serviceTypeDe(job.service_type)],
+    ...cargoRows(job),
+  ];
+
+  const tableX = margin;
+  const tableW = contentW;
+  const labelCol = 150;
+  for (let i = 0; i < detailRows.length; i++) {
+    const [label, value] = detailRows[i]!;
+    const valueLines = wrapLines(value, font, 9, tableW - labelCol - 16);
+    const rowH = 10 + LINE_GAP * valueLines.length;
+    if (y - rowH < 36) break;
+    if (i % 2 === 0) {
+      page.drawRectangle({ x: tableX, y: y - rowH + 6, width: tableW, height: rowH, color: ROW_BG });
+    }
+    page.drawLine({
+      start: { x: tableX, y: y - rowH + 6 },
+      end: { x: tableX + tableW, y: y - rowH + 6 },
+      thickness: 0.4,
+      color: LINE,
+    });
+    drawSafe(page, font, label, tableX + 8, y - 6, 8, MUTED);
+    valueLines.forEach((ln, li) => {
+      drawSafe(page, font, ln, tableX + labelCol, y - 6 - li * LINE_GAP, 9, TEXT);
+    });
+    y -= rowH;
+  }
+
+  drawSafe(
+    page,
     font,
-    color: NAVY,
-  });
-
-  page.drawText(
-    sanitizeTextForStandardPdfFont(
-      `${PDF_COMPANY.name}  |  ${PDF_COMPANY.addressLine}  |  ${PDF_COMPANY.phone}  |  ${PDF_COMPANY.website}`,
-    ),
-    { x: margin, y: 28, size: 7, font, color: MUTED },
+    `${PDF_COMPANY.name}  |  ${PDF_COMPANY.addressLine}  |  Steuernr. ${PDF_COMPANY.taxNumber}`,
+    margin,
+    28,
+    7,
+    MUTED,
   );
 
   return doc.save();
