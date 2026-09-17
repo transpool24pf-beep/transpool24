@@ -1,10 +1,12 @@
 import { PDFDocument, rgb, StandardFonts, type PDFFont, type PDFPage } from "pdf-lib";
 import type { Job } from "./supabase";
 import { getPdfLogoBytes, PDF_COMPANY } from "./pdf-company";
-import { sanitizeTextForStandardPdfFont, pdfPrintableOrFallback } from "./invoice-pdf";
+import { sanitizeTextForStandardPdfFont } from "./invoice-pdf";
 import { formatAuftragNumber } from "./order-ref";
 import { cargoCategoryLabelDe, formatCargoLoadsPlainDe, parseCargoLoads, summarizeCargoLoads } from "./cargo";
 import { jobPreferredDeliveryAt, jobRecipientAddress, jobSenderAddress, type StructuredAddress } from "./structured-address";
+import { arabicForPdfDraw, hasArabicScript } from "./arabic-pdf";
+import { embedArabicPdfFont } from "./pdf-unicode-font";
 
 const TEAL = rgb(24 / 255, 63 / 255, 104 / 255);
 const ORANGE = rgb(0.95, 0.48, 0.12);
@@ -15,11 +17,30 @@ const MUTED = rgb(0.32, 0.38, 0.42);
 const WHITE = rgb(1, 1, 1);
 const LINE_GAP = 16;
 
-function wrapLines(text: string, font: PDFFont, size: number, maxWidth: number): string[] {
-  const safe = sanitizeTextForStandardPdfFont(text, 2400);
-  if (!safe) return [""];
+function fieldFont(text: string, latin: PDFFont, arabic: PDFFont | null): PDFFont {
+  return arabic && hasArabicScript(text) ? arabic : latin;
+}
+
+function fieldDrawText(text: string): string {
+  const s = text ?? "";
+  if (/[\uFB50-\uFDFF\uFE70-\uFEFF]/.test(s)) return s;
+  if (hasArabicScript(s)) return arabicForPdfDraw(s);
+  return sanitizeTextForStandardPdfFont(s, 2400);
+}
+
+function wrapLines(
+  text: string,
+  latin: PDFFont,
+  arabic: PDFFont | null,
+  size: number,
+  maxWidth: number,
+): string[] {
+  const raw = (text ?? "").trim() || "-";
+  const font = fieldFont(raw, latin, arabic);
+  const safe = fieldDrawText(raw);
+  if (!safe) return ["-"];
   if (font.widthOfTextAtSize(safe, size) <= maxWidth) return [safe];
-  const words = safe.split(/\s+/).filter(Boolean);
+  const words = hasArabicScript(raw) ? [safe] : safe.split(/\s+/).filter(Boolean);
   const lines: string[] = [];
   let cur = "";
   for (const w of words) {
@@ -31,38 +52,42 @@ function wrapLines(text: string, font: PDFFont, size: number, maxWidth: number):
     }
   }
   if (cur) lines.push(cur);
-  return lines.length ? lines : [""];
+  return lines.length ? lines : ["-"];
 }
 
 function drawSafe(
   page: PDFPage,
-  font: PDFFont,
+  latin: PDFFont,
+  arabic: PDFFont | null,
   text: string,
   x: number,
   y: number,
   size: number,
   color = TEXT,
 ): void {
-  page.drawText(sanitizeTextForStandardPdfFont(text), { x, y, size, font, color });
+  const font = fieldFont(text, latin, arabic);
+  page.drawText(fieldDrawText(text), { x, y, size, font, color });
 }
 
 function drawRight(
   page: PDFPage,
-  font: PDFFont,
+  latin: PDFFont,
+  arabic: PDFFont | null,
   text: string,
   right: number,
   y: number,
   size: number,
   color = TEXT,
 ): void {
-  const safe = sanitizeTextForStandardPdfFont(text);
+  const font = fieldFont(text, latin, arabic);
+  const safe = fieldDrawText(text);
   const w = font.widthOfTextAtSize(safe, size);
   page.drawText(safe, { x: right - w, y, size, font, color });
 }
 
 function tealBar(page: PDFPage, x: number, yTop: number, w: number, h: number, title: string, fontBold: PDFFont) {
   page.drawRectangle({ x, y: yTop - h, width: w, height: h, color: TEAL });
-  drawSafe(page, fontBold, title, x + 10, yTop - h + 6, 9, WHITE);
+  drawSafe(page, fontBold, null, title, x + 10, yTop - h + 6, 9, WHITE);
 }
 
 function formatDeDateTime(iso: string | Date | null | undefined): string {
@@ -123,6 +148,7 @@ function cargoRows(job: Job): [string, string][] {
 function drawPairColumn(
   page: PDFPage,
   font: PDFFont,
+  arabic: PDFFont | null,
   x: number,
   y: number,
   pairs: [string, string][],
@@ -132,10 +158,10 @@ function drawPairColumn(
   const valueW = colW - labelW - 8;
   let yy = y;
   for (const [label, value] of pairs) {
-    if (label) drawSafe(page, font, label, x, yy, 8, MUTED);
-    const lines = wrapLines(value || "-", font, 9, valueW).slice(0, 6);
+    if (label) drawSafe(page, font, null, label, x, yy, 8, MUTED);
+    const lines = wrapLines(value || "-", font, arabic, 9, valueW).slice(0, 6);
     lines.forEach((ln, i) => {
-      drawSafe(page, font, ln, x + (label ? labelW : 0), yy - i * LINE_GAP, 9, TEXT);
+      drawSafe(page, font, arabic, ln, x + (label ? labelW : 0), yy - i * LINE_GAP, 9, TEXT);
     });
     yy -= LINE_GAP * Math.max(1, lines.length) + 4;
   }
@@ -146,6 +172,7 @@ export async function generateDriverRunSheetPdf(job: Job): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const fontBold = await doc.embedFont(StandardFonts.HelveticaBold);
+  const arabicFont = await embedArabicPdfFont(doc);
   const page = doc.addPage([595, 842]);
   const { width, height } = page.getSize();
   const margin = 40;
@@ -172,7 +199,7 @@ export async function generateDriverRunSheetPdf(job: Job): Promise<Uint8Array> {
     }
   }
 
-  drawRight(page, fontBold, "FAHRERBLATT", width - margin, y - 8, 22, TEAL);
+  drawRight(page, fontBold, null, "FAHRERBLATT", width - margin, y - 8, 22, TEAL);
 
   const auftrag = formatAuftragNumber(job);
   const metaRight = width - margin;
@@ -185,12 +212,12 @@ export async function generateDriverRunSheetPdf(job: Job): Promise<Uint8Array> {
     ["Lieferzeit:", formatDeDateTime(jobPreferredDeliveryAt(job))],
   ];
   for (const [k, v] of meta) {
-    drawSafe(page, font, k, metaLabelX, metaY, 9, MUTED);
-    drawRight(page, fontBold, v, metaRight, metaY, 9, TEXT);
+    drawSafe(page, font, null, k, metaLabelX, metaY, 9, MUTED);
+    drawRight(page, fontBold, null, v, metaRight, metaY, 9, TEXT);
     metaY -= LINE_GAP;
   }
 
-  drawSafe(page, font, "Transport & Logistik", margin, y - logoH - 14, 11, ORANGE);
+  drawSafe(page, font, null, "Transport & Logistik", margin, y - logoH - 14, 11, ORANGE);
   let companyY = y - logoH - 32;
   const companyLines = [
     PDF_COMPANY.name,
@@ -202,7 +229,7 @@ export async function generateDriverRunSheetPdf(job: Job): Promise<Uint8Array> {
     PDF_COMPANY.website,
   ];
   for (const line of companyLines) {
-    drawSafe(page, font, line, margin, companyY, 8, TEXT);
+    drawSafe(page, font, null, line, margin, companyY, 8, TEXT);
     companyY -= 12;
   }
 
@@ -220,7 +247,7 @@ export async function generateDriverRunSheetPdf(job: Job): Promise<Uint8Array> {
   y -= 32;
 
   const leftAddr: [string, string][] = [
-    ["Name / Firma:", pdfPrintableOrFallback(pickup.company, job.company_name)],
+    ["Name / Firma:", pickup.company.trim() || "-"],
     ["Straße Hausnummer:", streetLine(pickup, job.pickup_address)],
     ["PLZ Ort:", plzOrt(pickup, job.pickup_city)],
     ["", pickup.country || "Deutschland"],
@@ -228,7 +255,7 @@ export async function generateDriverRunSheetPdf(job: Job): Promise<Uint8Array> {
   if (pickup.notes.trim()) leftAddr.push(["Hinweis Ladestelle:", pickup.notes]);
 
   const rightAddr: [string, string][] = [
-    ["Name / Firma:", pdfPrintableOrFallback(drop.company, job.company_name)],
+    ["Name / Firma:", drop.company.trim() || "-"],
     ["Telefon Empfaenger:", drop.phone || "-"],
     ["Straße Hausnummer:", streetLine(drop, job.delivery_address)],
     ["PLZ Ort:", plzOrt(drop, job.delivery_city)],
@@ -236,15 +263,15 @@ export async function generateDriverRunSheetPdf(job: Job): Promise<Uint8Array> {
   ];
   if (drop.notes.trim()) rightAddr.push(["Hinweis Entladung:", drop.notes]);
 
-  const yLeft = drawPairColumn(page, font, leftX, y, leftAddr, colW);
-  const yRight = drawPairColumn(page, font, rightX, y, rightAddr, colW);
+  const yLeft = drawPairColumn(page, font, arabicFont, leftX, y, leftAddr, colW);
+  const yRight = drawPairColumn(page, font, arabicFont, rightX, y, rightAddr, colW);
   y = Math.min(yLeft, yRight) - 16;
 
   tealBar(page, margin, y, contentW, 20, "KUNDENDATEN UND AUFTRAG", fontBold);
   y -= 28;
 
   const detailRows: [string, string][] = [
-    ["Kundenname / Firma:", pdfPrintableOrFallback(job.company_name, pickup.company)],
+    ["Kundenname / Firma:", job.company_name || "-"],
     ["Telefon / WhatsApp:", job.phone || "-"],
     ["E-Mail:", job.customer_email || "-"],
     ...cargoRows(job),
@@ -255,7 +282,7 @@ export async function generateDriverRunSheetPdf(job: Job): Promise<Uint8Array> {
   const labelCol = 150;
   for (let i = 0; i < detailRows.length; i++) {
     const [label, value] = detailRows[i]!;
-    const valueLines = wrapLines(value, font, 9, tableW - labelCol - 16);
+    const valueLines = wrapLines(value, font, arabicFont, 9, tableW - labelCol - 16);
     const rowH = 10 + LINE_GAP * valueLines.length;
     if (y - rowH < 36) break;
     if (i % 2 === 0) {
@@ -267,9 +294,9 @@ export async function generateDriverRunSheetPdf(job: Job): Promise<Uint8Array> {
       thickness: 0.4,
       color: LINE,
     });
-    drawSafe(page, font, label, tableX + 8, y - 6, 8, MUTED);
+    drawSafe(page, font, null, label, tableX + 8, y - 6, 8, MUTED);
     valueLines.forEach((ln, li) => {
-      drawSafe(page, font, ln, tableX + labelCol, y - 6 - li * LINE_GAP, 9, TEXT);
+      drawSafe(page, font, arabicFont, ln, tableX + labelCol, y - 6 - li * LINE_GAP, 9, TEXT);
     });
     y -= rowH;
   }
@@ -277,6 +304,7 @@ export async function generateDriverRunSheetPdf(job: Job): Promise<Uint8Array> {
   drawSafe(
     page,
     font,
+    null,
     `${PDF_COMPANY.name}  |  ${PDF_COMPANY.addressLine}  |  Steuernr. ${PDF_COMPANY.taxNumber}`,
     margin,
     28,
