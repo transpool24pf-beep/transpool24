@@ -295,6 +295,8 @@ export function OrderForm({
   const loadsRef = useRef<HTMLDivElement>(null);
   const serviceTypeRef = useRef<HTMLDivElement>(null);
   const photosRef = useRef<HTMLDivElement>(null);
+  const [step1Attempted, setStep1Attempted] = useState(false);
+  const [step2Attempted, setStep2Attempted] = useState(false);
   const [step3Attempted, setStep3Attempted] = useState(false);
   const [step, setStep] = useState(1);
   const [data, setData] = useState<OrderFormData>(initial);
@@ -690,10 +692,15 @@ export function OrderForm({
     t,
   ]);
 
+  const missingFieldClass = (attempted: boolean, missing: boolean) =>
+    attempted && missing
+      ? "border-red-500 bg-red-50 ring-2 ring-red-400/70 focus:border-red-600 focus:ring-red-500"
+      : "border-[#0d2137]/20";
+
   const step3FieldWarn = useCallback(
     (needsAttention: boolean) =>
       step3Attempted && needsAttention
-        ? "border-amber-500 ring-2 ring-amber-400/60"
+        ? "border-red-500 ring-2 ring-red-400/70"
         : "border-[#0d2137]/20",
     [step3Attempted],
   );
@@ -1025,6 +1032,7 @@ export function OrderForm({
     if (step >= 4) return;
 
     if (step === 1) {
+      setStep1Attempted(true);
       if (!step1Complete) {
         setError(t("step1Incomplete"));
         if (!data.companyName.trim()) {
@@ -1053,6 +1061,7 @@ export function OrderForm({
     }
 
     if (step === 2) {
+      setStep2Attempted(true);
       if (!step2Complete) {
         setError(t("step2Incomplete"));
         if (!isStructuredAddressComplete(data.pickupAddr)) {
@@ -1223,7 +1232,10 @@ export function OrderForm({
               onFocus={() => setContactSuggestionsOpen(true)}
               onBlur={() => setTimeout(() => setContactSuggestionsOpen(false), 200)}
               placeholder={t("companyNamePlaceholder")}
-              className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+              className={`w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-1 ${
+                missingFieldClass(step1Attempted, !data.companyName.trim())
+              } ${step1Attempted && !data.companyName.trim() ? "" : "focus:border-[var(--accent)] focus:ring-[var(--accent)]"}`}
+              aria-invalid={step1Attempted && !data.companyName.trim()}
             />
           </div>
           <div>
@@ -1238,7 +1250,10 @@ export function OrderForm({
               onFocus={() => setContactSuggestionsOpen(true)}
               onBlur={() => setTimeout(() => setContactSuggestionsOpen(false), 200)}
               placeholder={t("emailPlaceholder")}
-              className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+              className={`w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-1 ${
+                missingFieldClass(step1Attempted, !data.email.trim())
+              } ${step1Attempted && !data.email.trim() ? "" : "focus:border-[var(--accent)] focus:ring-[var(--accent)]"}`}
+              aria-invalid={step1Attempted && !data.email.trim()}
             />
           </div>
           <div>
@@ -1297,7 +1312,12 @@ export function OrderForm({
                 onFocus={() => setContactSuggestionsOpen(true)}
                 onBlur={() => setTimeout(() => setContactSuggestionsOpen(false), 200)}
                 placeholder={t("whatsappPlaceholder")}
-                className="min-w-0 flex-1 rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                className={`min-w-0 flex-1 rounded-lg border px-4 py-2 focus:outline-none focus:ring-1 ${
+                  step1Attempted && !data.phone.trim()
+                    ? "border-red-500 bg-red-50 ring-2 ring-red-400/70 focus:border-red-600 focus:ring-red-500"
+                    : "border-[#0d2137]/20 focus:border-[var(--accent)] focus:ring-[var(--accent)]"
+                }`}
+                aria-invalid={step1Attempted && !data.phone.trim()}
               />
             </div>
           </div>
@@ -1341,6 +1361,7 @@ export function OrderForm({
             title={t("senderFullTitle")}
             value={data.pickupAddr}
             notesLabel={t("addressLoadingNotes")}
+            highlightMissing={step2Attempted}
             streetInputRef={pickupAddressRef}
             streetName={addressLineInputNamesRef.current.pickup}
             postalName="tp24-pickup-plz"
@@ -1448,6 +1469,7 @@ export function OrderForm({
             title={t("recipientFullTitle")}
             value={data.deliveryAddr}
             notesLabel={t("addressUnloadingNotes")}
+            highlightMissing={step2Attempted}
             streetInputRef={deliveryAddressRef}
             streetName={addressLineInputNamesRef.current.delivery}
             postalName="tp24-delivery-plz"
@@ -1671,7 +1693,9 @@ export function OrderForm({
               ))}
             </div>
             {!data.serviceType && (
-              <p className="mt-1 text-sm text-amber-700">{t("serviceTypeRequired")}</p>
+              <p className={`mt-1 text-sm ${step3Attempted ? "font-medium text-red-600" : "text-amber-700"}`}>
+                {t("serviceTypeRequired")}
+              </p>
             )}
           </div>
           <div ref={loadsRef} className="rounded-lg border border-[#0d2137]/15 bg-[#0d2137]/5 p-4">
@@ -1714,7 +1738,8 @@ export function OrderForm({
                         onChange={(e) =>
                           updateLoad(idx, { quantity: Math.max(0, Math.floor(Number(e.target.value) || 0)) })
                         }
-                        className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
+                        className={`w-full rounded border px-2 py-1.5 text-sm ${missingFieldClass(step3Attempted, line.quantity < 1)}`}
+                        aria-invalid={step3Attempted && line.quantity < 1}
                       />
                     </div>
                     <div className="col-span-2 sm:col-span-2 lg:col-span-2">
@@ -1724,7 +1749,8 @@ export function OrderForm({
                         onChange={(e) =>
                           updateLoad(idx, { loadCarrier: (e.target.value || "") as LoadCarrierId | "" })
                         }
-                        className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
+                        className={`w-full rounded border px-2 py-1.5 text-sm ${missingFieldClass(step3Attempted, !line.loadCarrier)}`}
+                        aria-invalid={step3Attempted && !line.loadCarrier}
                       >
                         <option value="">,  {t("loadCarrierPlaceholder")}</option>
                         {LOAD_CARRIERS.map((c) => (
@@ -1751,7 +1777,8 @@ export function OrderForm({
                         min={1}
                         value={line.lengthCm > 0 ? line.lengthCm : ""}
                         onChange={(e) => updateLoad(idx, { lengthCm: Math.max(0, Number(e.target.value) || 0) })}
-                        className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
+                        className={`w-full rounded border px-2 py-1.5 text-sm ${missingFieldClass(step3Attempted, line.lengthCm <= 0)}`}
+                        aria-invalid={step3Attempted && line.lengthCm <= 0}
                       />
                     </div>
                     <div>
@@ -1761,7 +1788,8 @@ export function OrderForm({
                         min={1}
                         value={line.widthCm > 0 ? line.widthCm : ""}
                         onChange={(e) => updateLoad(idx, { widthCm: Math.max(0, Number(e.target.value) || 0) })}
-                        className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
+                        className={`w-full rounded border px-2 py-1.5 text-sm ${missingFieldClass(step3Attempted, line.widthCm <= 0)}`}
+                        aria-invalid={step3Attempted && line.widthCm <= 0}
                       />
                     </div>
                     <div>
@@ -1771,7 +1799,8 @@ export function OrderForm({
                         min={1}
                         value={line.heightCm > 0 ? line.heightCm : ""}
                         onChange={(e) => updateLoad(idx, { heightCm: Math.max(0, Number(e.target.value) || 0) })}
-                        className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
+                        className={`w-full rounded border px-2 py-1.5 text-sm ${missingFieldClass(step3Attempted, line.heightCm <= 0)}`}
+                        aria-invalid={step3Attempted && line.heightCm <= 0}
                       />
                     </div>
                     <div>
@@ -1782,7 +1811,8 @@ export function OrderForm({
                         step={0.1}
                         value={line.kgPerUnit > 0 ? line.kgPerUnit : ""}
                         onChange={(e) => updateLoad(idx, { kgPerUnit: Math.max(0, Number(e.target.value) || 0) })}
-                        className="w-full rounded border border-[#0d2137]/20 px-2 py-1.5 text-sm"
+                        className={`w-full rounded border px-2 py-1.5 text-sm ${missingFieldClass(step3Attempted, line.kgPerUnit <= 0)}`}
+                        aria-invalid={step3Attempted && line.kgPerUnit <= 0}
                       />
                     </div>
                     <div>
@@ -1824,7 +1854,12 @@ export function OrderForm({
             >
               +
             </button>
-            <div ref={photosRef} className="mt-4">
+            <div
+              ref={photosRef}
+              className={`mt-4 rounded-lg p-2 ${
+                step3Attempted && cargoPhotoUrls.length < 1 ? "border-2 border-red-500 bg-red-50 ring-2 ring-red-400/70" : ""
+              }`}
+            >
               <label
                 htmlFor={cargoPhotoInputId}
                 className="mb-1 block text-xs font-medium text-[var(--foreground)]/80"
