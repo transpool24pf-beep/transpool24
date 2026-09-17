@@ -208,7 +208,9 @@ export function jobPreferredDeliveryAt(job: JobLike): string | null {
 
 export function jobSenderAddress(job: JobLike): StructuredAddress {
   const line = `${job.pickup_address ?? ""}${job.pickup_city ? `, ${job.pickup_city}` : ""}`;
-  return fromDetails(job.cargo_details ?? null, "senderAddress", line);
+  const parsed = fromDetails(job.cargo_details ?? null, "senderAddress", line);
+  const bookingCompany = job.company_name?.trim() || "";
+  return { ...parsed, company: bookingCompany || parsed.company };
 }
 
 export function jobRecipientAddress(job: JobLike): StructuredAddress {

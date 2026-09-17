@@ -113,7 +113,10 @@ export async function POST(req: Request) {
       load_unload_90min_cents: pricing.load_unload_90min_cents,
     };
 
-    const senderAddress = normalizeStructuredAddress(cd?.senderAddress);
+    const senderAddress = {
+      ...normalizeStructuredAddress(cd?.senderAddress),
+      company: (typeof companyName === "string" ? companyName : "").trim(),
+    };
     const recipientAddress = normalizeStructuredAddress(cd?.recipientAddress);
     if ((recipientAddress.phone ?? "").replace(/\D/g, "").length < 6) {
       return NextResponse.json({ error: "RECIPIENT_PHONE_REQUIRED" }, { status: 400 });

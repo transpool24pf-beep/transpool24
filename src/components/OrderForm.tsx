@@ -1237,7 +1237,7 @@ export function OrderForm({
             cargoHeightCm: loadSummary.cargoHeightCm,
             stackable: loadSummary.stackable,
             dangerousGoods: loadSummary.dangerousGoods,
-            senderAddress: data.pickupAddr,
+            senderAddress: { ...data.pickupAddr, company: data.companyName.trim() },
             recipientAddress: data.deliveryAddr,
             preferred_delivery_at:
               data.deliveryDate && data.deliveryTime ? `${data.deliveryDate}T${data.deliveryTime}` : null,
@@ -1458,6 +1458,7 @@ export function OrderForm({
             value={data.pickupAddr}
             notesLabel={t("addressLoadingNotes")}
             highlightMissing={step2Attempted}
+            hideCompany
             streetInputRef={pickupAddressRef}
             streetName={addressLineInputNamesRef.current.pickup}
             postalName="tp24-pickup-plz"

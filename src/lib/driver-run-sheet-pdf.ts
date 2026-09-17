@@ -247,7 +247,7 @@ export async function generateDriverRunSheetPdf(job: Job): Promise<Uint8Array> {
   y -= 32;
 
   const leftAddr: [string, string][] = [
-    ["Name / Firma:", pickup.company.trim() || "-"],
+    ["Name / Firma:", (job.company_name || pickup.company).trim() || "-"],
     ["Straße Hausnummer:", streetLine(pickup, job.pickup_address)],
     ["PLZ Ort:", plzOrt(pickup, job.pickup_city)],
     ["", pickup.country || "Deutschland"],

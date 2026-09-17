@@ -36,6 +36,7 @@ export function OrderFullAddressFields({
   labels,
   highlightMissing = false,
   phoneRequired = false,
+  hideCompany = false,
 }: {
   title: string;
   value: StructuredAddress;
@@ -62,6 +63,7 @@ export function OrderFullAddressFields({
   };
   highlightMissing?: boolean;
   phoneRequired?: boolean;
+  hideCompany?: boolean;
 }) {
   const set = (patch: Partial<StructuredAddress>) => onChange({ ...value, ...patch });
   const cls = (missing: boolean) => (highlightMissing && missing ? inputMissing : inputOk);
@@ -80,10 +82,12 @@ export function OrderFullAddressFields({
       }`}
     >
       <h3 className="text-sm font-semibold text-[#0d2137]">{title}</h3>
+      {!hideCompany ? (
       <label className="block">
         <span className="mb-1 block text-xs font-medium text-[#0d2137]/80">{labels.company}</span>
         <input type="text" {...noBrowserFill} value={value.company} onChange={(e) => set({ company: e.target.value })} className={inputOk} />
       </label>
+      ) : null}
       {labels.phone ? (
         <label className="block">
           <span className="mb-1 block text-xs font-medium text-[#0d2137]/80">{labels.phone}</span>
