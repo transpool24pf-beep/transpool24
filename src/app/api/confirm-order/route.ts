@@ -155,7 +155,7 @@ export async function POST(req: Request) {
     let orderNumber = generateOrderNumber();
     const maxAttempts = 5;
     let attempt = 0;
-    let job: { id: string } | null = null;
+    let job: { id: string; order_number: number | null } | null = null;
     let insertError: unknown = null;
 
     while (attempt < maxAttempts) {
@@ -214,7 +214,7 @@ export async function POST(req: Request) {
         logistics_status: "confirmed",
         confirmation_token: confirmationToken,
         })
-        .select("id")
+        .select("id, order_number")
         .single();
       job = data;
       insertError = error;
@@ -236,8 +236,9 @@ export async function POST(req: Request) {
       );
     }
 
+    const orderRef = job.order_number != null ? String(job.order_number) : job.id;
     const summary = [
-      `Neuer bestätigter Auftrag: ${job.id}`,
+      `Neuer bestätigter Auftrag: #${orderRef}`,
       `Firma: ${companyName}`,
       `Telefon: ${phone}`,
       `Abholung: ${formatStructuredAddressPlain(senderAddress) || pickupAddress}`,
@@ -255,6 +256,7 @@ export async function POST(req: Request) {
           body: JSON.stringify({
             event: "order.confirmed",
             job_id: job.id,
+            order_number: job.order_number,
             confirmation_token: confirmationToken,
             company_name: companyName,
             phone,
@@ -283,12 +285,13 @@ export async function POST(req: Request) {
         `Gewicht: ${weightKg} kg | Stück/Pakete: ${Math.round(packageCountRaw)}`,
       `Fotos: ${photoUrls.length}`,
       `Betrag: ${(priceCents / 100).toFixed(2)} EUR`,
-      `Ref: ${job.id}`,
+      `Auftrag: #${orderRef}`,
     ].join("\n");
     const whatsappLink = `https://wa.me/?text=${encodeURIComponent(whatsappMessage)}`;
 
     return NextResponse.json({
       jobId: job.id,
+      orderNumber: job.order_number,
       confirmationToken,
       whatsappLink,
     });

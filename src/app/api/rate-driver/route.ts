@@ -21,7 +21,7 @@ export async function GET(req: Request) {
   }
   return NextResponse.json({
     ok: true,
-    order_number: data.order_number ?? data.id,
+    order_number: data.order_number ?? null,
     already_rated: data.customer_driver_rating != null,
   });
 }

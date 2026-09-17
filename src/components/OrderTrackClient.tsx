@@ -27,6 +27,8 @@ type TrackJob = {
   logistics_status: string;
   pickup_address: string;
   delivery_address: string;
+  loading_notes?: string | null;
+  unloading_notes?: string | null;
   estimated_arrival_at: string | null;
   eta_minutes_remaining: number | null;
   last_driver_lat: number | null;
@@ -280,7 +282,7 @@ export function OrderTrackClient({
         <dl className="grid gap-3 text-sm sm:grid-cols-2">
           <div>
             <dt className="text-[var(--foreground)]/60">{t("orderRef")}</dt>
-            <dd className="font-mono font-semibold">{job.order_number ?? job.id}</dd>
+            <dd className="font-mono font-semibold">{job.order_number ?? "-"}</dd>
           </div>
           <div>
             <dt className="text-[var(--foreground)]/60">{t("trackStatus")}</dt>
@@ -290,10 +292,22 @@ export function OrderTrackClient({
             <dt className="text-[var(--foreground)]/60">{t("trackPickup")}</dt>
             <dd>{job.pickup_address}</dd>
           </div>
+          {job.loading_notes?.trim() ? (
+            <div className="sm:col-span-2">
+              <dt className="text-[var(--foreground)]/60">{t("addressLoadingNotes")}</dt>
+              <dd className="whitespace-pre-line">{job.loading_notes.trim()}</dd>
+            </div>
+          ) : null}
           <div className="sm:col-span-2">
             <dt className="text-[var(--foreground)]/60">{t("trackDelivery")}</dt>
             <dd>{job.delivery_address}</dd>
           </div>
+          {job.unloading_notes?.trim() ? (
+            <div className="sm:col-span-2">
+              <dt className="text-[var(--foreground)]/60">{t("addressUnloadingNotes")}</dt>
+              <dd className="whitespace-pre-line">{job.unloading_notes.trim()}</dd>
+            </div>
+          ) : null}
           {job.distance_km != null && (
             <div>
               <dt className="text-[var(--foreground)]/60">{t("trackDistance")}</dt>
@@ -402,7 +416,7 @@ export function OrderTrackClient({
           <ul className="max-h-40 space-y-1 overflow-y-auto font-mono text-xs text-[var(--foreground)]/80">
             {trail.slice(0, 15).map((p, i) => (
               <li key={`${p.recorded_at}-${i}`}>
-                {Number(p.latitude).toFixed(5)}, {Number(p.longitude).toFixed(5)} —{" "}
+                {Number(p.latitude).toFixed(5)}, {Number(p.longitude).toFixed(5)} , {" "}
                 {new Date(p.recorded_at).toLocaleTimeString(bcp47ForSiteLocale(locale), {
                   hour: "2-digit",
                   minute: "2-digit",

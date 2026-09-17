@@ -42,6 +42,7 @@ import {
 } from "@/lib/structured-address";
 import { localeToHtmlLang } from "@/lib/locale-html-lang";
 import { GOOGLE_WRITE_REVIEW_URL } from "@/lib/google-review";
+import { displayOrderRef } from "@/lib/order-ref";
 import {
   formatIsoDateForOrderInput,
   localTodayIso,
@@ -301,7 +302,12 @@ export function OrderForm({
   const [pickupDateField, setPickupDateField] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [orderConfirmed, setOrderConfirmed] = useState<{ jobId: string; token: string; whatsappLink: string } | null>(null);
+  const [orderConfirmed, setOrderConfirmed] = useState<{
+    jobId: string;
+    orderNumber: number | null;
+    token: string;
+    whatsappLink: string;
+  } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [confirmChecked, setConfirmChecked] = useState(false);
   const [pickupSuggestions, setPickupSuggestions] = useState<Suggestion[]>([]);
@@ -1149,6 +1155,7 @@ export function OrderForm({
         clearOrderFormDraft();
         setOrderConfirmed({
           jobId: json.jobId,
+          orderNumber: typeof json.orderNumber === "number" ? json.orderNumber : null,
           token: json.confirmationToken,
           whatsappLink: json.whatsappLink,
         });
@@ -2057,7 +2064,10 @@ export function OrderForm({
             <p className="mt-3 text-sm text-green-700">{t("confirmByEmailHint")}</p>
           </div>
           <p className="text-center text-sm text-green-700">
-            {t("orderRef")}: <code className="rounded bg-green-100 px-1.5 py-0.5 font-mono text-xs">{orderConfirmed.jobId}</code>
+            {t("orderRef")}:{" "}
+            <code className="rounded bg-green-100 px-1.5 py-0.5 font-mono text-xs">
+              {displayOrderRef({ order_number: orderConfirmed.orderNumber }) || "—"}
+            </code>
           </p>
           <div className="border-t border-green-200 pt-5">
             <a

@@ -22,7 +22,7 @@ function RateDriverContent() {
       .then((r) => r.json())
       .then((data) => {
         if (data.ok) {
-          setOrderLabel(String(data.order_number ?? "").slice(0, 8));
+          setOrderLabel(data.order_number != null ? String(data.order_number) : "");
           setAlreadyRated(!!data.already_rated);
           setStatus(data.already_rated ? "done" : "form");
         } else {

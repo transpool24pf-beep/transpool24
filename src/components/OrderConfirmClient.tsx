@@ -3,9 +3,12 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { GermanVatPriceBlock } from "@/components/GermanVatPriceBlock";
+import { formatStructuredAddressPlain, jobRecipientAddress, jobSenderAddress } from "@/lib/structured-address";
+import { displayOrderRef } from "@/lib/order-ref";
 
 type Job = {
   id: string;
+  order_number?: number | null;
   company_name: string;
   pickup_address: string;
   pickup_city: string | null;
@@ -15,6 +18,7 @@ type Job = {
   distance_km: number | null;
   price_cents: number;
   phone: string;
+  cargo_details?: Record<string, unknown> | null;
 };
 
 export function OrderConfirmClient({
@@ -80,13 +84,19 @@ export function OrderConfirmClient({
       </h2>
 
       <div className="space-y-2 rounded-lg border border-[#0d2137]/10 bg-[#0d2137]/5 p-4 text-sm">
-        <p><strong>{t("orderRef")}:</strong> <code className="font-mono text-xs">{job.id}</code></p>
+        <p><strong>{t("orderRef")}:</strong> <code className="font-mono text-xs">{displayOrderRef(job) || "—"}</code></p>
         <p><strong>{t("companyName")}:</strong> {job.company_name}</p>
         <p><strong>{t("phone")}:</strong> {job.phone}</p>
-        <p><strong>{t("pickup")}:</strong> {job.pickup_address}{job.pickup_city ? `, ${job.pickup_city}` : ""}</p>
-        <p><strong>{t("delivery")}:</strong> {job.delivery_address}{job.delivery_city ? `, ${job.delivery_city}` : ""}</p>
+        <p className="whitespace-pre-line"><strong>{t("pickup")}:</strong> {formatStructuredAddressPlain(jobSenderAddress(job), false) || `${job.pickup_address}${job.pickup_city ? `, ${job.pickup_city}` : ""}`}</p>
+        {jobSenderAddress(job).notes.trim() ? (
+          <p className="whitespace-pre-line"><strong>{t("addressLoadingNotes")}:</strong> {jobSenderAddress(job).notes.trim()}</p>
+        ) : null}
+        <p className="whitespace-pre-line"><strong>{t("delivery")}:</strong> {formatStructuredAddressPlain(jobRecipientAddress(job), false) || `${job.delivery_address}${job.delivery_city ? `, ${job.delivery_city}` : ""}`}</p>
+        {jobRecipientAddress(job).notes.trim() ? (
+          <p className="whitespace-pre-line"><strong>{t("addressUnloadingNotes")}:</strong> {jobRecipientAddress(job).notes.trim()}</p>
+        ) : null}
         <p><strong>{t("cargoSize")}:</strong> {job.cargo_size}</p>
-        <p><strong>{t("distance")}:</strong> {job.distance_km ?? "—"} km</p>
+        <p><strong>{t("distance")}:</strong> {job.distance_km ?? "-"} km</p>
         <div className="pt-2">
           <GermanVatPriceBlock grossCents={job.price_cents} />
         </div>
