@@ -8,8 +8,8 @@
     "blog": "Magazine"
   },
   "siteMetadata": {
-    "title": "TransPool24 – Logística en Pforzheim, Alemania",
-    "description": "Empresa de transporte en Pforzheim y marketplace logístico digital en Alemania. Transporte por carretera Baden-Württemberg, mensajería y expedición. Reserva online, seguimiento en tiempo real, cálculo de precios. Logística digital, pago seguro Stripe. Servicio de reparto Pforzheim, TransPool24.",
+    "title": "Mejor plataforma de logística en Pforzheim | TransPool24",
+    "description": "TransPool24 es la mejor plataforma digital de logística desde Pforzheim: transporte por carretera, mensajería, expedición y B2B en Baden-Württemberg y Alemania. Reserva online, seguimiento en vivo, precios claros, factura tras la entrega. Titular Omar Mdeik, autónomo, Kaiser-Friedrich-Str. 139, 75172 Pforzheim. Tel. +49 176 22624264.",
     "keywords": [
       "TransPool24",
       "TransPool24 Pforzheim",
@@ -49,13 +49,28 @@
       "Carga completa camión",
       "Plataforma carga digital",
       "Bolsa de carga digital",
-      "Pago Stripe transporte",
       "Pago seguro logística",
       "Servicio reparto Pforzheim",
       "Entrega zona Karlsruhe",
       "Última milla Alemania",
       "Reserva transporte carretera",
-      "Startup logística Alemania"
+      "Startup logística Alemania",
+      "best logistics platform Germany",
+      "best transport platform Pforzheim",
+      "best digital freight marketplace",
+      "TransPool24 Omar Mdeik",
+      "Kaiser-Friedrich-Strasse 139 Pforzheim",
+      "75172 Pforzheim haulage",
+      "invoice after delivery transport",
+      "pay after delivery logistics",
+      "Güterkraftverkehr Germany",
+      "live tracking freight Germany",
+      "TransPool24 Impressum",
+      "Baden-Württemberg logistics marketplace",
+      "B2B road freight platform",
+      "courier Karlsruhe Stuttgart Pforzheim",
+      "3.5 tonne van with driver",
+      "LTL FTL Germany"
     ]
   },
   "aboutNarrative": {
@@ -73,7 +88,7 @@
     "dailyOpsTitle": "Operación diaria en la práctica",
     "dailyOpsLead": "Entre reserva, recogida y entrega, el flujo debe funcionar en el día a día real, no solo en presentaciones.",
     "dailyOpsB1": "Estado con el que puedes actuar: desde la reserva confirmada hasta la entrega, con seguimiento y prueba de entrega cuando importa.",
-    "dailyOpsB2": "Precio y pago: presupuesto claro antes de pagar y checkout seguro con Stripe, menos disputas, tesorería más predecible.",
+    "dailyOpsB2": "Precio y pago: presupuesto claro antes de reservar, factura tras la entrega, menos disputas, tesorería más predecible.",
     "dailyOpsB3": "Pforzheim y toda Alemania: red de conductores integrados para mercancía B2B y operaciones comerciales.",
     "csrTitle": "Responsabilidad social: empleo",
     "csrLead": "Somos parte del tejido social alemán. Activar el mercado laboral es un pilar central:",
@@ -775,7 +790,7 @@
         "legal": "Art. 6(1)(b) GDPR (contract); where applicable (a) (consent)"
       },
       "r2": {
-        "data": "Payment data (via Stripe): payment status, limited card metadata, no full card numbers stored by us",
+        "data": "Invoice and payment data: billing address, payment status, bank transfer; we do not store full card numbers",
         "purpose": "Payment processing",
         "legal": "Art. 6(1)(b) GDPR; Art. 6(1)(c) for tax/legal retention"
       },
@@ -997,7 +1012,7 @@
     "s4": {
       "title": "4. Prices, payment, payment provider",
       "p1": "Prices are in euros unless stated otherwise and include VAT where applicable. Deviations may arise from route, extras, waiting time or special effort.",
-      "p2": "Card payments may be processed via Stripe; Stripe’s terms apply additionally. Rights of retention exist only for counterclaims from the same contract relationship."
+      "p2": "Payment is due after delivery by invoice (bank transfer). Rights of retention exist only for counterclaims from the same contract relationship."
     },
     "s5": {
       "title": "5. Cooperation, cargo, safety",

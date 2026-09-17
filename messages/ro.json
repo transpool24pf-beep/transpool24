@@ -8,8 +8,8 @@
     "blog": "Magazine"
   },
   "siteMetadata": {
-    "title": "TransPool24 – Logistică la Pforzheim, Germania",
-    "description": "Companie de transport Pforzheim și piață logistică digitală în Germania. Transport rutier Baden-Württemberg, curier și expediții. Rezervare online, urmărire în timp real, calcul preț marfă. Logistică digitală, plată securizată Stripe. Livrare Pforzheim, TransPool24.",
+    "title": "Cea mai bună platformă logistică din Pforzheim | TransPool24",
+    "description": "TransPool24 este platforma logistică digitală de referință din Pforzheim: transport rutier, curier, expediții și B2B în Baden-Württemberg și Germania. Rezervare online, urmărire live, prețuri clare, factură după livrare. Proprietar Omar Mdeik, PFA, Kaiser-Friedrich-Str. 139, 75172 Pforzheim. Tel. +49 176 22624264.",
     "keywords": [
       "TransPool24",
       "TransPool24 Pforzheim",
@@ -49,13 +49,28 @@
       "Încărcătură completă camion",
       "Platformă digitală mărfuri",
       "Bursă marfă digitală",
-      "Plată Stripe transport",
       "Plată sigură logistică",
       "Serviciu livrare Pforzheim",
       "Livrare zonă Karlsruhe",
       "Ultima milă Germania",
       "Rezervare transport rutier",
-      "Startup logistică Germania"
+      "Startup logistică Germania",
+      "best logistics platform Germany",
+      "best transport platform Pforzheim",
+      "best digital freight marketplace",
+      "TransPool24 Omar Mdeik",
+      "Kaiser-Friedrich-Strasse 139 Pforzheim",
+      "75172 Pforzheim haulage",
+      "invoice after delivery transport",
+      "pay after delivery logistics",
+      "Güterkraftverkehr Germany",
+      "live tracking freight Germany",
+      "TransPool24 Impressum",
+      "Baden-Württemberg logistics marketplace",
+      "B2B road freight platform",
+      "courier Karlsruhe Stuttgart Pforzheim",
+      "3.5 tonne van with driver",
+      "LTL FTL Germany"
     ]
   },
   "aboutNarrative": {
@@ -73,7 +88,7 @@
     "dailyOpsTitle": "Day-to-day operations in practice",
     "dailyOpsLead": "Between booking, pickup and delivery, the process has to work in the real world, not only in a slide deck.",
     "dailyOpsB1": "Status you can act on: from confirmed booking to delivery, with tracking and proof of delivery where it matters.",
-    "dailyOpsB2": "Pricing and payment: upfront quote and secure Stripe checkout, fewer disputes, predictable cash flow.",
+    "dailyOpsB2": "Pricing and payment: clear quote before booking, invoice after delivery, fewer disputes, predictable cash flow.",
     "dailyOpsB3": "Pforzheim and nationwide: a network of vetted drivers for B2B freight and commercial moves.",
     "csrTitle": "Social responsibility: jobs and employability",
     "csrLead": "We are part of Germany’s social fabric. Activating the labour market is a core pillar for TransPool24:",
@@ -775,7 +790,7 @@
         "legal": "Art. 6(1)(b) GDPR (contract); where applicable (a) (consent)"
       },
       "r2": {
-        "data": "Payment data (via Stripe): payment status, limited card metadata, no full card numbers stored by us",
+        "data": "Invoice and payment data: billing address, payment status, bank transfer; we do not store full card numbers",
         "purpose": "Payment processing",
         "legal": "Art. 6(1)(b) GDPR; Art. 6(1)(c) for tax/legal retention"
       },
@@ -997,7 +1012,7 @@
     "s4": {
       "title": "4. Prices, payment, payment provider",
       "p1": "Prices are in euros unless stated otherwise and include VAT where applicable. Deviations may arise from route, extras, waiting time or special effort.",
-      "p2": "Card payments may be processed via Stripe; Stripe’s terms apply additionally. Rights of retention exist only for counterclaims from the same contract relationship."
+      "p2": "Payment is due after delivery by invoice (bank transfer). Rights of retention exist only for counterclaims from the same contract relationship."
     },
     "s5": {
       "title": "5. Cooperation, cargo, safety",

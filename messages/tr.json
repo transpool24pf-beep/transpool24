@@ -8,8 +8,8 @@
     "blog": "Magazine"
   },
   "siteMetadata": {
-    "title": "TransPool24 – Pforzheim'de lojistik, Almanya",
-    "description": "Pforzheim nakliye şirketi ve Almanya'da dijital lojistik pazaryeri. Baden-Württemberg karayolu taşımacılığı, kurye ve nakliyat. Online rezervasyon, gerçek zamanlı gönderi takibi, navlun fiyatı hesaplama. Dijital lojistik, güvenli Stripe ödemesi. Pforzheim teslimat hizmeti, TransPool24.",
+    "title": "Pforzheim’in en iyi lojistik platformu | TransPool24",
+    "description": "TransPool24, Pforzheim’den önde gelen dijital lojistik ve nakliye platformudur: karayolu taşımacılığı, kurye, nakliyat ve B2B Almanya genelinde. Online rezervasyon, canlı takip, şeffaf fiyat, teslimattan sonra fatura. Sahibi Omar Mdeik, şahıs şirketi, Kaiser-Friedrich-Str. 139, 75172 Pforzheim. Tel. +49 176 22624264.",
     "keywords": [
       "TransPool24",
       "TransPool24 Pforzheim",
@@ -46,7 +46,6 @@
       "parsiyel yük",
       "komple yük",
       "Dijital yük platformu",
-      "Stripe ödeme taşımacılık",
       "güvenli online ödeme lojistik",
       "Pforzheim teslimat hizmeti",
       "Karlsruhe çevresi teslimat",
@@ -54,7 +53,23 @@
       "taşınma nakliyesi",
       "büyük paket",
       "Karayolu taşıma rezervasyonu",
-      "Almanya lojistik girişimi"
+      "Almanya lojistik girişimi",
+      "best logistics platform Germany",
+      "best transport platform Pforzheim",
+      "best digital freight marketplace",
+      "TransPool24 Omar Mdeik",
+      "Kaiser-Friedrich-Strasse 139 Pforzheim",
+      "75172 Pforzheim haulage",
+      "invoice after delivery transport",
+      "pay after delivery logistics",
+      "Güterkraftverkehr Germany",
+      "live tracking freight Germany",
+      "TransPool24 Impressum",
+      "Baden-Württemberg logistics marketplace",
+      "B2B road freight platform",
+      "courier Karlsruhe Stuttgart Pforzheim",
+      "3.5 tonne van with driver",
+      "LTL FTL Germany"
     ]
   },
   "aboutNarrative": {
@@ -72,7 +87,7 @@
     "dailyOpsTitle": "Günlük operasyon pratikte",
     "dailyOpsLead": "Rezervasyon, yükleme ve teslimat arasında süreç gerçek iş dünyasında işlemeli, yalnızca sunumlarda değil.",
     "dailyOpsB1": "Harekete geçirilebilir durum: onaylı rezervasyondan teslimata, gerektiğinde takip ve teslim kanıtı ile.",
-    "dailyOpsB2": "Fiyatlandırma ve ödeme: önceden net teklif ve güvenli Stripe ödemesi, daha az anlaşmazlık, öngörülebilir nakit akışı.",
+    "dailyOpsB2": "Fiyatlandırma ve ödeme: rezervasyondan önce net teklif, teslimattan sonra fatura, daha az anlaşmazlık, öngörülebilir nakit akışı.",
     "dailyOpsB3": "Pforzheim ve Almanya geneli: B2B yük ve ticari taşımalar için doğrulanmış sürücü ağı.",
     "csrTitle": "Sosyal sorumluluk: iş ve istihdam",
     "csrLead": "Almanya’nın toplumsal dokusunun parçasıyız. İşgücü piyasasını canlandırmak temel önceliklerimizdendir:",
@@ -774,7 +789,7 @@
         "legal": "Art. 6(1)(b) GDPR (contract); where applicable (a) (consent)"
       },
       "r2": {
-        "data": "Payment data (via Stripe): payment status, limited card metadata, no full card numbers stored by us",
+        "data": "Invoice and payment data: billing address, payment status, bank transfer; we do not store full card numbers",
         "purpose": "Payment processing",
         "legal": "Art. 6(1)(b) GDPR; Art. 6(1)(c) for tax/legal retention"
       },
@@ -996,7 +1011,7 @@
     "s4": {
       "title": "4. Prices, payment, payment provider",
       "p1": "Prices are in euros unless stated otherwise and include VAT where applicable. Deviations may arise from route, extras, waiting time or special effort.",
-      "p2": "Card payments may be processed via Stripe; Stripe’s terms apply additionally. Rights of retention exist only for counterclaims from the same contract relationship."
+      "p2": "Payment is due after delivery by invoice (bank transfer). Rights of retention exist only for counterclaims from the same contract relationship."
     },
     "s5": {
       "title": "5. Cooperation, cargo, safety",

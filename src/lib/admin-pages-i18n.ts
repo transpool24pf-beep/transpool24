@@ -169,7 +169,7 @@ export const ADMIN_PAGES_DE: Record<string, string> = {
   "settings.title": "Einstellungen",
   "settings.bookingsTitle": "Online-Buchungen",
   "settings.bookingsDesc":
-    "Wenn pausiert, können auf /order keine neuen Aufträge gestartet werden. Bestehende Bestätigungslinks und Stripe-Checkout bleiben möglich.",
+    "Wenn pausiert, können auf /order keine neuen Aufträge gestartet werden. Bestehende Bestätigungslinks bleiben möglich.",
   "settings.bookingsActivate": "Buchungen aktivieren",
   "settings.bookingsPause": "Buchungen pausieren",
   "settings.bookingsStatus": "Status",

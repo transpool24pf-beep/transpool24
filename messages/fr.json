@@ -8,8 +8,8 @@
     "blog": "Magazine"
   },
   "siteMetadata": {
-    "title": "TransPool24 – Logistique à Pforzheim, Allemagne",
-    "description": "Transporteur à Pforzheim et marketplace logistique numérique en Allemagne. Fret routier Bade-Wurtemberg, coursier et messagerie. Réservation en ligne, suivi d'envoi en temps réel, calcul des prix. Logistique digitale, paiement sécurisé Stripe. Service de livraison Pforzheim, TransPool24.",
+    "title": "Meilleure plateforme logistique à Pforzheim | TransPool24",
+    "description": "TransPool24 est la première plateforme logistique numérique de Pforzheim : fret routier, coursier, messagerie et transport B2B en Bade-Wurtemberg et en Allemagne. Réservation en ligne, suivi en direct, prix clairs, facture après livraison. Titulaire Omar Mdeik, entreprise individuelle, Kaiser-Friedrich-Str. 139, 75172 Pforzheim. Tél. +49 176 22624264.",
     "keywords": [
       "TransPool24",
       "TransPool24 Pforzheim",
@@ -49,13 +49,28 @@
       "TL complet",
       "Plateforme fret numérique",
       "Bourse fret digitale",
-      "Paiement Stripe transport",
       "Paiement sécurisé logistique",
       "Service livraison Pforzheim",
       "Livraison région Karlsruhe",
       "Dernier kilomètre Allemagne",
       "Transport routier réservation",
-      "Startup logistique Allemagne"
+      "Startup logistique Allemagne",
+      "best logistics platform Germany",
+      "best transport platform Pforzheim",
+      "best digital freight marketplace",
+      "TransPool24 Omar Mdeik",
+      "Kaiser-Friedrich-Strasse 139 Pforzheim",
+      "75172 Pforzheim haulage",
+      "invoice after delivery transport",
+      "pay after delivery logistics",
+      "Güterkraftverkehr Germany",
+      "live tracking freight Germany",
+      "TransPool24 Impressum",
+      "Baden-Württemberg logistics marketplace",
+      "B2B road freight platform",
+      "courier Karlsruhe Stuttgart Pforzheim",
+      "3.5 tonne van with driver",
+      "LTL FTL Germany"
     ]
   },
   "aboutNarrative": {
@@ -73,7 +88,7 @@
     "dailyOpsTitle": "L’exploitation quotidienne sur le terrain",
     "dailyOpsLead": "Entre réservation, enlèvement et livraison, le parcours doit fonctionner dans la réalité opérationnelle, pas seulement sur des slides.",
     "dailyOpsB1": "Un statut actionnable : de la commande confirmée à la livraison, avec suivi et preuve de livraison lorsque c’est pertinent.",
-    "dailyOpsB2": "Tarification et paiement : devis clair avant paiement et encaissement sécurisé Stripe, moins de litiges, trésorerie plus lisible.",
+    "dailyOpsB2": "Tarification et paiement : devis clair avant réservation, facture après livraison, moins de litiges, trésorerie plus lisible.",
     "dailyOpsB3": "Pforzheim et toute l’Allemagne : un réseau de conducteurs intégrés pour fret B2B et flux commerciaux.",
     "csrTitle": "Responsabilité sociale : emploi",
     "csrLead": "Nous faisons partie du tissu social allemand. L’activation du marché du travail est essentielle :",
@@ -775,7 +790,7 @@
         "legal": "Art. 6(1)(b) GDPR (contract); where applicable (a) (consent)"
       },
       "r2": {
-        "data": "Payment data (via Stripe): payment status, limited card metadata, no full card numbers stored by us",
+        "data": "Invoice and payment data: billing address, payment status, bank transfer; we do not store full card numbers",
         "purpose": "Payment processing",
         "legal": "Art. 6(1)(b) GDPR; Art. 6(1)(c) for tax/legal retention"
       },
@@ -997,7 +1012,7 @@
     "s4": {
       "title": "4. Prices, payment, payment provider",
       "p1": "Prices are in euros unless stated otherwise and include VAT where applicable. Deviations may arise from route, extras, waiting time or special effort.",
-      "p2": "Card payments may be processed via Stripe; Stripe’s terms apply additionally. Rights of retention exist only for counterclaims from the same contract relationship."
+      "p2": "Payment is due after delivery by invoice (bank transfer). Rights of retention exist only for counterclaims from the same contract relationship."
     },
     "s5": {
       "title": "5. Cooperation, cargo, safety",

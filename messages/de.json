@@ -8,8 +8,8 @@
     "blog": "Magazin"
   },
   "siteMetadata": {
-    "title": "Logistik & Transportunternehmen Pforzheim",
-    "description": "Transportunternehmen Pforzheim: digitaler Logistik-Marktplatz Deutschland, Güterkraftverkehr Baden-Württemberg. Kurierdienst & Spedition, online buchen, Echtzeit-Sendungsverfolgung, Frachtpreise berechnen. Digitale Logistik mit sicherer Zahlung (Stripe). Pforzheim Delivery Service, TransPool24.",
+    "title": "Beste Logistik- & Transportplattform Pforzheim | TransPool24",
+    "description": "TransPool24 ist die führende digitale Logistik- und Transportplattform aus Pforzheim: Güterkraftverkehr, Kurier, Spedition und B2B-Straßentransport in Baden-Württemberg und ganz Deutschland. Online buchen, Live-Tracking, klare Preise, Zahlung nach Lieferung per Rechnung. Inhaber Omar Mdeik, Einzelunternehmen, Kaiser-Friedrich-Str. 139, 75172 Pforzheim. Tel. +49 176 22624264.",
     "keywords": [
       "TransPool24",
       "TransPool24 Pforzheim",
@@ -53,32 +53,49 @@
       "Teilladung",
       "Komplettladung",
       "Frachtenbörse digital",
-      "Stripe Zahlung Transport",
       "sichere Online Zahlung Logistik",
       "Pforzheim Lieferdienst",
       "Transport Karlsruhe Umgebung",
       "Last Mile Deutschland",
       "Umzugstransport",
       "Paket groß",
-      "Logistik Startup Deutschland"
+      "Logistik Startup Deutschland",
+      "beste Logistikplattform Deutschland",
+      "beste Transportplattform Pforzheim",
+      "beste Spedition Pforzheim",
+      "beste digitale Logistikplattform",
+      "TransPool24 Einzelunternehmen",
+      "Omar Mdeik TransPool24",
+      "Kaiser-Friedrich-Straße 139 Pforzheim",
+      "75172 Pforzheim Transport",
+      "Rechnung nach Lieferung Transport",
+      "Zahlung nach Zustellung",
+      "Güterkraftverkehr Pforzheim",
+      "Live-Tracking Transport Deutschland",
+      "Impressum TransPool24",
+      "Logistikmarktplatz Baden-Württemberg",
+      "B2B Spedition digital",
+      "Kurier Karlsruhe Pforzheim Stuttgart",
+      "3,5 t Transporter mit Fahrer",
+      "Teilladung Komplettladung Deutschland"
     ]
   },
   "aboutNarrative": {
     "pageTitle": "Über uns",
     "operationalKicker": "TÄGLICHER BETRIEB FÜR UNTERNEHMEN & HANDEL",
-    "metaTitle": "Über uns | TransPool24, digitale Logistik aus Pforzheim",
-    "metaDescription": "Technische Vision, flexible Logistik und strategische Ziele in Deutschland, gefolgt von operativen Details für B2B.",
+    "metaTitle": "Beste Logistik- & Transportplattform Pforzheim – Über uns",
+    "metaDescription": "TransPool24, führende digitale Logistikplattform aus Pforzheim: Inhaber Omar Mdeik, Kaiser-Friedrich-Str. 139. Güterkraftverkehr, Live-Tracking, Rechnung nach Lieferung.",
     "intro1": "TransPool24 begann nicht als „nur eine Buchungsseite“ für Transport, sondern aus einer technischen Vision: flexible Logistik neu zu denken. Unser Produkt folgt einem minimalistisch-modernen Ansatz, Preußischblau für Ruhe und Vertrauen, kräftiges Orange für Dynamik, damit die Plattform sowohl deutsche Technologie-Erwartungen als auch Klarheit im Tagesgeschäft trifft. Das Interface ist keine Deko: Es ist eine durchdachte Nutzerreise, die komplexe Abläufe in wenigen Klicks fassbar macht.",
     "intro2": "Wie führende digitale Logistikplattformen weltweit verankern wir Transparenz, Automatisierung und Vertrauen zwischen Auftraggeber und Fahrer, klarer Status, weniger Telefon-Ping-Pong, planbare Zahlungsflüsse.",
     "strategicTitle": "Unsere strategischen Ziele",
     "strategicLead": "Wir wollen das digitale Bindeglied sein, das Pforzheim mit allen Bundesländern verbindet, und Zeit- sowie Logistiklücken im Straßentransport schließt:",
     "bulletAutomation": "Volle Automatisierung: von der Moment-Preisfindung bis zu nachvollziehbarem Sendungs-Tracking.",
-    "bulletTransparency": "Maximale Transparenz: sichere, internationale Zahlungswege, die alle Parteien schützen.",
+    "bulletTransparency": "Maximale Transparenz: Live-Tracking, nachvollziehbare Auftragsstatus und klare Rechnungsstellung nach Lieferung.",
     "bulletSocial": "Soziale Verantwortung: Arbeitsmarkt stärken und Kompetenzen im Feld aufbauen.",
     "dailyOpsTitle": "Täglicher Betrieb in der Praxis",
     "dailyOpsLead": "Zwischen Buchung, Abholung und Lieferung muss der Ablauf im realen Geschäftskunden-Alltag funktionieren, nicht nur auf Folien.",
     "dailyOpsB1": "Status zum Handeln: vom bestätigten Auftrag bis zur Zustellung, mit Sendungsverfolgung und Liefernachweis wo es relevant ist.",
-    "dailyOpsB2": "Preis und Zahlung: Angebot vor der Zahlung und sicherer Stripe-Checkout, weniger Rückfragen, planbare Liquidität.",
+    "dailyOpsB2": "Preis und Zahlung: klares Angebot vor der Buchung, Zahlung nach Lieferung per Rechnung, weniger Rückfragen, planbare Liquidität.",
     "dailyOpsB3": "Pforzheim und deutschlandweit: eingebundene Fahrer für gewerbliche Sendungen und operative Transporte.",
     "csrTitle": "Soziale Verantwortung: Jobs und Teilhabe",
     "csrLead": "Wir sind Teil des gesellschaftlichen Gefüges in Deutschland. Die Aktivierung des Arbeitsmarktes ist für uns ein zentrales Standbein:",
@@ -919,7 +936,7 @@
         "legal": "Art. 6 Abs. 1 lit. b DSGVO (Vertrag); ggf. lit. a (Einwilligung)"
       },
       "r2": {
-        "data": "Zahlungsdaten (über Stripe): Zahlungsstatus, ggf. abgekürzte Kartendaten, keine vollständigen Kartennummern bei uns",
+        "data": "Rechnungs- und Zahlungsdaten: Rechnungsanschrift, Zahlungsstatus, Banküberweisung; keine Speicherung vollständiger Kartendaten bei uns",
         "purpose": "Zahlungsabwicklung",
         "legal": "Art. 6 Abs. 1 lit. b DSGVO; Art. 6 Abs. 1 lit. c bei steuerlichen Pflichten"
       },
@@ -1004,9 +1021,9 @@
       "p3": "Stornierungen und Umbuchungen richten sich nach den zum Zeitpunkt der Buchung mitgeteilten Regelungen sowie dem Gesetz, soweit die Kundin / der Kunde Verbraucherin oder Verbraucher ist."
     },
     "s4": {
-      "title": "4. Preise, Zahlung, Zahlungsdienstleister",
+      "title": "4. Preise und Zahlung",
       "p1": "Die angezeigten Preise verstehen sich, sofern nicht anders gekennzeichnet, in Euro und enthalten die gesetzliche Umsatzsteuer, soweit diese anfällt. Abweichungen können sich aus Route, Zusatzleistungen, Wartezeiten oder Sonderaufwand ergeben.",
-      "p2": "Die Abwicklung von Kartenzahlungen kann über den Zahlungsdienstleister Stripe erfolgen. Es gelten ergänzend die jeweiligen Nutzungsbedingungen von Stripe. Ein Zurückbehaltungsrecht steht der Kundin / dem Kunden nur zu, soweit der Gegenanspruch auf demselben Vertragsverhältnis beruht."
+      "p2": "Die Zahlung erfolgt nach Lieferung per Rechnung (Überweisung). Ein Zurückbehaltungsrecht steht der Kundin / dem Kunden nur zu, soweit der Gegenanspruch auf demselben Vertragsverhältnis beruht."
     },
     "s5": {
       "title": "5. Mitwirkungspflichten, Ladung, Sicherheit",
