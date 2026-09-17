@@ -73,7 +73,7 @@ function cargoWhatForJob(job: Job): string {
   const cd = (job.cargo_details ?? null) as Record<string, unknown> | null;
   const loads = formatCargoLoadsPlainDe(cd);
   if (loads.trim()) return loads;
-  const parts = [job.cargo_size].filter(Boolean);
+  const parts: string[] = [job.cargo_size].filter(Boolean);
   if (cd && typeof cd.cargoCategory === "string" && cd.cargoCategory) parts.push(String(cd.cargoCategory));
   const w = cd && (typeof cd.weightKg === "number" ? cd.weightKg : typeof cd.cargoWeightKg === "number" ? cd.cargoWeightKg : null);
   if (w != null) parts.push(`${w} kg`);
