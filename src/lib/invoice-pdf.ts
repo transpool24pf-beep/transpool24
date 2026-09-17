@@ -118,20 +118,6 @@ function drawRight(
   page.drawText(safe, { x: right - w, y, size, font, color });
 }
 
-function drawCentered(
-  page: PDFPage,
-  font: PDFFont,
-  text: string,
-  centerX: number,
-  y: number,
-  size: number,
-  color = TEXT
-): void {
-  const safe = sanitizeTextForStandardPdfFont(text);
-  const w = font.widthOfTextAtSize(safe, size);
-  page.drawText(safe, { x: centerX - w / 2, y, size, font, color });
-}
-
 function drawLabelValue(
   page: PDFPage,
   font: PDFFont,
@@ -178,11 +164,10 @@ export async function generateInvoicePdf(
   const doc = await PDFDocument.create();
   const font = await doc.embedFont(StandardFonts.Helvetica);
   const fontBold = await doc.embedFont(StandardFonts.HelveticaBold);
-  let page = doc.addPage([595, 842]);
+  const page = doc.addPage([595, 842]);
   const { width, height } = page.getSize();
   const margin = 40;
   const contentW = width - margin * 2;
-  const pageMid = width / 2;
   let y = height - 28;
 
   const logoBytes = await getPdfLogoBytes();
@@ -462,25 +447,7 @@ export async function generateInvoicePdf(
     }
     blockY -= LINE_GAP + 4;
   }
-  y = blockY - 20;
-
-  const thanksLines = wrapLines(
-    "Vielen Dank für Ihr Vertrauen in TransPool24 - Ihr zuverlässiger Partner für Transport & Logistik.",
-    font,
-    9,
-    contentW - 20
-  );
-  const thanksNeed = thanksLines.length * LINE_GAP + 28;
-  if (y < 40 + thanksNeed) {
-    page = doc.addPage([595, 842]);
-    y = height - 48;
-  }
-  for (const ln of thanksLines) {
-    drawCentered(page, font, ln, pageMid, y, 9, TEAL);
-    y -= LINE_GAP;
-  }
-  y -= 6;
-  drawCentered(page, fontBold, "TransPool24 · Transport & Logistik", pageMid, y, 9, TEAL_DARK);
+  y = blockY - 16;
 
   return doc.save();
 }

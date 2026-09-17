@@ -482,8 +482,20 @@ export async function generateUmzugsvertragPdf(job: Job): Promise<Uint8Array> {
     MUTED
   );
 
-  ensure(36);
-  y -= 18;
+  ensure(52);
+  y -= 22;
+  const thanksLines = wrapLines(
+    "Vielen Dank für Ihr Vertrauen in TransPool24 - Ihr zuverlässiger Partner für Transport & Logistik.",
+    font,
+    9,
+    contentW - 20
+  );
+  for (const ln of thanksLines) {
+    ensure(18);
+    drawCentered(page, font, ln, pageMid, y, 9, TEAL);
+    y -= 14;
+  }
+  y -= 8;
   drawCentered(page, fontBold, "TransPool24 · Transport & Logistik", pageMid, y, 9, TEAL);
 
   return doc.save();
