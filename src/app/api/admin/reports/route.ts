@@ -1,6 +1,14 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/admin-api";
+import { formatCargoLoadsPlainDe } from "@/lib/cargo";
+import { formatAuftragNumber } from "@/lib/order-ref";
+import {
+  formatStructuredAddressPlain,
+  jobPreferredDeliveryAt,
+  jobRecipientAddress,
+  jobSenderAddress,
+} from "@/lib/structured-address";
 
 /** Simple aggregates for admin dashboard (extend with more queries later) */
 export async function GET() {
@@ -10,7 +18,7 @@ export async function GET() {
   const { data: jobs, error } = await supabase
     .from("jobs")
     .select(
-      "id, order_number, company_name, price_cents, logistics_status, payment_status, created_at, assigned_driver_application_id"
+      "id, order_number, company_name, phone, customer_email, pickup_address, delivery_address, cargo_size, cargo_details, distance_km, price_cents, driver_price_cents, logistics_status, payment_status, created_at, preferred_pickup_at, assigned_driver_application_id, pod_completed_at"
     );
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -57,6 +65,42 @@ export async function GET() {
     console.warn("[admin/reports] support_requests count", supErr.message);
   }
   const supportTickets7d = supErr ? 0 : supportCount ?? 0;
+  const archiveOrders = list
+    .filter((j) => j.logistics_status !== "draft")
+    .slice()
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .map((j) => {
+      const cargo_details =
+        j.cargo_details && typeof j.cargo_details === "object" && !Array.isArray(j.cargo_details)
+          ? (j.cargo_details as Record<string, unknown>)
+          : null;
+      const jobLike = { ...j, cargo_details };
+      const sender = jobSenderAddress(jobLike);
+      const recipient = jobRecipientAddress(jobLike);
+      return {
+        id: j.id,
+        auftrag: formatAuftragNumber(j),
+        order_number: j.order_number,
+        company_name: j.company_name ?? "",
+        phone: j.phone ?? "",
+        customer_email: j.customer_email ?? "",
+        pickup: formatStructuredAddressPlain(sender) || j.pickup_address || "",
+        delivery: formatStructuredAddressPlain(recipient) || j.delivery_address || "",
+        recipient_phone: recipient.phone ?? "",
+        pickup_at: j.preferred_pickup_at ?? null,
+        delivery_at: jobPreferredDeliveryAt(jobLike),
+        cargo_size: j.cargo_size ?? "",
+        loads: formatCargoLoadsPlainDe(cargo_details) || "",
+        distance_km: j.distance_km,
+        price_cents: j.price_cents ?? 0,
+        driver_price_cents: j.driver_price_cents ?? null,
+        payment_status: j.payment_status ?? "",
+        logistics_status: j.logistics_status ?? "",
+        created_at: j.created_at,
+        pod_completed_at: j.pod_completed_at ?? null,
+        has_driver: j.assigned_driver_application_id != null,
+      };
+    });
   return NextResponse.json({
     totalOrders,
     revenueEur: (revenueCents / 100).toFixed(2),
@@ -71,5 +115,6 @@ export async function GET() {
     paidInvoices,
     inTransitCount,
     supportTickets7d,
+    archiveOrders,
   });
 }
