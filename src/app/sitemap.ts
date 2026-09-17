@@ -5,9 +5,16 @@ import { getPublicSiteUrl } from "@/lib/public-site-url";
 
 const STATIC_SUFFIXES = ["", "/why", "/driver", "/privacy", "/terms", "/support"] as const;
 
+/** Real content date for static locale pages — do not use `new Date()` per request. */
+const STATIC_LASTMOD = new Date("2026-09-17T08:00:00.000Z");
+
+function safeLastmod(value: Date | undefined): Date {
+  if (!value || Number.isNaN(value.getTime())) return STATIC_LASTMOD;
+  return value;
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const site = getPublicSiteUrl();
-  const lastModified = new Date();
   const seen = new Set<string>();
   const entries: MetadataRoute.Sitemap = [];
 
@@ -20,7 +27,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     seen.add(url);
     entries.push({
       url,
-      lastModified: extra?.lastModified ?? lastModified,
+      lastModified: safeLastmod(extra?.lastModified),
       changeFrequency: extra?.changeFrequency ?? "weekly",
       priority: extra?.priority ?? 0.7,
     });
@@ -31,26 +38,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const path = `/${loc}${suffix}`;
       const isHome = suffix === "";
       push(path, {
-        lastModified,
+        lastModified: STATIC_LASTMOD,
         changeFrequency: "weekly",
         priority: isHome && (loc === "de" || loc === "ar") ? 1 : isHome ? 0.9 : 0.7,
       });
     }
   }
 
-  const nativeBlogLocales = await listLocalesWithNativeBlogPosts();
-  const blogLocales = nativeBlogLocales.length > 0 ? nativeBlogLocales : [defaultLocale];
-  for (const loc of blogLocales) {
-    push(`/${loc}/blog`, { lastModified, changeFrequency: "weekly", priority: 0.65 });
-  }
+  try {
+    const nativeBlogLocales = await listLocalesWithNativeBlogPosts();
+    const blogLocales = nativeBlogLocales.length > 0 ? nativeBlogLocales : [defaultLocale];
+    for (const loc of blogLocales) {
+      push(`/${loc}/blog`, { lastModified: STATIC_LASTMOD, changeFrequency: "weekly", priority: 0.65 });
+    }
 
-  const posts = await listPublishedPostsForSitemap();
-  for (const post of posts) {
-    push(`/${post.locale}/blog/${post.slug}`, {
-      lastModified: post.lastModified,
-      changeFrequency: "weekly",
-      priority: 0.6,
-    });
+    const posts = await listPublishedPostsForSitemap();
+    for (const post of posts) {
+      push(`/${post.locale}/blog/${post.slug}`, {
+        lastModified: post.lastModified,
+        changeFrequency: "weekly",
+        priority: 0.6,
+      });
+    }
+  } catch (e) {
+    console.error("[sitemap] blog entries skipped", e);
+    push(`/${defaultLocale}/blog`, { lastModified: STATIC_LASTMOD, changeFrequency: "weekly", priority: 0.65 });
   }
 
   return entries;
