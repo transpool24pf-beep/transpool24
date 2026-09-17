@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { BlogMarkdown } from "@/components/BlogMarkdown";
-import { getPublishedPostBySlug } from "@/lib/blog";
+import { getPublishedPostSeo } from "@/lib/blog";
 import { IconCalendar, IconUser } from "@/components/blog/BlogNewsIcons";
 import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
@@ -19,10 +19,14 @@ const LEGACY_POST_SLUGS = new Set(["willkommen-transpool24-magazin"]);
 export async function generateMetadata({ params }: Props) {
   const { locale: loc, slug } = await params;
   const locale = loc as Locale;
-  const post = await getPublishedPostBySlug(locale, slug);
+  const seo = await getPublishedPostSeo(locale, slug);
+  const post = seo.post;
   const t = await getTranslations({ locale, namespace: "blog" });
   if (!post) {
-    return { title: seoDocumentTitle(t("notFoundTitle")) };
+    return {
+      title: seoDocumentTitle(t("notFoundTitle")),
+      robots: { index: false, follow: false },
+    };
   }
   const title = post.meta_title?.trim() || post.title;
   const description = post.meta_description?.trim() || post.excerpt || t("metaIndexDescription");
@@ -33,6 +37,11 @@ export async function generateMetadata({ params }: Props) {
     ogType: "article",
     publishedTime: post.published_at ?? undefined,
     ogImage: post.featured_image_url ?? undefined,
+    canonicalLocale: seo.canonicalLocale ?? locale,
+    hreflangLocales: seo.hreflangLocales,
+    robots: seo.indexable
+      ? { index: true, follow: true }
+      : { index: false, follow: true },
   });
 }
 
@@ -59,7 +68,8 @@ export default async function BlogPostPage({ params }: Props) {
     redirect(`/${locale}/blog`);
   }
 
-  const post = await getPublishedPostBySlug(locale, slug);
+  const seo = await getPublishedPostSeo(locale, slug);
+  const post = seo.post;
   if (!post) {
     notFound();
   }

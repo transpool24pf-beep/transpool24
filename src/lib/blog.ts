@@ -307,6 +307,108 @@ export async function getPublishedPostBySlug(
   return fallback;
 }
 
+export type PublishedPostSeo = {
+  post: BlogPost | null;
+  /** Locales that have a published DB row for this slug. */
+  hreflangLocales: Locale[];
+  canonicalLocale: Locale | null;
+  /** True only when this locale has its own published row (not a fallback/on-the-fly translation). */
+  indexable: boolean;
+};
+
+/** SEO for a magazine article: index only native locale rows; others canonical to the source locale. */
+export async function getPublishedPostSeo(locale: string, slug: string): Promise<PublishedPostSeo> {
+  const empty: PublishedPostSeo = {
+    post: null,
+    hreflangLocales: [],
+    canonicalLocale: null,
+    indexable: false,
+  };
+  const sb = tryGetSupabase();
+  if (!sb) return empty;
+  const loc = locale as Locale;
+  if (!locales.includes(loc)) return empty;
+
+  const { data: siblings, error } = await sb
+    .from("blog_posts")
+    .select("*")
+    .eq("slug", slug)
+    .eq("status", "published")
+    .not("published_at", "is", null);
+  if (error) {
+    console.error("[blog] getPublishedPostSeo", error);
+    return empty;
+  }
+  const group = (siblings ?? []) as BlogPost[];
+  const hreflangLocales = [
+    ...new Set(
+      group.map((r) => r.locale).filter((l): l is Locale => locales.includes(l as Locale)),
+    ),
+  ];
+  const native = group.find((r) => r.locale === loc) ?? null;
+  const source = pickTranslationSource(group);
+  const canonicalLocale = (native?.locale as Locale | undefined) ?? (source?.locale as Locale | undefined) ?? null;
+
+  if (native) {
+    return { post: native, hreflangLocales, canonicalLocale: loc, indexable: true };
+  }
+
+  const post = await getPublishedPostBySlug(loc, slug);
+  return {
+    post,
+    hreflangLocales,
+    canonicalLocale,
+    indexable: false,
+  };
+}
+
+export async function listLocalesWithNativeBlogPosts(): Promise<Locale[]> {
+  const sb = tryGetSupabase();
+  if (!sb) return [];
+  const { data, error } = await sb
+    .from("blog_posts")
+    .select("locale")
+    .eq("status", "published")
+    .not("published_at", "is", null);
+  if (error) {
+    console.error("[blog] listLocalesWithNativeBlogPosts", error);
+    return [];
+  }
+  const set = new Set<Locale>();
+  for (const row of data ?? []) {
+    const l = (row as { locale: string }).locale;
+    if (locales.includes(l as Locale)) set.add(l as Locale);
+  }
+  return [...set];
+}
+
+export async function listPublishedPostsForSitemap(): Promise<
+  { locale: Locale; slug: string; lastModified: Date }[]
+> {
+  const sb = tryGetSupabase();
+  if (!sb) return [];
+  const { data, error } = await sb
+    .from("blog_posts")
+    .select("locale, slug, published_at, updated_at")
+    .eq("status", "published")
+    .not("published_at", "is", null);
+  if (error) {
+    console.error("[blog] listPublishedPostsForSitemap", error);
+    return [];
+  }
+  const out: { locale: Locale; slug: string; lastModified: Date }[] = [];
+  for (const row of data ?? []) {
+    const locale = (row as { locale: string }).locale;
+    const slug = (row as { slug: string }).slug;
+    if (!locales.includes(locale as Locale) || !slug) continue;
+    const updated = (row as { updated_at?: string | null }).updated_at;
+    const published = (row as { published_at?: string | null }).published_at;
+    const lastModified = new Date(updated || published || Date.now());
+    out.push({ locale: locale as Locale, slug, lastModified });
+  }
+  return out;
+}
+
 /** Prefer de → en → ar → any, so articles stay readable without OPENAI_API_KEY. */
 function pickSiblingFallbackPost(group: BlogPost[], _loc: Locale): BlogPost | null {
   if (group.length === 0) return null;

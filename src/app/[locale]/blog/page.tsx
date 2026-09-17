@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { listPublishedPosts } from "@/lib/blog";
+import { listLocalesWithNativeBlogPosts, listPublishedPosts } from "@/lib/blog";
 import { AboutUsWhyNarrative } from "@/components/about/AboutUsWhyNarrative";
 import { BlogNewsCard } from "@/components/blog/BlogNewsCard";
 import { HomeLogisticsHero } from "@/components/HomeLogisticsHero";
@@ -27,9 +27,14 @@ type Props = { params: Promise<{ locale: string }> };
 export async function generateMetadata({ params }: Props) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "blog" });
+  const nativeLocales = await listLocalesWithNativeBlogPosts();
+  const hasNative = nativeLocales.includes(locale as Locale);
   return localeAlternatesAndSocial(locale, "/blog", {
     title: t("metaIndexTitle"),
     description: t("metaIndexDescription"),
+    canonicalLocale: hasNative ? locale : "de",
+    hreflangLocales: nativeLocales.length > 0 ? nativeLocales : ["de"],
+    robots: hasNative ? { index: true, follow: true } : { index: false, follow: true },
   });
 }
 

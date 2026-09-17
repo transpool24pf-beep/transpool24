@@ -12,6 +12,7 @@ function ampDocument(locale: Locale): string {
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1" />
   <title>TransPool24</title>
+  <meta name="robots" content="noindex, follow" />
   <link rel="canonical" href="${canonical}" />
   <script async src="https://cdn.ampproject.org/v0.js"></script>
   <script async custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js"></script>
@@ -42,6 +43,7 @@ export async function GET(
     headers: {
       "Content-Type": "text/html; charset=utf-8",
       "Cache-Control": "public, max-age=3600, s-maxage=3600",
+      "X-Robots-Tag": "noindex, follow",
     },
   });
 }

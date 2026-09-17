@@ -91,6 +91,8 @@ const nextConfig: NextConfig = {
       { source: "/terms", destination: "/de/terms", permanent: true },
       { source: "/driver", destination: "/de/driver", permanent: true },
       { source: "/blog", destination: "/de/blog", permanent: true },
+      { source: "/cs", destination: "/de", permanent: true },
+      { source: "/cs/:path*", destination: "/de/:path*", permanent: true },
       // AMP landing (AdSense AMP auto-ads); default locale for bare /amp.
       { source: "/amp", destination: "/de/amp", permanent: false },
     ];

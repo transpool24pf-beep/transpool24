@@ -31,6 +31,10 @@ export type LocaleSeoContent = {
   ogImage?: string;
   publishedTime?: string;
   robots?: Metadata["robots"];
+  /** Canonical locale when this URL is a duplicate (missing translation, invalid locale). */
+  canonicalLocale?: string;
+  /** If set, hreflang lists only these locales (plus x-default → defaultLocale). */
+  hreflangLocales?: readonly string[];
 };
 
 /**
@@ -45,18 +49,6 @@ export function localeAlternatesAndSocial(
 ): Metadata {
   const site = getPublicSiteUrl();
 
-  if (!isLocale(locale)) {
-    const docTitle = plainSeoTitle(opts.title);
-    return {
-      title: seoDocumentTitle(opts.title),
-      description: opts.description,
-      keywords: opts.keywords,
-      robots: opts.robots,
-      openGraph: { title: docTitle, description: opts.description },
-      twitter: { card: "summary_large_image", title: docTitle, description: opts.description },
-    };
-  }
-
   const raw = pathnameAfterLocale.startsWith("/")
     ? pathnameAfterLocale
     : pathnameAfterLocale
@@ -64,12 +56,36 @@ export function localeAlternatesAndSocial(
       : "";
   const normalizedSuffix = raw === "/" ? "" : raw.replace(/\/$/, "") || "";
 
-  const path = `/${locale}${normalizedSuffix}`;
+  if (!isLocale(locale)) {
+    const docTitle = plainSeoTitle(opts.title);
+    const dest = `/${defaultLocale}${normalizedSuffix}`;
+    return {
+      title: seoDocumentTitle(opts.title),
+      description: opts.description,
+      keywords: opts.keywords,
+      robots: opts.robots ?? { index: false, follow: true },
+      openGraph: { title: docTitle, description: opts.description },
+      twitter: { card: "summary_large_image", title: docTitle, description: opts.description },
+      alternates: { canonical: `${site}${dest}` },
+    };
+  }
+
+  const canonicalLoc =
+    opts.canonicalLocale && isLocale(opts.canonicalLocale) ? opts.canonicalLocale : locale;
+  const path = `/${canonicalLoc}${normalizedSuffix}`;
+
+  const hreflangSrc =
+    opts.hreflangLocales && opts.hreflangLocales.length > 0
+      ? opts.hreflangLocales.filter((l): l is Locale => isLocale(l))
+      : [...locales];
+  const hreflangSet = new Set<Locale>(hreflangSrc);
+  hreflangSet.add(canonicalLoc);
+  hreflangSet.add(defaultLocale);
 
   const languages: Record<string, string> = {
     "x-default": `${site}/${defaultLocale}${normalizedSuffix}`,
   };
-  for (const l of locales) {
+  for (const l of hreflangSet) {
     languages[l] = `${site}/${l}${normalizedSuffix}`;
   }
 

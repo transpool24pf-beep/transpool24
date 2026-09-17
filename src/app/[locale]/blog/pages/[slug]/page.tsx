@@ -19,7 +19,10 @@ export async function generateMetadata({ params }: Props) {
   const page = await getPublishedPageBySlug(locale, slug);
   const t = await getTranslations({ locale, namespace: "blog" });
   if (!page) {
-    return { title: seoDocumentTitle(t("notFoundTitle")) };
+    return {
+      title: seoDocumentTitle(t("notFoundTitle")),
+      robots: { index: false, follow: false },
+    };
   }
   const title = page.meta_title?.trim() || page.title;
   const description = page.meta_description?.trim() || t("metaIndexDescription");
