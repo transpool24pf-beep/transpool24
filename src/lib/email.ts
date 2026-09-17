@@ -271,7 +271,8 @@ export async function sendOrderConfirmationEmail(
   }
 }
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com";
+const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com").replace(/\/$/, "");
+const EMAIL_HOME_URL = `${SITE_URL}/de`;
 /** Bump after replacing public/transpool24-email-logo.png (Gmail/proxy cache). */
 const EMAIL_HEADER_CACHE_BUST = process.env.EMAIL_HEADER_CACHE_BUST?.trim() || "20260403g";
 /** Dedicated file for mail + support forms, avoids production /5439.png (site header) being an old banner strip. */
@@ -339,6 +340,13 @@ function mergeAttachmentsWithLogo(logo: Attachment | null, existing?: Attachment
   return merged.length ? merged : undefined;
 }
 
+function emailLogoLinkHtml(imgSrc: string, extraImgStyle: string): string {
+  const maxW = EMAIL_HEADER_LOGO_MAX_WIDTH_PX;
+  return `<a href="${EMAIL_HOME_URL}" target="_blank" rel="noopener noreferrer" style="display:block; text-decoration:none; border:0; outline:none;">
+        <img src="${imgSrc}" alt="TransPool24" width="${maxW}" border="0" style="${extraImgStyle}" />
+      </a>`;
+}
+
 function emailHeaderBannerHtmlWithSrc(imgSrc: string): string {
   const bg = "#ffffff";
   const maxW = EMAIL_HEADER_LOGO_MAX_WIDTH_PX;
@@ -346,7 +354,7 @@ function emailHeaderBannerHtmlWithSrc(imgSrc: string): string {
   <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background:${bg}; border-collapse:collapse; border-bottom:1px solid #e2e8f0;">
     <tr>
       <td align="center" valign="middle" style="padding:16px 14px 18px 14px; line-height:0; mso-line-height-rule:exactly; background:${bg};">
-        <img src="${imgSrc}" alt="TransPool24" width="${maxW}" style="display:block; margin:0 auto; border:0; outline:none; width:100%; max-width:${maxW}px; height:auto; object-fit:contain; object-position:center center; background:${bg}; -ms-interpolation-mode:bicubic;" />
+        ${emailLogoLinkHtml(imgSrc, `display:block; margin:0 auto; border:0; outline:none; width:100%; max-width:${maxW}px; height:auto; object-fit:contain; object-position:center center; background:${bg}; -ms-interpolation-mode:bicubic;`)}
       </td>
     </tr>
   </table>`;
@@ -871,7 +879,7 @@ function buildDriverApprovalHtml(
         </tr>
         <tr>
           <td style="background:#0d2137; padding: 28px 24px; text-align: center;">
-            <img src="${branding.brandImgSrc}" alt="TransPool24" width="${EMAIL_HEADER_LOGO_MAX_WIDTH_PX}" style="display:block; margin:0 auto 16px auto; width:100%; max-width:${EMAIL_HEADER_LOGO_MAX_WIDTH_PX}px; height:auto; object-fit:contain; object-position:center center; border:0; -ms-interpolation-mode:bicubic;" />
+            ${emailLogoLinkHtml(branding.brandImgSrc, `display:block; margin:0 auto 16px auto; width:100%; max-width:${EMAIL_HEADER_LOGO_MAX_WIDTH_PX}px; height:auto; object-fit:contain; object-position:center center; border:0; -ms-interpolation-mode:bicubic;`)}
             <p style="margin:0; font-size:18px; font-weight:700; color:#fff; line-height:1.4;">
               Ihr Weg ist sicher – und unser Team steht immer hinter Ihnen.
             </p>
@@ -955,7 +963,7 @@ function buildDriverPaymentInvoiceEmailHtml(
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; padding: 0 20px 24px;">
     <tr><td>
       <div style="background: #ffffff; border-radius: 0 0 16px 16px; padding: 32px 24px; text-align: center;">
-        <img src="${branding.brandImgSrc}" alt="TransPool24" width="${EMAIL_HEADER_LOGO_MAX_WIDTH_PX}" style="display:block; margin:0 auto 20px; width:100%; max-width:${EMAIL_HEADER_LOGO_MAX_WIDTH_PX}px; height:auto; object-fit:contain; object-position:center center; border:0; -ms-interpolation-mode:bicubic;" />
+        ${emailLogoLinkHtml(branding.brandImgSrc, `display:block; margin:0 auto 20px; width:100%; max-width:${EMAIL_HEADER_LOGO_MAX_WIDTH_PX}px; height:auto; object-fit:contain; object-position:center center; border:0; -ms-interpolation-mode:bicubic;`)}
         <p style="margin: 0 0 20px 0; font-size: 18px; font-weight: bold; color: #0d2137;">Ihr Weg ist sicher – und unser Team steht immer hinter Ihnen.</p>
         <a href="${supportUrl}" style="display: inline-block; margin: 0 0 24px 0; padding: 14px 28px; background: #00BFFF; color: #fff; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 15px;">Wir sind an Ihrer Seite bei jedem Kilometer.</a>
         <p style="margin: 0 0 12px 0; font-size: 13px; color: #0d2137;">Folgen Sie uns</p>
