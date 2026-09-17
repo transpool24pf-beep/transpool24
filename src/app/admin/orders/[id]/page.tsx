@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useAdminLocale } from "@/contexts/AdminLocaleContext";
 import { cargoCategoryLabelDe, formatCargoLoadsPlainDe, parseCargoLoads } from "@/lib/cargo";
-import { formatStructuredAddressPlain, jobRecipientAddress, jobSenderAddress } from "@/lib/structured-address";
+import { formatStructuredAddressPlain, jobPreferredDeliveryAt, jobRecipientAddress, jobSenderAddress } from "@/lib/structured-address";
 import { odMailT, cargoCategoryAdminLabel, odT } from "@/lib/admin-order-detail-i18n";
 import { serviceTypeLabel } from "@/lib/admin-ui-strings";
 import { formatAuftragNumber, formatSendungNumber } from "@/lib/order-ref";
@@ -28,6 +28,7 @@ type Job = {
   logistics_status: string;
   created_at: string;
   preferred_pickup_at: string | null;
+  preferred_delivery_at?: string | null;
   confirmation_token: string | null;
   assigned_driver_application_id?: string | null;
   customer_driver_rating?: number | null;
@@ -640,13 +641,25 @@ export default function AdminOrderDetailPage({
                 )}
               </dd>
             </div>
-            {order.preferred_pickup_at && (
+            {(order.preferred_pickup_at || jobPreferredDeliveryAt(order)) && (
+              <>
+                {order.preferred_pickup_at ? (
               <div>
                 <dt className="text-[#0d2137]/60">{odT(locale, "od.pickupTime")}</dt>
                 <dd className="font-medium text-[#0d2137]">
                   {new Date(order.preferred_pickup_at).toLocaleString(dateLoc, { dateStyle: "short", timeStyle: "short" })}
                 </dd>
               </div>
+                ) : null}
+                {jobPreferredDeliveryAt(order) ? (
+              <div>
+                <dt className="text-[#0d2137]/60">{odT(locale, "od.deliveryTime")}</dt>
+                <dd className="font-medium text-[#0d2137]">
+                  {new Date(jobPreferredDeliveryAt(order)!).toLocaleString(dateLoc, { dateStyle: "short", timeStyle: "short" })}
+                </dd>
+              </div>
+                ) : null}
+              </>
             )}
             <div>
               <dt className="text-[#0d2137]/60">{odT(locale, "od.company")}</dt>
@@ -668,6 +681,12 @@ export default function AdminOrderDetailPage({
               <dt className="text-[#0d2137]/60">{odT(locale, "od.delivery")}</dt>
               <dd className="whitespace-pre-line">{formatStructuredAddressPlain(jobRecipientAddress(order)) || order.delivery_address}</dd>
             </div>
+            {jobRecipientAddress(order).phone.trim() ? (
+              <div>
+                <dt className="text-[#0d2137]/60">{odT(locale, "od.recipientPhone")}</dt>
+                <dd>{jobRecipientAddress(order).phone.trim()}</dd>
+              </div>
+            ) : null}
             <div>
               <dt className="text-[#0d2137]/60">{odT(locale, "od.cargoSize")}</dt>
               <dd>{order.cargo_size}</dd>

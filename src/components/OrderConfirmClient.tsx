@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { GermanVatPriceBlock } from "@/components/GermanVatPriceBlock";
-import { formatStructuredAddressPlain, jobRecipientAddress, jobSenderAddress } from "@/lib/structured-address";
+import { formatStructuredAddressPlain, jobPreferredDeliveryAt, jobRecipientAddress, jobSenderAddress } from "@/lib/structured-address";
 import { displayOrderRef } from "@/lib/order-ref";
 
 type Job = {
@@ -18,6 +18,8 @@ type Job = {
   distance_km: number | null;
   price_cents: number;
   phone: string;
+  preferred_pickup_at?: string | null;
+  preferred_delivery_at?: string | null;
   cargo_details?: Record<string, unknown> | null;
 };
 
@@ -88,10 +90,19 @@ export function OrderConfirmClient({
         <p><strong>{t("companyName")}:</strong> {job.company_name}</p>
         <p><strong>{t("phone")}:</strong> {job.phone}</p>
         <p className="whitespace-pre-line"><strong>{t("pickup")}:</strong> {formatStructuredAddressPlain(jobSenderAddress(job), false) || `${job.pickup_address}${job.pickup_city ? `, ${job.pickup_city}` : ""}`}</p>
+        {job.preferred_pickup_at ? (
+          <p><strong>{t("pickupDate")} / {t("pickupTime")}:</strong> {new Date(job.preferred_pickup_at).toLocaleString(locale, { dateStyle: "short", timeStyle: "short" })}</p>
+        ) : null}
         {jobSenderAddress(job).notes.trim() ? (
           <p className="whitespace-pre-line"><strong>{t("addressLoadingNotes")}:</strong> {jobSenderAddress(job).notes.trim()}</p>
         ) : null}
         <p className="whitespace-pre-line"><strong>{t("delivery")}:</strong> {formatStructuredAddressPlain(jobRecipientAddress(job), false) || `${job.delivery_address}${job.delivery_city ? `, ${job.delivery_city}` : ""}`}</p>
+        {jobRecipientAddress(job).phone.trim() ? (
+          <p><strong>{t("recipientPhone")}:</strong> {jobRecipientAddress(job).phone.trim()}</p>
+        ) : null}
+        {jobPreferredDeliveryAt(job) ? (
+          <p><strong>{t("deliveryDate")} / {t("deliveryTime")}:</strong> {new Date(jobPreferredDeliveryAt(job)!).toLocaleString(locale, { dateStyle: "short", timeStyle: "short" })}</p>
+        ) : null}
         {jobRecipientAddress(job).notes.trim() ? (
           <p className="whitespace-pre-line"><strong>{t("addressUnloadingNotes")}:</strong> {jobRecipientAddress(job).notes.trim()}</p>
         ) : null}

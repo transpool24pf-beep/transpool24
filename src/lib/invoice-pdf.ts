@@ -1,7 +1,7 @@
 import { PDFDocument, rgb, StandardFonts, type PDFFont, type PDFPage } from "pdf-lib";
 import type { Job } from "./supabase";
 import { getPdfLogoBytes, PDF_COMPANY } from "./pdf-company";
-import { jobRecipientAddress } from "./structured-address";
+import { jobPreferredDeliveryAt, jobRecipientAddress } from "./structured-address";
 import { formatAuftragNumber } from "./order-ref";
 
 export type InvoiceType = "customer" | "driver";
@@ -42,6 +42,13 @@ function formatDeDate(iso: string | Date | null | undefined): string {
   const d = iso instanceof Date ? iso : new Date(iso);
   if (Number.isNaN(d.getTime())) return "-";
   return d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+}
+
+function formatDeDateTime(iso: string | Date | null | undefined): string {
+  if (!iso) return "-";
+  const d = iso instanceof Date ? iso : new Date(iso);
+  if (Number.isNaN(d.getTime())) return "-";
+  return d.toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" });
 }
 
 export function invoiceNumberForJob(job: Job & { order_number?: number | null }): string {
@@ -200,6 +207,8 @@ export async function generateInvoicePdf(
     ["Rechnungsnummer:", invoiceNo],
     ["Rechnungsdatum:", invoiceDate],
     ["Leistungsdatum:", leistungDate],
+    ["Abholzeit:", formatDeDateTime(job.preferred_pickup_at)],
+    ["Lieferzeit:", formatDeDateTime(jobPreferredDeliveryAt(job))],
   ];
   for (const [k, v] of meta) {
     drawSafe(page, font, k, metaLabelX, metaY, 9, MUTED);
@@ -230,6 +239,7 @@ export async function generateInvoicePdf(
   const valueW = colW - labelW - 8;
   const leftPairs: [string, string][] = [
     ["Kundenname / Firma:", recipient.company || job.company_name || ""],
+    ["Telefon Empfaenger:", recipient.phone || job.phone || ""],
     ["Straße Hausnummer:", addrStreet],
     ["PLZ Ort:", plzOrt],
     ["", recipient.country || "Deutschland"],

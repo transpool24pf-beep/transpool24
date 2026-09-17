@@ -15,6 +15,7 @@ import {
 } from "@/lib/email-footer";
 import {
   formatStructuredAddressHtml,
+  jobPreferredDeliveryAt,
   jobRecipientAddress,
   jobSenderAddress,
 } from "./structured-address";
@@ -135,7 +136,9 @@ function buildConfirmationHtml(
           <tr style="background: #f8fafc;"><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Auftragsnummer</td><td style="border-bottom: 1px solid #e2e8f0;">${orderRef}</td></tr>
           <tr><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Datum</td><td style="border-bottom: 1px solid #e2e8f0;">${date}</td></tr>
           <tr style="background: #f8fafc;"><td style="border-bottom: 1px solid #e2e8f0; color: #64748b; vertical-align:top;">Abholung</td><td style="border-bottom: 1px solid #e2e8f0;">${addressHtmlForJob(job, "pickup")}</td></tr>
-          <tr><td style="border-bottom: 1px solid #e2e8f0; color: #64748b; vertical-align:top;">Lieferung (Empfänger)</td><td style="border-bottom: 1px solid #e2e8f0;">${addressHtmlForJob(job, "delivery")}</td></tr>
+          <tr><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Abholzeit</td><td style="border-bottom: 1px solid #e2e8f0;">${escapeHtml(formatDeDateTime(job.preferred_pickup_at))}</td></tr>
+          <tr style="background: #f8fafc;"><td style="border-bottom: 1px solid #e2e8f0; color: #64748b; vertical-align:top;">Lieferung (Empfänger)</td><td style="border-bottom: 1px solid #e2e8f0;">${addressHtmlForJob(job, "delivery")}</td></tr>
+          <tr><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Lieferzeit</td><td style="border-bottom: 1px solid #e2e8f0;">${escapeHtml(formatDeDateTime(jobPreferredDeliveryAt(job)))}</td></tr>
           <tr style="background: #f8fafc;"><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Ladung / Distanz</td><td style="border-bottom: 1px solid #e2e8f0;">${job.cargo_size}, ${job.distance_km ?? "-"} km</td></tr>
           ${cargoLoadsRows}
           ${cargoCategoryDe ? `<tr><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Warenkategorie</td><td style="border-bottom: 1px solid #e2e8f0;">${escapeHtml(cargoCategoryDe)}</td></tr>` : ""}
@@ -157,6 +160,13 @@ function buildConfirmationHtml(
 </body>
 </html>
   `.trim();
+}
+
+function formatDeDateTime(iso: string | null | undefined): string {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" });
 }
 
 function addressHtmlForJob(job: Job, kind: "pickup" | "delivery"): string {
@@ -413,7 +423,9 @@ function buildDeliveryConfirmationHtml(
         </p>
         <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse:collapse; font-size:14px; border:1px solid #e2e8f0; border-radius:8px;">
           <tr style="background:#f8fafc;"><td style="color:#64748b; width:32%; vertical-align:top;">Lieferadresse (Empfänger)</td><td>${addressHtmlForJob(job, "delivery")}</td></tr>
-          <tr><td style="color:#64748b; vertical-align:top;">Abholung</td><td>${addressHtmlForJob(job, "pickup")}</td></tr>
+          <tr><td style="color:#64748b;">Gewünschte Lieferzeit</td><td>${escapeHtml(formatDeDateTime(jobPreferredDeliveryAt(job)))}</td></tr>
+          <tr style="background:#f8fafc;"><td style="color:#64748b; vertical-align:top;">Abholung</td><td>${addressHtmlForJob(job, "pickup")}</td></tr>
+          <tr><td style="color:#64748b;">Gewünschte Abholzeit</td><td>${escapeHtml(formatDeDateTime(job.preferred_pickup_at))}</td></tr>
         </table>
         ${podBlock}
         ${trackBlock}
@@ -729,7 +741,9 @@ function buildTrackingUpdateHtml(
         ${driverBlock}
         <table width="100%" cellpadding="8" cellspacing="0" style="border-collapse:collapse; font-size:14px; border:1px solid #e2e8f0; border-radius:8px; margin-bottom:18px;">
           <tr style="background:#f8fafc;"><td style="color:#64748b; width:32%; vertical-align:top;">Abholung</td><td>${addressHtmlForJob(job, "pickup")}</td></tr>
-          <tr><td style="color:#64748b; vertical-align:top;">Zustellung (Empfänger)</td><td>${addressHtmlForJob(job, "delivery")}</td></tr>
+          <tr><td style="color:#64748b;">Abholzeit</td><td>${escapeHtml(formatDeDateTime(job.preferred_pickup_at))}</td></tr>
+          <tr style="background:#f8fafc;"><td style="color:#64748b; vertical-align:top;">Zustellung (Empfänger)</td><td>${addressHtmlForJob(job, "delivery")}</td></tr>
+          <tr><td style="color:#64748b;">Lieferzeit</td><td>${escapeHtml(formatDeDateTime(jobPreferredDeliveryAt(job)))}</td></tr>
         </table>
         <p style="margin:0 0 14px 0; text-align:center;">
           <a href="${escapeHref(options.trackOrderUrl)}" style="display:inline-block; padding:16px 28px; background:linear-gradient(135deg,#e85d04 0%,#f48c06 100%); color:#fff !important; text-decoration:none; border-radius:12px; font-weight:bold; font-size:17px; box-shadow:0 4px 18px rgba(232,93,4,0.35);">

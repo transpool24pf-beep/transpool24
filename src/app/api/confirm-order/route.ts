@@ -47,6 +47,7 @@ export async function POST(req: Request) {
       pickupAddress,
       deliveryAddress,
       pickupTime,
+      deliveryTime,
       cargoSize,
       serviceType = "driver_car",
       cargoDetails,
@@ -57,6 +58,8 @@ export async function POST(req: Request) {
       !phone ||
       !pickupAddress ||
       !deliveryAddress ||
+      !pickupTime ||
+      !deliveryTime ||
       !cargoSize ||
       !VALID_CARGO.includes(cargoSize)
     ) {
@@ -113,6 +116,9 @@ export async function POST(req: Request) {
 
     const senderAddress = normalizeStructuredAddress(cd?.senderAddress);
     const recipientAddress = normalizeStructuredAddress(cd?.recipientAddress);
+    if ((recipientAddress.phone ?? "").replace(/\D/g, "").length < 6) {
+      return NextResponse.json({ error: "RECIPIENT_PHONE_REQUIRED" }, { status: 400 });
+    }
     const pickupCity = senderAddress.city || cityFromGermanAddress(pickupAddress);
     const deliveryCity = recipientAddress.city || cityFromGermanAddress(deliveryAddress);
     const weightKg = weightKgRaw;
@@ -157,6 +163,7 @@ export async function POST(req: Request) {
     let attempt = 0;
     let job: { id: string; order_number: number | null } | null = null;
     let insertError: unknown = null;
+    let omitDeliveryCol = false;
 
     while (attempt < maxAttempts) {
       const { data, error } = await supabase
@@ -167,6 +174,7 @@ export async function POST(req: Request) {
         phone,
         customer_email: email || null,
         preferred_pickup_at: pickupTime || null,
+        ...(omitDeliveryCol ? {} : { preferred_delivery_at: deliveryTime || null }),
         pickup_address: pickupAddress,
         pickup_city: pickupCity,
         delivery_address: deliveryAddress,
@@ -188,6 +196,7 @@ export async function POST(req: Request) {
                 photoUrls,
                 senderAddress,
                 recipientAddress,
+                preferred_delivery_at: deliveryTime || null,
                 routeTerrain: p.routeTerrain,
                 routeWeather: p.routeWeather,
                 routeDriveTimeMultiplier: p.routeDriveTimeMultiplier,
@@ -225,6 +234,13 @@ export async function POST(req: Request) {
         attempt++;
         continue;
       }
+      const missingDeliveryCol =
+        (error as { code?: string })?.code === "42703" ||
+        /preferred_delivery_at/i.test(String((error as { message?: string })?.message ?? ""));
+      if (error && missingDeliveryCol && !omitDeliveryCol) {
+        omitDeliveryCol = true;
+        continue;
+      }
       break;
     }
 
@@ -242,7 +258,10 @@ export async function POST(req: Request) {
       `Firma: ${companyName}`,
       `Telefon: ${phone}`,
       `Abholung: ${formatStructuredAddressPlain(senderAddress) || pickupAddress}`,
+      `Abholzeit: ${pickupTime || "—"}`,
       `Lieferung: ${formatStructuredAddressPlain(recipientAddress) || deliveryAddress}`,
+      `Empfänger-Tel.: ${recipientAddress.phone || "—"}`,
+      `Lieferzeit: ${deliveryTime || "—"}`,
       `Ladung: ${cargoSize}, ${distanceKm} km`,
       `Betrag: ${(priceCents / 100).toFixed(2)} EUR`,
     ].join("\n");
@@ -279,7 +298,10 @@ export async function POST(req: Request) {
       `Firma: ${companyName}`,
       `Tel: ${phone}`,
       `Abholung: ${formatStructuredAddressPlain(senderAddress) || pickupAddress}`,
+      `Abholzeit: ${pickupTime || "—"}`,
       `Lieferung: ${formatStructuredAddressPlain(recipientAddress) || deliveryAddress}`,
+      `Empfänger-Tel.: ${recipientAddress.phone || "—"}`,
+      `Lieferzeit: ${deliveryTime || "—"}`,
       `Ladung: ${cargoSize} | ${distanceKm} km`,
       formatCargoLoadsPlainDe({ loads }) ||
         `Gewicht: ${weightKg} kg | Stück/Pakete: ${Math.round(packageCountRaw)}`,

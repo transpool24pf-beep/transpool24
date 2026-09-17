@@ -2,6 +2,7 @@
 
 export type StructuredAddress = {
   company: string;
+  phone: string;
   street: string;
   houseNumber: string;
   postalCode: string;
@@ -12,6 +13,7 @@ export type StructuredAddress = {
 
 export const EMPTY_STRUCTURED_ADDRESS: StructuredAddress = {
   company: "",
+  phone: "",
   street: "",
   houseNumber: "",
   postalCode: "",
@@ -26,6 +28,7 @@ export function normalizeStructuredAddress(raw: unknown): StructuredAddress {
   const str = (k: string) => (typeof o[k] === "string" ? o[k].trim() : "");
   return {
     company: str("company"),
+    phone: str("phone"),
     street: str("street"),
     houseNumber: str("houseNumber"),
     postalCode: str("postalCode").replace(/\D/g, "").slice(0, 5),
@@ -68,6 +71,7 @@ export function formatStructuredAddressPlain(
 ): string {
   const lines: string[] = [];
   if (a.company.trim()) lines.push(a.company.trim());
+  if (a.phone.trim()) lines.push(a.phone.trim());
   const street = `${a.street.trim()} ${a.houseNumber.trim()}`.trim();
   if (street) lines.push(street);
   const plzOrt = `${a.postalCode.trim()} ${a.city.trim()}`.trim();
@@ -86,6 +90,7 @@ export function formatStructuredAddressHtml(
 ): string {
   const parts: string[] = [];
   if (a.company.trim()) parts.push(escapeHtml(a.company.trim()));
+  if (a.phone.trim()) parts.push(escapeHtml(a.phone.trim()));
   const street = `${a.street.trim()} ${a.houseNumber.trim()}`.trim();
   if (street) parts.push(escapeHtml(street));
   const plzOrt = `${a.postalCode.trim()} ${a.city.trim()}`.trim();
@@ -172,21 +177,33 @@ type JobLike = {
   delivery_address?: string | null;
   delivery_city?: string | null;
   company_name?: string | null;
+  preferred_delivery_at?: string | null;
   cargo_details?: Record<string, unknown> | null;
 };
 
 function fromDetails(details: Record<string, unknown> | null | undefined, key: string, fallbackLine: string): StructuredAddress {
   const parsed = normalizeStructuredAddress(details?.[key]);
-  if (isStructuredAddressComplete(parsed) || parsed.street) return parsed;
+  if (isStructuredAddressComplete(parsed) || parsed.street) {
+    return parsed;
+  }
   const fromLine = parseStructuredAddressFromLine(fallbackLine);
-  if (parsed.notes || parsed.company) {
+  if (parsed.notes || parsed.company || parsed.phone) {
     return {
       ...fromLine,
       company: parsed.company || fromLine.company,
+      phone: parsed.phone || fromLine.phone,
       notes: parsed.notes || fromLine.notes,
     };
   }
   return fromLine;
+}
+
+export function jobPreferredDeliveryAt(job: JobLike): string | null {
+  if (typeof job.preferred_delivery_at === "string" && job.preferred_delivery_at.trim()) {
+    return job.preferred_delivery_at;
+  }
+  const raw = job.cargo_details?.preferred_delivery_at;
+  return typeof raw === "string" && raw.trim() ? raw : null;
 }
 
 export function jobSenderAddress(job: JobLike): StructuredAddress {

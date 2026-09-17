@@ -4,7 +4,7 @@ import { getPdfLogoBytes, PDF_COMPANY } from "./pdf-company";
 import { sanitizeTextForStandardPdfFont } from "./invoice-pdf";
 import { formatAuftragNumber } from "./order-ref";
 import { cargoCategoryLabelDe, formatCargoLoadsPlainDe, parseCargoLoads, summarizeCargoLoads } from "./cargo";
-import { jobRecipientAddress, jobSenderAddress, type StructuredAddress } from "./structured-address";
+import { jobPreferredDeliveryAt, jobRecipientAddress, jobSenderAddress, type StructuredAddress } from "./structured-address";
 
 const TEAL = rgb(24 / 255, 63 / 255, 104 / 255);
 const ORANGE = rgb(0.95, 0.48, 0.12);
@@ -188,6 +188,7 @@ export async function generateDriverRunSheetPdf(job: Job): Promise<Uint8Array> {
     ["Auftrag-Nr.:", auftrag],
     ["Datum:", formatDeDate(job.created_at)],
     ["Abholzeit:", formatDeDateTime(job.preferred_pickup_at)],
+    ["Lieferzeit:", formatDeDateTime(jobPreferredDeliveryAt(job))],
   ];
   for (const [k, v] of meta) {
     drawSafe(page, font, k, metaLabelX, metaY, 9, MUTED);
@@ -234,6 +235,7 @@ export async function generateDriverRunSheetPdf(job: Job): Promise<Uint8Array> {
 
   const rightAddr: [string, string][] = [
     ["Name / Firma:", drop.company || "-"],
+    ["Telefon Empfaenger:", drop.phone || "-"],
     ["Straße Hausnummer:", streetLine(drop, job.delivery_address)],
     ["PLZ Ort:", plzOrt(drop, job.delivery_city)],
     ["", drop.country || "Deutschland"],

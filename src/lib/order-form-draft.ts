@@ -15,6 +15,7 @@ export type OrderFormDraftV1 = {
   step: number;
   data: OrderFormData;
   pickupDateField: string;
+  deliveryDateField?: string;
   cargoPhotoUrls: string[];
   phoneCountryCode: string;
   distanceFromRoute: boolean;

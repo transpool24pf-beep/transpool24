@@ -251,6 +251,8 @@ export type OrderFormData = {
   deliveryAddr: StructuredAddress;
   pickupDate: string;
   pickupTime: string;
+  deliveryDate: string;
+  deliveryTime: string;
   cargoSize: CargoSize;
   loads: CargoLoadLine[];
   serviceType: ServiceType | "";
@@ -267,6 +269,8 @@ const initial: OrderFormData = {
   deliveryAddr: { ...EMPTY_STRUCTURED_ADDRESS },
   pickupDate: "",
   pickupTime: "",
+  deliveryDate: "",
+  deliveryTime: "",
   cargoSize: FIXED_CARGO_SIZE,
   loads: [emptyCargoLoadLine()],
   serviceType: "",
@@ -301,6 +305,7 @@ export function OrderForm({
   const [step, setStep] = useState(1);
   const [data, setData] = useState<OrderFormData>(initial);
   const [pickupDateField, setPickupDateField] = useState("");
+  const [deliveryDateField, setDeliveryDateField] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [orderConfirmed, setOrderConfirmed] = useState<{
@@ -432,6 +437,7 @@ export function OrderForm({
             : [emptyCargoLoadLine()],
       });
       setPickupDateField(maskPickupDateInput(d.pickupDateField));
+      setDeliveryDateField(maskPickupDateInput(d.deliveryDateField ?? ""));
       setCargoPhotoUrls(Array.isArray(d.cargoPhotoUrls) ? d.cargoPhotoUrls : []);
       setPhoneCountryCode(d.phoneCountryCode || "+49");
       setDistanceFromRoute(Boolean(d.distanceFromRoute));
@@ -462,6 +468,14 @@ export function OrderForm({
   }, [draftRestored, locale, data.pickupDate]);
 
   useEffect(() => {
+    if (!draftRestored) return;
+    setDeliveryDateField((display) => {
+      if (!data.deliveryDate) return display;
+      return formatIsoDateForOrderInput(data.deliveryDate, locale);
+    });
+  }, [draftRestored, locale, data.deliveryDate]);
+
+  useEffect(() => {
     if (!draftRestored || orderConfirmed) return;
     const tid = setTimeout(() => {
       saveOrderFormDraft({
@@ -469,6 +483,7 @@ export function OrderForm({
         step,
         data,
         pickupDateField,
+        deliveryDateField,
         cargoPhotoUrls,
         phoneCountryCode,
         distanceFromRoute,
@@ -497,6 +512,7 @@ export function OrderForm({
     step,
     data,
     pickupDateField,
+    deliveryDateField,
     cargoPhotoUrls,
     phoneCountryCode,
     distanceFromRoute,
@@ -669,8 +685,16 @@ export function OrderForm({
   }, []);
 
   const step1Complete = data.companyName.trim() !== "" && data.email.trim() !== "" && data.phone.trim() !== "";
+  const pickupScheduleReady =
+    parseOrderDateInputToIso(pickupDateField).kind === "valid" && Boolean(data.pickupTime.trim());
   const step2Complete =
-    isStructuredAddressComplete(data.pickupAddr) && isStructuredAddressComplete(data.deliveryAddr);
+    isStructuredAddressComplete(data.pickupAddr) &&
+    isStructuredAddressComplete(data.deliveryAddr) &&
+    (data.deliveryAddr.phone ?? "").replace(/\D/g, "").length >= 6 &&
+    parseOrderDateInputToIso(pickupDateField).kind === "valid" &&
+    Boolean(data.pickupTime.trim()) &&
+    parseOrderDateInputToIso(deliveryDateField).kind === "valid" &&
+    Boolean(data.deliveryTime.trim());
   const step3Complete =
     data.serviceType !== "" &&
     distanceFromRoute &&
@@ -971,10 +995,8 @@ export function OrderForm({
       return { ok: false };
     }
     if (parsed.kind === "empty") {
-      setData((prev) => ({ ...prev, pickupDate: "" }));
-      setPickupDateField("");
-      setError(null);
-      return { ok: true, iso: "" };
+      setError(t("pickupDateInvalid"));
+      return { ok: false };
     }
     const min = localTodayIso();
     if (parsed.iso < min) {
@@ -992,6 +1014,38 @@ export function OrderForm({
 
   const handlePickupDateBlur = () => {
     void applyPickupDateCommit();
+  };
+
+  const applyDeliveryDateCommit = useCallback((): { ok: true; iso: string } | { ok: false } => {
+    const pickupParsed = parseOrderDateInputToIso(pickupDateField);
+    if (pickupParsed.kind !== "valid" || !data.pickupTime.trim()) {
+      setError(t("pickupDateInvalid"));
+      return { ok: false };
+    }
+    const parsed = parseOrderDateInputToIso(deliveryDateField);
+    if (parsed.kind === "invalid" || parsed.kind === "empty") {
+      setError(t("deliveryDateInvalid"));
+      setDeliveryDateField(
+        data.deliveryDate ? formatIsoDateForOrderInput(data.deliveryDate, locale) : ""
+      );
+      return { ok: false };
+    }
+    const min = localTodayIso();
+    if (parsed.iso < min) {
+      setError(t("deliveryDateInvalid"));
+      setDeliveryDateField(
+        data.deliveryDate ? formatIsoDateForOrderInput(data.deliveryDate, locale) : ""
+      );
+      return { ok: false };
+    }
+    setData((prev) => ({ ...prev, deliveryDate: parsed.iso }));
+    setDeliveryDateField(formatIsoDateForOrderInput(parsed.iso, locale));
+    setError(null);
+    return { ok: true, iso: parsed.iso };
+  }, [deliveryDateField, data.deliveryDate, data.pickupTime, pickupDateField, locale, t]);
+
+  const handleDeliveryDateBlur = () => {
+    void applyDeliveryDateCommit();
   };
 
   const MAX_CARGO_PHOTOS = 8;
@@ -1076,14 +1130,25 @@ export function OrderForm({
       setError(null);
       const dateCommit = applyPickupDateCommit();
       if (!dateCommit.ok) return;
+      if (!data.pickupTime.trim()) {
+        setError(t("step2Incomplete"));
+        return;
+      }
+      const deliveryCommit = applyDeliveryDateCommit();
+      if (!deliveryCommit.ok) return;
+      if (!data.deliveryTime.trim()) {
+        setError(t("step2Incomplete"));
+        return;
+      }
+      if (deliveryCommit.iso < dateCommit.iso) {
+        setError(t("deliveryDateInvalid"));
+        return;
+      }
       setAddressHistory((prev) =>
         mergePersistedAddresses(prev, data.pickupAddressLine, data.deliveryAddressLine),
       );
       setDistanceLoading(true);
-      const dep =
-        dateCommit.iso && data.pickupTime
-          ? { pickupDate: dateCommit.iso, pickupTime: data.pickupTime }
-          : undefined;
+      const dep = { pickupDate: dateCommit.iso, pickupTime: data.pickupTime };
       fetchRealDistance(dep).finally(() => {
         setDistanceLoading(false);
         setStep(3);
@@ -1128,6 +1193,7 @@ export function OrderForm({
           pickupAddress,
           deliveryAddress,
           pickupTime: data.pickupDate && data.pickupTime ? `${data.pickupDate}T${data.pickupTime}` : null,
+          deliveryTime: data.deliveryDate && data.deliveryTime ? `${data.deliveryDate}T${data.deliveryTime}` : null,
           cargoSize: FIXED_CARGO_SIZE,
           serviceType: data.serviceType || "driver_car",
           distanceKm: data.distanceKm,
@@ -1145,6 +1211,8 @@ export function OrderForm({
             dangerousGoods: loadSummary.dangerousGoods,
             senderAddress: data.pickupAddr,
             recipientAddress: data.deliveryAddr,
+            preferred_delivery_at:
+              data.deliveryDate && data.deliveryTime ? `${data.deliveryDate}T${data.deliveryTime}` : null,
           },
         }),
       });
@@ -1470,6 +1538,7 @@ export function OrderForm({
             value={data.deliveryAddr}
             notesLabel={t("addressUnloadingNotes")}
             highlightMissing={step2Attempted}
+            phoneRequired
             streetInputRef={deliveryAddressRef}
             streetName={addressLineInputNamesRef.current.delivery}
             postalName="tp24-delivery-plz"
@@ -1493,6 +1562,7 @@ export function OrderForm({
             }}
             labels={{
               company: t("addressCompany"),
+              phone: t("recipientPhone"),
               street: t("addressStreet"),
               streetPlaceholder: t("addressStreetPlaceholder"),
               houseNumber: t("addressHouseNumber"),
@@ -1587,7 +1657,7 @@ export function OrderForm({
                 value={pickupDateField}
                 onChange={(e) => setPickupDateField(maskPickupDateInput(e.target.value))}
                 onBlur={handlePickupDateBlur}
-                className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                className={`w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-1 ${missingFieldClass(step2Attempted, parseOrderDateInputToIso(pickupDateField).kind !== "valid")}`}
               />
             </div>
             <div>
@@ -1597,9 +1667,41 @@ export function OrderForm({
               <input
                 type="time"
                 lang={htmlLang}
+                required
                 value={data.pickupTime}
                 onChange={(e) => update({ pickupTime: e.target.value })}
-                className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                className={`w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-1 ${missingFieldClass(step2Attempted, !data.pickupTime.trim())}`}
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
+                {t("deliveryDate")}
+              </label>
+              <input
+                type="text"
+                inputMode="numeric"
+                autoComplete="off"
+                lang={htmlLang}
+                placeholder={t("deliveryDatePlaceholder")}
+                value={deliveryDateField}
+                disabled={!pickupScheduleReady}
+                onChange={(e) => setDeliveryDateField(maskPickupDateInput(e.target.value))}
+                onBlur={handleDeliveryDateBlur}
+                className={`w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-1 ${missingFieldClass(step2Attempted, parseOrderDateInputToIso(deliveryDateField).kind !== "valid")}`}
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
+                {t("deliveryTime")}
+              </label>
+              <input
+                type="time"
+                lang={htmlLang}
+                required
+                disabled={!pickupScheduleReady}
+                value={data.deliveryTime}
+                onChange={(e) => update({ deliveryTime: e.target.value })}
+                className={`w-full rounded-lg border px-4 py-2 focus:outline-none focus:ring-1 ${missingFieldClass(step2Attempted, !data.deliveryTime.trim())}`}
               />
             </div>
           </div>
@@ -2042,6 +2144,26 @@ export function OrderForm({
                 {data.pickupTime ? data.pickupTime : ""}
               </p>
             )}
+            {(data.deliveryDate || data.deliveryTime) && (
+              <p>
+                <strong>
+                  {t("deliveryDate")} / {t("deliveryTime")}:
+                </strong>{" "}
+                {data.deliveryDate
+                  ? new Date(`${data.deliveryDate}T12:00:00`).toLocaleDateString(htmlLang, {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })
+                  : "-"}{" "}
+                {data.deliveryTime ? data.deliveryTime : ""}
+              </p>
+            )}
+            {data.deliveryAddr.phone.trim() ? (
+              <p>
+                <strong>{t("recipientPhone")}:</strong> {data.deliveryAddr.phone}
+              </p>
+            ) : null}
             <p><strong>{t("serviceType")}:</strong>             {data.serviceType ? t(SERVICE_OPTIONS.find((o) => o.value === data.serviceType)?.key ?? "serviceDriverCar") : "-"}</p>
             {loads.map((line, idx) => (
               <p key={idx}>

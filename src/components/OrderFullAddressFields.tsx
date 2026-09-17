@@ -35,6 +35,7 @@ export function OrderFullAddressFields({
   onPostalFocus,
   labels,
   highlightMissing = false,
+  phoneRequired = false,
 }: {
   title: string;
   value: StructuredAddress;
@@ -57,17 +58,21 @@ export function OrderFullAddressFields({
     postalCode: string;
     city: string;
     country: string;
+    phone?: string;
   };
   highlightMissing?: boolean;
+  phoneRequired?: boolean;
 }) {
   const set = (patch: Partial<StructuredAddress>) => onChange({ ...value, ...patch });
   const cls = (missing: boolean) => (highlightMissing && missing ? inputMissing : inputOk);
+  const phoneMissing = (value.phone ?? "").replace(/\D/g, "").length < 6;
   const blockIncomplete =
     highlightMissing &&
     (value.street.trim().length < 2 ||
       value.houseNumber.trim().length < 1 ||
       !/^\d{5}$/.test(value.postalCode.trim()) ||
-      value.city.trim().length < 2);
+      value.city.trim().length < 2 ||
+      (phoneRequired && phoneMissing));
   return (
     <div
       className={`space-y-3 rounded-xl border bg-[#f7f8fb] p-4 ${
@@ -79,6 +84,19 @@ export function OrderFullAddressFields({
         <span className="mb-1 block text-xs font-medium text-[#0d2137]/80">{labels.company}</span>
         <input type="text" {...noBrowserFill} value={value.company} onChange={(e) => set({ company: e.target.value })} className={inputOk} />
       </label>
+      {labels.phone ? (
+        <label className="block">
+          <span className="mb-1 block text-xs font-medium text-[#0d2137]/80">{labels.phone}</span>
+          <input
+            type="tel"
+            {...noBrowserFill}
+            value={value.phone ?? ""}
+            onChange={(e) => set({ phone: e.target.value })}
+            className={cls(Boolean(phoneRequired && phoneMissing))}
+            aria-invalid={highlightMissing && phoneRequired && phoneMissing}
+          />
+        </label>
+      ) : null}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_7rem]">
         <label className="block">
           <span className="mb-1 block text-xs font-medium text-[#0d2137]/80">{labels.street}</span>
