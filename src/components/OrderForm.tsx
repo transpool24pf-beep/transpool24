@@ -113,22 +113,34 @@ function addressLineForGeocode(raw: string): string {
   return `${t}, Deutschland`;
 }
 
+function streetNameKey(street: string, houseNumber = ""): string {
+  const fromSplit = splitStreetHouse(`${street} ${houseNumber}`.trim()).street;
+  return (fromSplit || street).trim().toLowerCase();
+}
+
+function isSameStreetName(prev: StructuredAddress, nextStreet: string): boolean {
+  const prevKey = streetNameKey(prev.street, prev.houseNumber);
+  const nextKey = streetNameKey(nextStreet);
+  if (!prevKey || !nextKey) return false;
+  return nextKey === prevKey || nextKey.startsWith(prevKey) || prevKey.startsWith(nextKey);
+}
+
 function structuredFromPlaceDetails(j: PlaceDetailsJson, prev: StructuredAddress): StructuredAddress {
   const fromFmt = j.formatted_address ? parseStructuredAddressFromLine(j.formatted_address) : EMPTY_STRUCTURED_ADDRESS;
-  const rawStreet = j.street?.trim() || fromFmt.street || prev.street;
+  const rawStreet = j.street?.trim() || fromFmt.street || "";
   const split = splitStreetHouse(rawStreet);
-  const houseNumber = j.houseNumber?.trim() || split.houseNumber || fromFmt.houseNumber || prev.houseNumber;
+  const houseNumber = j.houseNumber?.trim() || split.houseNumber || fromFmt.houseNumber || "";
   const postalCode =
-    j.postcode?.trim().replace(/\D/g, "").slice(0, 5) || fromFmt.postalCode || prev.postalCode;
-  const city = j.city?.trim() || fromFmt.city || prev.city;
-  const country = j.country?.trim() || prev.country || "Deutschland";
+    j.postcode?.trim().replace(/\D/g, "").slice(0, 5) || fromFmt.postalCode || "";
+  const city = j.city?.trim() || fromFmt.city || "";
+  const country = j.country?.trim() || fromFmt.country || "Deutschland";
   return {
     ...prev,
     street: split.street || rawStreet,
     houseNumber,
     postalCode,
     city,
-    country,
+    country: country || "Deutschland",
   };
 }
 
@@ -136,22 +148,26 @@ function expandPastedStreet(next: StructuredAddress, prev: StructuredAddress): S
   if (next.street === prev.street) return next;
   if (/\d{5}/.test(next.street)) {
     const parsed = parseStructuredAddressFromLine(next.street);
-    if (parsed.postalCode || parsed.city) {
+    if (parsed.street || parsed.postalCode || parsed.city) {
       return {
         ...next,
-        street: parsed.street || next.street,
-        houseNumber: parsed.houseNumber || next.houseNumber,
-        postalCode: parsed.postalCode || next.postalCode,
-        city: parsed.city || next.city,
-        country: parsed.country || next.country,
+        street: parsed.street || splitStreetHouse(next.street).street || next.street,
+        houseNumber: parsed.houseNumber,
+        postalCode: parsed.postalCode,
+        city: parsed.city,
+        country: parsed.country || next.country || "Deutschland",
       };
     }
   }
   const split = splitStreetHouse(next.street);
-  if (split.houseNumber && !next.houseNumber) {
-    return { ...next, street: split.street, houseNumber: split.houseNumber };
-  }
-  return next;
+  const keepArea = isSameStreetName(prev, split.street || next.street);
+  return {
+    ...next,
+    street: split.street || next.street,
+    houseNumber: split.houseNumber || (keepArea ? next.houseNumber : ""),
+    postalCode: keepArea ? next.postalCode : "",
+    city: keepArea ? next.city : "",
+  };
 }
 
 function lineFromPlaceDetails(j: PlaceDetailsJson, displayFallback: string): string {
@@ -535,24 +551,38 @@ export function OrderForm({
     }
   }, [countryCodeOpen]);
 
-  const pickupHistoryMatches = useMemo(
-    () =>
-      filterAddressHistoryForQuery(
-        addressHistory,
-        data.pickupAddr.street || data.pickupAddr.postalCode || data.pickupAddressLine,
-        10
-      ),
-    [addressHistory, data.pickupAddr.street, data.pickupAddr.postalCode, data.pickupAddressLine]
-  );
-  const deliveryHistoryMatches = useMemo(
-    () =>
-      filterAddressHistoryForQuery(
-        addressHistory,
-        data.deliveryAddr.street || data.deliveryAddr.postalCode || data.deliveryAddressLine,
-        10
-      ),
-    [addressHistory, data.deliveryAddr.street, data.deliveryAddr.postalCode, data.deliveryAddressLine]
-  );
+  const pickupHistoryMatches = useMemo(() => {
+    const sibling = formatStructuredAddressLine(data.deliveryAddr) || data.deliveryAddressLine;
+    const siblingKey = sibling.trim().toLowerCase().replace(/\s+/g, " ");
+    return filterAddressHistoryForQuery(
+      addressHistory,
+      data.pickupAddr.street || data.pickupAddr.postalCode || data.pickupAddressLine,
+      10
+    ).filter((line) => line.trim().toLowerCase().replace(/\s+/g, " ") !== siblingKey);
+  }, [
+    addressHistory,
+    data.pickupAddr.street,
+    data.pickupAddr.postalCode,
+    data.pickupAddressLine,
+    data.deliveryAddr,
+    data.deliveryAddressLine,
+  ]);
+  const deliveryHistoryMatches = useMemo(() => {
+    const sibling = formatStructuredAddressLine(data.pickupAddr) || data.pickupAddressLine;
+    const siblingKey = sibling.trim().toLowerCase().replace(/\s+/g, " ");
+    return filterAddressHistoryForQuery(
+      addressHistory,
+      data.deliveryAddr.street || data.deliveryAddr.postalCode || data.deliveryAddressLine,
+      10
+    ).filter((line) => line.trim().toLowerCase().replace(/\s+/g, " ") !== siblingKey);
+  }, [
+    addressHistory,
+    data.deliveryAddr.street,
+    data.deliveryAddr.postalCode,
+    data.deliveryAddressLine,
+    data.pickupAddr,
+    data.pickupAddressLine,
+  ]);
 
   const pickupHistoryKeySet = useMemo(
     () => new Set(pickupHistoryMatches.map((l) => l.trim().toLowerCase().replace(/\s+/g, " "))),
@@ -638,7 +668,12 @@ export function OrderForm({
           const parsed = parseStructuredAddressFromLine(stored);
           setData((prev) => {
             const prevAddr = field === "pickup" ? prev.pickupAddr : prev.deliveryAddr;
-            const nextAddr = { ...parsed, company: prevAddr.company, notes: prevAddr.notes };
+            const nextAddr = {
+              ...parsed,
+              company: prevAddr.company,
+              phone: prevAddr.phone,
+              notes: prevAddr.notes,
+            };
             return {
               ...prev,
               [keyAddr]: nextAddr,
@@ -649,11 +684,20 @@ export function OrderForm({
         }
       } catch {
         const parsed = parseStructuredAddressFromLine(stored);
-        setData((prev) => ({
-          ...prev,
-          [keyAddr]: parsed,
-          [keyLine]: stored || (field === "pickup" ? prev.pickupAddressLine : prev.deliveryAddressLine),
-        }));
+        setData((prev) => {
+          const prevAddr = field === "pickup" ? prev.pickupAddr : prev.deliveryAddr;
+          const nextAddr = {
+            ...parsed,
+            company: prevAddr.company,
+            phone: prevAddr.phone,
+            notes: prevAddr.notes,
+          };
+          return {
+            ...prev,
+            [keyAddr]: nextAddr,
+            [keyLine]: formatStructuredAddressLine(nextAddr) || stored || (field === "pickup" ? prev.pickupAddressLine : prev.deliveryAddressLine),
+          };
+        });
         setError(null);
       }
       persistAddressLine(stored);

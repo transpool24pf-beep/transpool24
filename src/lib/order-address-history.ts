@@ -54,11 +54,9 @@ export function mergePersistedAddresses(prev: string[], pickup: string, delivery
   return next;
 }
 
-/** Filter saved lines by current query; empty / no match → most recent first (capped) */
+/** Filter saved lines by current query; empty query → most recent. Unmatched typing → none (do not keep showing the other stop). */
 export function filterAddressHistoryForQuery(history: string[], query: string, limit = 10): string[] {
   const q = query.trim().toLowerCase();
   if (!q) return history.slice(0, limit);
-  const matched = history.filter((line) => line.toLowerCase().includes(q)).slice(0, limit);
-  if (matched.length > 0) return matched;
-  return history.slice(0, limit);
+  return history.filter((line) => line.toLowerCase().includes(q)).slice(0, limit);
 }
