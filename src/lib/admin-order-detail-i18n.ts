@@ -7,7 +7,7 @@ import type { AdminLocale } from "@/lib/admin-ui-strings";
 const MAIL_DE: Record<string, string> = {
   sectionEmailPdf: "E-Mail & PDF-Rechnungen (Texte: Deutsch)",
   driverPickEmail: "Fahrer (vor E-Mail erforderlich)",
-  driverPickPlaceholder: "— Fahrer wählen —",
+  driverPickPlaceholder: "Fahrer wählen , ",
   driverInEmailHint:
     "Fahrerdaten (Foto, Sterne, Telefon, Kennzeichen, Sprachen) erscheinen in der Kunden-E-Mail.",
   confirmEmailBtn: "Bestätigungs-E-Mail an Kunden senden",
@@ -39,7 +39,7 @@ const MAIL_DE: Record<string, string> = {
 const MAIL_AR: Record<string, string> = {
   sectionEmailPdf: "البريد وملفات PDF (نص الرسائل للعميل: ألماني)",
   driverPickEmail: "السائق (مطلوب قبل الإيميل)",
-  driverPickPlaceholder: "— اختر سائقاً —",
+  driverPickPlaceholder: "اختر سائقاً , ",
   driverInEmailHint:
     "بيانات السائق (صورة، تقييم، هاتف، لوحة السيارة) تظهر في بريد العميل.",
   confirmEmailBtn: "إرسال بريد التأكيد للعميل",
@@ -47,7 +47,7 @@ const MAIL_AR: Record<string, string> = {
   trackingEmailBtn: "إرسال رسالة التتبع (بدون PDF)",
   trackingEmailSending: "جاري الإرسال…",
   trackingEmailHint:
-    "نص احترافي بالألمانية، بيانات السائق إن وُجد، رابط تتبع مع خريطة — بدون مرفق PDF.",
+    "نص احترافي بالألمانية، بيانات السائق إن وُجد، رابط تتبع مع خريطة, بدون مرفق PDF.",
   invoicesTitle: "تنزيل الفواتير",
   invoiceCustomer: "فاتورة النظام (سعر العميل € {eur})",
   invoiceDriver: "فاتورة المجموعة / السائق (€ {eur})",
@@ -55,7 +55,7 @@ const MAIL_AR: Record<string, string> = {
   alertEmailSent: "تم إرسال البريد إلى: ",
   alertSendFailed: "فشل الإرسال.",
   alertRequestFailed: "فشل الطلب.",
-  alertNoToken: "لا يوجد رمز تأكيد — لا يمكن إرسال بريد التتبع.",
+  alertNoToken: "لا يوجد رمز تأكيد, لا يمكن إرسال بريد التتبع.",
   alertTrackingSent: "تم إرسال رسالة التتبع (بدون PDF) إلى: ",
   alertNoCustomerEmail: "لا يوجد بريد للعميل.",
   alertNetwork: "خطأ في الشبكة",
@@ -151,7 +151,7 @@ const CARGO_CAT_AR: Record<string, string> = {
 };
 
 export function cargoCategoryAdminLabel(locale: AdminLocale, id: string | null | undefined): string {
-  if (id == null || id === "") return "—";
+  if (id == null || id === "") return "-";
   if (locale === "ar") return CARGO_CAT_AR[id] ?? cargoCategoryLabelDe(id);
   return cargoCategoryLabelDe(id);
 }
@@ -162,6 +162,13 @@ const OD_DE: Record<string, string> = {
   "od.backList": "← Zurück zur Auftragsliste",
   "od.title": "Auftragsdetails",
   "od.actionsColumn": "Aktionen",
+  "od.driverActions": "Fahrer – Aktionen & Papiere",
+  "od.customerActions": "Kunde – Aktionen & Rechnungen",
+  "od.printDriverSheet": "Fahrerblatt drucken (Auftrag + Sendung)",
+  "od.printDriverSheetHint":
+    "Automatisches Blatt mit Abholung, Zeit, Ladung, Packstücken, Zustellung, Kundenname, Auftrag-Nr. und Sendung-Nr. zum Mitgeben.",
+  "od.auftragNr": "Auftrag-Nr.",
+  "od.sendungNr": "Sendung-Nr.",
   "od.dataTitle": "Auftragsdaten",
   "od.orderNumber": "Auftragsnummer",
   "od.created": "Datum (Erstellung)",
@@ -172,6 +179,8 @@ const OD_DE: Record<string, string> = {
   "od.emailCustomer": "E-Mail (Kunde)",
   "od.pickup": "Abholung",
   "od.delivery": "Zustellung",
+  "od.loadingNotes": "Hinweise Ladestelle",
+  "od.unloadingNotes": "Hinweise Entladestelle",
   "od.cargoSize": "Ladung (Größe)",
   "od.cargoCategory": "Warenkategorie",
   "od.loads": "Ladung (Loads)",
@@ -185,13 +194,13 @@ const OD_DE: Record<string, string> = {
   "od.priceCustomer": "Kundenpreis (System)",
   "od.priceDriverGroup": "Fahrerpreis (Gruppe)",
   "od.priceAssistant": "Helferpreis (Gruppe)",
-  "od.assistantSaveHint": "€ — speichert bei Fokuswechsel",
+  "od.assistantSaveHint": "€, speichert bei Fokuswechsel",
   "od.assistantInputTitle":
     "Berechnet aus Stundensatz × Fahrer-Gesamtzeit; manuell überschreibbar für WhatsApp & Fahrer-PDF",
   "od.ratingTitle": "Kundenbewertung Fahrer",
   "od.stars": "Sterne",
   "od.driverApplication": "Fahrer (Bewerbung)",
-  "od.noDriver": "— kein Fahrer —",
+  "od.noDriver": "kein Fahrer , ",
   "od.driverHintBeforeEmail":
     "Fahrer wählen, bevor die Bestätigungs-E-Mail an den Kunden gesendet wird.",
   "od.paymentPaid": "Bezahlt",
@@ -209,7 +218,7 @@ const OD_DE: Record<string, string> = {
   "od.copyTrackLink": "Kunden-Tracking-Link kopieren",
   "od.podPhotoLabel": "Aktuelles Lieferfoto",
   "od.podPhotoAlt": "Liefernachweis",
-  "od.podDriverReady": "Fahrer-Foto eingegangen — prüfen und per E-Mail an den Kunden senden.",
+  "od.podDriverReady": "Fahrer-Foto eingegangen, prüfen und per E-Mail an den Kunden senden.",
   "od.podWaitingDriver": "Noch kein Foto vom Fahrer. Sobald er hochlädt, erscheint es hier.",
   "od.thankYouBlockTitle": "Lieferfoto hochladen",
   "od.thankYouBlockDesc":
@@ -247,6 +256,13 @@ const OD_AR: Record<string, string> = {
   "od.backList": "← العودة لقائمة الطلبات",
   "od.title": "تفاصيل الطلب",
   "od.actionsColumn": "إجراءات",
+  "od.driverActions": "السائق – إجراءات وأوراق",
+  "od.customerActions": "الزبون – إجراءات وفواتير",
+  "od.printDriverSheet": "طباعة ورقة السائق (Auftrag + Sendung)",
+  "od.printDriverSheetHint":
+    "ورقة تلقائية: أين يذهب، متى، ماذا يستلم، عدد الطرود، أين يسلّم، اسم العميل، رقم Auftrag ورقم Sendung.",
+  "od.auftragNr": "رقم Auftrag",
+  "od.sendungNr": "رقم Sendung",
   "od.dataTitle": "بيانات الطلب",
   "od.orderNumber": "رقم الطلب",
   "od.created": "تاريخ الإنشاء",
@@ -257,6 +273,8 @@ const OD_AR: Record<string, string> = {
   "od.emailCustomer": "البريد (العميل)",
   "od.pickup": "الاستلام",
   "od.delivery": "التسليم",
+  "od.loadingNotes": "Hinweise Ladestelle",
+  "od.unloadingNotes": "Hinweise Entladestelle",
   "od.cargoSize": "الحمولة (الحجم)",
   "od.cargoCategory": "فئة البضاعة",
   "od.loads": "الحمولة (Loads)",
@@ -270,12 +288,12 @@ const OD_AR: Record<string, string> = {
   "od.priceCustomer": "سعر العميل (النظام)",
   "od.priceDriverGroup": "أجر السائق (المجموعة)",
   "od.priceAssistant": "أجر المعاون (المجموعة)",
-  "od.assistantSaveHint": "€ — يُحفظ عند مغادرة الحقل",
+  "od.assistantSaveHint": "€, يُحفظ عند مغادرة الحقل",
   "od.assistantInputTitle": "يُحسب من الأجر × زمن السائق؛ يمكن تعديله يدوياً لواتساب وPDF السائق",
   "od.ratingTitle": "تقييم العميل للسائق",
   "od.stars": "نجوم",
   "od.driverApplication": "السائق (طلب التعيين)",
-  "od.noDriver": "— بدون سائق —",
+  "od.noDriver": "بدون سائق , ",
   "od.driverHintBeforeEmail":
     "اختر سائقاً قبل إرسال بريد التأكيد للعميل (نص البريد بالألمانية).",
   "od.paymentPaid": "مدفوع",
@@ -292,11 +310,11 @@ const OD_AR: Record<string, string> = {
   "od.copyTrackLink": "نسخ رابط التتبع للعميل",
   "od.podPhotoLabel": "صورة التسليم الحالية",
   "od.podPhotoAlt": "إثبات التسليم",
-  "od.podDriverReady": "وصلت صورة السائق — راجعها ثم أرسلها للعميل بالبريد.",
+  "od.podDriverReady": "وصلت صورة السائق, راجعها ثم أرسلها للعميل بالبريد.",
   "od.podWaitingDriver": "لا توجد صورة من السائق بعد. ستظهر هنا فور رفعها.",
   "od.thankYouBlockTitle": "رفع صورة التسليم",
   "od.thankYouBlockDesc":
-    "اختر صورة التسليم من جهازك — تُرسل للعميل بالبريد (نص ألماني، تصميم TransPool24).",
+    "اختر صورة التسليم من جهازك, تُرسل للعميل بالبريد (نص ألماني، تصميم TransPool24).",
   "od.thankYouPickFile": "اختياري: استبدال بصورة من جهازك",
   "od.thankYouNoFile": "لا توجد صورة تسليم بعد. انتظر رفع السائق أو اختر صورة.",
   "od.thankYouSendBtn": "إرسال صورة التسليم بالبريد",
@@ -313,9 +331,9 @@ const OD_AR: Record<string, string> = {
   "od.alertGpsSaved": "تم حفظ موقع GPS (يظهر في صفحة تتبع العميل).",
   "od.alertTrackCopy": "تم نسخ رابط التتبع للعميل:\n",
   "od.promptCopy": "انسخ الرابط يدوياً:",
-  "od.alertNoTokenTrack": "لا يوجد رمز تأكيد — أرسل بريد التأكيد أولاً أو راجع قاعدة البيانات.",
+  "od.alertNoTokenTrack": "لا يوجد رمز تأكيد, أرسل بريد التأكيد أولاً أو راجع قاعدة البيانات.",
   "od.alertGpsCopied":
-    "تم نسخ رابط GPS للسائق. أرسله عبر واتساب أو SMS — السائق يفتح الرابط ويفعّل الموقع.\n\n",
+    "تم نسخ رابط GPS للسائق. أرسله عبر واتساب أو SMS, السائق يفتح الرابط ويفعّل الموقع.\n\n",
   "od.alertPickDriverWa": "اختر سائقاً أولاً.",
   "od.alertNoDriverPhone": "لا يوجد هاتف/واتساب في طلب السائق.",
   "od.alertBadWa": "رقم واتساب غير صالح للسائق.",

@@ -7,6 +7,7 @@ import { cargoCategoryLabelDe, formatCargoLoadsPlainDe, parseCargoLoads } from "
 import { formatStructuredAddressPlain, jobRecipientAddress, jobSenderAddress } from "@/lib/structured-address";
 import { odMailT, cargoCategoryAdminLabel, odT } from "@/lib/admin-order-detail-i18n";
 import { serviceTypeLabel } from "@/lib/admin-ui-strings";
+import { formatAuftragNumber, formatSendungNumber } from "@/lib/order-ref";
 
 type Job = {
   id: string;
@@ -98,7 +99,7 @@ const IC = {
 
 /** WhatsApp message for driver group, German only. */
 function buildWhatsAppMessage(o: Job): string {
-  const orderRef = o.order_number != null ? String(o.order_number) : o.id;
+  const orderRef = formatAuftragNumber(o);
   const driverEur = getDriverPriceEur(o);
   const assistantCents = o.assistant_price_cents ?? 1630;
   const assistantEur = (assistantCents / 100).toFixed(2);
@@ -128,7 +129,8 @@ function buildWhatsAppMessage(o: Job): string {
   const blocks: string[] = [
     `${IC.megaphone} TransPool24 – Transportauftrag`,
     "",
-    `${IC.clipboard} Auftragsnummer: ${orderRef}`,
+    `${IC.clipboard} Auftrag-Nr.: ${orderRef}`,
+    `${IC.clipboard} Sendung-Nr.: ${formatSendungNumber(o)}`,
     "",
     `${IC.phone} Telefon: ${o.phone}`,
     "",
@@ -388,7 +390,7 @@ export default function AdminOrderDetailPage({
       return;
     }
     const pickupUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(order.pickup_address)}&travelmode=driving`;
-    const orderRef = order.order_number != null ? String(order.order_number) : order.id.slice(0, 8);
+    const orderRef = formatAuftragNumber(order);
     const distStr = order.distance_km != null ? `${order.distance_km} km` : "-";
 
     let driverTrackUrl: string | null = null;
@@ -445,6 +447,11 @@ export default function AdminOrderDetailPage({
   const downloadInvoice = (type: "customer" | "driver") => {
     if (!order) return;
     window.open(`/api/admin/invoice?job_id=${encodeURIComponent(order.id)}&type=${type}`, "_blank");
+  };
+
+  const printDriverSheet = () => {
+    if (!order) return;
+    window.open(`/api/admin/orders/${encodeURIComponent(order.id)}/driver-sheet`, "_blank", "noopener");
   };
 
   const copyTrackingLink = () => {
@@ -550,8 +557,14 @@ export default function AdminOrderDetailPage({
           <h2 className="mb-4 text-lg font-semibold text-[#0d2137]">{odT(locale, "od.dataTitle")}</h2>
           <dl className="space-y-3 text-sm">
             <div>
-              <dt className="text-[#0d2137]/60">{odT(locale, "od.orderNumber")}</dt>
-              <dd className="font-mono font-semibold text-[#0d2137]">{order.order_number ?? order.id}</dd>
+              <dt className="text-[#0d2137]/60">{odT(locale, "od.auftragNr")}</dt>
+              <dd className="font-mono text-base font-bold tracking-wide text-[#0d2137]">
+                {formatAuftragNumber(order)}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-[#0d2137]/60">{odT(locale, "od.sendungNr")}</dt>
+              <dd className="font-mono text-base font-semibold text-[#0d2137]">{formatSendungNumber(order)}</dd>
             </div>
             <div>
               <dt className="text-[#0d2137]/60">{odT(locale, "od.created")}</dt>
@@ -836,30 +849,52 @@ export default function AdminOrderDetailPage({
           </dl>
         </div>
 
-        <div className="rounded-2xl border-2 border-[#0d2137]/10 bg-white p-6 shadow-lg">
-          <h2 className="mb-4 text-lg font-semibold text-[#0d2137]">{odT(locale, "od.actionsColumn")}</h2>
-          <div className="flex flex-col gap-3">
-            <button
-              type="button"
-              onClick={openWhatsApp}
-              className="flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-3 font-medium text-white shadow-sm hover:bg-[#20bd5a]"
-            >
-              {odT(locale, "od.waGroup")}
-            </button>
+        <div className="flex flex-col gap-6">
+          <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50/40 p-6 shadow-lg">
+            <h2 className="mb-1 text-lg font-semibold text-emerald-950">{odT(locale, "od.driverActions")}</h2>
+            <p className="mb-4 text-xs text-emerald-900/75">{odT(locale, "od.printDriverSheetHint")}</p>
+            <div className="flex flex-col gap-3">
+              <button
+                type="button"
+                onClick={printDriverSheet}
+                className="flex items-center justify-center gap-2 rounded-xl bg-[#0d2137] px-4 py-3 font-semibold text-white shadow-sm hover:bg-[#16324d]"
+              >
+                {odT(locale, "od.printDriverSheet")}
+              </button>
+              <button
+                type="button"
+                onClick={openWhatsApp}
+                className="flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-3 font-medium text-white shadow-sm hover:bg-[#20bd5a]"
+              >
+                {odT(locale, "od.waGroup")}
+              </button>
+              <button
+                type="button"
+                onClick={() => void openWhatsAppDriverNavLinks()}
+                className="flex flex-col items-center justify-center gap-1 rounded-xl border-2 border-emerald-700 bg-emerald-700 px-4 py-3 text-center font-medium text-white shadow-sm hover:bg-emerald-800"
+              >
+                <span>{odT(locale, "od.waDriver")}</span>
+                <span className="text-xs font-normal opacity-90">{odT(locale, "od.waDriverSub")}</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => downloadInvoice("driver")}
+                className="rounded-xl border-2 border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-medium text-amber-900 hover:bg-amber-100"
+              >
+                {odMailT(locale, "invoiceDriver", { eur: driverPriceEur })}
+              </button>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border-2 border-sky-200 bg-sky-50/50 p-6 shadow-lg">
+            <h2 className="mb-4 text-lg font-semibold text-sky-950">{odT(locale, "od.customerActions")}</h2>
+            <div className="flex flex-col gap-3">
             <button
               type="button"
               onClick={openWhatsAppCustomer}
-              className="flex items-center justify-center gap-2 rounded-xl border-2 border-[#25D366] bg-[#25D366]/10 px-4 py-3 font-medium text-[#25D366] hover:bg-[#25D366]/20"
+              className="flex items-center justify-center gap-2 rounded-xl border-2 border-[#25D366] bg-white px-4 py-3 font-medium text-[#25D366] hover:bg-[#25D366]/10"
             >
               {odT(locale, "od.waCustomer")} ({order.phone})
-            </button>
-            <button
-              type="button"
-              onClick={() => void openWhatsAppDriverNavLinks()}
-              className="flex flex-col items-center justify-center gap-1 rounded-xl border-2 border-emerald-700 bg-emerald-700 px-4 py-3 text-center font-medium text-white shadow-sm hover:bg-emerald-800"
-            >
-              <span>{odT(locale, "od.waDriver")}</span>
-              <span className="text-xs font-normal opacity-90">{odT(locale, "od.waDriverSub")}</span>
             </button>
             {order.customer_email && (
               <>
@@ -902,21 +937,13 @@ export default function AdminOrderDetailPage({
             )}
             <hr className="border-[#0d2137]/10" />
             <p className="text-sm font-medium text-[#0d2137]">{odMailT(locale, "invoicesTitle")}</p>
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => downloadInvoice("customer")}
-                className="rounded-xl border-2 border-blue-200 bg-blue-50 px-4 py-2.5 text-sm font-medium text-blue-800 hover:bg-blue-100"
-              >
-                {odMailT(locale, "invoiceCustomer", { eur: customerPriceEur })}
-              </button>
-              <button
-                type="button"
-                onClick={() => downloadInvoice("driver")}
-                className="rounded-xl border-2 border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-medium text-amber-800 hover:bg-amber-100"
-              >
-                {odMailT(locale, "invoiceDriver", { eur: driverPriceEur })}
-              </button>
+            <button
+              type="button"
+              onClick={() => downloadInvoice("customer")}
+              className="rounded-xl border-2 border-blue-200 bg-blue-50 px-4 py-2.5 text-sm font-medium text-blue-800 hover:bg-blue-100"
+            >
+              {odMailT(locale, "invoiceCustomer", { eur: customerPriceEur })}
+            </button>
             </div>
           </div>
         </div>

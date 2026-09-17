@@ -2,6 +2,7 @@ import { PDFDocument, rgb, StandardFonts, type PDFFont, type PDFPage } from "pdf
 import type { Job } from "./supabase";
 import { getPdfLogoBytes, PDF_COMPANY } from "./pdf-company";
 import { jobRecipientAddress } from "./structured-address";
+import { formatAuftragNumber } from "./order-ref";
 
 export type InvoiceType = "customer" | "driver";
 
@@ -44,9 +45,7 @@ function formatDeDate(iso: string | Date | null | undefined): string {
 }
 
 export function invoiceNumberForJob(job: Job & { order_number?: number | null }): string {
-  const y = new Date(job.created_at || Date.now()).getFullYear();
-  if (job.order_number != null) return `${y}-${String(job.order_number).padStart(3, "0")}`;
-  return `${y}-${job.id.slice(0, 6).toUpperCase()}`;
+  return formatAuftragNumber(job);
 }
 
 function parseDeAddress(full: string): { street: string; plzOrt: string } {
