@@ -6,7 +6,6 @@ import { useAdminLocale } from "@/contexts/AdminLocaleContext";
 import { cargoCategoryLabelDe, formatCargoLoadsPlainDe, parseCargoLoads } from "@/lib/cargo";
 import { formatStructuredAddressPlain, jobPreferredDeliveryAt, jobRecipientAddress, jobSenderAddress } from "@/lib/structured-address";
 import { odMailT, cargoCategoryAdminLabel, odT } from "@/lib/admin-order-detail-i18n";
-import { serviceTypeLabel } from "@/lib/admin-ui-strings";
 import { formatAuftragNumber, formatSendungNumber } from "@/lib/order-ref";
 
 type Job = {
@@ -58,13 +57,6 @@ function getDriverPriceEur(o: Job): string {
   if (o.driver_price_cents != null) return (o.driver_price_cents / 100).toFixed(2);
   if (o.distance_km != null && o.distance_km > 0) return ((18 * o.distance_km * 2) / 100).toFixed(2);
   return "18.00";
-}
-
-/** Service type labels for WhatsApp (German only). */
-function serviceTypeLabelDe(st: string | undefined): string {
-  if (st === "driver_only") return "Nur Fahrer (Ihr Fahrzeug)";
-  if (st === "driver_car_assistant") return "Fahrer mit Fahrzeug + Helfer";
-  return "Fahrer mit Fahrzeug";
 }
 
 /** Ladungsmaße aus cargo_details */
@@ -126,7 +118,6 @@ function buildWhatsAppMessage(o: Job): string {
       : [];
   const distanceStr = o.distance_km != null ? `${o.distance_km} km` : "-";
   const volumeStr = cargoVolumeStr(o.cargo_details);
-  const serviceLabel = serviceTypeLabelDe(o.service_type);
   const blocks: string[] = [
     `${IC.megaphone} TransPool24 – Transportauftrag`,
     "",
@@ -153,7 +144,6 @@ function buildWhatsAppMessage(o: Job): string {
           ...(packageCount != null ? [`${IC.package} Pakete/Stück: ${packageCount}`] : []),
         ]),
     ...(photoUrls.length > 0 ? [`📷 Fotos: ${photoUrls.length}`] : []),
-    `${IC.lorry} Leistung: ${serviceLabel}`,
     `${IC.building} Firma: ${o.company_name}`,
     "",
     `${IC.pin} Abholung:`,
@@ -690,10 +680,6 @@ export default function AdminOrderDetailPage({
             <div>
               <dt className="text-[#0d2137]/60">{odT(locale, "od.cargoSize")}</dt>
               <dd>{order.cargo_size}</dd>
-            </div>
-            <div>
-              <dt className="text-[#0d2137]/60">{odT(locale, "od.serviceType")}</dt>
-              <dd>{serviceTypeLabel(locale, order.service_type)}</dd>
             </div>
             {(() => {
               const loadsText = formatCargoLoadsPlainDe(order.cargo_details);

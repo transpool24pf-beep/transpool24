@@ -8,7 +8,7 @@ import {
   ADMIN_ORDER_STATUS_CONFIG,
   adminOrderStatusText,
 } from "@/lib/admin-orders-status";
-import { serviceTypeLabel, type AdminLocale } from "@/lib/admin-ui-strings";
+import { type AdminLocale } from "@/lib/admin-ui-strings";
 
 type Job = {
   id: string;
@@ -60,10 +60,7 @@ function matchSearch(o: Job, q: string): boolean {
     str((o.price_cents / 100).toFixed(2)).includes(s) ||
     (o.driver_price_cents != null && str((o.driver_price_cents / 100).toFixed(2)).includes(s)) ||
     (o.assistant_price_cents != null &&
-      str((o.assistant_price_cents / 100).toFixed(2)).includes(s)) ||
-    str(serviceTypeLabel("de", o.service_type)).includes(s) ||
-    str(serviceTypeLabel("ar", o.service_type)).includes(s) ||
-    str(o.service_type ?? "").includes(s)
+      str((o.assistant_price_cents / 100).toFixed(2)).includes(s))
   );
 }
 
@@ -305,12 +302,6 @@ export default function AdminOrdersPage() {
                   </th>
                   <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">{t("orders.colDate")}</th>
                   <th className="w-[8%] px-2 py-3 font-semibold text-[#0d2137]">{t("orders.colCompany")}</th>
-                  <th
-                    className="w-[12%] px-2 py-3 font-semibold text-[#0d2137]"
-                    dir={locale === "ar" ? "rtl" : "ltr"}
-                  >
-                    {t("orders.colService")}
-                  </th>
                   <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">{t("orders.colCustomerEur")}</th>
                   <th className="w-[7%] px-2 py-3 font-semibold text-[#0d2137]">{t("orders.colDriverEur")}</th>
                   <th
@@ -375,17 +366,6 @@ export default function AdminOrdersPage() {
                       </td>
                       <td className="min-w-0 truncate px-2 py-2 font-medium text-[#0d2137] text-xs" title={o.company_name}>
                         {o.company_name}
-                      </td>
-                      <td
-                        className="min-w-0 px-2 py-2 text-xs font-medium text-[#0d2137] leading-snug"
-                        dir={locale === "ar" ? "rtl" : "ltr"}
-                        title={
-                          locale === "ar"
-                            ? serviceTypeLabel("de", o.service_type)
-                            : serviceTypeLabel("ar", o.service_type)
-                        }
-                      >
-                        {serviceTypeLabel(locale, o.service_type)}
                       </td>
                       <td
                         className="min-w-0 px-2 py-2 font-semibold text-[#0d2137] text-xs whitespace-nowrap"
@@ -527,14 +507,6 @@ export default function AdminOrdersPage() {
                           </dd>
                         </div>
                         <div className="flex justify-between gap-2">
-                          <dt className="text-[#0d2137]/55">{t("orders.dtService")}</dt>
-                          <dd
-                            className={`max-w-[65%] ${locale === "ar" ? "text-left" : "text-right"}`}
-                          >
-                            {serviceTypeLabel(locale, o.service_type)}
-                          </dd>
-                        </div>
-                        <div className="flex justify-between gap-2">
                           <dt className="text-[#0d2137]/55">{t("orders.dtCustomerEur")}</dt>
                           <dd className="font-semibold">{(o.price_cents / 100).toFixed(2)} €</dd>
                         </div>
@@ -655,14 +627,6 @@ export default function AdminOrdersPage() {
                               className={`max-w-[60%] font-medium ${locale === "ar" ? "text-left" : "text-right"}`}
                             >
                               {o.company_name}
-                            </dd>
-                          </div>
-                          <div className="flex justify-between gap-2">
-                            <dt className="text-[#0d2137]/55">{t("orders.dtService")}</dt>
-                            <dd
-                              className={`max-w-[60%] ${locale === "ar" ? "text-left" : "text-right"}`}
-                            >
-                              {serviceTypeLabel(locale, o.service_type)}
                             </dd>
                           </div>
                           <div className="flex justify-between gap-2">

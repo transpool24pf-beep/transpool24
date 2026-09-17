@@ -5,7 +5,6 @@ import type { Attachment } from "resend";
 import type { Job } from "./supabase";
 import { generateInvoicePdf } from "./invoice-pdf";
 import { cargoCategoryLabelDe, formatCargoLoadsPlainDe, parseCargoLoads } from "./cargo";
-import { splitGermanVatFromGross } from "./pricing";
 import {
   loadEmailFooterSocial,
   buildEmailFooterOrderBlock,
@@ -49,10 +48,6 @@ function buildConfirmationHtml(
   footer: ResolvedEmailFooter
 ): string {
   const { rateDriverUrl, driver } = options;
-  const vat = splitGermanVatFromGross(job.price_cents);
-  const netEur = (vat.netCents / 100).toFixed(2);
-  const vatEur = (vat.vatCents / 100).toFixed(2);
-  const totalEur = (vat.grossCents / 100).toFixed(2);
   const orderRef = job.order_number != null ? String(job.order_number) : job.id.slice(0, 8);
   const date = new Date(job.created_at).toLocaleDateString("de-DE", {
     day: "2-digit",
@@ -60,6 +55,7 @@ function buildConfirmationHtml(
     year: "numeric",
   });
   const companyName = (job.company_name || "").trim() || "Kunde";
+  const totalEur = (job.price_cents / 100).toFixed(2);
   const driverSection =
     driver
       ? `
@@ -145,9 +141,7 @@ function buildConfirmationHtml(
           ${weightRow}
           ${pkgRow}
           ${photosRow}
-          <tr style="background: #f8fafc;"><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">Netto</td><td style="border-bottom: 1px solid #e2e8f0;">€ ${netEur}</td></tr>
-          <tr><td style="border-bottom: 1px solid #e2e8f0; color: #64748b;">zzgl. 19 % MwSt.</td><td style="border-bottom: 1px solid #e2e8f0;">€ ${vatEur}</td></tr>
-          <tr><td style="color: #64748b;">Gesamtbetrag (brutto)</td><td style="font-weight: bold;">€ ${totalEur}</td></tr>
+          <tr><td style="color: #64748b;">Gesamtbetrag</td><td style="font-weight: bold;">€ ${totalEur}</td></tr>
         </table>
         <p style="margin: 16px 0 0 0; font-size: 14px; color: #64748b;">Die Zahlung erfolgt nach der Zustellung per ordnungsgemäßer Rechnung. Eine Vorauszahlung ist nicht erforderlich.</p>
         <p style="margin: 12px 0 0 0; font-size: 14px; color: #64748b;">Sie können die Vertragsdetails in der Auftragszusammenfassung unten einsehen. Die beigefügte PDF enthält Details zur Fahrt, zum Fahrer und zu den Firmeninformationen.</p>

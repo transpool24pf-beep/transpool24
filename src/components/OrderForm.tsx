@@ -97,12 +97,6 @@ type CargoSize = "XS" | "M" | "L";
 /** Single vehicle class offered on the order form: 3.5 t van. */
 const FIXED_CARGO_SIZE: CargoSize = "L";
 
-const SERVICE_OPTIONS: { value: ServiceType; key: "serviceDriverOnly" | "serviceDriverCar" | "serviceDriverCarAssistant" }[] = [
-  { value: "driver_only", key: "serviceDriverOnly" },
-  { value: "driver_car", key: "serviceDriverCar" },
-  { value: "driver_car_assistant", key: "serviceDriverCarAssistant" },
-];
-
 const DEFAULT_KM = 50;
 
 /** Append country for geocoding when the customer omits it */
@@ -289,7 +283,7 @@ const initial: OrderFormData = {
   deliveryTime: "",
   cargoSize: FIXED_CARGO_SIZE,
   loads: [emptyCargoLoadLine()],
-  serviceType: "",
+  serviceType: "driver_car" as ServiceType,
   distanceKm: DEFAULT_KM,
 };
 
@@ -313,7 +307,6 @@ export function OrderForm({
   const pickupAddressRef = useRef<HTMLInputElement>(null);
   const deliveryAddressRef = useRef<HTMLInputElement>(null);
   const loadsRef = useRef<HTMLDivElement>(null);
-  const serviceTypeRef = useRef<HTMLDivElement>(null);
   const photosRef = useRef<HTMLDivElement>(null);
   const [step1Attempted, setStep1Attempted] = useState(false);
   const [step2Attempted, setStep2Attempted] = useState(false);
@@ -740,7 +733,6 @@ export function OrderForm({
     parseOrderDateInputToIso(deliveryDateField).kind === "valid" &&
     Boolean(data.deliveryTime.trim());
   const step3Complete =
-    data.serviceType !== "" &&
     distanceFromRoute &&
     loadsComplete &&
     cargoPhotoUrls.length >= 1;
@@ -748,13 +740,11 @@ export function OrderForm({
   const step3MissingFields = useMemo(() => {
     const missing: string[] = [];
     if (!loadsComplete) missing.push(t("cargoDetails"));
-    if (!data.serviceType) missing.push(t("serviceType"));
     if (cargoPhotoUrls.length < 1) missing.push(t("cargoPhotosLabel"));
     if (!distanceFromRoute) missing.push(t("distanceRoute"));
     return missing;
   }, [
     cargoPhotoUrls.length,
-    data.serviceType,
     distanceFromRoute,
     loadsComplete,
     t,
@@ -780,11 +770,6 @@ export function OrderForm({
       loadsRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       return false;
     }
-    if (!data.serviceType) {
-      setError(t("step3Incomplete"));
-      serviceTypeRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-      return false;
-    }
     if (cargoPhotoUrls.length < 1) {
       setError(t("step3Incomplete"));
       photosRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -800,7 +785,6 @@ export function OrderForm({
     return true;
   }, [
     cargoPhotoUrls.length,
-    data.serviceType,
     distanceFromRoute,
     loadsComplete,
     t,
@@ -1808,42 +1792,6 @@ export function OrderForm({
           <h2 className="text-lg font-semibold text-[var(--primary)]">
             {t("step3")}
           </h2>
-          <div>
-            <label className="mb-2 block text-sm font-medium text-[var(--foreground)]">
-              {t("serviceType")}
-            </label>
-            <div
-              ref={serviceTypeRef}
-              className={`space-y-2 rounded-lg ${step3FieldWarn(!data.serviceType)}`}
-            >
-              {SERVICE_OPTIONS.map(({ value, key }) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => update({ serviceType: value })}
-                  className={`flex w-full items-center gap-3 rounded-lg border-2 px-4 py-3 text-left transition ${
-                    data.serviceType === value
-                      ? "border-[var(--accent)] bg-[var(--accent)]/10 text-[var(--accent)]"
-                      : "border-[#0d2137]/20 text-[var(--foreground)] hover:border-[#0d2137]/40"
-                  }`}
-                >
-                  <span
-                    className={`h-5 w-5 shrink-0 rounded-full border-2 ${
-                      data.serviceType === value
-                        ? "border-[var(--accent)] bg-[var(--accent)]"
-                        : "border-[#0d2137]/40"
-                    }`}
-                  />
-                  <span className="font-medium">{t(key)}</span>
-                </button>
-              ))}
-            </div>
-            {!data.serviceType && (
-              <p className={`mt-1 text-sm ${step3Attempted ? "font-medium text-red-600" : "text-amber-700"}`}>
-                {t("serviceTypeRequired")}
-              </p>
-            )}
-          </div>
           <div ref={loadsRef} className="rounded-lg border border-[#0d2137]/15 bg-[#0d2137]/5 p-4">
             <p className="mb-1 text-sm font-medium text-[var(--foreground)]">{t("cargoDetails")}</p>
             <p className="mb-3 text-xs text-amber-800">{t("cargoDetailsMandatoryHint")}</p>
@@ -2208,7 +2156,6 @@ export function OrderForm({
                 <strong>{t("recipientPhone")}:</strong> {data.deliveryAddr.phone}
               </p>
             ) : null}
-            <p><strong>{t("serviceType")}:</strong>             {data.serviceType ? t(SERVICE_OPTIONS.find((o) => o.value === data.serviceType)?.key ?? "serviceDriverCar") : "-"}</p>
             {loads.map((line, idx) => (
               <p key={idx}>
                 <strong>

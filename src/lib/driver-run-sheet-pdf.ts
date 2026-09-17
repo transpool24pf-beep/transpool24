@@ -65,12 +65,6 @@ function tealBar(page: PDFPage, x: number, yTop: number, w: number, h: number, t
   drawSafe(page, fontBold, title, x + 10, yTop - h + 6, 9, WHITE);
 }
 
-function serviceTypeDe(st: Job["service_type"] | undefined): string {
-  if (st === "driver_only") return "Nur Fahrer (Ihr Fahrzeug)";
-  if (st === "driver_car_assistant") return "Fahrer mit Fahrzeug + Helfer";
-  return "Fahrer mit Fahrzeug";
-}
-
 function formatDeDateTime(iso: string | Date | null | undefined): string {
   if (!iso) return "-";
   const d = iso instanceof Date ? iso : new Date(iso);
@@ -253,7 +247,6 @@ export async function generateDriverRunSheetPdf(job: Job): Promise<Uint8Array> {
     ["Kundenname / Firma:", job.company_name || "-"],
     ["Telefon / WhatsApp:", job.phone || "-"],
     ["E-Mail:", job.customer_email || "-"],
-    ["Leistung / Service:", serviceTypeDe(job.service_type)],
     ...cargoRows(job),
   ];
 

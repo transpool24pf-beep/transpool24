@@ -9,7 +9,6 @@ import {
   ADMIN_ORDER_STATUS_CONFIG,
   adminOrderStatusText,
 } from "@/lib/admin-orders-status";
-import { serviceTypeLabel } from "@/lib/admin-ui-strings";
 
 /** Show red pulsing alert when remaining time is at or below this (minutes). */
 const IN_PROGRESS_DANGER_MINUTES = 30;
@@ -227,12 +226,6 @@ function InProgressOrderCard({
           <dt className="text-[#0d2137]/55">{t("orders.dtCompany")}</dt>
           <dd className={`max-w-[65%] font-medium ${locale === "ar" ? "text-left" : "text-right"}`}>
             {o.company_name}
-          </dd>
-        </div>
-        <div className="flex justify-between gap-2">
-          <dt className="text-[#0d2137]/55">{t("orders.dtService")}</dt>
-          <dd className={`max-w-[65%] ${locale === "ar" ? "text-left" : "text-right"}`}>
-            {serviceTypeLabel(locale, o.service_type)}
           </dd>
         </div>
         <div className="flex justify-between gap-2">
