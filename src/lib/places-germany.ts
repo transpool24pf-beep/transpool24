@@ -51,6 +51,7 @@ function parseAddressComponents(
     if (c.types.includes("postal_code")) postcode = c.long_name;
     if (c.types.includes("locality")) city = c.long_name;
     if (!city && c.types.includes("postal_town")) city = c.long_name;
+    if (!city && c.types.includes("sublocality_level_1")) city = c.long_name;
     if (!city && c.types.includes("administrative_area_level_3")) city = c.long_name;
     if (c.types.includes("country")) country = c.long_name;
   }

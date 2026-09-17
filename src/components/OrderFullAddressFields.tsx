@@ -13,6 +13,9 @@ const noBrowserFill = {
   autoCorrect: "off" as const,
   autoCapitalize: "off" as const,
   spellCheck: false as const,
+  "data-1p-ignore": true,
+  "data-lpignore": "true",
+  "data-form-type": "other",
 };
 
 export function OrderFullAddressFields({

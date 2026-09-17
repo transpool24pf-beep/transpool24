@@ -51,7 +51,21 @@ export function formatStructuredAddressLine(a: StructuredAddress): string {
   return [street, plzOrt, country].filter(Boolean).join(", ");
 }
 
-export function formatStructuredAddressPlain(a: StructuredAddress): string {
+export type AddressNotesKind = "load" | "unload";
+
+export function addressNotesLabel(kind: AddressNotesKind): string {
+  return kind === "unload" ? "Hinweise Entladestelle" : "Hinweise Ladestelle";
+}
+
+/** Site notes only (empty if the customer left the field blank). */
+export function structuredAddressNotes(a: StructuredAddress): string {
+  return a.notes.trim();
+}
+
+export function formatStructuredAddressPlain(
+  a: StructuredAddress,
+  notesKind: AddressNotesKind | false = "load"
+): string {
   const lines: string[] = [];
   if (a.company.trim()) lines.push(a.company.trim());
   const street = `${a.street.trim()} ${a.houseNumber.trim()}`.trim();
@@ -59,11 +73,17 @@ export function formatStructuredAddressPlain(a: StructuredAddress): string {
   const plzOrt = `${a.postalCode.trim()} ${a.city.trim()}`.trim();
   if (plzOrt) lines.push(plzOrt);
   if (a.country.trim()) lines.push(a.country.trim());
-  if (a.notes.trim()) lines.push(a.notes.trim());
+  if (notesKind !== false && a.notes.trim()) {
+    lines.push(`${addressNotesLabel(notesKind)}: ${a.notes.trim()}`);
+  }
   return lines.join("\n");
 }
 
-export function formatStructuredAddressHtml(a: StructuredAddress, escapeHtml: (s: string) => string): string {
+export function formatStructuredAddressHtml(
+  a: StructuredAddress,
+  escapeHtml: (s: string) => string,
+  notesKind: AddressNotesKind | false = "load"
+): string {
   const parts: string[] = [];
   if (a.company.trim()) parts.push(escapeHtml(a.company.trim()));
   const street = `${a.street.trim()} ${a.houseNumber.trim()}`.trim();
@@ -71,7 +91,9 @@ export function formatStructuredAddressHtml(a: StructuredAddress, escapeHtml: (s
   const plzOrt = `${a.postalCode.trim()} ${a.city.trim()}`.trim();
   if (plzOrt) parts.push(escapeHtml(plzOrt));
   if (a.country.trim()) parts.push(escapeHtml(a.country.trim()));
-  if (a.notes.trim()) parts.push(escapeHtml(a.notes.trim()));
+  if (notesKind !== false && a.notes.trim()) {
+    parts.push(`<strong>${escapeHtml(addressNotesLabel(notesKind))}:</strong> ${escapeHtml(a.notes.trim())}`);
+  }
   return parts.join("<br />");
 }
 
@@ -82,48 +104,60 @@ export function splitStreetHouse(streetPart: string): { street: string; houseNum
   return { street: s, houseNumber: "" };
 }
 
+const DE_ADDRESS_META =
+  /^(deutschland|germany|de|baden-w(?:ü|u)rttemberg|bayern|hessen|nordrhein-westfalen|nrw|rheinland-pfalz|saarland|sachsen(?:-anhalt)?|niedersachsen|schleswig-holstein|thüringen|thuringen|brandenburg|mecklenburg(?:-vorpommern)?|europa|europe)$/i;
+
+function isGermanAddressMeta(part: string): boolean {
+  const p = part.trim();
+  if (!p) return true;
+  if (/^\d{5}$/.test(p)) return true;
+  return DE_ADDRESS_META.test(p);
+}
+
+function cityFromAddressParts(parts: string[], plz: string, skip: string): string {
+  const skipN = skip.trim().toLowerCase();
+  const expanded: string[] = [];
+  for (const part of parts) {
+    const m = part.match(new RegExp(`^${plz}\\s+(.+)$`));
+    if (m?.[1]) expanded.push(m[1].trim());
+    else if (part !== plz && !part.startsWith(`${plz} `)) expanded.push(part);
+  }
+  return (
+    expanded.find((p) => {
+      if (isGermanAddressMeta(p) || !/[A-Za-zÄÖÜäöüß]/.test(p)) return false;
+      if (skipN && p.trim().toLowerCase() === skipN) return false;
+      return true;
+    }) ?? ""
+  );
+}
+
 /** Best-effort parse of a one-line German address into structured fields. */
 export function parseStructuredAddressFromLine(line: string): StructuredAddress {
   const t = (line ?? "").trim();
   const base = { ...EMPTY_STRUCTURED_ADDRESS };
   if (!t) return base;
-  let cleaned = t.replace(/,?\s*(Deutschland|Germany|DE)\s*$/i, "").trim();
-
-  let houseNumber = "";
-  const trailingHn = cleaned.match(/,\s*(\d+[a-zA-Z]?)\s*$/);
+  const cleaned = t.replace(/,?\s*(Deutschland|Germany|DE)\s*$/i, "").trim();
   const plzInLine = cleaned.match(/\b(\d{5})\b/)?.[1] ?? "";
-  if (trailingHn && trailingHn[1] !== plzInLine) {
-    houseNumber = trailingHn[1];
-    cleaned = cleaned.slice(0, trailingHn.index).trim();
-  }
-
-  const classic = cleaned.match(/^(.*?)[,\s]+(\d{5})\s*,?\s*(.+)$/);
-  if (classic) {
-    const split = splitStreetHouse(classic[1].trim().replace(/,$/, ""));
-    const city = classic[3].split(",")[0].trim();
-    return {
-      ...base,
-      street: split.street,
-      houseNumber: houseNumber || split.houseNumber,
-      postalCode: classic[2],
-      city,
-      country: "Deutschland",
-    };
-  }
 
   if (plzInLine) {
     const parts = cleaned.split(",").map((p) => p.trim()).filter(Boolean);
     const plzIdx = parts.findIndex((p) => p === plzInLine || p.startsWith(`${plzInLine} `));
-    const before = (plzIdx >= 0 ? parts.slice(0, plzIdx) : parts).join(", ");
-    const after = plzIdx >= 0 ? parts.slice(plzIdx + 1) : [];
-    const cityPart = after.find((p) => !/baden-w(?:ü|u)rttemberg|bayern|hessen|nrw|sachsen/i.test(p)) ?? "";
-    const split = splitStreetHouse(before);
+    const beforeParts = plzIdx >= 0 ? parts.slice(0, plzIdx) : parts;
+    const afterParts = plzIdx >= 0 ? parts.slice(plzIdx) : [];
+    const streetSource =
+      beforeParts.find((p) => !isGermanAddressMeta(p)) || beforeParts[0] || "";
+    const split = splitStreetHouse(streetSource);
+    const city = cityFromAddressParts(
+      [...afterParts, ...beforeParts.slice().reverse()],
+      plzInLine,
+      streetSource,
+    );
     return {
       ...base,
       street: split.street,
-      houseNumber: houseNumber || split.houseNumber,
+      houseNumber: split.houseNumber,
       postalCode: plzInLine,
-      city: cityPart.replace(plzInLine, "").trim(),
+      city,
       country: "Deutschland",
     };
   }
@@ -144,7 +178,15 @@ type JobLike = {
 function fromDetails(details: Record<string, unknown> | null | undefined, key: string, fallbackLine: string): StructuredAddress {
   const parsed = normalizeStructuredAddress(details?.[key]);
   if (isStructuredAddressComplete(parsed) || parsed.street) return parsed;
-  return parseStructuredAddressFromLine(fallbackLine);
+  const fromLine = parseStructuredAddressFromLine(fallbackLine);
+  if (parsed.notes || parsed.company) {
+    return {
+      ...fromLine,
+      company: parsed.company || fromLine.company,
+      notes: parsed.notes || fromLine.notes,
+    };
+  }
+  return fromLine;
 }
 
 export function jobSenderAddress(job: JobLike): StructuredAddress {

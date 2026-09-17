@@ -112,11 +112,13 @@ function addressLineForGeocode(raw: string): string {
 }
 
 function structuredFromPlaceDetails(j: PlaceDetailsJson, prev: StructuredAddress): StructuredAddress {
-  const rawStreet = j.street?.trim() || prev.street;
+  const fromFmt = j.formatted_address ? parseStructuredAddressFromLine(j.formatted_address) : EMPTY_STRUCTURED_ADDRESS;
+  const rawStreet = j.street?.trim() || fromFmt.street || prev.street;
   const split = splitStreetHouse(rawStreet);
-  const houseNumber = j.houseNumber?.trim() || split.houseNumber || prev.houseNumber;
-  const postalCode = j.postcode?.trim().replace(/\D/g, "").slice(0, 5) || prev.postalCode;
-  const city = j.city?.trim() || prev.city;
+  const houseNumber = j.houseNumber?.trim() || split.houseNumber || fromFmt.houseNumber || prev.houseNumber;
+  const postalCode =
+    j.postcode?.trim().replace(/\D/g, "").slice(0, 5) || fromFmt.postalCode || prev.postalCode;
+  const city = j.city?.trim() || fromFmt.city || prev.city;
   const country = j.country?.trim() || prev.country || "Deutschland";
   return {
     ...prev,
@@ -334,6 +336,50 @@ export function OrderForm({
   );
   const pickupAddress = useMemo(() => addressLineForGeocode(data.pickupAddressLine), [data.pickupAddressLine]);
   const deliveryAddress = useMemo(() => addressLineForGeocode(data.deliveryAddressLine), [data.deliveryAddressLine]);
+  const plzCityLockRef = useRef({ pickup: "", delivery: "" });
+
+  const fillCityFromPostcode = useCallback((field: "pickup" | "delivery", postalCode: string, currentCity: string) => {
+    const pc = postalCode.replace(/\D/g, "").slice(0, 5);
+    if (!/^\d{5}$/.test(pc)) {
+      plzCityLockRef.current[field] = "";
+      return;
+    }
+    if (currentCity.trim() && plzCityLockRef.current[field] === pc) return;
+    const ctrl = new AbortController();
+    const timer = window.setTimeout(() => {
+      fetch(`/api/postcode-locality?postcode=${encodeURIComponent(pc)}`, { signal: ctrl.signal })
+        .then((r) => r.json())
+        .then((j: { city?: string | null }) => {
+          const city = typeof j.city === "string" ? j.city.trim() : "";
+          if (!city) return;
+          setData((prev) => {
+            const keyAddr = field === "pickup" ? "pickupAddr" : "deliveryAddr";
+            const keyLine = field === "pickup" ? "pickupAddressLine" : "deliveryAddressLine";
+            const addr = prev[keyAddr];
+            if (addr.postalCode !== pc) return prev;
+            if (addr.city.trim() && plzCityLockRef.current[field] === pc) return prev;
+            plzCityLockRef.current[field] = pc;
+            const nextAddr = { ...addr, city, country: addr.country || "Deutschland" };
+            return { ...prev, [keyAddr]: nextAddr, [keyLine]: formatStructuredAddressLine(nextAddr) };
+          });
+        })
+        .catch(() => {});
+    }, 220);
+    return () => {
+      window.clearTimeout(timer);
+      ctrl.abort();
+    };
+  }, []);
+
+  useEffect(
+    () => fillCityFromPostcode("pickup", data.pickupAddr.postalCode, data.pickupAddr.city),
+    [data.pickupAddr.postalCode, data.pickupAddr.city, fillCityFromPostcode],
+  );
+  useEffect(
+    () => fillCityFromPostcode("delivery", data.deliveryAddr.postalCode, data.deliveryAddr.city),
+    [data.deliveryAddr.postalCode, data.deliveryAddr.city, fillCityFromPostcode],
+  );
+
   const addressLineInputNamesRef = useRef({
     pickup:
       typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
