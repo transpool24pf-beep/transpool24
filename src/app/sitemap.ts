@@ -8,9 +8,11 @@ const STATIC_SUFFIXES = ["", "/why", "/driver", "/privacy", "/terms", "/support"
 /** Real content date for static locale pages — do not use `new Date()` per request. */
 const STATIC_LASTMOD = new Date("2026-09-17T08:00:00.000Z");
 
-function safeLastmod(value: Date | undefined): Date {
-  if (!value || Number.isNaN(value.getTime())) return STATIC_LASTMOD;
-  return value;
+function safeLastmod(value: string | Date | undefined): Date {
+  if (!value) return STATIC_LASTMOD;
+  const d = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(d.getTime())) return STATIC_LASTMOD;
+  return d;
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
