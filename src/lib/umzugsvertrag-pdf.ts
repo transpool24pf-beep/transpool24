@@ -164,7 +164,6 @@ export async function generateUmzugsvertragPdf(job: Job): Promise<Uint8Array> {
   const fontBold = await doc.embedFont(StandardFonts.HelveticaBold);
   const pageSize: [number, number] = [595, 842];
   let page = doc.addPage(pageSize);
-  const pages: PDFPage[] = [page];
   const { width, height } = page.getSize();
   const margin = 40;
   const contentW = width - margin * 2;
@@ -240,7 +239,6 @@ export async function generateUmzugsvertragPdf(job: Job): Promise<Uint8Array> {
   const ensure = (need: number) => {
     if (y - need < 56) {
       page = doc.addPage(pageSize);
-      pages.push(page);
       y = height - 40;
     }
   };
@@ -484,9 +482,9 @@ export async function generateUmzugsvertragPdf(job: Job): Promise<Uint8Array> {
     MUTED
   );
 
-  for (const p of pages) {
-    drawCentered(p, fontBold, "TransPool24 · Transport & Logistik", pageMid, 28, 9, TEAL);
-  }
+  ensure(36);
+  y -= 18;
+  drawCentered(page, fontBold, "TransPool24 · Transport & Logistik", pageMid, y, 9, TEAL);
 
   return doc.save();
 }
