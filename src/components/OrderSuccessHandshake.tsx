@@ -10,7 +10,6 @@ export function OrderSuccessHandshake({ className }: { className?: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [reduceMotion, setReduceMotion] = useState(false);
   const [entered, setEntered] = useState(false);
-  const playsRef = useRef(0);
 
   useEffect(() => {
     const id = requestAnimationFrame(() => setEntered(true));
@@ -29,6 +28,7 @@ export function OrderSuccessHandshake({ className }: { className?: string }) {
     if (reduceMotion) return;
     const el = videoRef.current;
     if (!el) return;
+    el.loop = true;
     el.play().catch(() => {});
   }, [reduceMotion]);
 
@@ -59,20 +59,10 @@ export function OrderSuccessHandshake({ className }: { className?: string }) {
                 muted
                 playsInline
                 autoPlay
+                loop
                 preload="auto"
                 className="h-full w-full origin-center scale-[1.06] object-cover"
                 aria-hidden
-                onEnded={() => {
-                  const el = videoRef.current;
-                  if (!el) return;
-                  playsRef.current += 1;
-                  if (playsRef.current < 2) {
-                    el.currentTime = 0;
-                    el.play().catch(() => {});
-                    return;
-                  }
-                  el.pause();
-                }}
               />
             )}
           </div>
