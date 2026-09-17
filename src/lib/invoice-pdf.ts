@@ -32,6 +32,16 @@ export function sanitizeTextForStandardPdfFont(text: string, maxLen = 2400): str
     .replace(/[^\u0020-\u007E\u00A0-\u00FF]/g, "?");
 }
 
+/** Helvetica cannot draw Arabic; use a Latin fallback (order company name) instead of ???. */
+export function pdfPrintableOrFallback(
+  value: string | null | undefined,
+  fallback: string | null | undefined,
+): string {
+  const keep = (raw: string) =>
+    sanitizeTextForStandardPdfFont(raw.trim()).replace(/\?/g, "").replace(/\s+/g, " ").trim();
+  return keep(value ?? "") || keep(fallback ?? "") || "-";
+}
+
 function formatEur(cents: number): string {
   const n = (Math.round(cents) / 100).toFixed(2).replace(".", ",");
   return `${n} EUR`;
@@ -238,7 +248,7 @@ export async function generateInvoicePdf(
   const labelW = 118;
   const valueW = colW - labelW - 8;
   const leftPairs: [string, string][] = [
-    ["Kundenname / Firma:", recipient.company || job.company_name || ""],
+    ["Kundenname / Firma:", pdfPrintableOrFallback(recipient.company, job.company_name)],
     ["Telefon Empfaenger:", recipient.phone || job.phone || ""],
     ["Straße Hausnummer:", addrStreet],
     ["PLZ Ort:", plzOrt],

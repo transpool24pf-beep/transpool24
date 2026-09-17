@@ -1,7 +1,7 @@
 import { PDFDocument, rgb, StandardFonts, type PDFFont, type PDFPage } from "pdf-lib";
 import type { Job } from "./supabase";
 import { getPdfLogoBytes, PDF_COMPANY } from "./pdf-company";
-import { sanitizeTextForStandardPdfFont } from "./invoice-pdf";
+import { sanitizeTextForStandardPdfFont, pdfPrintableOrFallback } from "./invoice-pdf";
 import { formatAuftragNumber } from "./order-ref";
 import { cargoCategoryLabelDe, formatCargoLoadsPlainDe, parseCargoLoads, summarizeCargoLoads } from "./cargo";
 import { jobPreferredDeliveryAt, jobRecipientAddress, jobSenderAddress, type StructuredAddress } from "./structured-address";
@@ -220,7 +220,7 @@ export async function generateDriverRunSheetPdf(job: Job): Promise<Uint8Array> {
   y -= 32;
 
   const leftAddr: [string, string][] = [
-    ["Name / Firma:", pickup.company || job.company_name || "-"],
+    ["Name / Firma:", pdfPrintableOrFallback(pickup.company, job.company_name)],
     ["Straße Hausnummer:", streetLine(pickup, job.pickup_address)],
     ["PLZ Ort:", plzOrt(pickup, job.pickup_city)],
     ["", pickup.country || "Deutschland"],
@@ -228,7 +228,7 @@ export async function generateDriverRunSheetPdf(job: Job): Promise<Uint8Array> {
   if (pickup.notes.trim()) leftAddr.push(["Hinweis Ladestelle:", pickup.notes]);
 
   const rightAddr: [string, string][] = [
-    ["Name / Firma:", drop.company || "-"],
+    ["Name / Firma:", pdfPrintableOrFallback(drop.company, job.company_name)],
     ["Telefon Empfaenger:", drop.phone || "-"],
     ["Straße Hausnummer:", streetLine(drop, job.delivery_address)],
     ["PLZ Ort:", plzOrt(drop, job.delivery_city)],
@@ -244,7 +244,7 @@ export async function generateDriverRunSheetPdf(job: Job): Promise<Uint8Array> {
   y -= 28;
 
   const detailRows: [string, string][] = [
-    ["Kundenname / Firma:", job.company_name || "-"],
+    ["Kundenname / Firma:", pdfPrintableOrFallback(job.company_name, pickup.company)],
     ["Telefon / WhatsApp:", job.phone || "-"],
     ["E-Mail:", job.customer_email || "-"],
     ...cargoRows(job),
