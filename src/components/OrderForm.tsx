@@ -2079,8 +2079,8 @@ export function OrderForm({
               <span className="flex items-center justify-center gap-1 text-3xl leading-none text-amber-400 drop-shadow-sm" aria-hidden>
                 <span className="transition group-hover:scale-110">★★★★★</span>
               </span>
-              <span className="flex flex-col items-center">
-                <OrderReviewTapHint className="-mb-1" />
+              <span className="flex flex-col items-center gap-1">
+                <OrderReviewTapHint />
                 <span className="inline-flex items-center gap-2 rounded-full bg-[#ea580c] px-5 py-2 text-sm font-bold text-white shadow-sm transition group-hover:bg-[#c2410c]">
                   {t("rateUsOnGoogleTap")}
                   <span aria-hidden>↗</span>
