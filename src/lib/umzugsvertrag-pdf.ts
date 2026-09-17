@@ -19,24 +19,45 @@ const ROW_BG = rgb(0.94, 0.95, 0.97);
 const TEXT = rgb(0.12, 0.14, 0.18);
 const MUTED = rgb(0.32, 0.38, 0.42);
 const WHITE = rgb(1, 1, 1);
-const LINE_GAP = 14;
+const LINE_GAP = 22;
 
 function formatEur(cents: number): string {
   const n = (Math.round(cents) / 100).toFixed(2).replace(".", ",");
   return `${n} EUR`;
 }
 
-function formatDeDate(iso: string | Date | null | undefined): string {
-  if (!iso) return "-";
+function asDate(iso: string | Date | null | undefined): Date | null {
+  if (!iso) return null;
   const d = iso instanceof Date ? iso : new Date(iso);
-  if (Number.isNaN(d.getTime())) return "-";
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function formatDeDate(iso: string | Date | null | undefined): string {
+  const d = asDate(iso);
+  if (!d) return "-";
   return d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
+function formatDeDateLong(iso: string | Date | null | undefined): string {
+  const d = asDate(iso);
+  if (!d) return "-";
+  return d.toLocaleDateString("de-DE", {
+    weekday: "long",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+}
+
+function formatDeTime(iso: string | Date | null | undefined): string {
+  const d = asDate(iso);
+  if (!d) return "-";
+  return d.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+}
+
 function formatDeDateTime(iso: string | Date | null | undefined): string {
-  if (!iso) return "-";
-  const d = iso instanceof Date ? iso : new Date(iso);
-  if (Number.isNaN(d.getTime())) return "-";
+  const d = asDate(iso);
+  if (!d) return "-";
   return d.toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" });
 }
 
@@ -87,47 +108,41 @@ function drawRight(
 
 function tealBar(page: PDFPage, x: number, yTop: number, w: number, h: number, title: string, fontBold: PDFFont) {
   page.drawRectangle({ x, y: yTop - h, width: w, height: h, color: TEAL });
-  drawSafe(page, fontBold, title, x + 10, yTop - h + 6, 8, WHITE);
+  drawSafe(page, fontBold, title, x + 10, yTop - h + 7, 9, WHITE);
+}
+
+function drawLabelValue(
+  page: PDFPage,
+  font: PDFFont,
+  x: number,
+  y: number,
+  label: string,
+  value: string,
+  labelW: number,
+  valueW: number
+): number {
+  if (label) drawSafe(page, font, label, x, y, 9, MUTED);
+  const lines = wrapLines(value || "", font, 9, valueW).slice(0, 4);
+  lines.forEach((ln, i) => {
+    drawSafe(page, font, ln, x + (label ? labelW : 0), y - i * LINE_GAP, 9, TEXT);
+  });
+  return LINE_GAP * Math.max(1, lines.length || 1);
 }
 
 function vehicleForCargo(size: string | null | undefined): string {
-  if (size === "L") return "3,5-t-Transporter (Kofferaufbau)";
-  if (size === "XS") return "Transporter (kompakt)";
+  if (size === "L") return "3,5-t-Transporter mit Kofferaufbau und Ladebordwand/Hebebühne";
+  if (size === "XS") return "Transporter (kompakt) mit Fahrer";
   return "Transporter mit Fahrer";
 }
 
-function serviceScope(job: Job): { included: string[]; excluded: string[] } {
-  const km =
-    job.distance_km != null && Number.isFinite(Number(job.distance_km))
-      ? `${Number(job.distance_km).toFixed(1)} km`
-      : "vereinbarte Strecke";
-  const included = [
-    "Fachgerechtes Beladen des Transportfahrzeugs",
-    `Sichere Transportfahrt (${km})`,
-    "Entladen am Lieferort",
-    "Ladungssicherung (Spanngurte, Decken) während des Transports",
-  ];
-  if (job.service_type === "driver_car_assistant") {
-    included.push("Helfer für Be- und Entladen laut Auftrag");
-  }
-  if (job.service_type === "driver_only") {
-    return {
-      included: ["Fahrerleistung laut Auftrag (ohne Fahrzeugstellung durch TransPool24)"],
-      excluded: ["Kein eigenes Transportfahrzeug von TransPool24", "Keine Demontage oder Montage von Möbeln"],
-    };
-  }
-  return {
-    included,
-    excluded: [
-      "Keine Demontage oder Montage von Möbeln/Küchen",
-      "Kein Ein- und Auspackservice, keine Entsorgung",
-      "Gut muss transportfertig bereitstehen",
-    ],
-  };
+function cityLine(a: { city: string; postalCode: string }, fallback: string): string {
+  const c = `${a.postalCode} ${a.city}`.trim();
+  return c || fallback || "";
 }
 
 /**
- * Customer moving/transport contract in the same layout as the customer invoice.
+ * Same invoice chrome (logo, teal bars, two columns) with the full
+ * Auftragsbestätigung / Umzugsvertrag wording, filled from the job.
  */
 export async function generateUmzugsvertragPdf(job: Job): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
@@ -143,6 +158,29 @@ export async function generateUmzugsvertragPdf(job: Job): Promise<Uint8Array> {
   const leftX = margin;
   const rightX = margin + colW + colGap;
   let y = height - 28;
+
+  const auftrag = formatAuftragNumber(job);
+  const sender = jobSenderAddress(job);
+  const recipient = jobRecipientAddress(job);
+  const customerName = pdfPrintableOrFallback(job.company_name, sender.company);
+  const pickupAt = job.preferred_pickup_at;
+  const deliveryAt = jobPreferredDeliveryAt(job);
+  const workDate = pickupAt || job.created_at;
+  const vat = splitGermanVatFromGross(job.price_cents ?? 0);
+  const gross = formatEur(vat.grossCents);
+  const vatAmt = formatEur(vat.vatCents);
+  const pickupCity = cityLine(sender, job.pickup_city || "");
+  const deliveryCity = cityLine(recipient, job.delivery_city || "");
+  const km =
+    job.distance_km != null && Number.isFinite(Number(job.distance_km))
+      ? `${Number(job.distance_km).toFixed(0)} km`
+      : "vereinbarte Strecke";
+  const pickupAddr =
+    formatStructuredAddressPlain(sender, false) || job.pickup_address || "-";
+  const deliveryAddr =
+    formatStructuredAddressPlain(recipient, false) || job.delivery_address || "-";
+  const pickupHint = sender.notes.trim();
+  const deliveryHint = recipient.notes.trim();
 
   const logoBytes = await getPdfLogoBytes();
   let logoH = 0;
@@ -163,263 +201,275 @@ export async function generateUmzugsvertragPdf(job: Job): Promise<Uint8Array> {
     }
   }
 
-  drawRight(page, fontBold, "UMZUGSVERTRAG", width - margin, y - 8, 18, TEAL);
-  drawRight(page, font, "Auftragsbestätigung", width - margin, y - 26, 10, MUTED);
-
-  const auftrag = formatAuftragNumber(job);
-  const sender = jobSenderAddress(job);
-  const recipient = jobRecipientAddress(job);
-  const customerName = pdfPrintableOrFallback(job.company_name, sender.company);
-  const pickupAt = job.preferred_pickup_at;
-  const deliveryAt = jobPreferredDeliveryAt(job);
-  const docDate = formatDeDate(pickupAt || job.created_at);
+  drawRight(page, fontBold, "AUFTRAGSBESTÄTIGUNG", width - margin, y - 8, 16, TEAL);
   const metaRight = width - margin;
   const metaLabelX = width - margin - 210;
-  let metaY = y - 44;
+  let metaY = y - 32;
   const meta: [string, string][] = [
     ["Auftragsnummer:", auftrag],
-    ["Vertragsdatum:", docDate],
+    ["Datum:", formatDeDate(workDate)],
     ["Kundenname:", customerName],
-    ["Abholung:", formatDeDateTime(pickupAt)],
-    ["Lieferung:", formatDeDateTime(deliveryAt)],
+    ["Abholzeit:", formatDeDateTime(pickupAt)],
+    ["Lieferzeit:", formatDeDateTime(deliveryAt)],
   ];
   for (const [k, v] of meta) {
-    drawSafe(page, font, k, metaLabelX, metaY, 8, MUTED);
-    drawRight(page, fontBold, v, metaRight, metaY, 8, TEXT);
-    metaY -= 13;
+    drawSafe(page, font, k, metaLabelX, metaY, 9, MUTED);
+    drawRight(page, fontBold, v, metaRight, metaY, 9, TEXT);
+    metaY -= LINE_GAP;
   }
 
   drawSafe(page, font, "Transport & Logistik", margin, y - logoH - 14, 11, ORANGE);
-  y = Math.min(y - logoH - 36, metaY - 10);
+  y = Math.min(y - logoH - 36, metaY - 14);
 
-  tealBar(page, leftX, y, colW, 18, "AUFTRAGGEBER (KUNDE)", fontBold);
-  tealBar(page, rightX, y, colW, 18, "AUFTRAGNEHMER", fontBold);
-  y -= 28;
-
-  const customerRows: [string, string][] = [
-    ["Name / Firma:", customerName],
-    ["Telefon:", job.phone || sender.phone || "-"],
-    ["E-Mail:", job.customer_email || "-"],
-    ["Kundennummer:", job.order_number != null ? String(job.order_number) : "-"],
-  ];
-  const companyRows: [string, string][] = [
-    ["", PDF_COMPANY.name],
-    ["Inhaber:", PDF_COMPANY.legalOwner],
-    ["", `${PDF_COMPANY.street}`],
-    ["", `${PDF_COMPANY.postalCode} ${PDF_COMPANY.city}`],
-    ["Steuernummer:", PDF_COMPANY.taxNumber],
-  ];
-  const rowN = Math.max(customerRows.length, companyRows.length);
-  for (let i = 0; i < rowN; i++) {
-    if (customerRows[i]) {
-      drawSafe(page, font, customerRows[i][0], leftX, y, 8, MUTED);
-      drawSafe(page, font, customerRows[i][1], leftX + 92, y, 8, TEXT);
-    }
-    if (companyRows[i]) {
-      drawSafe(page, font, companyRows[i][0], rightX, y, 8, MUTED);
-      drawSafe(page, font, companyRows[i][1], rightX + (companyRows[i][0] ? 88 : 0), y, 8, TEXT);
-    }
-    y -= 13;
-  }
-  y -= 10;
-
-  const newPageIfNeeded = (need: number) => {
-    if (y - need < 56) {
+  const ensure = (need: number) => {
+    if (y - need < 52) {
       page = doc.addPage(pageSize);
       y = height - 40;
     }
   };
 
-  newPageIfNeeded(90);
-  tealBar(page, margin, y, contentW, 18, "1. TERMINE & ADRESSEN", fontBold);
-  y -= 28;
-  const pickupPlain = formatStructuredAddressPlain(sender) || job.pickup_address || "-";
-  const deliveryPlain = formatStructuredAddressPlain(recipient, "unload") || job.delivery_address || "-";
-  const addrPairs: [string, string][] = [
-    ["Umzugs- / Transportdatum:", formatDeDate(pickupAt || job.created_at)],
-    ["Abholzeit:", formatDeDateTime(pickupAt)],
-    ["Lieferzeit:", formatDeDateTime(deliveryAt)],
-    ["Beladeadresse:", pickupPlain.replace(/\n/g, ", ")],
-    ["Entladeadresse:", deliveryPlain.replace(/\n/g, ", ")],
-  ];
-  for (const [label, value] of addrPairs) {
-    const lines = wrapLines(value, font, 8, contentW - 130);
-    drawSafe(page, font, label, margin, y, 8, MUTED);
+  const section = (title: string) => {
+    ensure(36);
+    tealBar(page, margin, y, contentW, 20, title, fontBold);
+    y -= 32;
+  };
+
+  const para = (text: string, size = 9) => {
+    const lines = wrapLines(text, font, size, contentW);
+    for (const ln of lines) {
+      ensure(16);
+      drawSafe(page, font, ln, margin, y, size, TEXT);
+      y -= 13;
+    }
+  };
+
+  const bullet = (text: string) => {
+    const lines = wrapLines(text, font, 9, contentW - 16);
     lines.forEach((ln, i) => {
-      drawSafe(page, font, ln, margin + 128, y - i * 11, 8, TEXT);
+      ensure(16);
+      drawSafe(page, font, i === 0 ? `•  ${ln}` : `    ${ln}`, margin, y, 9, TEXT);
+      y -= 13;
     });
-    y -= 11 * Math.max(1, lines.length) + 4;
+  };
+
+  const subhead = (text: string) => {
+    ensure(18);
+    drawSafe(page, fontBold, text, margin, y, 9, TEAL);
+    y -= 16;
+  };
+
+  tealBar(page, leftX, y, colW, 20, "AUFTRAGGEBER (KUNDE)", fontBold);
+  tealBar(page, rightX, y, colW, 20, "AUFTRAGNEHMER", fontBold);
+  y -= 32;
+
+  const leftPairs: [string, string][] = [
+    ["Name / Firma:", customerName],
+    ["E-Mail:", job.customer_email || "-"],
+    ["Telefon:", job.phone || sender.phone || "-"],
+    ["Kundennummer:", job.order_number != null ? String(job.order_number) : "-"],
+  ];
+  const rightPairs: [string, string][] = [
+    ["", PDF_COMPANY.name],
+    ["Inhaber:", PDF_COMPANY.legalOwner],
+    ["", PDF_COMPANY.street],
+    ["", `${PDF_COMPANY.postalCode} ${PDF_COMPANY.city}`],
+    ["Steuernummer:", PDF_COMPANY.taxNumber],
+  ];
+  for (let i = 0; i < Math.max(leftPairs.length, rightPairs.length); i++) {
+    const lp = leftPairs[i] ?? ["", ""];
+    const rp = rightPairs[i] ?? ["", ""];
+    const h1 = drawLabelValue(page, font, leftX, y, lp[0], lp[1], 108, colW - 116);
+    const h2 = drawLabelValue(page, font, rightX, y, rp[0], rp[1], 90, colW - 98);
+    y -= Math.max(h1, h2) + 4;
+  }
+  y -= 10;
+
+  section("1. TERMINE & ADRESSEN");
+  bullet(`Umzugsdatum: ${formatDeDateLong(workDate)}`);
+  bullet(`Arbeitsbeginn: ${pickupAt ? `${formatDeTime(pickupAt)} Uhr` : "-"}`);
+  bullet(
+    `Beladeadresse${pickupCity ? ` (${pickupCity})` : ""}: ${pickupAddr.replace(/\n/g, ", ")}${
+      pickupHint ? ` (${pickupHint})` : ""
+    }`
+  );
+  bullet(
+    `Entladeadresse${deliveryCity ? ` (${deliveryCity})` : ""}: ${deliveryAddr.replace(/\n/g, ", ")}${
+      deliveryHint ? ` (${deliveryHint})` : ""
+    }`
+  );
+  y -= 8;
+
+  section("2. LADUNG");
+  para(`Größe: ${job.cargo_size || "-"}`);
+  y -= 2;
+  const cargo = formatCargoLoadsPlainDe(job.cargo_details);
+  if (cargo) {
+    for (const line of cargo.split("\n")) bullet(line);
+  } else {
+    bullet("Ladung laut Auftrag / Kundenangabe.");
   }
   y -= 8;
 
-  newPageIfNeeded(80);
-  tealBar(page, margin, y, contentW, 18, "2. LADUNG (KUNDE)", fontBold);
-  y -= 28;
-  drawSafe(page, font, "Größe:", margin, y, 8, MUTED);
-  drawSafe(page, fontBold, job.cargo_size || "-", margin + 70, y, 9, TEXT);
-  y -= 16;
-  const cargoText = formatCargoLoadsPlainDe(job.cargo_details);
-  const cargoLines = cargoText
-    ? cargoText.split("\n").flatMap((line) => wrapLines(line, font, 8, contentW))
-    : wrapLines("Ladung laut Auftrag / Kundenangabe.", font, 8, contentW);
-  for (const ln of cargoLines) {
-    newPageIfNeeded(16);
-    drawSafe(page, font, ln, margin, y, 8, TEXT);
-    y -= 12;
-  }
-  y -= 8;
-
-  newPageIfNeeded(100);
-  tealBar(page, margin, y, contentW, 18, "3. LEISTUNGSUMFANG", fontBold);
-  y -= 28;
-  drawSafe(page, font, "Fahrzeug:", margin, y, 8, MUTED);
-  drawSafe(page, font, vehicleForCargo(job.cargo_size), margin + 70, y, 8, TEXT);
-  y -= 16;
-  drawSafe(page, fontBold, "Enthaltene Leistungen:", margin, y, 8, TEAL);
-  y -= 14;
-  const scope = serviceScope(job);
-  for (const item of scope.included) {
-    newPageIfNeeded(14);
-    drawSafe(page, font, `- ${item}`, margin, y, 8, TEXT);
-    y -= 12;
+  section("3. VEREINBARTER LEISTUNGSUMFANG");
+  para(`Fahrzeug: ${vehicleForCargo(job.cargo_size)}`);
+  y -= 4;
+  subhead("Enthaltene Leistungen:");
+  if (job.service_type === "driver_only") {
+    bullet("Fahrerleistung laut Auftrag (ohne Fahrzeugstellung durch TransPool24)");
+  } else {
+    bullet(
+      `Fachgerechtes Beladen des Transportfahrzeugs${pickupCity ? ` in ${sender.city || pickupCity}` : ""}`
+    );
+    bullet(`Sichere Transportfahrt${deliveryCity ? ` nach ${recipient.city || deliveryCity}` : ""} (ca. ${km})`);
+    bullet(
+      `Entladen und Tragen der Möbelstücke und Kartons${deliveryHint ? ` (${deliveryHint})` : " am Lieferort"}`
+    );
+    bullet("Ladungssicherung (Spanngurte, Decken) während des Transports");
+    if (job.service_type === "driver_car_assistant") {
+      bullet("Helfer für Be- und Entladen laut Auftrag");
+    }
   }
   y -= 4;
-  drawSafe(page, fontBold, "Nicht enthalten:", margin, y, 8, TEAL);
-  y -= 14;
-  for (const item of scope.excluded) {
-    newPageIfNeeded(14);
-    drawSafe(page, font, `- ${item}`, margin, y, 8, TEXT);
-    y -= 12;
-  }
+  subhead("Nicht enthaltene Leistungen:");
+  bullet("Keine Demontage oder Montage von Möbeln/Küchen");
+  bullet("Kein Ein- und Auspackservice, keine Entsorgung/Entrümpelung");
+  bullet("Alle Möbelstücke müssen transportfertig demontiert und verpackt bereitstehen.");
   y -= 8;
 
-  newPageIfNeeded(110);
-  tealBar(page, margin, y, contentW, 18, "4. VERGÜTUNG & ZAHLUNG", fontBold);
-  y -= 28;
-  const vat = splitGermanVatFromGross(job.price_cents ?? 0);
+  section("4. VERGÜTUNG & ZAHLUNGSBEDINGUNGEN");
   const tableW = contentW;
-  const cols = [
-    { w: 36, h: "Pos." },
-    { w: tableW - 36 - 90 - 90, h: "Bezeichnung" },
-    { w: 90, h: "Einzelpreis" },
-    { w: 90, h: "Gesamtpreis" },
-  ];
-  page.drawRectangle({ x: margin, y: y - 18, width: tableW, height: 18, color: TEAL });
-  let hx = margin;
-  cols.forEach((c) => {
-    drawSafe(page, fontBold, c.h, hx + 4, y - 12, 7, WHITE);
-    hx += c.w;
-  });
-  y -= 18;
+  page.drawRectangle({ x: margin, y: y - 22, width: tableW, height: 22, color: TEAL });
+  drawSafe(page, fontBold, "Pos.", margin + 8, y - 14, 8, WHITE);
+  drawSafe(page, fontBold, "Bezeichnung", margin + 44, y - 14, 8, WHITE);
+  drawRight(page, fontBold, "Gesamtpreis", margin + tableW - 8, y - 14, 8, WHITE);
+  y -= 22;
   page.drawRectangle({
     x: margin,
-    y: y - 22,
+    y: y - 28,
     width: tableW,
-    height: 22,
+    height: 28,
     color: ROW_BG,
     borderColor: LINE,
-    borderWidth: 0.4,
+    borderWidth: 0.5,
   });
-  drawSafe(page, font, "1", margin + 8, y - 14, 8);
-  drawSafe(page, font, "Transportdienstleistung laut diesem Vertrag", margin + 40, y - 14, 8);
-  drawRight(page, font, formatEur(vat.netCents), margin + tableW - 94, y - 14, 8);
-  drawRight(page, fontBold, formatEur(vat.netCents), margin + tableW - 6, y - 14, 8);
-  y -= 36;
-  drawSafe(page, font, "Netto", margin + tableW - 210, y, 8, MUTED);
-  drawRight(page, font, formatEur(vat.netCents), margin + tableW - 4, y, 8);
-  y -= 13;
-  drawSafe(page, font, "zzgl. 19 % MwSt.", margin + tableW - 210, y, 8, MUTED);
-  drawRight(page, font, formatEur(vat.vatCents), margin + tableW - 4, y, 8);
-  y -= 15;
-  drawSafe(page, fontBold, "Festpreis brutto", margin + tableW - 210, y, 9, TEAL);
-  drawRight(page, fontBold, formatEur(vat.grossCents), margin + tableW - 4, y, 9, TEAL);
-  y -= 20;
-  for (const ln of wrapLines(
-    "Rechnungsstellung erfolgt nach Durchführung. Der Betrag ist innerhalb von 7 Tagen nach Rechnungserhalt ohne Abzug per Überweisung fällig. Keine versteckten Zusatzkosten für die vereinbarten Leistungen und die oben genannte Ladung.",
-    font,
-    8,
-    contentW
-  )) {
-    newPageIfNeeded(14);
-    drawSafe(page, font, ln, margin, y, 8, TEXT);
-    y -= 11;
-  }
+  drawSafe(page, font, "1", margin + 8, y - 18, 9);
+  drawSafe(page, font, "Transportdienstleistung laut diesem Vertrag", margin + 44, y - 18, 9);
+  drawRight(page, fontBold, formatEur(vat.netCents), margin + tableW - 8, y - 18, 9);
+  y -= 40;
+  drawSafe(page, font, "Netto", margin + tableW - 210, y, 9, MUTED);
+  drawRight(page, font, formatEur(vat.netCents), margin + tableW - 4, y, 9);
+  y -= 16;
+  drawSafe(page, font, "zzgl. 19 % MwSt.", margin + tableW - 210, y, 9, MUTED);
+  drawRight(page, font, vatAmt, margin + tableW - 4, y, 9);
+  y -= 18;
+  drawSafe(page, fontBold, "Vereinbarter Brutto-Festpreis", margin + tableW - 210, y, 10, TEAL);
+  drawRight(page, fontBold, gross, margin + tableW - 4, y, 10, TEAL);
+  y -= 22;
+  para(
+    "Zusatzkosten: Es entstehen am Umzugstag keine versteckten Zusatzkosten für die vereinbarten Leistungen und Güter laut Listung."
+  );
+  para(
+    "Zahlungsbedingungen: Rechnungsstellung erfolgt direkt nach Durchführung. Der Rechnungsbetrag ist innerhalb von 7 Tagen nach Rechnungserhalt ohne Abzug per Überweisung fällig."
+  );
+  para(`Bankverbindung für die Überweisung: IBAN ${PDF_COMPANY.iban}`);
   y -= 8;
 
-  newPageIfNeeded(90);
-  tealBar(page, margin, y, contentW, 18, "5. HAFTUNG", fontBold);
-  y -= 28;
-  for (const ln of wrapLines(
-    "Es gilt die gesetzliche Haftung für Möbelspediteure nach § 451g HGB (Grundhaftung bis 620,00 EUR je Kubikmeter Rauminhalt). Für bereits beschädigte Gegenstände sowie selbst verpackte Kartons wird keine Haftung für den Inhalt übernommen, sofern keine äußere Beschädigung des Kartons durch den Frachtführer vorliegt.",
-    font,
-    8,
-    contentW
-  )) {
-    newPageIfNeeded(14);
-    drawSafe(page, font, ln, margin, y, 8, TEXT);
-    y -= 11;
-  }
-  y -= 12;
+  section("5. HAFTUNG & VERSICHERUNG");
+  para(
+    "Es gilt die gesetzliche Haftung für Möbelspediteure nach § 451g HGB (Grundhaftung bis 620,00 EUR je Kubikmeter Rauminhalt)."
+  );
+  para(
+    "Für bereits beschädigte Gegenstände sowie selbst verpackte Kartons wird keine Haftung für den Inhalt übernommen, sofern keine äußere Beschädigung des Kartons durch den Frachtführer vorliegt."
+  );
+  y -= 8;
 
-  newPageIfNeeded(70);
-  tealBar(page, leftX, y, colW, 18, "BANKVERBINDUNG", fontBold);
-  tealBar(page, rightX, y, colW, 18, "KONTAKT", fontBold);
-  y -= 28;
-  const bank = [
+  section(`6. NACHTRAG / KLARSTELLUNGEN (Stand: ${formatDeDate(new Date())})`);
+  para(
+    "Auf Rückfrage des Auftraggebers werden folgende Punkte zur Auftragsbestätigung verbindlich klargestellt:"
+  );
+  y -= 4;
+  subhead("Fälligkeit & Leistungsdatum:");
+  bullet(
+    `Die Zahlung des vereinbarten Betrags von ${gross} erfolgt vereinbarungsgemäß unmittelbar nach vollständiger Durchführung am ${formatDeDate(workDate)} und nach Erhalt einer korrekten Rechnung. Ein davon abweichendes Leistungsdatum auf der Rechnung wird entsprechend korrigiert.`
+  );
+  subhead("Umsatzsteuer (§ 19 UStG):");
+  bullet(
+    `Der Festpreis von ${gross} gilt brutto. Auf der Rechnung werden die enthaltenen 19 % MwSt. (${vatAmt}) ausgewiesen. Der Festpreis bleibt unverändert bei ${gross}.`
+  );
+  subhead("Fahrzeugausstattung:");
+  bullet(`Zum Einsatz kommt, wie vereinbart, ${vehicleForCargo(job.cargo_size)}.`);
+  subhead("Geschäftsanschrift:");
+  bullet(
+    `Die verbindliche Anschrift des Auftragnehmers lautet: ${PDF_COMPANY.street}, ${PDF_COMPANY.postalCode} ${PDF_COMPANY.city}.`
+  );
+  subhead("Haftung & Verbraucherschutz (§§ 451e, 451g HGB):");
+  bullet(
+    "Es gilt die gesetzliche Haftungsgrenze von 620,00 EUR je Kubikmeter Rauminhalt gemäß § 451g HGB. Eine ordnungsgemäße Transportversicherung im Rahmen der geltenden Verbraucherschutzbestimmungen ist eingeschlossen."
+  );
+  y -= 10;
+
+  ensure(90);
+  tealBar(page, leftX, y, colW, 20, "BANKVERBINDUNG", fontBold);
+  tealBar(page, rightX, y, colW, 20, "KONTAKT", fontBold);
+  y -= 34;
+  const bank: [string, string][] = [
     ["Kontoinhaber:", PDF_COMPANY.legalOwner],
     ["Bank:", PDF_COMPANY.bankName],
     ["IBAN:", PDF_COMPANY.iban],
     ["BIC:", PDF_COMPANY.bic],
   ];
-  const contact = [
+  const contact: [string, string][] = [
     ["E-Mail:", PDF_COMPANY.email],
     ["Telefon:", PDF_COMPANY.invoicePhone],
     ["Webseite:", PDF_COMPANY.websiteUrl],
   ];
   for (let i = 0; i < 4; i++) {
     if (bank[i]) {
-      drawSafe(page, font, bank[i][0], leftX, y, 8, MUTED);
-      drawSafe(page, font, bank[i][1], leftX + 88, y, 8, TEXT);
+      drawLabelValue(page, font, leftX, y, bank[i][0], bank[i][1], 88, colW - 96);
     }
     if (contact[i]) {
-      drawSafe(page, font, contact[i][0], rightX, y, 8, MUTED);
-      drawSafe(page, font, contact[i][1], rightX + 58, y, 8, TEXT);
+      drawLabelValue(page, font, rightX, y, contact[i][0], contact[i][1], 58, colW - 66);
     }
-    y -= 13;
+    y -= LINE_GAP + 2;
   }
-  y -= 18;
+  y -= 16;
 
-  newPageIfNeeded(70);
+  ensure(88);
+  drawSafe(page, font, `${PDF_COMPANY.city}, ${formatDeDate(workDate)}`, margin, y, 9, TEXT);
+  y -= 12;
+  drawSafe(page, font, "Ort, Datum", margin, y, 8, MUTED);
+  y -= 28;
+  page.drawLine({
+    start: { x: margin, y },
+    end: { x: margin + colW - 10, y },
+    thickness: 0.8,
+    color: LINE,
+  });
+  y -= 12;
+  drawSafe(page, fontBold, PDF_COMPANY.legalOwner, margin, y, 9, TEXT);
+  y -= 12;
+  drawSafe(page, font, `Unterschrift / Bestätigung TransPool24 (${PDF_COMPANY.legalOwner})`, margin, y, 8, MUTED);
+  y -= 28;
+  page.drawLine({
+    start: { x: margin, y },
+    end: { x: margin + colW + 40, y },
+    thickness: 0.8,
+    color: LINE,
+  });
+  y -= 12;
   drawSafe(
     page,
     font,
-    `Pforzheim, ${docDate}                    Unterschriften:`,
+    `Unterschrift / Bestätigung Auftraggeber (${customerName})`,
     margin,
     y,
     8,
     MUTED
   );
-  y -= 28;
-  page.drawLine({
-    start: { x: margin, y },
-    end: { x: margin + colW - 8, y },
-    thickness: 0.7,
-    color: LINE,
-  });
-  page.drawLine({
-    start: { x: rightX, y },
-    end: { x: width - margin, y },
-    thickness: 0.7,
-    color: LINE,
-  });
-  y -= 12;
-  drawSafe(page, font, `TransPool24 / ${PDF_COMPANY.legalOwner}`, margin, y, 7, MUTED);
-  drawSafe(page, font, `Auftraggeber / ${customerName}`, rightX, y, 7, MUTED);
 
   return doc.save();
 }
 
-/** Invoice first, then Umzugsvertrag — one file for download; callers can also attach separately. */
 export async function mergeInvoiceAndVertrag(
   invoicePdf: Uint8Array,
   vertragPdf: Uint8Array
