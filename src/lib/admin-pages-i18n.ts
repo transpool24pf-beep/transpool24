@@ -117,7 +117,7 @@ export const ADMIN_PAGES_DE: Record<string, string> = {
   "reports.colRecipientPhone": "Empfänger-Tel.",
   "reports.details": "Details",
   "reports.driverSheet": "Fahrerblatt",
-  "reports.invoicePdf": "Kundenrechnung",
+  "reports.invoicePdf": "Rechnung + Vertrag",
   "reports.colDriverNo": "Fahrernummer",
   "reports.colDriverPay": "Fahrerhonorar (Saldo)",
 
@@ -343,7 +343,7 @@ export const ADMIN_PAGES_AR: Record<string, string> = {
   "reports.colRecipientPhone": "هاتف المستلم",
   "reports.details": "التفاصيل",
   "reports.driverSheet": "ورقة السائق",
-  "reports.invoicePdf": "فاتورة العميل",
+  "reports.invoicePdf": "فاتورة + عقد",
   "reports.colDriverNo": "رقم السائق",
   "reports.colDriverPay": "مبلغ السائق (الرصيد)",
 

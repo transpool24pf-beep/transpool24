@@ -17,7 +17,7 @@ const MAIL_DE: Record<string, string> = {
   trackingEmailHint:
     "Professioneller Text auf Deutsch, Fahrerinfos falls zugewiesen, Tracking-Link mit Karte – ohne PDF-Anhang.",
   invoicesTitle: "Rechnungen herunterladen",
-  invoiceCustomer: "Systemrechnung (Kundenpreis € {eur})",
+  invoiceCustomer: "Rechnung + Umzugsvertrag (€ {eur})",
   invoiceDriver: "Gruppe / Fahrer-Rechnung (€ {eur})",
   alertPickDriverFirst: "Bitte zuerst einen Fahrer wählen (erscheint in der Kunden-E-Mail).",
   alertEmailSent: "E-Mail gesendet an: ",
@@ -49,7 +49,7 @@ const MAIL_AR: Record<string, string> = {
   trackingEmailHint:
     "نص احترافي بالألمانية، بيانات السائق إن وُجد، رابط تتبع مع خريطة, بدون مرفق PDF.",
   invoicesTitle: "تنزيل الفواتير",
-  invoiceCustomer: "فاتورة النظام (سعر العميل € {eur})",
+  invoiceCustomer: "فاتورة + عقد النقل (€ {eur})",
   invoiceDriver: "فاتورة المجموعة / السائق (€ {eur})",
   alertPickDriverFirst: "اختر سائقاً أولاً (يظهر في بريد العميل).",
   alertEmailSent: "تم إرسال البريد إلى: ",

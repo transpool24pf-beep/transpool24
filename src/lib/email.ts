@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { Resend } from "resend";
 import type { Attachment } from "resend";
 import type { Job } from "./supabase";
-import { generateInvoicePdf } from "./invoice-pdf";
+import { generateUmzugsvertragPdf } from "./umzugsvertrag-pdf";
 import { cargoCategoryLabelDe, formatCargoLoadsPlainDe, parseCargoLoads } from "./cargo";
 import { splitGermanVatFromGross } from "./pricing";
 import {
@@ -150,7 +150,7 @@ function buildConfirmationHtml(
           <tr><td style="color: #64748b;">Gesamtbetrag (brutto)</td><td style="font-weight: bold;">€ ${totalEur}</td></tr>
         </table>
         <p style="margin: 16px 0 0 0; font-size: 14px; color: #64748b;">Die Zahlung erfolgt nach der Zustellung per ordnungsgemäßer Rechnung. Eine Vorauszahlung ist nicht erforderlich.</p>
-        <p style="margin: 12px 0 0 0; font-size: 14px; color: #64748b;">Sie können die Vertragsdetails in der Auftragszusammenfassung unten einsehen. Die beigefügte PDF enthält Details zur Fahrt, zum Fahrer und zu den Firmeninformationen.</p>
+        <p style="margin: 12px 0 0 0; font-size: 14px; color: #64748b;">Im Anhang finden Sie die Rechnung und den Umzugsvertrag (Auftragsbestätigung) mit Ihrem Namen, Datum, Adressen und der Ladung.</p>
         ${rateBlock}
         <p style="margin-top: 24px; font-size: 13px; color: #94a3b8;">,  TransPool24</p>
         ${buildEmailFooterOrderBlock(footer)}
@@ -234,17 +234,28 @@ export async function sendOrderConfirmationEmail(
   const orderRef = job.order_number != null ? String(job.order_number) : job.id.slice(0, 8);
   const resend = new Resend(apiKey);
   const hasPdf = pdfBuffer != null && pdfBuffer.byteLength > 0;
+  let vertragBuffer: Uint8Array | null = null;
+  try {
+    vertragBuffer = await generateUmzugsvertragPdf(job);
+  } catch (e) {
+    console.error("[TransPool24] Umzugsvertrag PDF failed:", e);
+  }
   try {
     const [branding, footer] = await Promise.all([loadTransactionalEmailBranding(), loadEmailFooterSocial()]);
-    const pdfAtt: Attachment[] | undefined = hasPdf
-      ? [
-          {
-            filename: `TransPool24-Rechnung-${orderRef}.pdf`,
-            content: Buffer.from(pdfBuffer).toString("base64"),
-          },
-        ]
-      : undefined;
-    const mergedAtt = mergeAttachmentsWithLogo(branding.logoAttachment, pdfAtt);
+    const pdfAtt: Attachment[] = [];
+    if (hasPdf) {
+      pdfAtt.push({
+        filename: `TransPool24-Rechnung-${orderRef}.pdf`,
+        content: Buffer.from(pdfBuffer).toString("base64"),
+      });
+    }
+    if (vertragBuffer != null && vertragBuffer.byteLength > 0) {
+      pdfAtt.push({
+        filename: `TransPool24-Umzugsvertrag-${orderRef}.pdf`,
+        content: Buffer.from(vertragBuffer).toString("base64"),
+      });
+    }
+    const mergedAtt = mergeAttachmentsWithLogo(branding.logoAttachment, pdfAtt.length ? pdfAtt : undefined);
     const { error } = await resend.emails.send({
       ...transactionalEmailSendOptions(),
       to: [to],
