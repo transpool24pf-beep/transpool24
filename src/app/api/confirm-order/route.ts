@@ -12,6 +12,7 @@ import {
 } from "@/lib/cargo";
 import { normalizeStructuredAddress, formatStructuredAddressPlain } from "@/lib/structured-address";
 import { computeOrderPricingFromAddresses } from "@/lib/order-pricing-compute";
+import { addGermanVat19 } from "@/lib/pricing";
 import { randomBytes, randomInt } from "crypto";
 
 const VALID_CARGO = ["XS", "M", "L"] as const;
@@ -146,7 +147,7 @@ export async function POST(req: Request) {
     const distanceKm = p.distanceKm;
     const durationMinutes = p.durationMinutes;
     const breakdown = p.breakdown;
-    const priceCents = breakdown.totalCents;
+    const priceCents = addGermanVat19(breakdown.totalCents).grossCents;
     const weightSurchargeCents = breakdown.weightSurchargeCents;
     const cargoCategorySurchargeCents = breakdown.cargoCategorySurchargeCents;
     const roundTripMinutes = p.roundTripMinutes;

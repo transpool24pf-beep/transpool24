@@ -3,6 +3,7 @@ import type { Job } from "./supabase";
 import { getPdfLogoBytes, PDF_COMPANY } from "./pdf-company";
 import { jobPreferredDeliveryAt, jobRecipientAddress } from "./structured-address";
 import { formatAuftragNumber } from "./order-ref";
+import { splitGermanVatFromGross } from "./pricing";
 
 export type InvoiceType = "customer" | "driver";
 
@@ -284,6 +285,8 @@ export async function generateInvoicePdf(
   y -= 24;
 
   type LineItem = { pos: number; art: string; name: string; qty: string; unit: string; unitCents: number };
+  const totalCents = type === "driver" && hasAssistant ? amountCents + assistantCents : amountCents;
+  const customerVat = type === "driver" ? null : splitGermanVatFromGross(totalCents);
   const items: LineItem[] = [
     {
       pos: 1,
@@ -291,7 +294,7 @@ export async function generateInvoicePdf(
       name: type === "driver" ? "Fahrerleistung" : "Transportdienstleistung",
       qty: "1",
       unit: "Stück",
-      unitCents: amountCents,
+      unitCents: customerVat ? customerVat.netCents : amountCents,
     },
   ];
   if (type === "driver" && hasAssistant) {
@@ -363,8 +366,7 @@ export async function generateInvoicePdf(
     y -= rowH;
   });
 
-  const totalCents = type === "driver" && hasAssistant ? amountCents + assistantCents : amountCents;
-  const sumW = 200;
+  const sumW = 220;
   const sumX = margin + tableW - sumW;
   y -= 12;
   page.drawLine({
@@ -373,34 +375,52 @@ export async function generateInvoicePdf(
     thickness: 1.4,
     color: TEAL,
   });
-  y -= 22;
-  drawSafe(page, fontBold, "Gesamtsumme", sumX + 8, y, 10, TEAL);
-  drawRight(page, fontBold, formatEur(totalCents), margin + tableW - 4, y, 10, TEAL);
-  page.drawLine({
-    start: { x: sumX, y: y - 8 },
-    end: { x: margin + tableW, y: y - 8 },
-    thickness: 1.4,
-    color: TEAL,
-  });
-  y -= 36;
-
-  page.drawRectangle({
-    x: margin,
-    y: y - 28,
-    width: contentW,
-    height: 28,
-    color: GREEN_BG,
-  });
-  drawSafe(
-    page,
-    font,
-    "Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.",
-    margin + 10,
-    y - 17,
-    9,
-    TEAL_DARK
-  );
-  y -= 48;
+  if (customerVat) {
+    y -= 18;
+    drawSafe(page, font, "Netto", sumX + 8, y, 9, MUTED);
+    drawRight(page, font, formatEur(customerVat.netCents), margin + tableW - 4, y, 9, TEXT);
+    y -= 16;
+    drawSafe(page, font, "zzgl. 19 % MwSt.", sumX + 8, y, 9, MUTED);
+    drawRight(page, font, formatEur(customerVat.vatCents), margin + tableW - 4, y, 9, TEXT);
+    y -= 18;
+    drawSafe(page, fontBold, "Gesamtbetrag", sumX + 8, y, 10, TEAL);
+    drawRight(page, fontBold, formatEur(customerVat.grossCents), margin + tableW - 4, y, 10, TEAL);
+    page.drawLine({
+      start: { x: sumX, y: y - 8 },
+      end: { x: margin + tableW, y: y - 8 },
+      thickness: 1.4,
+      color: TEAL,
+    });
+    y -= 28;
+  } else {
+    y -= 22;
+    drawSafe(page, fontBold, "Gesamtsumme", sumX + 8, y, 10, TEAL);
+    drawRight(page, fontBold, formatEur(totalCents), margin + tableW - 4, y, 10, TEAL);
+    page.drawLine({
+      start: { x: sumX, y: y - 8 },
+      end: { x: margin + tableW, y: y - 8 },
+      thickness: 1.4,
+      color: TEAL,
+    });
+    y -= 36;
+    page.drawRectangle({
+      x: margin,
+      y: y - 28,
+      width: contentW,
+      height: 28,
+      color: GREEN_BG,
+    });
+    drawSafe(
+      page,
+      font,
+      "Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.",
+      margin + 10,
+      y - 17,
+      9,
+      TEAL_DARK
+    );
+    y -= 48;
+  }
 
   tealBar(page, margin, y, contentW, 20, "ZAHLUNGSBEDINGUNGEN", fontBold);
   y -= 38;
