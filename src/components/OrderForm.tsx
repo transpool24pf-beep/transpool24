@@ -28,6 +28,7 @@ import {
   saveOrderAddressHistory,
 } from "@/lib/order-address-history";
 import { OrderFullAddressFields } from "@/components/OrderFullAddressFields";
+import { OrderSuccessHandshake } from "@/components/OrderSuccessHandshake";
 import {
   EMPTY_STRUCTURED_ADDRESS,
   formatStructuredAddressLine,
@@ -2048,6 +2049,7 @@ export function OrderForm({
 
       {step === 4 && orderConfirmed && (
         <div className="space-y-5 rounded-xl border border-green-200 bg-green-50 p-6 text-[var(--primary)]">
+          <OrderSuccessHandshake className="mb-1" />
           <div className="text-center">
             <p className="text-xl font-semibold text-green-800">{t("thankYouTitle")}</p>
             <p className="mt-2 text-green-700">{t("thankYouMessage")}</p>

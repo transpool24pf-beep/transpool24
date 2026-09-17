@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { OrderSuccessHandshake } from "@/components/OrderSuccessHandshake";
 import { localeAlternatesAndSocial } from "@/lib/locale-seo-metadata";
 
 export async function generateMetadata({
@@ -36,6 +37,7 @@ export default async function OrderSuccessPage({
       <main className="min-h-[calc(100vh-8rem)] bg-[var(--background)] py-16">
         <div className="mx-auto max-w-lg px-4 text-center">
           <div className="rounded-xl border border-green-200 bg-green-50 p-8">
+            <OrderSuccessHandshake className="mb-5" />
             <h1 className="text-xl font-bold text-green-800">
               {t("success")}
             </h1>
