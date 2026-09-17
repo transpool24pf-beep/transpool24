@@ -17,6 +17,7 @@ import {
   saveDriverWizardDraft,
 } from "@/lib/driver-wizard-storage";
 import { DriverCitySelect, CITY_OTHER } from "@/components/DriverCitySelect";
+import { OrderSuccessHandshake } from "@/components/OrderSuccessHandshake";
 
 const DriverCityMap = dynamic(
   () => import("@/components/DriverCityMap").then((m) => m.DriverCityMap),
@@ -358,7 +359,11 @@ export function DriverWizardForm({
   if (step === 4) {
     return (
       <div className="rounded-2xl border border-[#0d2137]/10 bg-white p-8 text-center shadow-lg">
-        <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100 text-4xl text-emerald-600">✓</div>
+        <OrderSuccessHandshake
+          className="mb-2"
+          webmSrc="/videos/driver-success-handshake.webm"
+          mp4Src="/videos/driver-success-handshake.mp4"
+        />
         <h2 className="text-2xl font-bold text-[#0d2137]">{t("successTitle")}</h2>
         <p className="mt-4 max-w-lg mx-auto text-[#0d2137]/80 leading-relaxed">
           {t("successMessage")}
