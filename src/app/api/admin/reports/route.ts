@@ -17,16 +17,37 @@ export async function GET() {
   const supabase = createServerSupabase();
   const reportSelect =
     "id, order_number, company_name, phone, customer_email, pickup_address, delivery_address, cargo_size, cargo_details, distance_km, price_cents, driver_price_cents, logistics_status, payment_status, created_at, preferred_pickup_at, assigned_driver_application_id, pod_completed_at, archived_at";
-  let { data: jobs, error } = await supabase.from("jobs").select(reportSelect);
-  if (error && isMissingDbColumn(error, "archived_at")) {
-    const retry = await supabase.from("jobs").select(reportSelect.replace(", archived_at", ""));
-    jobs = retry.data;
-    error = retry.error;
+  const reportSelectWithoutArchive =
+    "id, order_number, company_name, phone, customer_email, pickup_address, delivery_address, cargo_size, cargo_details, distance_km, price_cents, driver_price_cents, logistics_status, payment_status, created_at, preferred_pickup_at, assigned_driver_application_id, pod_completed_at";
+  const first = await supabase.from("jobs").select(reportSelect);
+  const used =
+    first.error && isMissingDbColumn(first.error, "archived_at")
+      ? await supabase.from("jobs").select(reportSelectWithoutArchive)
+      : first;
+  if (used.error) {
+    return NextResponse.json({ error: used.error.message }, { status: 500 });
   }
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-  const list = jobs ?? [];
+  const list = (used.data ?? []) as Array<{
+    id: string;
+    order_number: number | null;
+    company_name: string | null;
+    phone: string | null;
+    customer_email: string | null;
+    pickup_address: string | null;
+    delivery_address: string | null;
+    cargo_size: string | null;
+    cargo_details: unknown;
+    distance_km: number | null;
+    price_cents: number | null;
+    driver_price_cents: number | null;
+    logistics_status: string | null;
+    payment_status: string | null;
+    created_at: string;
+    preferred_pickup_at: string | null;
+    assigned_driver_application_id: string | null;
+    pod_completed_at: string | null;
+    archived_at?: string | null;
+  }>;
   const totalOrders = list.length;
   const revenueCents = list.filter((j) => j.logistics_status !== "cancelled" && j.logistics_status !== "draft").reduce((s, j) => s + (j.price_cents ?? 0), 0);
   const byStatus: Record<string, number> = {};
