@@ -48,7 +48,8 @@ CREATE TABLE IF NOT EXISTS public.jobs (
   stripe_payment_intent_id TEXT,
   assigned_driver_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  archived_at TIMESTAMPTZ
 );
 
 -- Settings (pricing etc., editable from admin dashboard)

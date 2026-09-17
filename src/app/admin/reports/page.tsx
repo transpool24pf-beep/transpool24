@@ -26,6 +26,7 @@ type ArchiveOrder = {
   created_at: string;
   pod_completed_at: string | null;
   has_driver: boolean;
+  hidden_from_orders?: boolean;
 };
 
 type ReportPayload = {
@@ -186,6 +187,9 @@ export default function AdminReportsPage() {
                   <div className="flex flex-wrap items-start justify-between gap-3 p-4">
                     <div className="min-w-0 flex-1 space-y-1">
                       <p className="font-mono text-sm font-bold text-[#0d2137]">{o.auftrag}</p>
+                      {o.hidden_from_orders ? (
+                        <p className="text-xs font-semibold text-amber-800">{t("reports.hiddenFromOrders")}</p>
+                      ) : null}
                       <p className="font-medium text-[#0d2137]">{o.company_name || t("common.none")}</p>
                       <p className="text-xs text-[#0d2137]/65">
                         {adminOrderStatusText(locale, o.logistics_status)}

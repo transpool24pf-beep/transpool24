@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createServerSupabase } from "@/lib/supabase";
+import { createServerSupabase, isMissingDbColumn } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/admin-api";
 import { formatCargoLoadsPlainDe } from "@/lib/cargo";
 import { formatAuftragNumber } from "@/lib/order-ref";
@@ -15,11 +15,14 @@ export async function GET() {
   const err = await requireAdmin();
   if (err) return err;
   const supabase = createServerSupabase();
-  const { data: jobs, error } = await supabase
-    .from("jobs")
-    .select(
-      "id, order_number, company_name, phone, customer_email, pickup_address, delivery_address, cargo_size, cargo_details, distance_km, price_cents, driver_price_cents, logistics_status, payment_status, created_at, preferred_pickup_at, assigned_driver_application_id, pod_completed_at"
-    );
+  const reportSelect =
+    "id, order_number, company_name, phone, customer_email, pickup_address, delivery_address, cargo_size, cargo_details, distance_km, price_cents, driver_price_cents, logistics_status, payment_status, created_at, preferred_pickup_at, assigned_driver_application_id, pod_completed_at, archived_at";
+  let { data: jobs, error } = await supabase.from("jobs").select(reportSelect);
+  if (error && isMissingDbColumn(error, "archived_at")) {
+    const retry = await supabase.from("jobs").select(reportSelect.replace(", archived_at", ""));
+    jobs = retry.data;
+    error = retry.error;
+  }
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
@@ -99,6 +102,7 @@ export async function GET() {
         created_at: j.created_at,
         pod_completed_at: j.pod_completed_at ?? null,
         has_driver: j.assigned_driver_application_id != null,
+        hidden_from_orders: Boolean((j as { archived_at?: string | null }).archived_at),
       };
     });
   return NextResponse.json({

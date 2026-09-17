@@ -1,17 +1,23 @@
 import { NextResponse } from "next/server";
-import { createServerSupabase } from "@/lib/supabase";
+import { createServerSupabase, isMissingDbColumn } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/admin-api";
 
 export async function GET() {
   const err = await requireAdmin();
   if (err) return err;
   const supabase = createServerSupabase();
-  const { data, error } = await supabase
+  const selectCols =
+    "id, order_number, company_name, phone, customer_email, pickup_address, delivery_address, cargo_size, cargo_details, service_type, distance_km, duration_minutes, price_cents, driver_price_cents, assistant_price_cents, payment_status, logistics_status, created_at, preferred_pickup_at, confirmation_token, assigned_driver_application_id, estimated_arrival_at, eta_minutes_remaining, last_driver_location_at, pod_photo_url, pod_completed_at";
+  let { data, error } = await supabase
     .from("jobs")
-    .select(
-      "id, order_number, company_name, phone, customer_email, pickup_address, delivery_address, cargo_size, cargo_details, service_type, distance_km, duration_minutes, price_cents, driver_price_cents, assistant_price_cents, payment_status, logistics_status, created_at, preferred_pickup_at, confirmation_token, assigned_driver_application_id, estimated_arrival_at, eta_minutes_remaining, last_driver_location_at, pod_photo_url, pod_completed_at"
-    )
+    .select(selectCols)
+    .is("archived_at", null)
     .order("created_at", { ascending: false });
+  if (error && isMissingDbColumn(error, "archived_at")) {
+    const retry = await supabase.from("jobs").select(selectCols).order("created_at", { ascending: false });
+    data = retry.data;
+    error = retry.error;
+  }
   if (error) {
     console.error("[admin/orders]", error);
     return NextResponse.json({ error: error.message }, { status: 500 });

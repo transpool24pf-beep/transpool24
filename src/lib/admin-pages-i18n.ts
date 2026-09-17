@@ -102,7 +102,8 @@ export const ADMIN_PAGES_DE: Record<string, string> = {
   "reports.byPayment": "Nach Zahlungsstatus (payment_status)",
   "reports.archiveTitle": "Auftragsarchiv",
   "reports.archiveDesc":
-    "Alle bearbeiteten Aufträge (ohne Entwürfe) mit Kundendaten, Adressen, Zeiten, Ladung, Preis und Status.",
+    "Alle bearbeiteten Aufträge (ohne Entwürfe) mit Kundendaten, Adressen, Zeiten, Ladung, Preis und Status. Aus der Auftragsliste entfernte Aufträge bleiben hier.",
+  "reports.hiddenFromOrders": "Aus Auftragsliste entfernt",
   "reports.archiveEmpty": "Noch keine bearbeiteten Aufträge.",
   "reports.archiveSearch": "Suche (Nr., Firma, Telefon, Adresse…)",
   "reports.archiveCount": "{n} Aufträge",
@@ -325,7 +326,8 @@ export const ADMIN_PAGES_AR: Record<string, string> = {
   "reports.byPayment": "حسب حالة الدفع (payment_status)",
   "reports.archiveTitle": "أرشيف الطلبات",
   "reports.archiveDesc":
-    "كل الطلبات التي تم العمل عليها (بدون المسودات) مع بيانات العميل والعناوين والأوقات والحمولة والسعر والحالة.",
+    "كل الطلبات التي تم العمل عليها (بدون المسودات) مع بيانات العميل والعناوين والأوقات والحمولة والسعر والحالة. الطلبات المحذوفة من قائمة الطلبات تبقى هنا.",
+  "reports.hiddenFromOrders": "محذوف من قائمة الطلبات",
   "reports.archiveEmpty": "لا توجد طلبات تم العمل عليها بعد.",
   "reports.archiveSearch": "بحث (رقم، شركة، هاتف، عنوان…)",
   "reports.archiveCount": "{n} طلبات",

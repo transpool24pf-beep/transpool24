@@ -83,4 +83,19 @@ export type Job = {
   customer_review_published?: boolean;
   created_at: string;
   updated_at: string;
+  /** Set when hidden from admin orders list; row stays for reports archive. */
+  archived_at?: string | null;
 };
+
+export function isMissingDbColumn(
+  error: { message?: string; code?: string } | null | undefined,
+  column: string
+): boolean {
+  if (!error) return false;
+  const msg = `${error.code ?? ""} ${error.message ?? ""}`.toLowerCase();
+  const col = column.toLowerCase();
+  return (
+    error.code === "42703" ||
+    (msg.includes(col) && (msg.includes("does not exist") || msg.includes("schema cache")))
+  );
+}
