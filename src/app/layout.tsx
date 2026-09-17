@@ -35,6 +35,9 @@ export const metadata: Metadata = {
   },
   verification: {
     google: "mHa9lgBmjQYj6ODwN5JtGqKC83sFZ6Gfr-aTgKA9O6k",
+    other: {
+      "trustpilot-one-time-domain-verification-id": "0daa1bc4-9b5e-4cde-855f-89d0c0d65ed1",
+    },
   },
   robots: {
     index: true,
