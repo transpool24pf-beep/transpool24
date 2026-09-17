@@ -55,7 +55,7 @@ export async function recordDriverLocationForJob(
 
   if (jobRow) {
     const st = jobRow.logistics_status ?? "";
-    if (st === "assigned" || st === "paid" || st === "confirmed") {
+    if (st && st !== "delivered" && st !== "cancelled" && st !== "draft" && st !== "in_transit") {
       jobUpdate.logistics_status = "in_transit";
     }
     const dest = typeof jobRow.delivery_address === "string" ? jobRow.delivery_address.trim() : "";

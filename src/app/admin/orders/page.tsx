@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAdminLocale } from "@/contexts/AdminLocaleContext";
 import {
@@ -81,51 +81,31 @@ function LogisticsStatusPicker({
   statusSummaryAria: string;
   onPick: (id: string, status: string) => void;
 }) {
-  const detailsRef = useRef<HTMLDetailsElement>(null);
   const conf = ADMIN_ORDER_STATUS_CONFIG[logisticsStatus] ?? ADMIN_ORDER_STATUS_CONFIG.draft;
-  const dir = locale === "ar" ? "rtl" : "ltr";
-  const align = locale === "ar" ? "text-right" : "text-left";
+  const known = logisticsStatus in ADMIN_ORDER_STATUS_CONFIG;
 
   return (
-    <details ref={detailsRef} className="relative mx-auto w-full max-w-[6.25rem]" dir={dir}>
-      <summary
-        className={`flex cursor-pointer list-none items-center justify-center gap-1 rounded-full border-2 bg-white py-1 pe-1.5 ps-1 text-[11px] font-semibold leading-tight shadow-sm [&::-webkit-details-marker]:hidden ${conf.color} ${conf.pillBorder}`}
-        title={`${conf.labelDe} / ${conf.labelAr}`}
-        aria-label={`${statusSummaryAria}: ${adminOrderStatusText(locale, logisticsStatus)}`}
-        aria-haspopup="listbox"
-      >
-        <span className={`inline-block h-2.5 w-2.5 shrink-0 rounded-full ${conf.bg}`} aria-hidden />
-        <span className="min-w-0 flex-1 truncate text-center">{adminOrderStatusText(locale, logisticsStatus)}</span>
-        <span className="shrink-0 text-[8px] text-[#0d2137]/40" aria-hidden>
-          ▾
-        </span>
-      </summary>
-      <div
-        className="absolute end-0 top-[calc(100%+6px)] z-50 min-w-[8.5rem] rounded-xl border-2 border-[#0d2137]/12 bg-white py-1 shadow-xl"
-        role="listbox"
+    <label className="block min-w-[9.75rem]">
+      <span className="sr-only">{statusSummaryAria}</span>
+      <select
+        value={known ? logisticsStatus : logisticsStatus}
+        disabled={disabled}
         aria-label={pickStatusAria}
+        title={`${conf.labelDe} / ${conf.labelAr}`}
+        onChange={(e) => {
+          const value = e.target.value;
+          if (value !== logisticsStatus) onPick(jobId, value);
+        }}
+        className={`w-full cursor-pointer appearance-none rounded-full border-2 bg-white py-1.5 pe-7 ps-2 text-center text-[11px] font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent)]/35 disabled:opacity-45 ${conf.color} ${conf.pillBorder}`}
       >
+        {!known ? <option value={logisticsStatus}>{logisticsStatus}</option> : null}
         {Object.entries(ADMIN_ORDER_STATUS_CONFIG).map(([value, c]) => (
-          <button
-            key={value}
-            type="button"
-            role="option"
-            disabled={disabled}
-            aria-selected={logisticsStatus === value}
-            onClick={() => {
-              if (value !== logisticsStatus) onPick(jobId, value);
-              if (detailsRef.current) detailsRef.current.open = false;
-            }}
-            className={`flex w-full items-center gap-2 px-2.5 py-1.5 ${align} text-[11px] font-medium transition hover:bg-[#0d2137]/6 disabled:opacity-45 ${c.color} ${
-              logisticsStatus === value ? "bg-[#0d2137]/8" : ""
-            }`}
-          >
-            <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${c.bg}`} />
+          <option key={value} value={value}>
             {locale === "ar" ? c.labelAr : c.labelDe}
-          </button>
+          </option>
         ))}
-      </div>
-    </details>
+      </select>
+    </label>
   );
 }
 
@@ -160,7 +140,11 @@ export default function AdminOrdersPage() {
       .then(async (r) => {
         const data = r.ok ? ((await r.json()) as Partial<Job> & { id?: string }) : null;
         if (data?.id) {
-          setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, ...data } : o)));
+          if (logistics_status === "delivered") {
+            setOrders((prev) => prev.filter((o) => o.id !== id));
+          } else {
+            setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, ...data } : o)));
+          }
         }
       })
       .finally(() => setUpdating(null));
@@ -295,7 +279,7 @@ export default function AdminOrdersPage() {
                     {t("orders.colNr")}
                   </th>
                   <th
-                    className="w-[7%] px-1 py-3 text-center font-semibold text-[#0d2137]"
+                    className="w-[12%] min-w-[10rem] px-1 py-3 text-center font-semibold text-[#0d2137]"
                     dir={locale === "ar" ? "rtl" : "ltr"}
                   >
                     {t("orders.colStatus")}

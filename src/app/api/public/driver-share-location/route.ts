@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { rateLimitResponse } from "@/lib/rate-limit";
 import { createServerSupabase } from "@/lib/supabase";
 import { recordDriverLocationForJob } from "@/lib/record-driver-location";
+import { markJobInTransitIfActive } from "@/lib/job-status-automation";
 
 /**
  * Driver shares GPS using job_id + driver_tracking_token (from admin link).
@@ -56,13 +57,8 @@ export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
   const jobId = typeof body.job_id === "string" ? body.job_id : null;
   const token = typeof body.token === "string" ? body.token : null;
-  const lat = typeof body.latitude === "number" ? body.latitude : Number(body.lat);
-  const lng = typeof body.longitude === "number" ? body.longitude : Number(body.lng);
   if (!jobId || !token) {
     return NextResponse.json({ error: "job_id and token required" }, { status: 400 });
-  }
-  if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
-    return NextResponse.json({ error: "Invalid latitude/longitude" }, { status: 400 });
   }
   const supabase = createServerSupabase();
   const { data: job, error: fetchErr } = await supabase
@@ -75,6 +71,15 @@ export async function POST(req: Request) {
   }
   if (!job.driver_tracking_token || job.driver_tracking_token !== token) {
     return NextResponse.json({ error: "Invalid token" }, { status: 403 });
+  }
+  if (body.start_live === true) {
+    const marked = await markJobInTransitIfActive(supabase, jobId);
+    return NextResponse.json({ ok: true, logistics_status: marked.logistics_status });
+  }
+  const lat = typeof body.latitude === "number" ? body.latitude : Number(body.lat);
+  const lng = typeof body.longitude === "number" ? body.longitude : Number(body.lng);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+    return NextResponse.json({ error: "Invalid latitude/longitude" }, { status: 400 });
   }
   const result = await recordDriverLocationForJob(supabase, jobId, lat, lng, {
     accuracy_m: body.accuracy_m != null ? Number(body.accuracy_m) : null,

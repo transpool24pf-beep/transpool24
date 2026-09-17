@@ -49,7 +49,8 @@ CREATE TABLE IF NOT EXISTS public.jobs (
   assigned_driver_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
-  archived_at TIMESTAMPTZ
+  archived_at TIMESTAMPTZ,
+  driver_payout_credited_at TIMESTAMPTZ
 );
 
 -- Settings (pricing etc., editable from admin dashboard)

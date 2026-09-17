@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { rateLimitResponse } from "@/lib/rate-limit";
 import { createServerSupabase } from "@/lib/supabase";
 import { randomUUID } from "crypto";
+import { completeDeliveredJob } from "@/lib/job-status-automation";
 
 const BUCKET = "driver-documents";
 const MAX_SIZE = 8 * 1024 * 1024; // 8 MB (client also resizes to JPEG)
@@ -135,30 +136,25 @@ export async function POST(req: Request) {
     const publicUrl = urlData.publicUrl;
     const now = new Date().toISOString();
 
-    const updates: Record<string, unknown> = {
+    const done = await completeDeliveredJob(supabase, jobId, {
       pod_photo_url: publicUrl,
       pod_completed_at: now,
-      logistics_status: "delivered",
-      updated_at: now,
-    };
-
-    const { data: updated, error: updErr } = await supabase
-      .from("jobs")
-      .update(updates)
-      .eq("id", jobId)
-      .select("id, pod_photo_url, pod_completed_at, logistics_status")
-      .single();
-
-    if (updErr) {
-      console.error("[driver-pod] job update", updErr);
-      return NextResponse.json({ error: updErr.message }, { status: 500 });
+    });
+    if (!done.ok) {
+      return NextResponse.json({ error: done.message ?? "Update fehlgeschlagen" }, { status: 500 });
     }
+
+    const { data: updated } = await supabase
+      .from("jobs")
+      .select("id, pod_photo_url, pod_completed_at, logistics_status")
+      .eq("id", jobId)
+      .maybeSingle();
 
     return NextResponse.json({
       ok: true,
-      pod_photo_url: updated.pod_photo_url,
-      pod_completed_at: updated.pod_completed_at,
-      logistics_status: updated.logistics_status,
+      pod_photo_url: updated?.pod_photo_url ?? publicUrl,
+      pod_completed_at: updated?.pod_completed_at ?? now,
+      logistics_status: updated?.logistics_status ?? "delivered",
     });
   } catch (e) {
     console.error("[driver-pod]", e);

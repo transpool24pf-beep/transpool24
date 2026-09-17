@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase, isMissingDbColumn } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/admin-api";
+import { completeDeliveredJob } from "@/lib/job-status-automation";
 
 export async function GET() {
   const err = await requireAdmin();
@@ -119,6 +120,9 @@ export async function PATCH(req: Request) {
   if (error) {
     console.error("[admin/orders PATCH]", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+  if (String(data.logistics_status ?? "") === "delivered") {
+    await completeDeliveredJob(supabase, id);
   }
   return NextResponse.json(data);
 }

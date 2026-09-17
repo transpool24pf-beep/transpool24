@@ -9,6 +9,7 @@ import {
   jobRecipientAddress,
   jobSenderAddress,
 } from "@/lib/structured-address";
+import { driverPayoutCents } from "@/lib/job-status-automation";
 
 /** Simple aggregates for admin dashboard (extend with more queries later) */
 export async function GET() {
@@ -89,6 +90,25 @@ export async function GET() {
     console.warn("[admin/reports] support_requests count", supErr.message);
   }
   const supportTickets7d = supErr ? 0 : supportCount ?? 0;
+  const appIds = [
+    ...new Set(
+      list
+        .map((j) => j.assigned_driver_application_id)
+        .filter((id): id is string => typeof id === "string" && id.length > 0)
+    ),
+  ];
+  const driverNumberByAppId = new Map<string, number>();
+  if (appIds.length > 0) {
+    const { data: drivers } = await supabase
+      .from("driver_applications")
+      .select("id, driver_number")
+      .in("id", appIds);
+    for (const d of drivers ?? []) {
+      const id = (d as { id?: string }).id;
+      const num = (d as { driver_number?: number | null }).driver_number;
+      if (id && num != null) driverNumberByAppId.set(id, Number(num));
+    }
+  }
   const archiveOrders = list
     .filter((j) => j.logistics_status !== "draft")
     .slice()
@@ -124,6 +144,10 @@ export async function GET() {
         pod_completed_at: j.pod_completed_at ?? null,
         has_driver: j.assigned_driver_application_id != null,
         hidden_from_orders: Boolean((j as { archived_at?: string | null }).archived_at),
+        driver_number: j.assigned_driver_application_id
+          ? driverNumberByAppId.get(j.assigned_driver_application_id) ?? null
+          : null,
+        driver_payout_cents: driverPayoutCents(j),
       };
     });
   return NextResponse.json({

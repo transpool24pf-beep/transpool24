@@ -172,6 +172,18 @@ export function DriverShareLocationClient({
     setErr(null);
     setMsg(t("starting"));
     setSharing(true);
+    void fetch("/api/public/driver-share-location", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ job_id: jobId, token, start_live: true }),
+    })
+      .then((r) => r.json())
+      .then((data: { logistics_status?: string }) => {
+        if (typeof data.logistics_status === "string" && data.logistics_status) {
+          setStatus(data.logistics_status);
+        }
+      })
+      .catch(() => {});
     watchId.current = navigator.geolocation.watchPosition(
       (pos) => {
         if (!isUsableGpsAccuracy(pos.coords.accuracy)) return;
@@ -243,6 +255,7 @@ export function DriverShareLocationClient({
         .then((data) => {
           if (data.pod_photo_url) setPodPhotoUrl(data.pod_photo_url);
           setDeliveryComplete(true);
+          setStatus("delivered");
           setPodOk(data.already_completed ? t("podAlreadyDone") : t("podUploadOk"));
         })
         .catch((er) => setPodErr(er instanceof Error ? er.message : t("podUploadFailed")))
@@ -294,7 +307,15 @@ export function DriverShareLocationClient({
           {status && (
             <div>
               <dt className="text-[var(--foreground)]/60">{t("status")}</dt>
-              <dd className="capitalize">{status.replace(/_/g, " ")}</dd>
+              <dd className="font-semibold">
+                {status === "in_transit"
+                  ? t("statusInTransit")
+                  : status === "delivered"
+                    ? t("statusDelivered")
+                    : status === "assigned"
+                      ? t("statusAssigned")
+                      : status.replace(/_/g, " ")}
+              </dd>
             </div>
           )}
           {pickup && (

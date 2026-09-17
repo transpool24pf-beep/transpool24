@@ -85,6 +85,8 @@ export type Job = {
   updated_at: string;
   /** Set when hidden from admin orders list; row stays for reports archive. */
   archived_at?: string | null;
+  /** Set when driver payable balance was credited for this delivered job. */
+  driver_payout_credited_at?: string | null;
 };
 
 export function isMissingDbColumn(

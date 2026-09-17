@@ -6,6 +6,7 @@ import { rateLimitResponse } from "@/lib/rate-limit";
 import { sendThankYouDeliveryEmail } from "@/lib/email";
 import { isTrustedPodImageUrl } from "@/lib/trusted-image-url";
 import type { Job } from "@/lib/supabase";
+import { completeDeliveredJob } from "@/lib/job-status-automation";
 
 const BUCKET = "driver-documents";
 const PATH_PREFIX = "admin-thankyou-delivery/";
@@ -95,15 +96,21 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       }
       attachBuf = buf;
       const now = new Date().toISOString();
-      await supabase
-        .from("jobs")
-        .update({
+      if (row.logistics_status === "cancelled") {
+        await supabase
+          .from("jobs")
+          .update({
+            pod_photo_url: photoUrl,
+            pod_completed_at: row.pod_completed_at ?? now,
+            updated_at: now,
+          })
+          .eq("id", jobId);
+      } else {
+        await completeDeliveredJob(supabase, jobId, {
           pod_photo_url: photoUrl,
           pod_completed_at: row.pod_completed_at ?? now,
-          logistics_status: row.logistics_status === "cancelled" ? row.logistics_status : "delivered",
-          updated_at: now,
-        })
-        .eq("id", jobId);
+        });
+      }
     }
   }
 

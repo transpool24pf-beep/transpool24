@@ -27,6 +27,8 @@ type ArchiveOrder = {
   pod_completed_at: string | null;
   has_driver: boolean;
   hidden_from_orders?: boolean;
+  driver_number?: number | null;
+  driver_payout_cents?: number | null;
 };
 
 type ReportPayload = {
@@ -88,6 +90,7 @@ export default function AdminReportsPage() {
         o.loads,
         o.logistics_status,
         o.payment_status,
+        o.driver_number != null ? String(o.driver_number) : "",
       ]
         .join(" ")
         .toLowerCase()
@@ -290,6 +293,18 @@ export default function AdminReportsPage() {
                           <dd className="mt-0.5">{fmtDt(o.pod_completed_at, dateLocale)}</dd>
                         </div>
                       ) : null}
+                      {o.driver_number != null ? (
+                        <div>
+                          <dt className="text-xs text-[#0d2137]/50">{t("reports.colDriverNo")}</dt>
+                          <dd className="mt-0.5 font-mono">#{String(o.driver_number).padStart(5, "0")}</dd>
+                        </div>
+                      ) : null}
+                      {o.driver_payout_cents != null && o.driver_payout_cents > 0 ? (
+                        <div>
+                          <dt className="text-xs text-[#0d2137]/50">{t("reports.colDriverPay")}</dt>
+                          <dd className="mt-0.5" dir="ltr">€ {(o.driver_payout_cents / 100).toFixed(2)}</dd>
+                        </div>
+                      ) : null}
                     </dl>
                   ) : null}
                 </article>
@@ -305,8 +320,8 @@ export default function AdminReportsPage() {
           <ul className="space-y-2 text-sm">
             {statusEntries.map(([st, n]) => (
               <li key={st} className="flex justify-between border-b border-[#0d2137]/10 py-2 last:border-0">
-                <span className="font-mono text-[#0d2137]/80" dir="ltr">
-                  {st}
+                <span className="text-[#0d2137]/80">
+                  {adminOrderStatusText(locale, st)}
                 </span>
                 <span className="font-semibold text-[#0d2137]">{n}</span>
               </li>
