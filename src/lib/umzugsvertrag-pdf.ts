@@ -106,6 +106,20 @@ function drawRight(
   page.drawText(safe, { x: right - w, y, size, font, color });
 }
 
+function drawCentered(
+  page: PDFPage,
+  font: PDFFont,
+  text: string,
+  centerX: number,
+  y: number,
+  size: number,
+  color = TEXT
+): void {
+  const safe = sanitizeTextForStandardPdfFont(text);
+  const w = font.widthOfTextAtSize(safe, size);
+  page.drawText(safe, { x: centerX - w / 2, y, size, font, color });
+}
+
 function tealBar(page: PDFPage, x: number, yTop: number, w: number, h: number, title: string, fontBold: PDFFont) {
   page.drawRectangle({ x, y: yTop - h, width: w, height: h, color: TEAL });
   drawSafe(page, fontBold, title, x + 10, yTop - h + 7, 9, WHITE);
@@ -150,9 +164,11 @@ export async function generateUmzugsvertragPdf(job: Job): Promise<Uint8Array> {
   const fontBold = await doc.embedFont(StandardFonts.HelveticaBold);
   const pageSize: [number, number] = [595, 842];
   let page = doc.addPage(pageSize);
+  const pages: PDFPage[] = [page];
   const { width, height } = page.getSize();
   const margin = 40;
   const contentW = width - margin * 2;
+  const pageMid = width / 2;
   const colGap = 10;
   const colW = (contentW - colGap) / 2;
   const leftX = margin;
@@ -222,8 +238,9 @@ export async function generateUmzugsvertragPdf(job: Job): Promise<Uint8Array> {
   y = Math.min(y - logoH - 36, metaY - 14);
 
   const ensure = (need: number) => {
-    if (y - need < 52) {
+    if (y - need < 56) {
       page = doc.addPage(pageSize);
+      pages.push(page);
       y = height - 40;
     }
   };
@@ -247,7 +264,7 @@ export async function generateUmzugsvertragPdf(job: Job): Promise<Uint8Array> {
     const lines = wrapLines(text, font, 9, contentW - 16);
     lines.forEach((ln, i) => {
       ensure(16);
-      drawSafe(page, font, i === 0 ? `•  ${ln}` : `    ${ln}`, margin, y, 9, TEXT);
+      drawSafe(page, font, i === 0 ? `*  ${ln}` : `   ${ln}`, margin, y, 9, TEXT);
       y -= 13;
     });
   };
@@ -466,6 +483,10 @@ export async function generateUmzugsvertragPdf(job: Job): Promise<Uint8Array> {
     8,
     MUTED
   );
+
+  for (const p of pages) {
+    drawCentered(p, fontBold, "TransPool24 · Transport & Logistik", pageMid, 28, 9, TEAL);
+  }
 
   return doc.save();
 }

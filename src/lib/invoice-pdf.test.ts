@@ -7,7 +7,7 @@ describe("sanitizeTextForStandardPdfFont", () => {
   });
   it("replaces Arabic with placeholders", () => {
     const s = sanitizeTextForStandardPdfFont("Test شريف End");
-    expect(s).toMatch(/^Test \?+ End$/);
+    expect(s).toMatch(/^Test \*+ End$/);
   });
   it("maps Euro sign", () => {
     expect(sanitizeTextForStandardPdfFont("99 €")).toBe("99 EUR");

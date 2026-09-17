@@ -29,8 +29,9 @@ export function sanitizeTextForStandardPdfFont(text: string, maxLen = 2400): str
     .replace(/\u20AC/g, "EUR")
     .replace(/[\u2013\u2014\u2212]/g, "-")
     .replace(/\u2026/g, "...")
+    .replace(/[\u2022\u2023\u25E6\u2043\u2219]/g, "*")
     .replace(/[\u00AD\u200B-\u200D\uFEFF]/g, "")
-    .replace(/[^\u0020-\u007E\u00A0-\u00FF]/g, "?");
+    .replace(/[^\u0020-\u007E\u00A0-\u00FF]/g, "*");
 }
 
 /** Helvetica cannot draw Arabic; use a Latin fallback (order company name) instead of ???. */
@@ -469,12 +470,16 @@ export async function generateInvoicePdf(
     9,
     contentW - 20
   );
+  const footerBrandY = 28;
+  const thanksBlockH = thanksLines.length * LINE_GAP + 18;
+  if (y - thanksBlockH < footerBrandY + 16) {
+    y = footerBrandY + thanksBlockH + 8;
+  }
   for (const ln of thanksLines) {
     drawCentered(page, font, ln, pageMid, y, 9, TEAL);
     y -= LINE_GAP;
   }
-  y -= 4;
-  drawCentered(page, fontBold, "TransPool24 · Transport & Logistik", pageMid, y, 9, TEAL_DARK);
+  drawCentered(page, fontBold, "TransPool24 · Transport & Logistik", pageMid, footerBrandY, 9, TEAL_DARK);
 
   return doc.save();
 }
