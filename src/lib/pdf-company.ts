@@ -17,10 +17,10 @@ export const PDF_COMPANY = {
   website: "www.transpool24.com",
   websiteUrl: "https://www.transpool24.com/de",
   email: "transpool24pf@gmail.com",
-  phone: "+49 176 29767442",
-  /** Invoice template (Numbers / CSV) */
-  invoicePhone: "17622624264",
-  bankName: "Trago Bank",
+  phone: "+49 176 22624264",
+  /** Same as phone; used on invoice/contract contact block */
+  invoicePhone: "+49 176 22624264",
+  bankName: "Targobank",
   iban: "DE64 3002 0900 5321 0926 15",
   bic: "CMCIDEDD",
 } as const;

@@ -12,4 +12,4 @@ ALTER TABLE public.support_requests
   ADD COLUMN IF NOT EXISTS marketing_opt_in boolean NOT NULL DEFAULT false,
   ADD COLUMN IF NOT EXISTS admin_reply text;
 
-COMMENT ON COLUMN public.support_requests.phone_e164 IS 'Digits only, international (e.g. 4917629767442) for wa.me';
+COMMENT ON COLUMN public.support_requests.phone_e164 IS 'Digits only, international (e.g. 4917622624264) for wa.me';

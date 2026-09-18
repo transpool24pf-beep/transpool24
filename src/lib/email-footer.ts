@@ -1,4 +1,5 @@
 import { DEFAULT_PUBLIC_CONTACT_EMAIL, getPublicContactEmail } from "@/lib/site-contact";
+import { PDF_COMPANY } from "@/lib/pdf-company";
 import { createServerSupabase } from "@/lib/supabase";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com";
@@ -168,7 +169,7 @@ export function buildEmailFooterInvoiceBlock(footer: ResolvedEmailFooter): {
   followUsTableHtml: string;
 } {
   const sec = escapeHtml(footer.emailDisplaySecondary);
-  const supportLineHtml = `<p style="margin: 20px 0 0 0; font-size: 14px; color: #666;">Benötigen Sie Unterstützung? TransPool24 Kundenservice – Telefonnummer: +49 176 29767442 – E-Mail: ${sec}</p>`;
+  const supportLineHtml = `<p style="margin: 20px 0 0 0; font-size: 14px; color: #666;">Benötigen Sie Unterstützung? TransPool24 Kundenservice – Telefonnummer: ${PDF_COMPANY.phone} – E-Mail: ${sec}</p>`;
   const li = escapeHref(footer.linkedinHref);
   const linkedinLineHtml = footer.linkedinHref
     ? `<p style="margin: 12px 0 0 0; font-size: 13px;"><a href="${li}" style="color:#0d2137;">LinkedIn</a> · Servicezeiten: rund um die Uhr</p>`
