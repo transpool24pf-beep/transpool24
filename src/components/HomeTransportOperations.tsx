@@ -13,6 +13,10 @@ const SERVICE_TILES = [
   { id: "s6", image: "/images/services/bulky-waste.jpg" },
   { id: "s7", image: "/images/services/express-pallet.jpg" },
   { id: "s8", image: "/images/services/packed-furniture.jpg" },
+  { id: "s9", image: "/images/services/engine-pallet.jpg" },
+  { id: "s10", image: "/images/services/carton-pallet.jpg" },
+  { id: "s11", image: "/images/services/b2b.png" },
+  { id: "s12", image: "/images/services/barrel-pallet.jpg" },
 ] as const;
 
 export function HomeTransportOperations() {

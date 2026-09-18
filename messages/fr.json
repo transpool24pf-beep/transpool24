@@ -176,7 +176,11 @@
       "s5_title": "Enlèvement",
       "s6_title": "Encombrants",
       "s7_title": "Fret express",
-      "s8_title": "Meubles & cartons"
+      "s8_title": "Meubles & cartons",
+      "s9_title": "Moteurs & machines",
+      "s10_title": "Envoi sur palette",
+      "s11_title": "Transport B2B",
+      "s12_title": "Fûts & industriel"
     },
     "germanyMap": {
       "eyebrow": "Nous relions l'Allemagne",

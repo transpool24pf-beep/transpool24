@@ -176,7 +176,11 @@
       "s5_title": "Smaltimento",
       "s6_title": "Ingombranti",
       "s7_title": "Merce express",
-      "s8_title": "Mobili e scatoloni"
+      "s8_title": "Mobili e scatoloni",
+      "s9_title": "Motori e macchine",
+      "s10_title": "Spedizione su pallet",
+      "s11_title": "Trasporto B2B",
+      "s12_title": "Fusti e industriale"
     },
     "germanyMap": {
       "eyebrow": "Colleghiamo la Germania",

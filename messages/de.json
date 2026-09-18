@@ -318,7 +318,11 @@
       "s5_title": "Entsorgung",
       "s6_title": "Sperrmüll",
       "s7_title": "Express / Eilgut",
-      "s8_title": "Möbel & Kartons"
+      "s8_title": "Möbel & Kartons",
+      "s9_title": "Maschinen & Motoren",
+      "s10_title": "Palettenversand",
+      "s11_title": "B2B-Transport",
+      "s12_title": "Fässer & Industrie"
     },
     "germanyMap": {
       "eyebrow": "Wir verbinden Deutschland",

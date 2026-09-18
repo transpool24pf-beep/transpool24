@@ -176,7 +176,11 @@
       "s5_title": "Desecho",
       "s6_title": "Enseres voluminosos",
       "s7_title": "Carga urgente",
-      "s8_title": "Muebles y cajas"
+      "s8_title": "Muebles y cajas",
+      "s9_title": "Motores y maquinaria",
+      "s10_title": "Envío en palé",
+      "s11_title": "Transporte B2B",
+      "s12_title": "Bidones e industrial"
     },
     "germanyMap": {
       "eyebrow": "Conectamos Alemania",

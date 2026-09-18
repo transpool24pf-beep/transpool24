@@ -312,7 +312,11 @@
       "s5_title": "Disposal",
       "s6_title": "Bulky waste",
       "s7_title": "Express freight",
-      "s8_title": "Furniture & boxes"
+      "s8_title": "Furniture & boxes",
+      "s9_title": "Engines & machinery",
+      "s10_title": "Pallet shipping",
+      "s11_title": "B2B transport",
+      "s12_title": "Drums & industrial"
     },
     "germanyMap": {
       "eyebrow": "We connect Germany",

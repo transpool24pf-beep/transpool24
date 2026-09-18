@@ -175,7 +175,11 @@
       "s5_title": "Atık / söküm",
       "s6_title": "Hacimli atık",
       "s7_title": "Ekspres yük",
-      "s8_title": "Mobilya ve koliler"
+      "s8_title": "Mobilya ve koliler",
+      "s9_title": "Motor ve makine",
+      "s10_title": "Palet sevkiyatı",
+      "s11_title": "B2B taşıma",
+      "s12_title": "Varil ve endüstriyel"
     },
     "germanyMap": {
       "eyebrow": "Almanya'yı birbirine bağlıyoruz",
