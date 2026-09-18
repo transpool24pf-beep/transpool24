@@ -59,7 +59,8 @@ export function HomeTransportOperations() {
                       src={tile.image}
                       alt={title}
                       fill
-                      className="object-contain drop-shadow-[0_18px_28px_rgba(13,33,55,0.18)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.55] group-hover:drop-shadow-[0_32px_48px_rgba(13,33,55,0.28)]"
+                      unoptimized
+                      className="bg-transparent object-contain drop-shadow-[0_18px_28px_rgba(13,33,55,0.18)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.55] group-hover:drop-shadow-[0_32px_48px_rgba(13,33,55,0.28)]"
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     />
                   </div>
