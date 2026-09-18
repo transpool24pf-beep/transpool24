@@ -38,7 +38,6 @@ export function HomeTransportOperations() {
           <h2 className="text-3xl font-extrabold tracking-tight text-[var(--primary)] sm:text-4xl">
             {t("title")}
           </h2>
-          <p className="mt-4 text-lg text-[var(--foreground)]/70">{t("subtitle")}</p>
         </div>
 
         <div
