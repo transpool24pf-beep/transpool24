@@ -351,6 +351,32 @@ export function OrderForm({
   const [draftRestored, setDraftRestored] = useState(false);
   const countryCodeRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const suggestionsCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const cancelAddressSuggestionsClose = useCallback(() => {
+    if (suggestionsCloseTimerRef.current) {
+      clearTimeout(suggestionsCloseTimerRef.current);
+      suggestionsCloseTimerRef.current = null;
+    }
+  }, []);
+
+  const closeAddressSuggestions = useCallback(() => {
+    cancelAddressSuggestionsClose();
+    setSuggestionsOpen(null);
+    setPickupSuggestions([]);
+    setDeliverySuggestions([]);
+  }, [cancelAddressSuggestionsClose]);
+
+  const scheduleAddressSuggestionsClose = useCallback(() => {
+    cancelAddressSuggestionsClose();
+    suggestionsCloseTimerRef.current = setTimeout(() => {
+      setSuggestionsOpen(null);
+      setPickupSuggestions([]);
+      setDeliverySuggestions([]);
+    }, 180);
+  }, [cancelAddressSuggestionsClose]);
+
+  useEffect(() => () => cancelAddressSuggestionsClose(), [cancelAddressSuggestionsClose]);
   /** Links Google Autocomplete + Place Details billing sessions */
   const placesSessionRef = useRef(
     typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
@@ -694,11 +720,9 @@ export function OrderForm({
         setError(null);
       }
       persistAddressLine(stored);
-      if (field === "pickup") setPickupSuggestions([]);
-      else setDeliverySuggestions([]);
-      setSuggestionsOpen(null);
+      closeAddressSuggestions();
     })();
-  }, [persistAddressLine]);
+  }, [persistAddressLine, closeAddressSuggestions]);
 
   const normalizePhone = (value: string, countryCode: string = phoneCountryCode) => {
     const digits = value.replace(/\D/g, "");
@@ -1463,13 +1487,17 @@ export function OrderForm({
             streetName={addressLineInputNamesRef.current.pickup}
             postalName="tp24-pickup-plz"
             onStreetFocus={() => {
+              cancelAddressSuggestionsClose();
               setAddressHistory(loadOrderAddressHistory());
               setSuggestionsOpen("pickup-street");
             }}
+            onStreetBlur={scheduleAddressSuggestionsClose}
             onPostalFocus={() => {
+              cancelAddressSuggestionsClose();
               setAddressHistory(loadOrderAddressHistory());
               setSuggestionsOpen("pickup-plz");
             }}
+            onPostalBlur={scheduleAddressSuggestionsClose}
             onChange={(next) => {
               const expanded = expandPastedStreet(next, data.pickupAddr);
               update({ pickupAddr: expanded, pickupAddressLine: formatStructuredAddressLine(expanded) });
@@ -1572,13 +1600,17 @@ export function OrderForm({
             streetName={addressLineInputNamesRef.current.delivery}
             postalName="tp24-delivery-plz"
             onStreetFocus={() => {
+              cancelAddressSuggestionsClose();
               setAddressHistory(loadOrderAddressHistory());
               setSuggestionsOpen("delivery-street");
             }}
+            onStreetBlur={scheduleAddressSuggestionsClose}
             onPostalFocus={() => {
+              cancelAddressSuggestionsClose();
               setAddressHistory(loadOrderAddressHistory());
               setSuggestionsOpen("delivery-plz");
             }}
+            onPostalBlur={scheduleAddressSuggestionsClose}
             onChange={(next) => {
               const expanded = expandPastedStreet(next, data.deliveryAddr);
               update({ deliveryAddr: expanded, deliveryAddressLine: formatStructuredAddressLine(expanded) });

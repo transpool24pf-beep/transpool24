@@ -32,7 +32,9 @@ export function OrderFullAddressFields({
   streetName,
   postalName,
   onStreetFocus,
+  onStreetBlur,
   onPostalFocus,
+  onPostalBlur,
   labels,
   highlightMissing = false,
   phoneRequired = false,
@@ -49,7 +51,9 @@ export function OrderFullAddressFields({
   streetName?: string;
   postalName?: string;
   onStreetFocus?: () => void;
+  onStreetBlur?: () => void;
   onPostalFocus?: () => void;
+  onPostalBlur?: () => void;
   labels: {
     company: string;
     street: string;
@@ -114,6 +118,10 @@ export function OrderFullAddressFields({
               placeholder={labels.streetPlaceholder}
               onChange={(e) => set({ street: e.target.value })}
               onFocus={onStreetFocus}
+              onBlur={onStreetBlur}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") onStreetBlur?.();
+              }}
               className={cls(value.street.trim().length < 2)}
               aria-invalid={highlightMissing && value.street.trim().length < 2}
             />
@@ -148,6 +156,10 @@ export function OrderFullAddressFields({
               placeholder="75172"
               onChange={(e) => set({ postalCode: e.target.value.replace(/\D/g, "").slice(0, 5) })}
               onFocus={onPostalFocus}
+              onBlur={onPostalBlur}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") onPostalBlur?.();
+              }}
               className={cls(!/^\d{5}$/.test(value.postalCode.trim()))}
               aria-invalid={highlightMissing && !/^\d{5}$/.test(value.postalCode.trim())}
             />
