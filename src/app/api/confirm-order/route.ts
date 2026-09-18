@@ -154,13 +154,46 @@ export async function POST(req: Request) {
     const weightSurchargeCents = breakdown.weightSurchargeCents;
     const cargoCategorySurchargeCents = breakdown.cargoCategorySurchargeCents;
     const roundTripMinutes = p.roundTripMinutes;
-    const loadingMinutes = p.loadingMinutes;
-    const unloadingMinutes = p.unloadingMinutes;
     const totalDriverMinutes = p.totalDriverMinutes;
 
     /** Fahrerpreis = 18 × Hin- und Rückfahrt (Cent), 18 Cent pro km Hin+Rück */
     const roundTripKm = distanceKm * 2;
     const driverPriceCents = Math.round(18 * roundTripKm);
+
+    const cargoDetailsStored =
+      cargoDetails && typeof cargoDetails === "object"
+        ? (() => {
+            const stored = {
+              ...cargoDetails,
+              loads,
+              cargoCategory: cargoCat || cargoDetails.cargoCategory || null,
+              weightKg,
+              packageCount: Math.round(packageCountRaw),
+              cargoLengthCm: loadSummary.cargoLengthCm,
+              cargoWidthCm: loadSummary.cargoWidthCm,
+              cargoHeightCm: loadSummary.cargoHeightCm,
+              stackable: loadSummary.stackable,
+              dangerousGoods: loadSummary.dangerousGoods,
+              photoUrls,
+              senderAddress,
+              recipientAddress,
+              preferred_delivery_at: deliveryTime || null,
+              routeTerrain: p.routeTerrain,
+              routeWeather: p.routeWeather,
+              routeDriveTimeMultiplier: p.routeDriveTimeMultiplier,
+              terrainSource: p.terrainSource,
+              weatherSource: p.weatherSource,
+              weightSurchargeCents,
+              cargoCategorySurchargeCents,
+              roundTripMinutes,
+              totalDriverMinutes,
+              assistantCount,
+            } as Record<string, unknown>;
+            delete stored.loadingMinutes;
+            delete stored.unloadingMinutes;
+            return stored;
+          })()
+        : null;
 
     const supabase = createServerSupabase();
     const confirmationToken = generateToken();
@@ -186,37 +219,7 @@ export async function POST(req: Request) {
         delivery_address: deliveryAddress,
         delivery_city: deliveryCity,
         cargo_size: cargoSize,
-        cargo_details:
-          cargoDetails && typeof cargoDetails === "object"
-            ? {
-                ...cargoDetails,
-                loads,
-                cargoCategory: cargoCat || cargoDetails.cargoCategory || null,
-                weightKg,
-                packageCount: Math.round(packageCountRaw),
-                cargoLengthCm: loadSummary.cargoLengthCm,
-                cargoWidthCm: loadSummary.cargoWidthCm,
-                cargoHeightCm: loadSummary.cargoHeightCm,
-                stackable: loadSummary.stackable,
-                dangerousGoods: loadSummary.dangerousGoods,
-                photoUrls,
-                senderAddress,
-                recipientAddress,
-                preferred_delivery_at: deliveryTime || null,
-                routeTerrain: p.routeTerrain,
-                routeWeather: p.routeWeather,
-                routeDriveTimeMultiplier: p.routeDriveTimeMultiplier,
-                terrainSource: p.terrainSource,
-                weatherSource: p.weatherSource,
-                weightSurchargeCents,
-                cargoCategorySurchargeCents,
-                roundTripMinutes,
-                loadingMinutes,
-                unloadingMinutes,
-                totalDriverMinutes,
-                assistantCount,
-              }
-            : null,
+        cargo_details: cargoDetailsStored,
         service_type: st,
         distance_km: distanceKm,
         duration_minutes: durationMinutes ?? null,

@@ -9,12 +9,10 @@ import {
   type ServiceType,
   type PricingOptions,
   type PriceBreakdown,
-  formatPrice,
 } from "@/lib/pricing";
 import {
   emptyCargoLoadLine,
   clampAssistantCount,
-  getLoadUnloadMinutes,
   isCargoLoadLineComplete,
   LOAD_CARRIERS,
   loadCarrierOffersAssistant,
@@ -761,7 +759,6 @@ export function OrderForm({
   );
   const assistantCount = offersAssistant ? Math.max(0, Math.min(6, Math.round(data.assistantCount || 0))) : 0;
   const resolvedServiceType = serviceTypeFromAssistantCount(assistantCount);
-  const { loadingMinutes, unloadingMinutes } = getLoadUnloadMinutes(loads.map((l) => l.loadCarrier));
 
   useEffect(() => {
     if (!offersAssistant && data.assistantCount) {
@@ -2139,12 +2136,6 @@ export function OrderForm({
                 <p>
                   {t("distanceOneWay")}: {data.distanceKm} km
                 </p>
-                <p>
-                  {t("loadingTime")}: {loadingMinutes} {t("minutes")}
-                </p>
-                <p>
-                  {t("unloadingTime")}: {unloadingMinutes} {t("minutes")}
-                </p>
               </div>
             )}
           </div>
@@ -2174,13 +2165,6 @@ export function OrderForm({
           {showStep3Price && priceBreakdown ? (
             <div className="space-y-2">
               <p className="text-sm text-[var(--foreground)]/80">{t("price")}</p>
-              {priceBreakdown.assistantCents > 0 ? (
-                <div className="rounded-lg border border-[var(--accent)]/25 bg-[var(--accent)]/8 px-3 py-2 text-sm text-[#0d2137]">
-                  <p className="text-[#0d2137]/80">
-                    {t("priceBreakdownAssistant")} ({assistantCount}): {formatPrice(priceBreakdown.assistantCents)}
-                  </p>
-                </div>
-              ) : null}
               <GermanVatPriceBlock netCents={priceCents} />
             </div>
           ) : (
@@ -2281,11 +2265,6 @@ export function OrderForm({
               <p>
                 <strong>{t("assistantCountLabel")}:</strong>{" "}
                 {assistantCount === 0 ? t("assistantCountNone") : t("assistantCountOption", { count: assistantCount })}
-              </p>
-            ) : null}
-            {priceBreakdown?.assistantCents ? (
-              <p>
-                <strong>{t("priceBreakdownAssistant")}:</strong> {formatPrice(priceBreakdown.assistantCents)}
               </p>
             ) : null}
             <div className="pt-2">
