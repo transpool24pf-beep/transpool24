@@ -6,7 +6,7 @@ import {
   type ServiceType,
 } from "@/lib/pricing";
 import { getRouteDistanceAndDuration, geocodeAddressForMap } from "@/lib/route-distance-server";
-import { getLoadUnloadMinutes, loadUnloadTotalMinutes } from "@/lib/cargo";
+import { clampAssistantCount, getLoadUnloadMinutes, loadUnloadTotalMinutes } from "@/lib/cargo";
 import { routeDriveTimeMultiplier, type RouteTerrainId, type RouteWeatherId } from "@/lib/route-pricing-factors";
 import { resolveWeatherForMidpoint, terrainFromGoogleElevation } from "@/lib/auto-route-factors";
 
@@ -47,6 +47,8 @@ export async function computeOrderPricingFromAddresses(input: {
   googleMapsApiKey?: string | null;
   /** When the client already calculated route distance (step 2), reuse it for pricing. */
   knownRoute?: { distanceKm: number; durationMinutes: number | null };
+  loadCarriers?: readonly (string | null | undefined)[];
+  assistantCount?: number;
 }): Promise<{ ok: true; data: OrderPricingComputeOk } | { ok: false; error: "ROUTE_FAILED" }> {
   const key = input.googleMapsApiKey ?? process.env.GOOGLE_MAPS_API_KEY ?? null;
 
@@ -99,8 +101,16 @@ export async function computeOrderPricingFromAddresses(input: {
   const oneWayAdjusted = Math.round(oneWayBase * driveMult);
   const roundTripMinutes = oneWayAdjusted * 2;
 
-  const { loadingMinutes, unloadingMinutes } = getLoadUnloadMinutes();
-  const totalDriverMinutes = Math.round(oneWayAdjusted + loadUnloadTotalMinutes());
+  const loadCarriers =
+    input.loadCarriers && input.loadCarriers.length > 0
+      ? input.loadCarriers
+      : input.cargoCategory
+        ? [input.cargoCategory]
+        : [];
+  const assistantCount = clampAssistantCount(input.assistantCount);
+  const { loadingMinutes, unloadingMinutes } = getLoadUnloadMinutes(loadCarriers);
+  const luTotal = loadUnloadTotalMinutes(loadCarriers);
+  const totalDriverMinutes = Math.round(oneWayAdjusted + luTotal);
   const weightKg = Math.max(0, Number(input.weightKg) || 0);
   const centsPer10 =
     input.pricingOpts.weight_surcharge_cents_per_10kg != null
@@ -120,7 +130,9 @@ export async function computeOrderPricingFromAddresses(input: {
     input.serviceType,
     totalDriverMinutes,
     weightSurchargeCents,
-    cargoCategorySurchargeCents
+    cargoCategorySurchargeCents,
+    assistantCount,
+    luTotal
   );
 
   return {

@@ -9,7 +9,9 @@ import {
   parseCargoLoads,
   summarizeCargoLoads,
   formatCargoLoadsPlainDe,
-  serviceTypeFromLoadCarriers,
+  clampAssistantCount,
+  loadCarrierOffersAssistant,
+  serviceTypeFromAssistantCount,
 } from "@/lib/cargo";
 import { normalizeStructuredAddress, formatStructuredAddressPlain } from "@/lib/structured-address";
 import { computeOrderPricingFromAddresses } from "@/lib/order-pricing-compute";
@@ -99,7 +101,9 @@ export async function POST(req: Request) {
     const departureTime =
       pickupTime && !Number.isNaN(Date.parse(pickupTime)) ? new Date(pickupTime) : null;
 
-    const st = serviceTypeFromLoadCarriers(loads.map((l) => l.loadCarrier));
+    const offersAssistant = loads.some((l) => loadCarrierOffersAssistant(l.loadCarrier));
+    const assistantCount = offersAssistant ? clampAssistantCount(cd?.assistantCount) : 0;
+    const st = serviceTypeFromAssistantCount(assistantCount);
     const pricing = await getPricingSettings();
     const pricingOpts = {
       price_per_km_cents: pricing.price_per_km_cents,
@@ -131,6 +135,8 @@ export async function POST(req: Request) {
       cargoSize,
       serviceType: st,
       pricingOpts,
+      loadCarriers: loads.map((l) => l.loadCarrier),
+      assistantCount,
     });
 
     if (!priced.ok) {
@@ -208,6 +214,7 @@ export async function POST(req: Request) {
                 loadingMinutes,
                 unloadingMinutes,
                 totalDriverMinutes,
+                assistantCount,
               }
             : null,
         service_type: st,

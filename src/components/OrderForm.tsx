@@ -13,12 +13,14 @@ import {
 } from "@/lib/pricing";
 import {
   emptyCargoLoadLine,
+  clampAssistantCount,
+  getLoadUnloadMinutes,
   isCargoLoadLineComplete,
   LOAD_CARRIERS,
-  LOAD_UNLOAD_TOTAL_MINUTES,
+  loadCarrierOffersAssistant,
   normalizeCargoLoadLine,
+  serviceTypeFromAssistantCount,
   summarizeCargoLoads,
-  serviceTypeFromLoadCarriers,
   type CargoLoadLine,
   type LoadCarrierId,
 } from "@/lib/cargo";
@@ -290,6 +292,7 @@ export type OrderFormData = {
   cargoSize: CargoSize;
   loads: CargoLoadLine[];
   serviceType: ServiceType | "";
+  assistantCount: number;
   distanceKm: number;
 };
 
@@ -308,6 +311,7 @@ const initial: OrderFormData = {
   cargoSize: FIXED_CARGO_SIZE,
   loads: [emptyCargoLoadLine()],
   serviceType: "driver_car" as ServiceType,
+  assistantCount: 0,
   distanceKm: DEFAULT_KM,
 };
 
@@ -486,6 +490,7 @@ export function OrderForm({
       setData({
         ...rawData,
         cargoSize: FIXED_CARGO_SIZE,
+        assistantCount: clampAssistantCount(rawData.assistantCount),
         pickupAddr,
         deliveryAddr,
         pickupAddressLine: formatStructuredAddressLine(pickupAddr) || rawData.pickupAddressLine || "",
@@ -750,10 +755,19 @@ export function OrderForm({
   const loads = data.loads?.length ? data.loads : [emptyCargoLoadLine()];
   const loadSummary = useMemo(() => summarizeCargoLoads(loads), [loads]);
   const loadsComplete = loads.length > 0 && loads.every(isCargoLoadLineComplete);
-  const resolvedServiceType = useMemo(
-    () => serviceTypeFromLoadCarriers(loads.map((l) => l.loadCarrier)),
+  const offersAssistant = useMemo(
+    () => loads.some((l) => loadCarrierOffersAssistant(l.loadCarrier)),
     [loads]
   );
+  const assistantCount = offersAssistant ? Math.max(0, Math.min(6, Math.round(data.assistantCount || 0))) : 0;
+  const resolvedServiceType = serviceTypeFromAssistantCount(assistantCount);
+  const { loadingMinutes, unloadingMinutes } = getLoadUnloadMinutes(loads.map((l) => l.loadCarrier));
+
+  useEffect(() => {
+    if (!offersAssistant && data.assistantCount) {
+      setData((prev) => ({ ...prev, assistantCount: 0, serviceType: "driver_car" }));
+    }
+  }, [offersAssistant, data.assistantCount]);
 
   const updateLoad = useCallback((index: number, patch: Partial<CargoLoadLine>) => {
     setData((prev) => {
@@ -834,7 +848,6 @@ export function OrderForm({
 
   const showStep3Price = step3Complete && !!pricePreview && !pricePreviewLoading && !pricePreviewError;
 
-  const loadUnloadMinutes = LOAD_UNLOAD_TOTAL_MINUTES;
   const priceBreakdown = pricePreview?.breakdown ?? null;
   const priceCents = pricePreview?.breakdown?.totalCents ?? 0;
 
@@ -871,6 +884,7 @@ export function OrderForm({
               weightKg: loadSummary.weightKg,
               cargoCategory: loadSummary.cargoCategory,
               loadCarriers: loads.map((l) => l.loadCarrier).filter(Boolean),
+              assistantCount,
               distanceKm: distanceFromRoute ? data.distanceKm : undefined,
               durationMinutes: distanceFromRoute ? routeDurationMinutes : undefined,
             }),
@@ -907,8 +921,10 @@ export function OrderForm({
     data.pickupTime,
     data.cargoSize,
     resolvedServiceType,
+    assistantCount,
     loadSummary.weightKg,
     loadSummary.cargoCategory,
+    loads,
     data.distanceKm,
     distanceFromRoute,
     routeDurationMinutes,
@@ -1275,6 +1291,7 @@ export function OrderForm({
             packageCount: loadSummary.packageCount,
             photoUrls: cargoPhotoUrls,
             cargoCategory: loadSummary.cargoCategory || null,
+            assistantCount,
             cargoLengthCm: loadSummary.cargoLengthCm,
             cargoWidthCm: loadSummary.cargoWidthCm,
             cargoHeightCm: loadSummary.cargoHeightCm,
@@ -2085,6 +2102,32 @@ export function OrderForm({
               {t("cargoL")}
             </div>
           </div>
+          {offersAssistant ? (
+            <div>
+              <label htmlFor="assistant-count" className="mb-1 block text-sm font-medium text-[var(--foreground)]">
+                {t("assistantCountLabel")}
+              </label>
+              <select
+                id="assistant-count"
+                value={assistantCount}
+                onChange={(e) => {
+                  const n = Math.max(0, Math.min(6, Number(e.target.value) || 0));
+                  update({
+                    assistantCount: n,
+                    serviceType: serviceTypeFromAssistantCount(n),
+                  });
+                }}
+                className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+              >
+                <option value={0}>{t("assistantCountNone")}</option>
+                {[1, 2, 3, 4, 5, 6].map((n) => (
+                  <option key={n} value={n}>
+                    {t("assistantCountOption", { count: n })}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : null}
           <div className="rounded-lg border border-[#0d2137]/15 bg-[#0d2137]/5 p-4">
             <p className="mb-2 text-sm font-medium text-[var(--foreground)]">{t("driverTimeSummary")}</p>
             {!distanceFromRoute ? (
@@ -2097,7 +2140,10 @@ export function OrderForm({
                   {t("distanceOneWay")}: {data.distanceKm} km
                 </p>
                 <p>
-                  {t("loadingUnloadingTime")}: {loadUnloadMinutes} {t("minutes")}
+                  {t("loadingTime")}: {loadingMinutes} {t("minutes")}
+                </p>
+                <p>
+                  {t("unloadingTime")}: {unloadingMinutes} {t("minutes")}
                 </p>
               </div>
             )}
@@ -2130,9 +2176,8 @@ export function OrderForm({
               <p className="text-sm text-[var(--foreground)]/80">{t("price")}</p>
               {priceBreakdown.assistantCents > 0 ? (
                 <div className="rounded-lg border border-[var(--accent)]/25 bg-[var(--accent)]/8 px-3 py-2 text-sm text-[#0d2137]">
-                  <p className="font-medium">{t("loadCarrierIncludesAssistant")}</p>
-                  <p className="mt-1 text-[#0d2137]/80">
-                    {t("priceBreakdownAssistant")}: {formatPrice(priceBreakdown.assistantCents)}
+                  <p className="text-[#0d2137]/80">
+                    {t("priceBreakdownAssistant")} ({assistantCount}): {formatPrice(priceBreakdown.assistantCents)}
                   </p>
                 </div>
               ) : null}
@@ -2232,6 +2277,12 @@ export function OrderForm({
               <strong>{t("cargoPhotosLabel")}:</strong> {cargoPhotoUrls.length}
             </p>
             <p><strong>{t("distance")}:</strong> {data.distanceKm} km</p>
+            {offersAssistant ? (
+              <p>
+                <strong>{t("assistantCountLabel")}:</strong>{" "}
+                {assistantCount === 0 ? t("assistantCountNone") : t("assistantCountOption", { count: assistantCount })}
+              </p>
+            ) : null}
             {priceBreakdown?.assistantCents ? (
               <p>
                 <strong>{t("priceBreakdownAssistant")}:</strong> {formatPrice(priceBreakdown.assistantCents)}

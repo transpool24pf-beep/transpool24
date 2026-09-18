@@ -188,7 +188,7 @@ export const LOAD_CARRIER_LABEL_DE: Record<LoadCarrierId, string> = {
   ...LEGACY_LOAD_CARRIER_LABEL_DE,
 };
 
-/** Move / wrap / load / furniture / disposal jobs always include a Helfer. */
+/** Jobs that offer optional Helfer and use 60 min loading + 60 min unloading. */
 export const ASSISTANT_LOAD_CARRIER_IDS: readonly BookingLoadCarrierId[] = [
   "wrapping_protection",
   "loading_transport",
@@ -210,14 +210,18 @@ export function isLoadCarrierId(id: unknown): id is LoadCarrierId {
   return typeof id === "string" && id in LOAD_CARRIER_LABEL_DE;
 }
 
-export function loadCarrierRequiresAssistant(id: string | null | undefined): boolean {
+export function loadCarrierOffersAssistant(id: string | null | undefined): boolean {
   return typeof id === "string" && (ASSISTANT_LOAD_CARRIER_IDS as readonly string[]).includes(id);
 }
 
-export function serviceTypeFromLoadCarriers(
-  ids: readonly (string | null | undefined)[]
-): "driver_car" | "driver_car_assistant" {
-  return ids.some((id) => loadCarrierRequiresAssistant(id)) ? "driver_car_assistant" : "driver_car";
+export function serviceTypeFromAssistantCount(count: number): "driver_car" | "driver_car_assistant" {
+  return Math.max(0, Math.round(Number(count) || 0)) > 0 ? "driver_car_assistant" : "driver_car";
+}
+
+export function clampAssistantCount(raw: unknown): number {
+  const n = Math.round(Number(raw) || 0);
+  if (!Number.isFinite(n) || n < 0) return 0;
+  return Math.min(6, n);
 }
 
 export type CargoLoadLine = {
@@ -334,23 +338,37 @@ export function getCargoCategory(id: CargoCategoryId | string | null) {
   return CARGO_CATEGORIES.find((c) => c.id === id) ?? null;
 }
 
-/** Fixed loading + unloading block billed on every order (one-way km is billed separately). */
+/** Default loading + unloading when the job is not a move/wrap/disposal type. */
 export const LOAD_UNLOAD_TOTAL_MINUTES = 90;
+export const LOAD_UNLOAD_MOVE_MINUTES_EACH = 60;
 
 /**
- * Load/unload minutes for pricing: always 90 minutes total, independent of
- * cargo category and weight.
+ * Move / wrap / furniture / disposal: 60 min loading + 60 min unloading.
+ * Other cargo: 45 + 45 (90 total).
  */
 export function getLoadUnloadMinutes(
-  _categoryId?: CargoCategoryId | string | null,
+  loadCarriers?: readonly (string | null | undefined)[] | CargoCategoryId | string | null,
   _weightKg?: number
 ): { loadingMinutes: number; unloadingMinutes: number } {
+  const ids = Array.isArray(loadCarriers)
+    ? loadCarriers
+    : loadCarriers
+      ? [loadCarriers]
+      : [];
+  if (ids.some((id) => loadCarrierOffersAssistant(id))) {
+    return {
+      loadingMinutes: LOAD_UNLOAD_MOVE_MINUTES_EACH,
+      unloadingMinutes: LOAD_UNLOAD_MOVE_MINUTES_EACH,
+    };
+  }
   const half = Math.round(LOAD_UNLOAD_TOTAL_MINUTES / 2);
   return { loadingMinutes: half, unloadingMinutes: LOAD_UNLOAD_TOTAL_MINUTES - half };
 }
 
-export function loadUnloadTotalMinutes(): number {
-  const { loadingMinutes, unloadingMinutes } = getLoadUnloadMinutes();
+export function loadUnloadTotalMinutes(
+  loadCarriers?: readonly (string | null | undefined)[] | CargoCategoryId | string | null
+): number {
+  const { loadingMinutes, unloadingMinutes } = getLoadUnloadMinutes(loadCarriers);
   return loadingMinutes + unloadingMinutes;
 }
 

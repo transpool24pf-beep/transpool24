@@ -73,18 +73,19 @@ function resolveBillingMinutes(
 /** Assistant total for the job: hourly rate × (billing minutes / 60), rounded to cents */
 export function assistantChargeCentsFromMinutes(
   totalDriverMinutes: number,
-  assistantHourlyCents: number
+  assistantHourlyCents: number,
+  assistantCount = 1
 ): number {
   const m = Math.max(0, Number(totalDriverMinutes));
-  if (!Number.isFinite(m) || m <= 0) return 0;
-  return Math.round((m / 60) * assistantHourlyCents);
+  const n = Math.max(0, Math.round(Number(assistantCount) || 0));
+  if (!Number.isFinite(m) || m <= 0 || n <= 0) return 0;
+  return Math.round((m / 60) * assistantHourlyCents * n);
 }
 
 /**
  * Full price breakdown.
- * Driver with vehicle: one-way km + flat 90-minute load/unload price.
- * Driver only: hourly × (one-way drive + load/unload minutes).
- * Assistant: hourly × those same minutes.
+ * Driver with vehicle: one-way km + load/unload block (scaled from the 90-minute price).
+ * Assistant: hourly × billing minutes × number of helpers.
  */
 export function calculatePriceBreakdown(
   distanceKm: number,
@@ -94,7 +95,9 @@ export function calculatePriceBreakdown(
   serviceType: ServiceType = "driver_car",
   totalDriverMinutes?: number | null,
   weightSurchargeCents?: number | null,
-  cargoCategorySurchargeCents?: number | null
+  cargoCategorySurchargeCents?: number | null,
+  assistantCount = 0,
+  loadUnloadMinutes = LOAD_UNLOAD_TOTAL_MINUTES
 ): PriceBreakdown {
   const driverOnlyHourly = options?.driver_only_hourly_cents ?? DEFAULT_DRIVER_ONLY_HOURLY_CENTS;
   const assistantHourlyCents = options?.assistant_fee_cents ?? DEFAULT_ASSISTANT_HOURLY_CENTS;
@@ -103,6 +106,8 @@ export function calculatePriceBreakdown(
   const weightExtra = Math.max(0, Math.round(Number(weightSurchargeCents) || 0));
   const categoryExtra = Math.max(0, Math.round(Number(cargoCategorySurchargeCents) || 0));
   const extras = weightExtra + categoryExtra;
+  const helpers = Math.max(0, Math.round(Number(assistantCount) || 0));
+  const luMinutes = Math.max(1, Math.round(Number(loadUnloadMinutes) || LOAD_UNLOAD_TOTAL_MINUTES));
 
   if (serviceType === "driver_only") {
     const total = Math.round((timeMinutes / 60) * driverOnlyHourly);
@@ -121,16 +126,15 @@ export function calculatePriceBreakdown(
   const perKmMap = options?.price_per_km_cents ?? DEFAULT_PRICE_PER_KM_CENTS;
   const perKm = perKmMap[cargoSize] ?? 100;
   const distanceCents = Math.round(distanceKm * perKm);
-  const driverTimeCents = loadUnload90MinCentsFromOptions(options);
-  const assistantCents =
-    serviceType === "driver_car_assistant"
-      ? assistantChargeCentsFromMinutes(timeMinutes, assistantHourlyCents)
-      : 0;
-  const totalCents = Math.max(distanceCents + driverTimeCents + assistantCents + extras, 1000);
+  const driverTimeCents = Math.round(
+    loadUnload90MinCentsFromOptions(options) * (luMinutes / LOAD_UNLOAD_TOTAL_MINUTES)
+  );
+  const assistantTotal = assistantChargeCentsFromMinutes(timeMinutes, assistantHourlyCents, helpers);
+  const totalCents = Math.max(distanceCents + driverTimeCents + assistantTotal + extras, 1000);
   return {
     distanceCents,
     driverTimeCents,
-    assistantCents,
+    assistantCents: assistantTotal,
     weightSurchargeCents: weightExtra,
     cargoCategorySurchargeCents: categoryExtra,
     totalCents,

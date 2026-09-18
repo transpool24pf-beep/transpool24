@@ -3,7 +3,12 @@ import { rateLimitResponse } from "@/lib/rate-limit";
 import { getBookingsSettings } from "@/lib/bookings-settings";
 import { getPricingSettings } from "@/lib/settings";
 import { computeOrderPricingFromAddresses } from "@/lib/order-pricing-compute";
-import { isLoadCarrierId, serviceTypeFromLoadCarriers } from "@/lib/cargo";
+import {
+  clampAssistantCount,
+  isLoadCarrierId,
+  loadCarrierOffersAssistant,
+  serviceTypeFromAssistantCount,
+} from "@/lib/cargo";
 
 const VALID_CARGO = ["XS", "M", "L"] as const;
 
@@ -31,9 +36,10 @@ export async function POST(req: Request) {
       body.cargoCategory != null && typeof body.cargoCategory === "string" ? body.cargoCategory : "";
     const loadCarriersRaw = Array.isArray(body.loadCarriers) ? body.loadCarriers : [];
     const loadCarriers = loadCarriersRaw.filter((x: unknown): x is string => typeof x === "string");
-    const serviceType = serviceTypeFromLoadCarriers(
-      loadCarriers.length > 0 ? loadCarriers : [cargoCategory]
-    );
+    const carriersForType: string[] = loadCarriers.length > 0 ? loadCarriers : [cargoCategory];
+    const offersAssistant = carriersForType.some((id: string) => loadCarrierOffersAssistant(id));
+    const assistantCount = offersAssistant ? clampAssistantCount(body.assistantCount) : 0;
+    const serviceType = serviceTypeFromAssistantCount(assistantCount);
     const distanceKmBody = body.distanceKm != null ? Number(body.distanceKm) : NaN;
     const durationMinutesBody = body.durationMinutes != null ? Number(body.durationMinutes) : NaN;
     const knownRoute =
@@ -78,6 +84,8 @@ export async function POST(req: Request) {
       serviceType,
       pricingOpts,
       knownRoute,
+      loadCarriers: carriersForType,
+      assistantCount,
     });
 
     if (!result.ok) {
