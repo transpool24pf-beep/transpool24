@@ -8,6 +8,7 @@ import {
   formattedAddressContainsPostcode,
   isUnreliablePlzAutoStreet,
 } from "@/lib/plz-street-hint-filters";
+import { parseStructuredAddressFromLine } from "@/lib/structured-address";
 
 const AUTOCOMPLETE_URL = "https://maps.googleapis.com/maps/api/place/autocomplete/json";
 const DETAILS_URL = "https://maps.googleapis.com/maps/api/place/details/json";
@@ -131,16 +132,23 @@ export async function googlePlaceDetailsGermany(
 
   const loc = data.result.geometry?.location;
   const parsed = parseAddressComponents(data.result.address_components);
+  const fromLine = parseStructuredAddressFromLine(data.result.formatted_address);
+  const street = parsed.street || fromLine.street || null;
+  const houseNumber = parsed.houseNumber || fromLine.houseNumber || null;
+  const postcode = parsed.postcode || fromLine.postalCode || null;
+  const city = parsed.city || fromLine.city || null;
+  const country = parsed.country || fromLine.country || null;
+
   if (loc == null || typeof loc.lat !== "number" || typeof loc.lng !== "number") {
     return {
       formatted_address: data.result.formatted_address,
       lat: 0,
       lng: 0,
-      street: parsed.street,
-      houseNumber: parsed.houseNumber,
-      postcode: parsed.postcode,
-      city: parsed.city,
-      country: parsed.country,
+      street,
+      houseNumber,
+      postcode,
+      city,
+      country,
     };
   }
 
@@ -148,11 +156,11 @@ export async function googlePlaceDetailsGermany(
     formatted_address: data.result.formatted_address,
     lat: loc.lat,
     lng: loc.lng,
-    street: parsed.street,
-    houseNumber: parsed.houseNumber,
-    postcode: parsed.postcode,
-    city: parsed.city,
-    country: parsed.country,
+    street,
+    houseNumber,
+    postcode,
+    city,
+    country,
   };
 }
 

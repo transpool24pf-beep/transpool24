@@ -39,6 +39,7 @@ import {
   normalizeStructuredAddress,
   parseStructuredAddressFromLine,
   splitStreetHouse,
+  looksLikeStreetName,
   type StructuredAddress,
 } from "@/lib/structured-address";
 import { localeToHtmlLang } from "@/lib/locale-html-lang";
@@ -121,38 +122,59 @@ function isSameStreetName(prev: StructuredAddress, nextStreet: string): boolean 
   return nextKey === prevKey || nextKey.startsWith(prevKey) || prevKey.startsWith(nextKey);
 }
 
-function structuredFromPlaceDetails(j: PlaceDetailsJson, prev: StructuredAddress): StructuredAddress {
-  const fromFmt = j.formatted_address ? parseStructuredAddressFromLine(j.formatted_address) : EMPTY_STRUCTURED_ADDRESS;
-  const rawStreet = j.street?.trim() || fromFmt.street || "";
-  const split = splitStreetHouse(rawStreet);
-  const houseNumber = j.houseNumber?.trim() || split.houseNumber || fromFmt.houseNumber || "";
-  const postalCode =
-    j.postcode?.trim().replace(/\D/g, "").slice(0, 5) || fromFmt.postalCode || "";
-  const city = j.city?.trim() || fromFmt.city || "";
-  const country = j.country?.trim() || fromFmt.country || "Deutschland";
+function placeholderPhone(value: string): boolean {
+  return !value.trim() || /^[-–—._\s]+$/.test(value);
+}
+
+function mergePlaceAddress(parsed: StructuredAddress, prev: StructuredAddress): StructuredAddress {
+  const companyLooksLikeStreet = looksLikeStreetName(prev.company);
+  const fromCompany = companyLooksLikeStreet ? parseStructuredAddressFromLine(prev.company) : null;
+  const street =
+    parsed.street ||
+    (looksLikeStreetName(prev.street) ? splitStreetHouse(prev.street).street || prev.street : "") ||
+    fromCompany?.street ||
+    "";
+  const houseNumber = parsed.houseNumber || prev.houseNumber || fromCompany?.houseNumber || "";
   return {
     ...prev,
-    street: split.street || rawStreet,
+    company: companyLooksLikeStreet ? "" : prev.company,
+    phone: placeholderPhone(prev.phone) ? "" : prev.phone,
+    street,
     houseNumber,
-    postalCode,
-    city,
-    country: country || "Deutschland",
+    postalCode: parsed.postalCode || prev.postalCode,
+    city: parsed.city && parsed.city.toLowerCase() !== street.toLowerCase() ? parsed.city : prev.city,
+    country: parsed.country || prev.country || "Deutschland",
+    notes: prev.notes,
   };
+}
+
+function structuredFromPlaceDetails(j: PlaceDetailsJson, prev: StructuredAddress): StructuredAddress {
+  const fromFmt = j.formatted_address ? parseStructuredAddressFromLine(j.formatted_address) : EMPTY_STRUCTURED_ADDRESS;
+  const rawStreet = j.street?.trim() || "";
+  const cityFromGoogle = j.city?.trim() || fromFmt.city || "";
+  const streetCandidate = rawStreet || fromFmt.street || "";
+  const street =
+    streetCandidate && streetCandidate.toLowerCase() !== cityFromGoogle.toLowerCase() ? streetCandidate : "";
+  const split = splitStreetHouse(street || rawStreet);
+  const parsed: StructuredAddress = {
+    ...EMPTY_STRUCTURED_ADDRESS,
+    street: split.street || street,
+    houseNumber: j.houseNumber?.trim() || split.houseNumber || fromFmt.houseNumber || "",
+    postalCode: j.postcode?.trim().replace(/\D/g, "").slice(0, 5) || fromFmt.postalCode || "",
+    city: cityFromGoogle,
+    country: j.country?.trim() || fromFmt.country || "Deutschland",
+  };
+  return mergePlaceAddress(parsed, prev);
 }
 
 function expandPastedStreet(next: StructuredAddress, prev: StructuredAddress): StructuredAddress {
   if (next.street === prev.street) return next;
-  if (/\d{5}/.test(next.street)) {
-    const parsed = parseStructuredAddressFromLine(next.street);
-    if (parsed.street || parsed.postalCode || parsed.city) {
-      return {
-        ...next,
-        street: parsed.street || splitStreetHouse(next.street).street || next.street,
-        houseNumber: parsed.houseNumber,
-        postalCode: parsed.postalCode,
-        city: parsed.city,
-        country: parsed.country || next.country || "Deutschland",
-      };
+  const pasted = next.street.trim();
+  const looksFull = /\d{5}/.test(pasted) || pasted.includes(",") || looksLikeStreetName(pasted);
+  if (looksFull) {
+    const parsed = parseStructuredAddressFromLine(pasted);
+    if (parsed.street && (parsed.city || parsed.postalCode || parsed.houseNumber || pasted.includes(","))) {
+      return mergePlaceAddress(parsed, { ...next, street: parsed.street });
     }
   }
   const split = splitStreetHouse(next.street);
@@ -689,12 +711,7 @@ export function OrderForm({
           const parsed = parseStructuredAddressFromLine(stored);
           setData((prev) => {
             const prevAddr = field === "pickup" ? prev.pickupAddr : prev.deliveryAddr;
-            const nextAddr = {
-              ...parsed,
-              company: prevAddr.company,
-              phone: prevAddr.phone,
-              notes: prevAddr.notes,
-            };
+            const nextAddr = mergePlaceAddress(parsed, prevAddr);
             return {
               ...prev,
               [keyAddr]: nextAddr,
@@ -707,12 +724,7 @@ export function OrderForm({
         const parsed = parseStructuredAddressFromLine(stored);
         setData((prev) => {
           const prevAddr = field === "pickup" ? prev.pickupAddr : prev.deliveryAddr;
-          const nextAddr = {
-            ...parsed,
-            company: prevAddr.company,
-            phone: prevAddr.phone,
-            notes: prevAddr.notes,
-          };
+          const nextAddr = mergePlaceAddress(parsed, prevAddr);
           return {
             ...prev,
             [keyAddr]: nextAddr,

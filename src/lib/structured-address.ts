@@ -103,8 +103,8 @@ export function formatStructuredAddressHtml(
 }
 
 export function splitStreetHouse(streetPart: string): { street: string; houseNumber: string } {
-  const s = streetPart.trim();
-  const m = s.match(/^(.*\S)\s+(\d+[a-zA-Z]?)$/);
+  const s = streetPart.trim().replace(/,$/, "");
+  const m = s.match(/^(.*\S)\s+(\d+[a-zA-Z]?(?:\/\d+[a-zA-Z]?)?)$/);
   if (m) return { street: m[1].trim(), houseNumber: m[2].trim() };
   return { street: s, houseNumber: "" };
 }
@@ -112,11 +112,22 @@ export function splitStreetHouse(streetPart: string): { street: string; houseNum
 const DE_ADDRESS_META =
   /^(deutschland|germany|de|baden-w(?:ü|u)rttemberg|bayern|hessen|nordrhein-westfalen|nrw|rheinland-pfalz|saarland|sachsen(?:-anhalt)?|niedersachsen|schleswig-holstein|thüringen|thuringen|brandenburg|mecklenburg(?:-vorpommern)?|europa|europe)$/i;
 
+const DE_ADMIN_AREA =
+  /^(landkreis|kreis|regierungsbezirk)\b/i;
+
 function isGermanAddressMeta(part: string): boolean {
   const p = part.trim();
   if (!p) return true;
   if (/^\d{5}$/.test(p)) return true;
+  if (DE_ADMIN_AREA.test(p)) return true;
   return DE_ADDRESS_META.test(p);
+}
+
+export function looksLikeStreetName(value: string): boolean {
+  const s = value.trim();
+  if (s.length < 2) return false;
+  if (/\d/.test(s)) return true;
+  return /\b(straße|strasse|str\.|weg|platz|ring|allee|gasse|damm|chaussee|pfad|steig|ufer)\b/i.test(s);
 }
 
 function cityFromAddressParts(parts: string[], plz: string, skip: string): string {
@@ -131,6 +142,7 @@ function cityFromAddressParts(parts: string[], plz: string, skip: string): strin
     expanded.find((p) => {
       if (isGermanAddressMeta(p) || !/[A-Za-zÄÖÜäöüß]/.test(p)) return false;
       if (skipN && p.trim().toLowerCase() === skipN) return false;
+      if (looksLikeStreetName(p) && /\d/.test(p)) return false;
       return true;
     }) ?? ""
   );
@@ -142,33 +154,43 @@ export function parseStructuredAddressFromLine(line: string): StructuredAddress 
   const base = { ...EMPTY_STRUCTURED_ADDRESS };
   if (!t) return base;
   const cleaned = t.replace(/,?\s*(Deutschland|Germany|DE)\s*$/i, "").trim();
+  const parts = cleaned.split(",").map((p) => p.trim()).filter(Boolean);
   const plzInLine = cleaned.match(/\b(\d{5})\b/)?.[1] ?? "";
 
+  const streetSource =
+    parts.find((p) => looksLikeStreetName(p) && !/^\d{5}/.test(p)) ||
+    parts.find((p) => !isGermanAddressMeta(p) && !/^\d{5}/.test(p)) ||
+    parts[0] ||
+    cleaned;
+
+  const split = splitStreetHouse(streetSource);
+  let city = "";
   if (plzInLine) {
-    const parts = cleaned.split(",").map((p) => p.trim()).filter(Boolean);
     const plzIdx = parts.findIndex((p) => p === plzInLine || p.startsWith(`${plzInLine} `));
     const beforeParts = plzIdx >= 0 ? parts.slice(0, plzIdx) : parts;
     const afterParts = plzIdx >= 0 ? parts.slice(plzIdx) : [];
-    const streetSource =
-      beforeParts.find((p) => !isGermanAddressMeta(p)) || beforeParts[0] || "";
-    const split = splitStreetHouse(streetSource);
-    const city = cityFromAddressParts(
-      [...afterParts, ...beforeParts.slice().reverse()],
-      plzInLine,
-      streetSource,
-    );
-    return {
-      ...base,
-      street: split.street,
-      houseNumber: split.houseNumber,
-      postalCode: plzInLine,
-      city,
-      country: "Deutschland",
-    };
+    city = cityFromAddressParts([...afterParts, ...beforeParts.slice().reverse()], plzInLine, streetSource);
+  }
+  if (!city) {
+    city =
+      parts
+        .slice()
+        .reverse()
+        .find((p) => {
+          if (p === streetSource || isGermanAddressMeta(p) || /^\d{5}/.test(p)) return false;
+          if (looksLikeStreetName(p) && /\d/.test(p)) return false;
+          return /[A-Za-zÄÖÜäöüß]/.test(p);
+        }) ?? "";
   }
 
-  const split = splitStreetHouse(cleaned);
-  return { ...base, street: split.street, houseNumber: split.houseNumber };
+  return {
+    ...base,
+    street: split.street,
+    houseNumber: split.houseNumber,
+    postalCode: plzInLine,
+    city,
+    country: "Deutschland",
+  };
 }
 
 type JobLike = {

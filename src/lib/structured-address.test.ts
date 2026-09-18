@@ -20,9 +20,20 @@ describe("parseStructuredAddressFromLine", () => {
     expect(a.city).toBe("Mannheim");
   });
 
-  it("does not treat Deutschland as the city", () => {
-    const a = parseStructuredAddressFromLine("Hauptstraße 1, 10115 Berlin, Deutschland");
-    expect(a.city).toBe("Berlin");
-    expect(a.postalCode).toBe("10115");
+  it("fills street, house, city when Google omits the PLZ", () => {
+    const a = parseStructuredAddressFromLine("Rosenegaweg 5, Gottmadingen, Deutschland");
+    expect(a.street).toBe("Rosenegaweg");
+    expect(a.houseNumber).toBe("5");
+    expect(a.city).toBe("Gottmadingen");
+  });
+
+  it("does not use Landkreis as the city", () => {
+    const a = parseStructuredAddressFromLine(
+      "Rosenegaweg 5, Gottmadingen, Landkreis Konstanz, Baden-Württemberg, 78244, Deutschland",
+    );
+    expect(a.street).toBe("Rosenegaweg");
+    expect(a.houseNumber).toBe("5");
+    expect(a.postalCode).toBe("78244");
+    expect(a.city).toBe("Gottmadingen");
   });
 });
