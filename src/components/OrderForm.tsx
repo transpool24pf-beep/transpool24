@@ -2125,20 +2125,6 @@ export function OrderForm({
               </select>
             </div>
           ) : null}
-          <div className="rounded-lg border border-[#0d2137]/15 bg-[#0d2137]/5 p-4">
-            <p className="mb-2 text-sm font-medium text-[var(--foreground)]">{t("driverTimeSummary")}</p>
-            {!distanceFromRoute ? (
-              <p className="text-sm text-amber-700">
-                {t("driverTimeRequiresAddress")}
-              </p>
-            ) : (
-              <div className="space-y-1 text-sm font-semibold text-[var(--accent)]">
-                <p>
-                  {t("distanceOneWay")}: {data.distanceKm} km
-                </p>
-              </div>
-            )}
-          </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
               {distanceFromRoute ? t("distanceRoute") : t("distance")} (km)
