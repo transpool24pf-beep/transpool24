@@ -9,6 +9,7 @@ import {
   type ServiceType,
   type PricingOptions,
   type PriceBreakdown,
+  formatPrice,
 } from "@/lib/pricing";
 import {
   emptyCargoLoadLine,
@@ -17,6 +18,7 @@ import {
   LOAD_UNLOAD_TOTAL_MINUTES,
   normalizeCargoLoadLine,
   summarizeCargoLoads,
+  serviceTypeFromLoadCarriers,
   type CargoLoadLine,
   type LoadCarrierId,
 } from "@/lib/cargo";
@@ -736,6 +738,10 @@ export function OrderForm({
   const loads = data.loads?.length ? data.loads : [emptyCargoLoadLine()];
   const loadSummary = useMemo(() => summarizeCargoLoads(loads), [loads]);
   const loadsComplete = loads.length > 0 && loads.every(isCargoLoadLineComplete);
+  const resolvedServiceType = useMemo(
+    () => serviceTypeFromLoadCarriers(loads.map((l) => l.loadCarrier)),
+    [loads]
+  );
 
   const updateLoad = useCallback((index: number, patch: Partial<CargoLoadLine>) => {
     setData((prev) => {
@@ -849,9 +855,10 @@ export function OrderForm({
               pickupTime:
                 data.pickupDate && data.pickupTime ? `${data.pickupDate}T${data.pickupTime}` : null,
               cargoSize: FIXED_CARGO_SIZE,
-              serviceType: data.serviceType || "driver_car",
+              serviceType: resolvedServiceType,
               weightKg: loadSummary.weightKg,
               cargoCategory: loadSummary.cargoCategory,
+              loadCarriers: loads.map((l) => l.loadCarrier).filter(Boolean),
               distanceKm: distanceFromRoute ? data.distanceKm : undefined,
               durationMinutes: distanceFromRoute ? routeDurationMinutes : undefined,
             }),
@@ -887,7 +894,7 @@ export function OrderForm({
     data.pickupDate,
     data.pickupTime,
     data.cargoSize,
-    data.serviceType,
+    resolvedServiceType,
     loadSummary.weightKg,
     loadSummary.cargoCategory,
     data.distanceKm,
@@ -1247,7 +1254,7 @@ export function OrderForm({
           pickupTime: data.pickupDate && data.pickupTime ? `${data.pickupDate}T${data.pickupTime}` : null,
           deliveryTime: data.deliveryDate && data.deliveryTime ? `${data.deliveryDate}T${data.deliveryTime}` : null,
           cargoSize: FIXED_CARGO_SIZE,
-          serviceType: data.serviceType || "driver_car",
+          serviceType: resolvedServiceType,
           distanceKm: data.distanceKm,
           priceCents,
           cargoDetails: {
@@ -2109,6 +2116,14 @@ export function OrderForm({
           {showStep3Price && priceBreakdown ? (
             <div className="space-y-2">
               <p className="text-sm text-[var(--foreground)]/80">{t("price")}</p>
+              {priceBreakdown.assistantCents > 0 ? (
+                <div className="rounded-lg border border-[var(--accent)]/25 bg-[var(--accent)]/8 px-3 py-2 text-sm text-[#0d2137]">
+                  <p className="font-medium">{t("loadCarrierIncludesAssistant")}</p>
+                  <p className="mt-1 text-[#0d2137]/80">
+                    {t("priceBreakdownAssistant")}: {formatPrice(priceBreakdown.assistantCents)}
+                  </p>
+                </div>
+              ) : null}
               <GermanVatPriceBlock netCents={priceCents} />
             </div>
           ) : (
@@ -2205,6 +2220,11 @@ export function OrderForm({
               <strong>{t("cargoPhotosLabel")}:</strong> {cargoPhotoUrls.length}
             </p>
             <p><strong>{t("distance")}:</strong> {data.distanceKm} km</p>
+            {priceBreakdown?.assistantCents ? (
+              <p>
+                <strong>{t("priceBreakdownAssistant")}:</strong> {formatPrice(priceBreakdown.assistantCents)}
+              </p>
+            ) : null}
             <div className="pt-2">
               <GermanVatPriceBlock netCents={priceCents} />
             </div>

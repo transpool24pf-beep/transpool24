@@ -135,24 +135,25 @@ export function cargoCategoryLabelDe(id: string | null | undefined): string {
   return LEGACY_CARGO_CATEGORY_LABEL_DE[id] ?? id;
 }
 
-/** Load-carrier types (booking form Loads row, emails/PDF use German labels). */
-export type LoadCarrierId =
-  | "carton"
-  | "container"
-  | "dusseldorf_pallet"
-  | "europallet"
-  | "ftl_mega"
-  | "ftl_semi_trailer"
-  | "glt_long"
-  | "industrial_pallet"
-  | "klt"
-  | "lattice_box"
-  | "non_palletized_custom"
-  | "palletized_custom"
-  | "roll_container"
-  | "twinpallet";
+/** Same set as homepage “Beliebte Transportleistungen”. */
+export const BOOKING_LOAD_CARRIER_IDS = [
+  "wrapping_protection",
+  "loading_transport",
+  "household_move",
+  "kitchen_move",
+  "disposal",
+  "bulky_waste",
+  "express_freight",
+  "furniture_boxes",
+  "engines_machinery",
+  "pallet_shipping",
+  "b2b_transport",
+  "drums_industrial",
+] as const;
 
-export const LOAD_CARRIER_LABEL_DE: Record<LoadCarrierId, string> = {
+export type BookingLoadCarrierId = (typeof BOOKING_LOAD_CARRIER_IDS)[number];
+
+const LEGACY_LOAD_CARRIER_LABEL_DE = {
   carton: "Karton",
   container: "Container",
   dusseldorf_pallet: "Düsseldorfer Palette",
@@ -167,17 +168,56 @@ export const LOAD_CARRIER_LABEL_DE: Record<LoadCarrierId, string> = {
   palletized_custom: "palettiert, Sondermaße",
   roll_container: "Rollcontainer",
   twinpallet: "Twinpalette",
+} as const;
+
+export type LoadCarrierId = BookingLoadCarrierId | keyof typeof LEGACY_LOAD_CARRIER_LABEL_DE;
+
+export const LOAD_CARRIER_LABEL_DE: Record<LoadCarrierId, string> = {
+  wrapping_protection: "Verpackung & Schutz",
+  loading_transport: "Beladen & Transport",
+  household_move: "Haushaltsumzug",
+  kitchen_move: "Küchentransport",
+  disposal: "Entsorgung",
+  bulky_waste: "Sperrmüll",
+  express_freight: "Express / Eilgut",
+  furniture_boxes: "Möbel & Kartons",
+  engines_machinery: "Maschinen & Motoren",
+  pallet_shipping: "Palettenversand",
+  b2b_transport: "B2B-Transport",
+  drums_industrial: "Fässer & Industrie",
+  ...LEGACY_LOAD_CARRIER_LABEL_DE,
 };
 
-export const LOAD_CARRIERS: { id: LoadCarrierId; labelKey: string }[] = (
-  Object.keys(LOAD_CARRIER_LABEL_DE) as LoadCarrierId[]
-).map((id) => ({
-  id,
-  labelKey: `loadCarrier_${id}`,
-}));
+/** Move / wrap / load / furniture / disposal jobs always include a Helfer. */
+export const ASSISTANT_LOAD_CARRIER_IDS: readonly BookingLoadCarrierId[] = [
+  "wrapping_protection",
+  "loading_transport",
+  "household_move",
+  "kitchen_move",
+  "disposal",
+  "bulky_waste",
+  "furniture_boxes",
+];
+
+export const LOAD_CARRIERS: { id: BookingLoadCarrierId; labelKey: string }[] = BOOKING_LOAD_CARRIER_IDS.map(
+  (id) => ({
+    id,
+    labelKey: `loadCarrier_${id}`,
+  })
+);
 
 export function isLoadCarrierId(id: unknown): id is LoadCarrierId {
   return typeof id === "string" && id in LOAD_CARRIER_LABEL_DE;
+}
+
+export function loadCarrierRequiresAssistant(id: string | null | undefined): boolean {
+  return typeof id === "string" && (ASSISTANT_LOAD_CARRIER_IDS as readonly string[]).includes(id);
+}
+
+export function serviceTypeFromLoadCarriers(
+  ids: readonly (string | null | undefined)[]
+): "driver_car" | "driver_car_assistant" {
+  return ids.some((id) => loadCarrierRequiresAssistant(id)) ? "driver_car_assistant" : "driver_car";
 }
 
 export type CargoLoadLine = {

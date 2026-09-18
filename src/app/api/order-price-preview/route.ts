@@ -3,10 +3,9 @@ import { rateLimitResponse } from "@/lib/rate-limit";
 import { getBookingsSettings } from "@/lib/bookings-settings";
 import { getPricingSettings } from "@/lib/settings";
 import { computeOrderPricingFromAddresses } from "@/lib/order-pricing-compute";
-import { isLoadCarrierId } from "@/lib/cargo";
+import { isLoadCarrierId, serviceTypeFromLoadCarriers } from "@/lib/cargo";
 
 const VALID_CARGO = ["XS", "M", "L"] as const;
-const VALID_SERVICE = ["driver_only", "driver_car", "driver_car_assistant"] as const;
 
 /**
  * Live step-3 price preview: same logic as confirm-order (auto terrain + weather).
@@ -27,10 +26,14 @@ export async function POST(req: Request) {
         ? new Date(String(body.pickupTime))
         : null;
     const cargoSize = body.cargoSize;
-    const serviceType = VALID_SERVICE.includes(body.serviceType) ? body.serviceType : "driver_car";
     const weightKg = body.weightKg != null ? Number(body.weightKg) : NaN;
     const cargoCategory =
       body.cargoCategory != null && typeof body.cargoCategory === "string" ? body.cargoCategory : "";
+    const loadCarriersRaw = Array.isArray(body.loadCarriers) ? body.loadCarriers : [];
+    const loadCarriers = loadCarriersRaw.filter((x: unknown): x is string => typeof x === "string");
+    const serviceType = serviceTypeFromLoadCarriers(
+      loadCarriers.length > 0 ? loadCarriers : [cargoCategory]
+    );
     const distanceKmBody = body.distanceKm != null ? Number(body.distanceKm) : NaN;
     const durationMinutesBody = body.durationMinutes != null ? Number(body.durationMinutes) : NaN;
     const knownRoute =

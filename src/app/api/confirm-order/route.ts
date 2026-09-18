@@ -9,6 +9,7 @@ import {
   parseCargoLoads,
   summarizeCargoLoads,
   formatCargoLoadsPlainDe,
+  serviceTypeFromLoadCarriers,
 } from "@/lib/cargo";
 import { normalizeStructuredAddress, formatStructuredAddressPlain } from "@/lib/structured-address";
 import { computeOrderPricingFromAddresses } from "@/lib/order-pricing-compute";
@@ -21,7 +22,6 @@ const VALID_CARGO = ["XS", "M", "L"] as const;
 function generateOrderNumber(): number {
   return randomInt(100000, 1000000);
 }
-const VALID_SERVICE_TYPES = ["driver_only", "driver_car", "driver_car_assistant"] as const;
 
 function generateToken(): string {
   return randomBytes(24).toString("base64url");
@@ -49,7 +49,6 @@ export async function POST(req: Request) {
       pickupTime,
       deliveryTime,
       cargoSize,
-      serviceType = "driver_car",
       cargoDetails,
     } = body;
 
@@ -100,9 +99,7 @@ export async function POST(req: Request) {
     const departureTime =
       pickupTime && !Number.isNaN(Date.parse(pickupTime)) ? new Date(pickupTime) : null;
 
-    const st = VALID_SERVICE_TYPES.includes(serviceType as (typeof VALID_SERVICE_TYPES)[number])
-      ? (serviceType as (typeof VALID_SERVICE_TYPES)[number])
-      : "driver_car";
+    const st = serviceTypeFromLoadCarriers(loads.map((l) => l.loadCarrier));
     const pricing = await getPricingSettings();
     const pricingOpts = {
       price_per_km_cents: pricing.price_per_km_cents,
