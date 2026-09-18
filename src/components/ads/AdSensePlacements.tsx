@@ -43,7 +43,7 @@ export function AdSensePlacements() {
   const configured = adsenseManualUnitsConfigured();
   const enabled = allowed && marketing && configured;
   const showRails =
-    marketing && Boolean(ADSENSE_SLOT_SIDEBAR_LEFT || ADSENSE_SLOT_SIDEBAR_RIGHT);
+    enabled && Boolean(ADSENSE_SLOT_SIDEBAR_LEFT || ADSENSE_SLOT_SIDEBAR_RIGHT);
 
   if (!allowed) return null;
 
