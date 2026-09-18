@@ -167,14 +167,15 @@
     },
     "transportOps": {
       "title": "Popüler taşımacılık hizmetleri",
-      "subtitle": "Mobilyadan araçlara, önemli olan her şeyi taşıyoruz.",
-      "loading": "Yükleniyor…",
-      "demoNotice": "Demo kutucukları, görselleri ve başlıkları site CMS’inde (Taşıma kutucukları) ekleyin.",
-      "d1_title": "Mobilya teslimatı",
-      "d2_title": "Motosiklet taşıma",
-      "d3_title": "Araç taşıma",
-      "d4_title": "Şoför ve minibüs",
-      "driverPhotoAlt": "Sürücü {name}"
+      "subtitle": "Taşıma, paketleme, atık ve ekspres, net ve profesyonel görsellerle.",
+      "s1_title": "Paketleme ve koruma",
+      "s2_title": "Yükleme ve taşıma",
+      "s3_title": "Evden eve",
+      "s4_title": "Mutfak taşıma",
+      "s5_title": "Atık / söküm",
+      "s6_title": "Hacimli atık",
+      "s7_title": "Ekspres yük",
+      "s8_title": "Mobilya ve koliler"
     },
     "germanyMap": {
       "eyebrow": "Almanya'yı birbirine bağlıyoruz",

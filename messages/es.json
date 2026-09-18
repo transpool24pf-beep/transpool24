@@ -168,14 +168,15 @@
     },
     "transportOps": {
       "title": "Servicios de transporte populares",
-      "subtitle": "Desde muebles hasta vehículos, movemos lo que importa.",
-      "loading": "Cargando…",
-      "demoNotice": "Baldosas de demostración, añade imágenes y títulos en el CMS del sitio (Mosaicos de transporte).",
-      "d1_title": "Entrega de muebles",
-      "d2_title": "Transporte de motos",
-      "d3_title": "Transporte de coches",
-      "d4_title": "Hombre y furgoneta",
-      "driverPhotoAlt": "Conductor {name}"
+      "subtitle": "Mudanza, embalaje, desecho y express, con imágenes claras.",
+      "s1_title": "Embalaje y protección",
+      "s2_title": "Carga y transporte",
+      "s3_title": "Mudanza del hogar",
+      "s4_title": "Transporte de cocina",
+      "s5_title": "Desecho",
+      "s6_title": "Enseres voluminosos",
+      "s7_title": "Carga urgente",
+      "s8_title": "Muebles y cajas"
     },
     "germanyMap": {
       "eyebrow": "Conectamos Alemania",

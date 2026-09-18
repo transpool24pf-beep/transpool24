@@ -168,14 +168,15 @@
     },
     "transportOps": {
       "title": "Servizi di trasporto popolari",
-      "subtitle": "Dai mobili ai veicoli: spostiamo ciò che conta per te.",
-      "loading": "Caricamento…",
-      "demoNotice": "Riquadri dimostrativi: aggiungi le tue immagini e i tuoi titoli nel CMS del sito Web (riquadri di trasporto).",
-      "d1_title": "Consegna mobili",
-      "d2_title": "Trasporto moto",
-      "d3_title": "Trasporto auto",
-      "d4_title": "Uomo e furgone",
-      "driverPhotoAlt": "Autista {name}"
+      "subtitle": "Trasloco, imballaggio, smaltimento ed express, in modo chiaro.",
+      "s1_title": "Imballaggio e protezione",
+      "s2_title": "Carico e trasporto",
+      "s3_title": "Trasloco casa",
+      "s4_title": "Trasporto cucina",
+      "s5_title": "Smaltimento",
+      "s6_title": "Ingombranti",
+      "s7_title": "Merce express",
+      "s8_title": "Mobili e scatoloni"
     },
     "germanyMap": {
       "eyebrow": "Colleghiamo la Germania",

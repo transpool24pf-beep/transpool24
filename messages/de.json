@@ -310,14 +310,15 @@
     },
     "transportOps": {
       "title": "Beliebte Transportleistungen",
-      "subtitle": "Von Möbeln bis Fahrzeugen, wir bringen Ihre Sendung sicher ans Ziel.",
-      "loading": "Laden…",
-      "demoNotice": "Demo-Kacheln, eigene Bilder und Titel im Website-CMS unter „Transport-Kacheln“ pflegen.",
-      "d1_title": "Möbeltransport",
-      "d2_title": "Motorradtransport",
-      "d3_title": "Autotransport",
-      "d4_title": "Mann und Transporter",
-      "driverPhotoAlt": "Fahrer {name}"
+      "subtitle": "Umzug, Verpackung, Entsorgung und Express, klar und professionell dargestellt.",
+      "s1_title": "Verpackung & Schutz",
+      "s2_title": "Beladen & Transport",
+      "s3_title": "Haushaltsumzug",
+      "s4_title": "Küchentransport",
+      "s5_title": "Entsorgung",
+      "s6_title": "Sperrmüll",
+      "s7_title": "Express / Eilgut",
+      "s8_title": "Möbel & Kartons"
     },
     "germanyMap": {
       "eyebrow": "Wir verbinden Deutschland",

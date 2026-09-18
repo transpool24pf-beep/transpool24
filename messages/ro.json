@@ -167,15 +167,16 @@
       "f3_customerName": "Middle East Transport"
     },
     "transportOps": {
-      "title": "Popular transport services",
-      "subtitle": "From furniture to vehicles, we move what matters to you.",
-      "loading": "Încărcare…",
-      "demoNotice": "Demo tiles, add your own images and titles in the Website CMS (Transport tiles).",
-      "d1_title": "Livrare mobila",
-      "d2_title": "Transport motociclete",
-      "d3_title": "Transport auto",
-      "d4_title": "Barbat si duba",
-      "driverPhotoAlt": "Șofer {name}"
+      "title": "Servicii de transport populare",
+      "subtitle": "Mutare, ambalare, debarasare și express, prezentate clar.",
+      "s1_title": "Ambalare și protecție",
+      "s2_title": "Încărcare și transport",
+      "s3_title": "Mutare locuință",
+      "s4_title": "Transport bucătărie",
+      "s5_title": "Debarasare",
+      "s6_title": "Deșeuri voluminoase",
+      "s7_title": "Marfă express",
+      "s8_title": "Mobilă și cutii"
     },
     "germanyMap": {
       "eyebrow": "Conectăm Germania",

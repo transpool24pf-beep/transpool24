@@ -304,14 +304,15 @@
     },
     "transportOps": {
       "title": "Popular transport services",
-      "subtitle": "From furniture to vehicles, we move what matters to you.",
-      "loading": "Loading…",
-      "demoNotice": "Demo tiles, add your own images and titles in the Website CMS (Transport tiles).",
-      "d1_title": "Furniture delivery",
-      "d2_title": "Motorcycle transport",
-      "d3_title": "Car transport",
-      "d4_title": "Man and van",
-      "driverPhotoAlt": "Driver {name}"
+      "subtitle": "Moving, wrapping, disposal and express freight, shown clearly and professionally.",
+      "s1_title": "Wrapping & protection",
+      "s2_title": "Loading & transport",
+      "s3_title": "Household moving",
+      "s4_title": "Kitchen transport",
+      "s5_title": "Disposal",
+      "s6_title": "Bulky waste",
+      "s7_title": "Express freight",
+      "s8_title": "Furniture & boxes"
     },
     "germanyMap": {
       "eyebrow": "We connect Germany",

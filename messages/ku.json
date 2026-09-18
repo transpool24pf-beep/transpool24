@@ -167,15 +167,16 @@
       "f3_customerName": "Middle East Transport"
     },
     "transportOps": {
-      "title": "Popular transport services",
-      "subtitle": "Ji mobîlya bigire heya wesayîtan - tiştê ku ji we re girîng e em diguhezînin.",
-      "loading": "Barkirin…",
-      "demoNotice": "Pîlanên demo - wêne û sernavên xwe di Malpera CMS-ê de zêde bikin (Palên veguhastinê).",
-      "d1_title": "Radestkirina mobîlya",
-      "d2_title": "transport Motorcycle",
-      "d3_title": "transport car",
-      "d4_title": "Mirov û van",
-      "driverPhotoAlt": "Ajoker {name}"
+      "title": "Karên veguhastinê yên gelemperî",
+      "subtitle": "Veguhestin, pakkirin, avêtin û express, bi wêneyên zelal.",
+      "s1_title": "Pakkirin û parastin",
+      "s2_title": "Barkirin û veguhestin",
+      "s3_title": "Koçkirina malê",
+      "s4_title": "Veguhestina metbexê",
+      "s5_title": "Avêtin",
+      "s6_title": "Zibilê mezin",
+      "s7_title": "Bara express",
+      "s8_title": "Mobîlya û qutî"
     },
     "germanyMap": {
       "eyebrow": "Em Almanyayê girêdidin",

@@ -2,74 +2,30 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { TRANSPOOL24_VAN_IMAGE } from "@/lib/brand-assets";
 
-type Tile = { id: number; title: string; imageUrl: string; driverPhotoUrl?: string };
+const SERVICE_TILES = [
+  { id: "s1", image: "/images/services/appliance-wrap.jpg" },
+  { id: "s2", image: "/images/services/handtruck-packed.jpg" },
+  { id: "s3", image: "/images/services/household-move.jpg" },
+  { id: "s4", image: "/images/services/kitchen-move.jpg" },
+  { id: "s5", image: "/images/services/disposal.jpg" },
+  { id: "s6", image: "/images/services/bulky-waste.jpg" },
+  { id: "s7", image: "/images/services/express-pallet.jpg" },
+  { id: "s8", image: "/images/services/packed-furniture.jpg" },
+] as const;
 
 export function HomeTransportOperations() {
   const t = useTranslations("home.transportOps");
   const locale = useLocale();
-  const [tiles, setTiles] = useState<Tile[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/api/public/content/transport-tiles")
-      .then((r) => r.json())
-      .then((tileData) => {
-        if (cancelled) return;
-        setTiles(Array.isArray(tileData?.tiles) ? tileData.tiles : []);
-      })
-      .catch(() => {
-        if (!cancelled) setTiles([]);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const demoTiles: Tile[] = useMemo(
-    () => [
-      { id: -1, title: t("d1_title"), imageUrl: "/images/445.png" },
-      { id: -2, title: t("d2_title"), imageUrl: TRANSPOOL24_VAN_IMAGE },
-      { id: -3, title: t("d3_title"), imageUrl: "/images/445.png" },
-      { id: -4, title: t("d4_title"), imageUrl: TRANSPOOL24_VAN_IMAGE },
-    ],
-    [t],
-  );
-
-  const display = tiles.length > 0 ? tiles : demoTiles;
-  const isDemo = tiles.length === 0;
-
-  const portraitUrl = (tile: Tile) => {
-    const assigned = (tile.driverPhotoUrl ?? "").trim();
-    const main = (tile.imageUrl ?? "").trim();
-    if (assigned && assigned !== main) return assigned;
-    return "";
-  };
-
-  if (loading) {
-    return (
-      <section className="bg-gradient-to-b from-white to-[#f4f6f8] py-16 sm:py-24">
-        <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
-          <p className="text-[var(--foreground)]/60">{t("loading")}</p>
-        </div>
-      </section>
-    );
-  }
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-white via-[#fafbfc] to-[#eef1f4] py-20 sm:py-28">
+    <section className="relative overflow-x-clip bg-gradient-to-b from-white via-[#f7f8fa] to-[#eef1f4] py-20 sm:py-28">
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.35]"
+        className="pointer-events-none absolute inset-0 opacity-40"
         style={{
-          backgroundImage: `radial-gradient(circle at 20% 20%, rgba(232,93,4,0.08), transparent 45%),
-            radial-gradient(circle at 80% 60%, rgba(13,33,55,0.06), transparent 40%)`,
+          backgroundImage: `radial-gradient(circle at 18% 12%, rgba(232,93,4,0.07), transparent 42%),
+            radial-gradient(circle at 88% 70%, rgba(13,33,55,0.05), transparent 38%)`,
         }}
       />
 
@@ -79,61 +35,38 @@ export function HomeTransportOperations() {
             {t("title")}
           </h2>
           <p className="mt-4 text-lg text-[var(--foreground)]/70">{t("subtitle")}</p>
-          {isDemo && (
-            <p className="mt-2 text-sm italic text-[var(--foreground)]/50">{t("demoNotice")}</p>
-          )}
         </div>
 
-        <div className="mt-14 grid grid-cols-2 gap-5 sm:gap-7 lg:grid-cols-4">
-          {display.map((tile) => {
-            const portrait = portraitUrl(tile);
+        <div
+          className="mt-14 grid grid-cols-2 gap-4 py-6 sm:gap-6 sm:py-8 lg:grid-cols-4 lg:gap-7"
+          style={{ perspective: "1400px" }}
+        >
+          {SERVICE_TILES.map((tile) => {
+            const title = t(`${tile.id}_title`);
             return (
               <Link
                 key={tile.id}
                 href={`/${locale}/order`}
-                className="group relative block focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2"
+                className="group relative block focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-4"
               >
-                <div className="relative rounded-[1.35rem] bg-gradient-to-br from-[var(--accent)] via-[#f5a623] to-[#ff8c42] p-[3px] shadow-lg shadow-[var(--accent)]/20 transition duration-300 group-hover:shadow-xl group-hover:shadow-[var(--accent)]/30">
-                  <div className="relative overflow-hidden rounded-[1.2rem] bg-[#0d2137] ring-1 ring-white/10">
-                    <div className="pointer-events-none absolute inset-0 z-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                      <div className="absolute left-2 top-2 h-8 w-8 rounded-tl-lg border-l-2 border-t-2 border-white/50" />
-                      <div className="absolute right-2 top-2 h-8 w-8 rounded-tr-lg border-r-2 border-t-2 border-white/50" />
-                      <div className="absolute bottom-2 left-2 h-8 w-8 rounded-bl-lg border-b-2 border-l-2 border-white/50" />
-                      <div className="absolute bottom-2 right-2 h-8 w-8 rounded-br-lg border-b-2 border-r-2 border-white/50" />
-                    </div>
-
-                    <div className="relative aspect-[3/4] w-full sm:aspect-[4/5]">
+                <article className="relative h-full origin-center transform-gpu rounded-2xl bg-white shadow-[0_12px_40px_rgba(13,33,55,0.08)] ring-1 ring-[#0d2137]/8 transition-[transform,box-shadow] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform group-hover:z-20 group-hover:-translate-y-3 group-hover:scale-[1.07] group-hover:shadow-[0_28px_60px_rgba(13,33,55,0.18)] group-hover:ring-[var(--accent)]/35">
+                  <div className="overflow-hidden rounded-2xl">
+                    <div className="relative aspect-[4/5] bg-[#f4f6f8]">
                       <Image
-                        src={tile.imageUrl}
-                        alt=""
+                        src={tile.image}
+                        alt={title}
                         fill
-                        className="object-cover transition duration-500 group-hover:scale-105"
+                        className="object-contain p-3 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-125 sm:p-4"
                         sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                        unoptimized={tile.imageUrl.startsWith("http")}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#0d2137]/95 via-[#0d2137]/25 to-transparent" />
-                      {portrait ? (
-                        <div className="absolute left-1/2 top-3 z-20 -translate-x-1/2 sm:top-4">
-                          <div className="relative h-[4.75rem] w-[4.75rem] overflow-hidden rounded-full border-[3px] border-white shadow-lg ring-2 ring-[var(--accent)] sm:h-24 sm:w-24">
-                            <Image
-                              src={portrait}
-                              alt={t("driverPhotoAlt", { name: tile.title })}
-                              fill
-                              className="object-cover"
-                              sizes="96px"
-                              unoptimized={portrait.startsWith("http")}
-                            />
-                          </div>
-                        </div>
-                      ) : null}
-                      <div className="absolute inset-x-0 bottom-0 z-20 p-4 pt-12 sm:p-5">
-                        <p className="text-center text-sm font-bold leading-snug text-white drop-shadow-md sm:text-base">
-                          {tile.title}
-                        </p>
-                      </div>
+                    </div>
+                    <div className="border-t border-[#0d2137]/6 px-3 py-3 sm:px-4 sm:py-4">
+                      <p className="text-center text-sm font-bold leading-snug text-[#0d2137] sm:text-base">
+                        {title}
+                      </p>
                     </div>
                   </div>
-                </div>
+                </article>
               </Link>
             );
           })}

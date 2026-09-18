@@ -168,14 +168,15 @@
     },
     "transportOps": {
       "title": "Services de transport populaires",
-      "subtitle": "Du mobilier aux véhicules, nous transportons l’essentiel.",
-      "loading": "Chargement…",
-      "demoNotice": "Tuiles de démo, ajoutez vos images et titres dans le CMS du site (Tuiles transport).",
-      "d1_title": "Livraison de meubles",
-      "d2_title": "Transport de motos",
-      "d3_title": "Transport de voitures",
-      "d4_title": "Homme et camionnette",
-      "driverPhotoAlt": "Chauffeur {name}"
+      "subtitle": "Déménagement, emballage, enlèvement et express, présentés clairement.",
+      "s1_title": "Emballage & protection",
+      "s2_title": "Chargement & transport",
+      "s3_title": "Déménagement",
+      "s4_title": "Transport de cuisine",
+      "s5_title": "Enlèvement",
+      "s6_title": "Encombrants",
+      "s7_title": "Fret express",
+      "s8_title": "Meubles & cartons"
     },
     "germanyMap": {
       "eyebrow": "Nous relions l'Allemagne",
