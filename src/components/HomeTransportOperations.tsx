@@ -42,7 +42,7 @@ export function HomeTransportOperations() {
         </div>
 
         <div
-          className="mt-14 grid grid-cols-2 gap-4 py-6 sm:gap-6 sm:py-8 lg:grid-cols-4 lg:gap-7"
+          className="mt-14 grid grid-cols-2 gap-4 py-10 sm:gap-6 sm:py-14 lg:grid-cols-4 lg:gap-8"
           style={{ perspective: "1400px" }}
         >
           {SERVICE_TILES.map((tile) => {
@@ -51,15 +51,15 @@ export function HomeTransportOperations() {
               <Link
                 key={tile.id}
                 href={`/${locale}/order`}
-                className="group relative block focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-4"
+                className="group relative z-0 block focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-4 hover:z-30"
               >
-                <article className="relative h-full origin-center transform-gpu rounded-2xl bg-transparent transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform group-hover:z-20 group-hover:-translate-y-3 group-hover:scale-[1.07]">
+                <article className="relative h-full origin-center transform-gpu rounded-2xl bg-transparent transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform group-hover:-translate-y-8 group-hover:scale-[1.22]">
                   <div className="relative aspect-[4/5] overflow-visible bg-transparent">
                     <Image
                       src={tile.image}
                       alt={title}
                       fill
-                      className="object-contain drop-shadow-[0_18px_28px_rgba(13,33,55,0.18)] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-125"
+                      className="object-contain drop-shadow-[0_18px_28px_rgba(13,33,55,0.18)] transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.55] group-hover:drop-shadow-[0_32px_48px_rgba(13,33,55,0.28)]"
                       sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     />
                   </div>
