@@ -1859,8 +1859,7 @@ export function OrderForm({
             {t("step3")}
           </h2>
           <div ref={loadsRef} className="rounded-lg border border-[#0d2137]/15 bg-[#0d2137]/5 p-4">
-            <p className="mb-1 text-sm font-medium text-[var(--foreground)]">{t("cargoDetails")}</p>
-            <p className="mb-3 text-xs text-amber-800">{t("cargoDetailsMandatoryHint")}</p>
+            <p className="mb-3 text-sm font-medium text-[var(--foreground)]">{t("cargoDetails")}</p>
             <div className="space-y-4">
               {loads.map((line, idx) => (
                 <div
@@ -2126,26 +2125,28 @@ export function OrderForm({
             </div>
           ) : null}
           <div>
-            <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
-              {distanceFromRoute ? t("distanceRoute") : t("distance")} (km)
-            </label>
             {distanceFromRoute ? (
               <div className="rounded-lg border border-green-200 bg-green-50/50 px-4 py-3 text-sm font-medium text-green-800">
                 {data.distanceKm} km, {t("distanceFromRouteLabel")}
               </div>
             ) : (
-              <input
-                type="number"
-                min={1}
-                max={500}
-                value={data.distanceKm}
-                onChange={(e) => {
-                  update({ distanceKm: Math.max(1, Number(e.target.value) || 1) });
-                  setDistanceFromRoute(false);
-                }}
-                className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
-                step={0.1}
-              />
+              <>
+                <label className="mb-1 block text-sm font-medium text-[var(--foreground)]">
+                  {t("distance")} (km)
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={500}
+                  value={data.distanceKm}
+                  onChange={(e) => {
+                    update({ distanceKm: Math.max(1, Number(e.target.value) || 1) });
+                    setDistanceFromRoute(false);
+                  }}
+                  className="w-full rounded-lg border border-[#0d2137]/20 px-4 py-2 focus:border-[var(--accent)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                  step={0.1}
+                />
+              </>
             )}
           </div>
           {showStep3Price && priceBreakdown ? (
