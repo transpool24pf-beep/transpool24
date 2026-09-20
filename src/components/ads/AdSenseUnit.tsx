@@ -7,7 +7,7 @@ import {
   ADSENSE_SIDEBAR_WIDTH,
 } from "@/lib/adsense-config";
 
-type Variant = "sidebar" | "banner";
+type Variant = "sidebar" | "banner" | "compact";
 
 type Props = {
   slot: string;
@@ -45,6 +45,24 @@ export function AdSenseUnit({ slot, variant, enabled }: Props) {
         }}
         data-ad-client={ADSENSE_CLIENT}
         data-ad-slot={slot}
+      />
+    );
+  }
+
+  if (variant === "compact") {
+    return (
+      <ins
+        className="adsbygoogle adsense-unit--compact block w-full overflow-hidden"
+        style={{
+          display: "block",
+          width: "100%",
+          height: 90,
+          maxHeight: 90,
+        }}
+        data-ad-client={ADSENSE_CLIENT}
+        data-ad-slot={slot}
+        data-ad-format="horizontal"
+        data-full-width-responsive="false"
       />
     );
   }

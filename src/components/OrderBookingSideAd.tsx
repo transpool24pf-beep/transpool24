@@ -22,13 +22,15 @@ export function OrderBookingSideAd({ slot, label, enabled }: Props) {
   );
 }
 
-/** In-flow unit on phones (scrolls with the page, not a fixed overlay). */
+/** Compact horizontal banner on phones. */
 export function OrderBookingBannerAd({ slot, label, enabled }: Props) {
   if (!slot) return null;
   return (
-    <div className="my-4 w-full">
-      <AdFrame label={label}>
-        <AdSenseUnit slot={slot} variant="banner" enabled={enabled} />
+    <div className="my-3 w-full max-h-[118px] overflow-hidden">
+      <AdFrame label={label} className="!p-1 [&_p]:mb-0.5">
+        <div className="max-h-[90px] w-full overflow-hidden">
+          <AdSenseUnit slot={slot} variant="compact" enabled={enabled} />
+        </div>
       </AdFrame>
     </div>
   );
