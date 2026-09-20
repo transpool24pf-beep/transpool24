@@ -5,11 +5,12 @@ import { useTranslations } from "next-intl";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { OrderForm } from "@/components/OrderForm";
-import { OrderBookingSideAd } from "@/components/OrderBookingSideAd";
+import { OrderBookingBannerAd, OrderBookingSideAd, useIsDesktopLg } from "@/components/OrderBookingSideAd";
 import { OrderIntroDotLotties } from "@/components/OrderIntroDotLotties";
 import { adLabel } from "@/components/ads/AdSensePlacements";
 import { useMarketingConsent } from "@/components/ads/useMarketingConsent";
 import {
+  ADSENSE_SLOT_BANNER,
   ADSENSE_SLOT_SIDEBAR_LEFT,
   ADSENSE_SLOT_SIDEBAR_RIGHT,
   adsenseManualUnitsConfigured,
@@ -23,6 +24,7 @@ export function OrderPageClient({ locale, title }: { locale: string; title: stri
   const rtl = locale === "ar";
   const adsEnabled = useMarketingConsent() && adsenseManualUnitsConfigured();
   const adsLabel = adLabel(locale);
+  const isDesktop = useIsDesktopLg();
 
   const refreshBookingsStatus = useCallback(() => {
     fetch("/api/public/bookings-status", { cache: "no-store" })
@@ -93,13 +95,15 @@ export function OrderPageClient({ locale, title }: { locale: string; title: stri
             className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,36rem)_minmax(0,1fr)] lg:items-stretch lg:gap-5 xl:gap-8"
             style={{ direction: "ltr" }}
           >
-            <aside className="hidden lg:flex lg:items-start lg:justify-end lg:py-6">
-              <OrderBookingSideAd
-                slot={ADSENSE_SLOT_SIDEBAR_LEFT}
-                label={adsLabel}
-                enabled={adsEnabled}
-              />
-            </aside>
+            {isDesktop ? (
+              <aside className="flex items-start justify-end py-6">
+                <OrderBookingSideAd
+                  slot={ADSENSE_SLOT_SIDEBAR_LEFT}
+                  label={adsLabel}
+                  enabled={adsEnabled}
+                />
+              </aside>
+            ) : null}
 
             <div
               className="mx-auto min-w-0 w-full max-w-2xl lg:py-2"
@@ -111,16 +115,32 @@ export function OrderPageClient({ locale, title }: { locale: string; title: stri
                   {title}
                 </h1>
               )}
+              {isDesktop === false ? (
+                <OrderBookingBannerAd
+                  slot={ADSENSE_SLOT_BANNER}
+                  label={adsLabel}
+                  enabled={adsEnabled}
+                />
+              ) : null}
               <OrderForm locale={locale} bookingsPaused={false} onOrderConfirmed={() => setHideLogo(true)} />
+              {isDesktop === false ? (
+                <OrderBookingBannerAd
+                  slot={ADSENSE_SLOT_SIDEBAR_RIGHT}
+                  label={adsLabel}
+                  enabled={adsEnabled}
+                />
+              ) : null}
             </div>
 
-            <aside className="hidden lg:flex lg:items-start lg:justify-start lg:py-6">
-              <OrderBookingSideAd
-                slot={ADSENSE_SLOT_SIDEBAR_RIGHT}
-                label={adsLabel}
-                enabled={adsEnabled}
-              />
-            </aside>
+            {isDesktop ? (
+              <aside className="flex items-start justify-start py-6">
+                <OrderBookingSideAd
+                  slot={ADSENSE_SLOT_SIDEBAR_RIGHT}
+                  label={adsLabel}
+                  enabled={adsEnabled}
+                />
+              </aside>
+            ) : null}
           </div>
         </div>
       </main>
