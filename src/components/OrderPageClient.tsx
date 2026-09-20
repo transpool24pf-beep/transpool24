@@ -5,8 +5,15 @@ import { useTranslations } from "next-intl";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { OrderForm } from "@/components/OrderForm";
-import { OrderBookingSideLottie } from "@/components/OrderBookingSideLottie";
+import { OrderBookingSideAd } from "@/components/OrderBookingSideAd";
 import { OrderIntroDotLotties } from "@/components/OrderIntroDotLotties";
+import { adLabel } from "@/components/ads/AdSensePlacements";
+import { useMarketingConsent } from "@/components/ads/useMarketingConsent";
+import {
+  ADSENSE_SLOT_SIDEBAR_LEFT,
+  ADSENSE_SLOT_SIDEBAR_RIGHT,
+  adsenseManualUnitsConfigured,
+} from "@/lib/adsense-config";
 
 export function OrderPageClient({ locale, title }: { locale: string; title: string }) {
   const t = useTranslations("order");
@@ -14,6 +21,8 @@ export function OrderPageClient({ locale, title }: { locale: string; title: stri
   /** null = لم يُحمَّل بعد من الـ API */
   const [bookingsPaused, setBookingsPaused] = useState<boolean | null>(null);
   const rtl = locale === "ar";
+  const adsEnabled = useMarketingConsent() && adsenseManualUnitsConfigured();
+  const adsLabel = adLabel(locale);
 
   const refreshBookingsStatus = useCallback(() => {
     fetch("/api/public/bookings-status", { cache: "no-store" })
@@ -84,8 +93,12 @@ export function OrderPageClient({ locale, title }: { locale: string; title: stri
             className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,36rem)_minmax(0,1fr)] lg:items-stretch lg:gap-5 xl:gap-8"
             style={{ direction: "ltr" }}
           >
-            <aside className="hidden lg:flex lg:items-center lg:justify-end lg:py-6">
-              <OrderBookingSideLottie variant="a" />
+            <aside className="hidden lg:flex lg:items-start lg:justify-end lg:py-6">
+              <OrderBookingSideAd
+                slot={ADSENSE_SLOT_SIDEBAR_LEFT}
+                label={adsLabel}
+                enabled={adsEnabled}
+              />
             </aside>
 
             <div
@@ -101,8 +114,12 @@ export function OrderPageClient({ locale, title }: { locale: string; title: stri
               <OrderForm locale={locale} bookingsPaused={false} onOrderConfirmed={() => setHideLogo(true)} />
             </div>
 
-            <aside className="hidden lg:flex lg:items-center lg:justify-start lg:py-6">
-              <OrderBookingSideLottie variant="b" />
+            <aside className="hidden lg:flex lg:items-start lg:justify-start lg:py-6">
+              <OrderBookingSideAd
+                slot={ADSENSE_SLOT_SIDEBAR_RIGHT}
+                label={adsLabel}
+                enabled={adsEnabled}
+              />
             </aside>
           </div>
         </div>

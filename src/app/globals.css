@@ -43,38 +43,6 @@ body {
   animation: germany-map-dash-flow 3.2s steps(10) infinite;
 }
 
-/* Order page: side DotLotties drift in opposite directions */
-@keyframes order-lottie-drift-a {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  50% {
-    transform: translateX(14px);
-  }
-}
-
-@keyframes order-lottie-drift-b {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  50% {
-    transform: translateX(-14px);
-  }
-}
-
-.order-lottie-drift-a {
-  animation: order-lottie-drift-a 4.5s ease-in-out infinite;
-  will-change: transform;
-}
-
-.order-lottie-drift-b {
-  animation: order-lottie-drift-b 4.5s ease-in-out infinite;
-  animation-delay: -2.25s;
-  will-change: transform;
-}
-
 /* Header van crop/slide is driven in HeaderCarLottieTrack (lottie-web + rAF). *//* Customer tracking: live driver position = round photo filling the pin (no gaps / no Leaflet div border) */
 .leaflet-driver-photo-marker.leaflet-div-icon {
   background: transparent !important;

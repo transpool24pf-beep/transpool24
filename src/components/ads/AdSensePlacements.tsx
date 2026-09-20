@@ -6,6 +6,7 @@ import {
   ADSENSE_SLOT_SIDEBAR_LEFT,
   ADSENSE_SLOT_SIDEBAR_RIGHT,
   adsAllowedForPath,
+  adsUseFixedSidebarRails,
   adsenseManualUnitsConfigured,
 } from "@/lib/adsense-config";
 import { AdRailPageGutter, AdSidebarRail } from "@/components/ads/AdSidebarRail";
@@ -27,7 +28,7 @@ const AD_LABEL: Record<string, string> = {
   uk: "Реклама",
 };
 
-function adLabel(locale: string): string {
+export function adLabel(locale: string): string {
   return AD_LABEL[locale] ?? AD_LABEL.en!;
 }
 
@@ -43,7 +44,9 @@ export function AdSensePlacements() {
   const configured = adsenseManualUnitsConfigured();
   const enabled = allowed && marketing && configured;
   const showRails =
-    enabled && Boolean(ADSENSE_SLOT_SIDEBAR_LEFT || ADSENSE_SLOT_SIDEBAR_RIGHT);
+    enabled &&
+    adsUseFixedSidebarRails(pathname) &&
+    Boolean(ADSENSE_SLOT_SIDEBAR_LEFT || ADSENSE_SLOT_SIDEBAR_RIGHT);
 
   if (!allowed) return null;
 
