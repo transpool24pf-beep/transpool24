@@ -7,6 +7,7 @@ import { shouldOpenDriverFormFromDraft } from "@/lib/driver-wizard-storage";
 import { DriverWizardForm } from "./DriverWizardForm";
 import { OrderRouteLottie } from "./OrderRouteLottie";
 import { TRANSPOOL24_VAN_IMAGE } from "@/lib/brand-assets";
+import { PageAdsLayout } from "@/components/ads/PageAdsLayout";
 
 export function DriverPageClient({ locale }: { locale: string }) {
   const t = useTranslations("driver.landing");
@@ -43,6 +44,7 @@ export function DriverPageClient({ locale }: { locale: string }) {
 
   return (
     <main className="bg-[#f6f7fb]" lang={locale} dir={rtl ? "rtl" : "ltr"}>
+      <PageAdsLayout>
       {!showForm ? (
         <>
           <section className="overflow-hidden bg-[#f6f4ef]">
@@ -232,6 +234,7 @@ export function DriverPageClient({ locale }: { locale: string }) {
           </div>
         </section>
       )}
+      </PageAdsLayout>
     </main>
   );
 }

@@ -22,17 +22,13 @@ export function adsenseManualUnitsConfigured(): boolean {
   );
 }
 
-/** Legal and driver flows stay ad-free. Order page uses in-form side units instead of fixed rails. */
-const AD_FREE_SECTIONS = new Set([
-  "driver",
-  "privacy",
-  "terms",
-  "rate-driver",
-]);
+/** Legal pages stay ad-free. Driver apply, order, why, and blog use in-page units. */
+const AD_FREE_SECTIONS = new Set(["privacy", "terms", "rate-driver"]);
+
+const IN_PAGE_AD_SECTIONS = new Set(["order", "driver", "why", "blog"]);
 
 /**
- * Manual AdSense on marketing pages and the booking form.
- * Driver / legal pages stay ad-free.
+ * Manual AdSense on marketing pages, booking, driver apply, why, and blog.
  */
 export function adsAllowedForPath(pathname: string | null): boolean {
   if (!pathname) return false;
@@ -45,14 +41,15 @@ export function adsAllowedForPath(pathname: string | null): boolean {
   const section = parts[1]?.toLowerCase() ?? "";
   if (!section) return true;
   if (AD_FREE_SECTIONS.has(section)) return false;
+  if (section === "driver" && parts.length > 2) return false;
 
   return true;
 }
 
-/** Viewport-fixed skyscrapers; the order form has its own column ads. */
+/** Viewport-fixed skyscrapers; some pages use in-column ads instead. */
 export function adsUseFixedSidebarRails(pathname: string | null): boolean {
   if (!adsAllowedForPath(pathname)) return false;
   const parts = pathname!.split("/").filter(Boolean);
   const section = parts[1]?.toLowerCase() ?? "";
-  return section !== "order";
+  return !IN_PAGE_AD_SECTIONS.has(section);
 }

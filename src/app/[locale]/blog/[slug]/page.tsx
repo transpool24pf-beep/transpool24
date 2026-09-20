@@ -9,7 +9,6 @@ import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
 import { localeAlternatesAndSocial } from "@/lib/locale-seo-metadata";
 import { seoDocumentTitle } from "@/lib/seo-document-title";
-import { ContentAdBanner } from "@/components/ads/ContentAdBanner";
 
 export const revalidate = 60;
 
@@ -157,8 +156,6 @@ export default async function BlogPostPage({ params }: Props) {
         ) : null}
 
         <BlogMarkdown markdown={post.body || ""} />
-
-        <ContentAdBanner region="blog-article-banner" className="mt-10 border-t border-[#e8eaed] pt-8" />
       </article>
     </main>
   );
