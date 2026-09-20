@@ -51,11 +51,11 @@ export function AdSenseUnit({ slot, variant, enabled }: Props) {
 
   return (
     <ins
-      className="adsbygoogle adsense-unit--banner block min-h-[90px] w-full max-w-[728px] overflow-hidden"
-      style={{ display: "block" }}
+      className="adsbygoogle adsense-unit--banner block w-full overflow-hidden"
+      style={{ display: "block", minHeight: 100, width: "100%" }}
       data-ad-client={ADSENSE_CLIENT}
       data-ad-slot={slot}
-      data-ad-format="horizontal"
+      data-ad-format="auto"
       data-full-width-responsive="true"
     />
   );

@@ -8,11 +8,11 @@ export const ADSENSE_SIDEBAR_HEIGHT = 600;
 
 /** Manual display units, create in AdSense → Ads → By ad unit → Display. */
 export const ADSENSE_SLOT_SIDEBAR_LEFT =
-  process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR_LEFT?.trim() ?? "6424372308";
+  process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR_LEFT?.trim() || "6424372308";
 export const ADSENSE_SLOT_SIDEBAR_RIGHT =
-  process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR_RIGHT?.trim() ?? "1367340953";
+  process.env.NEXT_PUBLIC_ADSENSE_SLOT_SIDEBAR_RIGHT?.trim() || "1367340953";
 export const ADSENSE_SLOT_BANNER =
-  process.env.NEXT_PUBLIC_ADSENSE_SLOT_BANNER?.trim() ?? "6428095944";
+  process.env.NEXT_PUBLIC_ADSENSE_SLOT_BANNER?.trim() || "6428095944";
 
 export function adsenseManualUnitsConfigured(): boolean {
   return Boolean(

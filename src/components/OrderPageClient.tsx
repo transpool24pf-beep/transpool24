@@ -5,10 +5,10 @@ import { useTranslations } from "next-intl";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { OrderForm } from "@/components/OrderForm";
-import { OrderBookingBannerAd, OrderBookingSideAd, useIsDesktopLg } from "@/components/OrderBookingSideAd";
+import { OrderBookingBannerAd, OrderBookingSideAd, OrderBookingStickyBanner, useIsDesktopLg } from "@/components/OrderBookingSideAd";
 import { OrderIntroDotLotties } from "@/components/OrderIntroDotLotties";
 import { adLabel } from "@/components/ads/AdSensePlacements";
-import { useMarketingConsent } from "@/components/ads/useMarketingConsent";
+import { AdSenseScript } from "@/components/ads/AdSenseScript";
 import {
   ADSENSE_SLOT_BANNER,
   ADSENSE_SLOT_SIDEBAR_LEFT,
@@ -22,9 +22,11 @@ export function OrderPageClient({ locale, title }: { locale: string; title: stri
   /** null = لم يُحمَّل بعد من الـ API */
   const [bookingsPaused, setBookingsPaused] = useState<boolean | null>(null);
   const rtl = locale === "ar";
-  const adsEnabled = useMarketingConsent() && adsenseManualUnitsConfigured();
+  const adsEnabled = adsenseManualUnitsConfigured();
   const adsLabel = adLabel(locale);
-  const isDesktop = useIsDesktopLg();
+  const { isDesktop, ready } = useIsDesktopLg();
+  const showMobileAds = ready && !isDesktop;
+  const showDesktopAds = ready && isDesktop;
 
   const refreshBookingsStatus = useCallback(() => {
     fetch("/api/public/bookings-status", { cache: "no-store" })
@@ -88,14 +90,15 @@ export function OrderPageClient({ locale, title }: { locale: string; title: stri
 
   return (
     <>
+      <AdSenseScript enabled={adsEnabled} />
       <Header hideLogo={hideLogo} />
-      <main className="min-h-[calc(100vh-8rem)] bg-[var(--background)] py-8">
+      <main className={`min-h-[calc(100vh-8rem)] bg-[var(--background)] py-8 ${showMobileAds ? "pb-36" : ""}`}>
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div
             className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,36rem)_minmax(0,1fr)] lg:items-stretch lg:gap-5 xl:gap-8"
             style={{ direction: "ltr" }}
           >
-            {isDesktop ? (
+            {showDesktopAds ? (
               <aside className="flex items-start justify-end py-6">
                 <OrderBookingSideAd
                   slot={ADSENSE_SLOT_SIDEBAR_LEFT}
@@ -115,15 +118,15 @@ export function OrderPageClient({ locale, title }: { locale: string; title: stri
                   {title}
                 </h1>
               )}
-              {isDesktop === false ? (
+              {showMobileAds ? (
                 <OrderBookingBannerAd
-                  slot={ADSENSE_SLOT_BANNER}
+                  slot={ADSENSE_SLOT_SIDEBAR_LEFT}
                   label={adsLabel}
                   enabled={adsEnabled}
                 />
               ) : null}
               <OrderForm locale={locale} bookingsPaused={false} onOrderConfirmed={() => setHideLogo(true)} />
-              {isDesktop === false ? (
+              {showMobileAds ? (
                 <OrderBookingBannerAd
                   slot={ADSENSE_SLOT_SIDEBAR_RIGHT}
                   label={adsLabel}
@@ -132,7 +135,7 @@ export function OrderPageClient({ locale, title }: { locale: string; title: stri
               ) : null}
             </div>
 
-            {isDesktop ? (
+            {showDesktopAds ? (
               <aside className="flex items-start justify-start py-6">
                 <OrderBookingSideAd
                   slot={ADSENSE_SLOT_SIDEBAR_RIGHT}
@@ -144,6 +147,13 @@ export function OrderPageClient({ locale, title }: { locale: string; title: stri
           </div>
         </div>
       </main>
+      {showMobileAds ? (
+        <OrderBookingStickyBanner
+          slot={ADSENSE_SLOT_BANNER}
+          label={adsLabel}
+          enabled={adsEnabled}
+        />
+      ) : null}
       <Footer />
     </>
   );
