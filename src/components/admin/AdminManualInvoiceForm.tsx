@@ -18,6 +18,11 @@ export function AdminManualInvoiceForm() {
   const [invServiceDate, setInvServiceDate] = useState("");
   const [invPickup, setInvPickup] = useState("");
   const [invDelivery, setInvDelivery] = useState("");
+  const [delStreet, setDelStreet] = useState("");
+  const [delHouse, setDelHouse] = useState("");
+  const [delPlz, setDelPlz] = useState("");
+  const [delCity, setDelCity] = useState("");
+  const [delCountry, setDelCountry] = useState("Deutschland");
   const [invBusy, setInvBusy] = useState(false);
   const [invError, setInvError] = useState<string | null>(null);
 
@@ -59,6 +64,11 @@ export function AdminManualInvoiceForm() {
               serviceDate: invServiceDate || null,
               pickupAt: invPickup || null,
               deliveryAt: invDelivery || null,
+              deliveryStreet: delStreet,
+              deliveryHouseNumber: delHouse,
+              deliveryPostalCode: delPlz,
+              deliveryCity: delCity,
+              deliveryCountry: delCountry || "Deutschland",
             }),
           });
           if (!res.ok) {
@@ -144,6 +154,49 @@ export function AdminManualInvoiceForm() {
         <input
           value={invCustomerNo}
           onChange={(e) => setInvCustomerNo(e.target.value)}
+          className="w-full rounded-xl border-2 border-[#0d2137]/15 px-3 py-2 text-[#0d2137]"
+        />
+      </label>
+      <p className="sm:col-span-2 lg:col-span-3 mt-2 text-sm font-semibold text-[#0d2137]">
+        {t("reports.deliveryHeading")}
+      </p>
+      <label className="block text-sm">
+        <span className="mb-1 block font-medium text-[#0d2137]">{t("reports.street")}</span>
+        <input
+          value={delStreet}
+          onChange={(e) => setDelStreet(e.target.value)}
+          className="w-full rounded-xl border-2 border-[#0d2137]/15 px-3 py-2 text-[#0d2137]"
+        />
+      </label>
+      <label className="block text-sm">
+        <span className="mb-1 block font-medium text-[#0d2137]">{t("reports.houseNumber")}</span>
+        <input
+          value={delHouse}
+          onChange={(e) => setDelHouse(e.target.value)}
+          className="w-full rounded-xl border-2 border-[#0d2137]/15 px-3 py-2 text-[#0d2137]"
+        />
+      </label>
+      <label className="block text-sm">
+        <span className="mb-1 block font-medium text-[#0d2137]">{t("reports.postalCode")}</span>
+        <input
+          value={delPlz}
+          onChange={(e) => setDelPlz(e.target.value)}
+          className="w-full rounded-xl border-2 border-[#0d2137]/15 px-3 py-2 text-[#0d2137]"
+        />
+      </label>
+      <label className="block text-sm">
+        <span className="mb-1 block font-medium text-[#0d2137]">{t("reports.city")}</span>
+        <input
+          value={delCity}
+          onChange={(e) => setDelCity(e.target.value)}
+          className="w-full rounded-xl border-2 border-[#0d2137]/15 px-3 py-2 text-[#0d2137]"
+        />
+      </label>
+      <label className="block text-sm">
+        <span className="mb-1 block font-medium text-[#0d2137]">{t("common.country")}</span>
+        <input
+          value={delCountry}
+          onChange={(e) => setDelCountry(e.target.value)}
           className="w-full rounded-xl border-2 border-[#0d2137]/15 px-3 py-2 text-[#0d2137]"
         />
       </label>

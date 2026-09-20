@@ -245,6 +245,21 @@ export async function generateInvoicePdf(
   if (recipient.notes.trim()) {
     leftPairs.push(["Hinweis Entladung:", recipient.notes]);
   }
+  const delRaw =
+    job.cargo_details && typeof job.cargo_details === "object"
+      ? (job.cargo_details as Record<string, unknown>).invoiceDeliveryAddress
+      : null;
+  if (delRaw && typeof delRaw === "object") {
+    const d = delRaw as Record<string, unknown>;
+    const ds = [d.street, d.houseNumber].map((x) => (typeof x === "string" ? x.trim() : "")).join(" ").trim();
+    const dp = [d.postalCode, d.city].map((x) => (typeof x === "string" ? x.trim() : "")).join(" ").trim();
+    const dc = typeof d.country === "string" ? d.country.trim() : "";
+    if (ds || dp) {
+      leftPairs.push(["Lieferadresse:", ds || "-"]);
+      if (dp) leftPairs.push(["PLZ Ort (Lieferung):", dp]);
+      if (dc) leftPairs.push(["", dc]);
+    }
+  }
   const rightPairs: [string, string][] = [
     ["", PDF_COMPANY.name],
     ["", PDF_COMPANY.street],
@@ -465,6 +480,11 @@ export type ManualCustomerInvoiceInput = {
   serviceDateIso: string | null;
   pickupAtIso: string | null;
   deliveryAtIso: string | null;
+  deliveryStreet: string;
+  deliveryHouseNumber: string;
+  deliveryPostalCode: string;
+  deliveryCity: string;
+  deliveryCountry: string;
 };
 
 /** Same customer Rechnung layout; company/bank/terms stay TransPool24. Price is net, 19 % MwSt. added. */
@@ -476,6 +496,11 @@ export async function generateManualCustomerInvoicePdf(
   const streetLine = `${input.street} ${input.houseNumber}`.trim();
   const plzOrt = `${input.postalCode} ${input.city}`.trim();
   const addr = [streetLine, plzOrt, input.country || "Deutschland"].filter(Boolean).join(", ");
+  const deliveryStreetLine = `${input.deliveryStreet} ${input.deliveryHouseNumber}`.trim();
+  const deliveryPlzOrt = `${input.deliveryPostalCode} ${input.deliveryCity}`.trim();
+  const deliveryAddr = [deliveryStreetLine, deliveryPlzOrt, input.deliveryCountry || "Deutschland"]
+    .filter(Boolean)
+    .join(", ");
   const grossCents = addGermanVat19(input.netCents).grossCents;
   const job = {
     id: "manual-invoice",
@@ -483,8 +508,8 @@ export async function generateManualCustomerInvoicePdf(
     company_name: input.customerName,
     pickup_address: addr,
     pickup_city: input.city || null,
-    delivery_address: addr,
-    delivery_city: input.city || null,
+    delivery_address: deliveryAddr || addr,
+    delivery_city: input.deliveryCity || input.city || null,
     phone: input.phone,
     customer_email: null,
     preferred_pickup_at: input.pickupAtIso || input.serviceDateIso,
@@ -500,6 +525,13 @@ export async function generateManualCustomerInvoicePdf(
         city: input.city,
         country: input.country || "Deutschland",
         notes: "",
+      },
+      invoiceDeliveryAddress: {
+        street: input.deliveryStreet,
+        houseNumber: input.deliveryHouseNumber,
+        postalCode: input.deliveryPostalCode,
+        city: input.deliveryCity,
+        country: input.deliveryCountry || "Deutschland",
       },
     },
     service_type: "driver_car" as const,

@@ -134,6 +134,7 @@ export const ADMIN_PAGES_DE: Record<string, string> = {
   "reports.serviceDate": "Leistungsdatum",
   "reports.extractNeedName": "Kundenname erforderlich",
   "reports.extractNeedPrice": "Gültigen Nettobetrag eingeben",
+  "reports.deliveryHeading": "Lieferadresse (Zustellung)",
 
   "drivers.title": "Fahrer",
   "drivers.hintBefore": "Bewerbungen aus dem Fahrerformular finden Sie unter",
@@ -374,6 +375,7 @@ export const ADMIN_PAGES_AR: Record<string, string> = {
   "reports.serviceDate": "تاريخ الخدمة",
   "reports.extractNeedName": "اسم العميل مطلوب",
   "reports.extractNeedPrice": "أدخل سعراً صافياً صالحاً",
+  "reports.deliveryHeading": "إلى أين التسليم",
 
   "drivers.title": "السائقون",
   "drivers.hintBefore": "طلبات التسجيل من نموذج السائق تجدها في",

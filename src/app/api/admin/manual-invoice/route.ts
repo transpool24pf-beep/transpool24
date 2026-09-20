@@ -55,6 +55,11 @@ export async function POST(req: Request) {
       serviceDateIso: isoOrNull(body.serviceDate),
       pickupAtIso: isoOrNull(body.pickupAt),
       deliveryAtIso: isoOrNull(body.deliveryAt),
+      deliveryStreet: str(body.deliveryStreet, 120),
+      deliveryHouseNumber: str(body.deliveryHouseNumber, 20),
+      deliveryPostalCode: str(body.deliveryPostalCode, 10),
+      deliveryCity: str(body.deliveryCity, 80),
+      deliveryCountry: str(body.deliveryCountry, 80) || "Deutschland",
     });
     const invoiceNo = formatAuftragNumber({
       order_number: orderNumber,
