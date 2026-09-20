@@ -40,11 +40,10 @@ export async function POST(req: Request) {
     if (netCents == null || netCents < 100 || netCents > 50_000_000) {
       return NextResponse.json({ error: "INVALID_NET" }, { status: 400 });
     }
-    const customerNumber = str(body.customerNumber, 20);
+    const customerNumber = str(body.customerNumber, 40);
     const orderNumber = /^\d{1,9}$/.test(customerNumber)
       ? Number(customerNumber)
       : randomInt(100000, 1000000);
-    const createdAt = new Date().toISOString();
     const input = {
       customerName,
       customerEmail: str(body.customerEmail, 160),
@@ -55,7 +54,8 @@ export async function POST(req: Request) {
       city: str(body.city, 80),
       country: str(body.country, 80) || "Deutschland",
       orderNumber,
-      netCents,
+      printedAuftragNumber: customerNumber,
+      amountCents: netCents,
       serviceDateIso: isoOrNull(body.serviceDate),
       pickupAtIso: isoOrNull(body.pickupAt),
       deliveryAtIso: isoOrNull(body.deliveryAt),
@@ -69,14 +69,12 @@ export async function POST(req: Request) {
     const invoicePdf = await generateInvoicePdf(job, { type: "customer" });
     const vertragPdf = await generateUmzugsvertragPdf(job);
     const pdf = await mergeInvoiceAndVertrag(invoicePdf, vertragPdf);
-    const invoiceNo = formatAuftragNumber({
-      order_number: orderNumber,
-      created_at: createdAt,
-    });
+    const invoiceNo = formatAuftragNumber(job);
+    const safeFile = invoiceNo.replace(/[^\w.-]+/g, "_");
     return new NextResponse(Buffer.from(pdf), {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="TransPool24-Rechnung-Umzugsvertrag-${invoiceNo}.pdf"`,
+        "Content-Disposition": `attachment; filename="TransPool24-Rechnung-Umzugsvertrag-${safeFile}.pdf"`,
       },
     });
   } catch (e) {

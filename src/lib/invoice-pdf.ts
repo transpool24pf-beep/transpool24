@@ -2,8 +2,8 @@ import { PDFDocument, rgb, StandardFonts, type PDFFont, type PDFPage } from "pdf
 import type { Job } from "./supabase";
 import { getPdfLogoBytes, PDF_COMPANY } from "./pdf-company";
 import { jobPreferredDeliveryAt, jobRecipientAddress } from "./structured-address";
-import { formatAuftragNumber } from "./order-ref";
-import { addGermanVat19, splitGermanVatFromGross } from "./pricing";
+import { formatAuftragNumber, formatKundennummer } from "./order-ref";
+import { splitGermanVatFromGross } from "./pricing";
 
 export type InvoiceType = "customer" | "driver";
 
@@ -240,7 +240,7 @@ export async function generateInvoicePdf(
     ["Straße Hausnummer:", addrStreet],
     ["PLZ Ort:", plzOrt],
     ["", recipient.country || "Deutschland"],
-    ["Kundennummer (optional):", job.order_number != null ? String(job.order_number) : ""],
+    ["Kundennummer (optional):", formatKundennummer(job) === "-" ? "" : formatKundennummer(job)],
   ];
   if (recipient.notes.trim()) {
     leftPairs.push(["Hinweis Entladung:", recipient.notes]);
@@ -462,7 +462,8 @@ export type ManualCustomerInvoiceInput = {
   city: string;
   country: string;
   orderNumber: number;
-  netCents: number;
+  printedAuftragNumber: string;
+  amountCents: number;
   serviceDateIso: string | null;
   pickupAtIso: string | null;
   deliveryAtIso: string | null;
@@ -487,7 +488,6 @@ export function buildManualCustomerInvoiceJob(input: ManualCustomerInvoiceInput)
   const deliveryAddr = hasDelivery
     ? [deliveryStreet, deliveryPlzOrt, deliveryCountry].filter(Boolean).join(", ")
     : pickupAddr;
-  const grossCents = addGermanVat19(input.netCents).grossCents;
   const senderAddress = {
     company: input.customerName,
     phone: input.phone,
@@ -526,11 +526,12 @@ export function buildManualCustomerInvoiceJob(input: ManualCustomerInvoiceInput)
     cargo_details: {
       senderAddress,
       recipientAddress,
+      printedAuftragNumber: input.printedAuftragNumber.trim(),
     },
     service_type: "driver_car" as const,
     distance_km: null,
     duration_minutes: null,
-    price_cents: grossCents,
+    price_cents: input.amountCents,
     created_at: now,
     updated_at: now,
     customer_id: null,

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useAdminLocale } from "@/contexts/AdminLocaleContext";
-import { addGermanVat19, formatPrice } from "@/lib/pricing";
+import { splitGermanVatFromGross, formatPrice } from "@/lib/pricing";
 
 export function AdminManualInvoiceForm() {
   const { t } = useAdminLocale();
@@ -30,7 +30,7 @@ export function AdminManualInvoiceForm() {
   const invVat = useMemo(() => {
     const n = Number(invNet.replace(/\s/g, "").replace(",", "."));
     if (!Number.isFinite(n) || n <= 0) return null;
-    return addGermanVat19(Math.round(n * 100));
+    return splitGermanVatFromGross(Math.round(n * 100));
   }, [invNet]);
 
   return (
@@ -218,7 +218,7 @@ export function AdminManualInvoiceForm() {
           inputMode="decimal"
           value={invNet}
           onChange={(e) => setInvNet(e.target.value)}
-          placeholder="423,04"
+              placeholder="800,00"
           className="w-full rounded-xl border-2 border-[#0d2137]/15 px-3 py-2 text-[#0d2137]"
         />
       </label>

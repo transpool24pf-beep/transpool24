@@ -7,7 +7,7 @@ import {
   jobRecipientAddress,
   jobSenderAddress,
 } from "./structured-address";
-import { formatAuftragNumber } from "./order-ref";
+import { formatAuftragNumber, formatKundennummer } from "./order-ref";
 import { splitGermanVatFromGross } from "./pricing";
 import { formatCargoLoadsPlainDe } from "./cargo";
 import { pdfPrintableOrFallback, sanitizeTextForStandardPdfFont } from "./invoice-pdf";
@@ -281,7 +281,7 @@ export async function generateUmzugsvertragPdf(job: Job): Promise<Uint8Array> {
     ["Name / Firma:", customerName],
     ["E-Mail:", job.customer_email || "-"],
     ["Telefon:", job.phone || sender.phone || "-"],
-    ["Kundennummer:", job.order_number != null ? String(job.order_number) : "-"],
+    ["Kundennummer:", formatKundennummer(job)],
   ];
   const rightPairs: [string, string][] = [
     ["", PDF_COMPANY.name],
