@@ -7,6 +7,7 @@ import { addGermanVat19, formatPrice } from "@/lib/pricing";
 export function AdminManualInvoiceForm() {
   const { t } = useAdminLocale();
   const [invName, setInvName] = useState("");
+  const [invEmail, setInvEmail] = useState("");
   const [invPhone, setInvPhone] = useState("");
   const [invStreet, setInvStreet] = useState("");
   const [invHouse, setInvHouse] = useState("");
@@ -53,6 +54,7 @@ export function AdminManualInvoiceForm() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               customerName: invName,
+              customerEmail: invEmail,
               phone: invPhone,
               street: invStreet,
               houseNumber: invHouse,
@@ -98,6 +100,15 @@ export function AdminManualInvoiceForm() {
           required
           value={invName}
           onChange={(e) => setInvName(e.target.value)}
+          className="w-full rounded-xl border-2 border-[#0d2137]/15 px-3 py-2 text-[#0d2137]"
+        />
+      </label>
+      <label className="block text-sm">
+        <span className="mb-1 block font-medium text-[#0d2137]">{t("common.email")}</span>
+        <input
+          type="email"
+          value={invEmail}
+          onChange={(e) => setInvEmail(e.target.value)}
           className="w-full rounded-xl border-2 border-[#0d2137]/15 px-3 py-2 text-[#0d2137]"
         />
       </label>

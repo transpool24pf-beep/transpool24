@@ -2,9 +2,12 @@ import { NextResponse } from "next/server";
 import { randomInt } from "crypto";
 import { requireAdmin } from "@/lib/admin-api";
 import {
-  generateManualCustomerInvoicePdf,
+  buildManualCustomerInvoiceJob,
+  generateInvoicePdf,
 } from "@/lib/invoice-pdf";
+import { generateUmzugsvertragPdf, mergeInvoiceAndVertrag } from "@/lib/umzugsvertrag-pdf";
 import { formatAuftragNumber } from "@/lib/order-ref";
+import type { Job } from "@/lib/supabase";
 
 function str(v: unknown, max = 200): string {
   return typeof v === "string" ? v.trim().slice(0, max) : "";
@@ -42,8 +45,9 @@ export async function POST(req: Request) {
       ? Number(customerNumber)
       : randomInt(100000, 1000000);
     const createdAt = new Date().toISOString();
-    const pdf = await generateManualCustomerInvoicePdf({
+    const input = {
       customerName,
+      customerEmail: str(body.customerEmail, 160),
       phone: str(body.phone, 40),
       street: str(body.street, 120),
       houseNumber: str(body.houseNumber, 20),
@@ -60,7 +64,11 @@ export async function POST(req: Request) {
       deliveryPostalCode: str(body.deliveryPostalCode, 10),
       deliveryCity: str(body.deliveryCity, 80),
       deliveryCountry: str(body.deliveryCountry, 80) || "Deutschland",
-    });
+    };
+    const job = buildManualCustomerInvoiceJob(input) as Job;
+    const invoicePdf = await generateInvoicePdf(job, { type: "customer" });
+    const vertragPdf = await generateUmzugsvertragPdf(job);
+    const pdf = await mergeInvoiceAndVertrag(invoicePdf, vertragPdf);
     const invoiceNo = formatAuftragNumber({
       order_number: orderNumber,
       created_at: createdAt,
@@ -68,7 +76,7 @@ export async function POST(req: Request) {
     return new NextResponse(Buffer.from(pdf), {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="TransPool24-Rechnung-${invoiceNo}.pdf"`,
+        "Content-Disposition": `attachment; filename="TransPool24-Rechnung-Umzugsvertrag-${invoiceNo}.pdf"`,
       },
     });
   } catch (e) {
