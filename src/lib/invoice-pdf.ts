@@ -3,7 +3,7 @@ import type { Job } from "./supabase";
 import { getPdfLogoBytes, PDF_COMPANY } from "./pdf-company";
 import { jobPreferredDeliveryAt, jobRecipientAddress } from "./structured-address";
 import { formatAuftragNumber } from "./order-ref";
-import { splitGermanVatFromGross } from "./pricing";
+import { addGermanVat19, splitGermanVatFromGross } from "./pricing";
 
 export type InvoiceType = "customer" | "driver";
 
@@ -450,4 +450,71 @@ export async function generateInvoicePdf(
   y = blockY - 16;
 
   return doc.save();
+}
+
+export type ManualCustomerInvoiceInput = {
+  customerName: string;
+  phone: string;
+  street: string;
+  houseNumber: string;
+  postalCode: string;
+  city: string;
+  country: string;
+  orderNumber: number;
+  netCents: number;
+  serviceDateIso: string | null;
+  pickupAtIso: string | null;
+  deliveryAtIso: string | null;
+};
+
+/** Same customer Rechnung layout; company/bank/terms stay TransPool24. Price is net, 19 % MwSt. added. */
+export async function generateManualCustomerInvoicePdf(
+  input: ManualCustomerInvoiceInput
+): Promise<Uint8Array> {
+  const now = new Date().toISOString();
+  const serial = input.orderNumber;
+  const streetLine = `${input.street} ${input.houseNumber}`.trim();
+  const plzOrt = `${input.postalCode} ${input.city}`.trim();
+  const addr = [streetLine, plzOrt, input.country || "Deutschland"].filter(Boolean).join(", ");
+  const grossCents = addGermanVat19(input.netCents).grossCents;
+  const job = {
+    id: "manual-invoice",
+    order_number: serial,
+    company_name: input.customerName,
+    pickup_address: addr,
+    pickup_city: input.city || null,
+    delivery_address: addr,
+    delivery_city: input.city || null,
+    phone: input.phone,
+    customer_email: null,
+    preferred_pickup_at: input.pickupAtIso || input.serviceDateIso,
+    preferred_delivery_at: input.deliveryAtIso,
+    cargo_size: "L" as const,
+    cargo_details: {
+      recipientAddress: {
+        company: input.customerName,
+        phone: input.phone,
+        street: input.street,
+        houseNumber: input.houseNumber,
+        postalCode: input.postalCode,
+        city: input.city,
+        country: input.country || "Deutschland",
+        notes: "",
+      },
+    },
+    service_type: "driver_car" as const,
+    distance_km: null,
+    duration_minutes: null,
+    price_cents: grossCents,
+    created_at: now,
+    updated_at: now,
+    customer_id: null,
+    payment_status: "pending" as const,
+    logistics_status: "confirmed",
+    confirmation_token: null,
+    stripe_session_id: null,
+    stripe_payment_intent_id: null,
+    assigned_driver_id: null,
+  };
+  return generateInvoicePdf(job, { type: "customer" });
 }
