@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { listLocalesWithNativeBlogPosts, listPublishedPosts } from "@/lib/blog";
 import { AboutUsWhyNarrative } from "@/components/about/AboutUsWhyNarrative";
@@ -56,6 +56,10 @@ export default async function BlogIndexPage({ params }: Props) {
   const locale = loc as Locale;
   if (!routing.locales.includes(locale)) {
     notFound();
+  }
+  const nativeLocales = await listLocalesWithNativeBlogPosts();
+  if (!nativeLocales.includes(locale) && locale !== "de") {
+    permanentRedirect("/de/blog");
   }
 
   const t = await getTranslations("blog");

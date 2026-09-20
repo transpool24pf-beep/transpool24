@@ -2,6 +2,7 @@ import createMiddleware from "next-intl/middleware";
 import { NextRequest, NextResponse } from "next/server";
 import { COOKIE_NAME } from "@/lib/admin-auth-constants";
 import { verifyAdminSessionEdge } from "@/lib/admin-auth-edge";
+import { resolveCanonicalRedirect } from "@/lib/canonical-request";
 import { routing } from "./i18n/routing";
 
 const intlMiddleware = createMiddleware(routing);
@@ -21,12 +22,10 @@ function safeAdminNextPath(next: string | null): string {
 
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
-  if (pathname === "/de/blog/willkommen-transpool24-magazin") {
-    const to = request.nextUrl.clone();
-    to.pathname = "/de/blog";
-    to.search = "";
-    return NextResponse.redirect(to, 308);
+  const host = request.headers.get("x-forwarded-host") || request.headers.get("host") || "";
+  const canonical = resolveCanonicalRedirect(host, pathname, request.nextUrl.search);
+  if (canonical) {
+    return NextResponse.redirect(canonical, 308);
   }
 
   if (pathname.startsWith("/admin")) {

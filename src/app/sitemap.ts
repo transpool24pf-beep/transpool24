@@ -6,7 +6,7 @@ import { getPublicSiteUrl } from "@/lib/public-site-url";
 const STATIC_SUFFIXES = ["", "/why", "/driver", "/privacy", "/terms", "/support"] as const;
 
 /** Real content date for static locale pages — do not use `new Date()` per request. */
-const STATIC_LASTMOD = new Date("2026-09-17T08:00:00.000Z");
+const STATIC_LASTMOD = new Date("2026-09-20T18:00:00.000Z");
 
 function safeLastmod(value: string | Date | undefined): Date {
   if (!value) return STATIC_LASTMOD;

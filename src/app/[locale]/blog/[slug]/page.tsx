@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { BlogMarkdown } from "@/components/BlogMarkdown";
 import { getPublishedPostSeo } from "@/lib/blog";
@@ -64,13 +64,20 @@ export default async function BlogPostPage({ params }: Props) {
     notFound();
   }
   if (LEGACY_POST_SLUGS.has(slug)) {
-    redirect(`/${locale}/blog`);
+    permanentRedirect("/de/blog");
   }
 
   const seo = await getPublishedPostSeo(locale, slug);
   const post = seo.post;
   if (!post) {
     notFound();
+  }
+  if (
+    !seo.indexable &&
+    seo.canonicalLocale &&
+    seo.canonicalLocale !== locale
+  ) {
+    permanentRedirect(`/${seo.canonicalLocale}/blog/${slug}`);
   }
 
   const t = await getTranslations("blog");

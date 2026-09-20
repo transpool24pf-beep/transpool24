@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { permanentRedirect } from "next/navigation";
 
 export default async function RateDriverRedirectPage({
   searchParams,
@@ -7,5 +7,5 @@ export default async function RateDriverRedirectPage({
 }) {
   const params = await searchParams;
   const token = params?.token ? `?token=${encodeURIComponent(params.token)}` : "";
-  redirect(`/de/rate-driver${token}`);
+  permanentRedirect(`/de/rate-driver${token}`);
 }
