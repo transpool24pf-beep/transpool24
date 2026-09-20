@@ -229,6 +229,8 @@ export function AdminManualInvoiceForm() {
         <span className="mb-1 block font-medium text-[#0d2137]">{t("reports.serviceDate")}</span>
         <input
           type="date"
+          dir="ltr"
+          lang="de"
           value={invServiceDate}
           onChange={(e) => setInvServiceDate(e.target.value)}
           className="w-full rounded-xl border-2 border-[#0d2137]/15 px-3 py-2 text-[#0d2137]"
@@ -238,6 +240,8 @@ export function AdminManualInvoiceForm() {
         <span className="mb-1 block font-medium text-[#0d2137]">{t("reports.colPickupTime")}</span>
         <input
           type="datetime-local"
+          dir="ltr"
+          lang="de"
           value={invPickup}
           onChange={(e) => setInvPickup(e.target.value)}
           className="w-full rounded-xl border-2 border-[#0d2137]/15 px-3 py-2 text-[#0d2137]"
@@ -247,6 +251,8 @@ export function AdminManualInvoiceForm() {
         <span className="mb-1 block font-medium text-[#0d2137]">{t("reports.colDeliveryTime")}</span>
         <input
           type="datetime-local"
+          dir="ltr"
+          lang="de"
           value={invDelivery}
           onChange={(e) => setInvDelivery(e.target.value)}
           className="w-full rounded-xl border-2 border-[#0d2137]/15 px-3 py-2 text-[#0d2137]"

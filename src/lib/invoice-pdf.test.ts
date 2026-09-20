@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { Job } from "./supabase";
-import { customerInvoiceServiceName, sanitizeTextForStandardPdfFont } from "./invoice-pdf";
+import {
+  customerInvoiceServiceName,
+  formatDeDateYmd,
+  sanitizeTextForStandardPdfFont,
+} from "./invoice-pdf";
 
 describe("sanitizeTextForStandardPdfFont", () => {
   it("keeps German umlauts and digits", () => {
@@ -12,6 +16,12 @@ describe("sanitizeTextForStandardPdfFont", () => {
   });
   it("maps Euro sign", () => {
     expect(sanitizeTextForStandardPdfFont("99 €")).toBe("99 EUR");
+  });
+});
+
+describe("formatDeDateYmd", () => {
+  it("formats YYYY-MM-DD as German invoice date without timezone shift", () => {
+    expect(formatDeDateYmd("2026-09-30")).toBe("30.09.2026");
   });
 });
 

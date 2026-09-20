@@ -20,8 +20,21 @@ function parseNetCents(raw: unknown): number | null {
   return Math.round(n * 100);
 }
 
+function ymdFrom(raw: unknown): string {
+  if (typeof raw !== "string") return "";
+  const m = raw.trim().match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return m ? `${m[1]}-${m[2]}-${m[3]}` : "";
+}
+
 function isoOrNull(raw: unknown): string | null {
   if (typeof raw !== "string" || !raw.trim()) return null;
+  const ymd = ymdFrom(raw);
+  const time = raw.trim().match(/T(\d{2}):(\d{2})/);
+  if (ymd && time) {
+    const local = new Date(`${ymd}T${time[1]}:${time[2]}:00`);
+    if (!Number.isNaN(local.getTime())) return local.toISOString();
+  }
+  if (ymd) return `${ymd}T12:00:00.000Z`;
   const d = new Date(raw.trim());
   if (Number.isNaN(d.getTime())) return null;
   return d.toISOString();
@@ -57,6 +70,7 @@ export async function POST(req: Request) {
       printedAuftragNumber: customerNumber,
       amountCents: netCents,
       serviceDateIso: isoOrNull(body.serviceDate),
+      printedInvoiceDate: ymdFrom(body.serviceDate) || ymdFrom(body.pickupAt),
       pickupAtIso: isoOrNull(body.pickupAt),
       deliveryAtIso: isoOrNull(body.deliveryAt),
       deliveryStreet: str(body.deliveryStreet, 120),

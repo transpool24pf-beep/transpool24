@@ -49,7 +49,39 @@ function formatEur(cents: number): string {
   return `${n} EUR`;
 }
 
+function ymdFromValue(value: string | Date | null | undefined): string {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    const y = value.getFullYear();
+    const m = String(value.getMonth() + 1).padStart(2, "0");
+    const d = String(value.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  }
+  if (typeof value !== "string" || !value.trim()) return "";
+  const m = value.trim().match(/^(\d{4})-(\d{2})-(\d{2})/);
+  return m ? `${m[1]}-${m[2]}-${m[3]}` : "";
+}
+
+export function formatDeDateYmd(ymd: string): string {
+  const m = ymd.trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!m) return "-";
+  return `${m[3]}.${m[2]}.${m[1]}`;
+}
+
+function printedInvoiceYmd(job: Job): string {
+  const raw =
+    job.cargo_details && typeof job.cargo_details === "object"
+      ? (job.cargo_details as Record<string, unknown>).printedInvoiceDate
+      : null;
+  if (typeof raw === "string") {
+    const ymd = ymdFromValue(raw);
+    if (ymd) return ymd;
+  }
+  return "";
+}
+
 function formatDeDate(iso: string | Date | null | undefined): string {
+  const ymd = ymdFromValue(iso);
+  if (ymd) return formatDeDateYmd(ymd);
   if (!iso) return "-";
   const d = iso instanceof Date ? iso : new Date(iso);
   if (Number.isNaN(d.getTime())) return "-";
@@ -215,8 +247,13 @@ export async function generateInvoicePdf(
   drawRight(page, fontBold, title, width - margin, y - 8, 22, TEAL_DARK);
 
   const invoiceNo = invoiceNumberForJob(job);
-  const invoiceDate = formatDeDate(new Date());
-  const leistungDate = formatDeDate(job.pod_completed_at || job.preferred_pickup_at || job.created_at);
+  const enteredInvoiceYmd = printedInvoiceYmd(job);
+  const invoiceDate = enteredInvoiceYmd
+    ? formatDeDateYmd(enteredInvoiceYmd)
+    : formatDeDate(new Date());
+  const leistungDate = formatDeDate(
+    enteredInvoiceYmd || job.pod_completed_at || job.preferred_pickup_at || job.created_at
+  );
   const metaRight = width - margin;
   const metaLabelX = width - margin - 210;
   let metaY = y - 32;
@@ -505,6 +542,7 @@ export type ManualCustomerInvoiceInput = {
   printedAuftragNumber: string;
   amountCents: number;
   serviceDateIso: string | null;
+  printedInvoiceDate: string;
   pickupAtIso: string | null;
   deliveryAtIso: string | null;
   deliveryStreet: string;
@@ -567,6 +605,7 @@ export function buildManualCustomerInvoiceJob(input: ManualCustomerInvoiceInput)
       senderAddress,
       recipientAddress,
       printedAuftragNumber: input.printedAuftragNumber.trim(),
+      printedInvoiceDate: ymdFromValue(input.printedInvoiceDate || input.serviceDateIso || input.pickupAtIso),
     },
     service_type: "driver_car" as const,
     distance_km: null,
