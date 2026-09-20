@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { OrderForm } from "@/components/OrderForm";
-import { OrderBookingBannerAd, OrderBookingSideAd, OrderBookingStickyBanner, useIsDesktopLg } from "@/components/OrderBookingSideAd";
+import { OrderBookingBannerAd, OrderBookingSideAd, useIsDesktopLg } from "@/components/OrderBookingSideAd";
 import { OrderIntroDotLotties } from "@/components/OrderIntroDotLotties";
 import { adLabel } from "@/components/ads/AdSensePlacements";
 import { AdSenseScript } from "@/components/ads/AdSenseScript";
@@ -92,7 +92,7 @@ export function OrderPageClient({ locale, title }: { locale: string; title: stri
     <>
       <AdSenseScript enabled={adsEnabled} />
       <Header hideLogo={hideLogo} />
-      <main className={`min-h-[calc(100vh-8rem)] bg-[var(--background)] py-8 ${showMobileAds ? "pb-36" : ""}`}>
+      <main className="min-h-[calc(100vh-8rem)] bg-[var(--background)] py-8">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div
             className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,36rem)_minmax(0,1fr)] lg:items-stretch lg:gap-5 xl:gap-8"
@@ -120,7 +120,7 @@ export function OrderPageClient({ locale, title }: { locale: string; title: stri
               )}
               {showMobileAds ? (
                 <OrderBookingBannerAd
-                  slot={ADSENSE_SLOT_SIDEBAR_LEFT}
+                  slot={ADSENSE_SLOT_BANNER}
                   label={adsLabel}
                   enabled={adsEnabled}
                 />
@@ -128,7 +128,7 @@ export function OrderPageClient({ locale, title }: { locale: string; title: stri
               <OrderForm locale={locale} bookingsPaused={false} onOrderConfirmed={() => setHideLogo(true)} />
               {showMobileAds ? (
                 <OrderBookingBannerAd
-                  slot={ADSENSE_SLOT_SIDEBAR_RIGHT}
+                  slot={ADSENSE_SLOT_SIDEBAR_LEFT}
                   label={adsLabel}
                   enabled={adsEnabled}
                 />
@@ -147,13 +147,6 @@ export function OrderPageClient({ locale, title }: { locale: string; title: stri
           </div>
         </div>
       </main>
-      {showMobileAds ? (
-        <OrderBookingStickyBanner
-          slot={ADSENSE_SLOT_BANNER}
-          label={adsLabel}
-          enabled={adsEnabled}
-        />
-      ) : null}
       <Footer />
     </>
   );
