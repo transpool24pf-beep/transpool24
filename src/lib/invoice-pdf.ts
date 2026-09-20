@@ -1,7 +1,7 @@
 import { PDFDocument, rgb, StandardFonts, type PDFFont, type PDFPage } from "pdf-lib";
 import type { Job } from "./supabase";
 import { getPdfLogoBytes, PDF_COMPANY } from "./pdf-company";
-import { jobPreferredDeliveryAt, jobRecipientAddress } from "./structured-address";
+import { jobPreferredDeliveryAt, jobRecipientAddress, jobSenderAddress } from "./structured-address";
 import { formatAuftragNumber, formatKundennummer } from "./order-ref";
 import { splitGermanVatFromGross } from "./pricing";
 
@@ -65,6 +65,26 @@ function formatDeDateTime(iso: string | Date | null | undefined): string {
 
 export function invoiceNumberForJob(job: Job & { order_number?: number | null }): string {
   return formatAuftragNumber(job);
+}
+
+function streetHouse(street: string, houseNumber: string): string {
+  return `${street} ${houseNumber}`.trim();
+}
+
+/** Line-item text: route, date, and Auftragsnummer as on the confirmation. */
+export function customerInvoiceServiceName(job: Job): string {
+  const sender = jobSenderAddress(job);
+  const dest = jobRecipientAddress(job);
+  const fromCity = (sender.city || job.pickup_city || "").trim();
+  const fromStreet = streetHouse(sender.street, sender.houseNumber);
+  const toCity = (dest.city || job.delivery_city || "").trim();
+  const date = formatDeDate(job.preferred_pickup_at || job.created_at);
+  const nr = formatAuftragNumber(job);
+  const fromPart =
+    fromCity && fromStreet ? `${fromCity} (${fromStreet})` : fromCity || fromStreet || "Abholort";
+  const toPart = toCity || "Lieferort";
+  const datePart = date !== "-" ? ` am ${date}` : "";
+  return `Umzugsservice von ${fromPart} nach ${toPart}${datePart} (gemäß Auftragsbestätigung Nr. ${nr})`;
 }
 
 function parseDeAddress(full: string): { street: string; plzOrt: string } {
@@ -221,12 +241,19 @@ export async function generateInvoicePdf(
   const leftX = margin;
   const rightX = margin + colW + colGap;
 
-  const recipient = jobRecipientAddress(job);
-  const addrStreet = `${recipient.street} ${recipient.houseNumber}`.trim() || parseDeAddress(job.pickup_address || "").street;
+  const billing = jobSenderAddress(job);
+  const delivery = jobRecipientAddress(job);
+  const addrStreet =
+    streetHouse(billing.street, billing.houseNumber) || parseDeAddress(job.pickup_address || "").street;
   const plzOrt =
-    `${recipient.postalCode} ${recipient.city}`.trim() ||
+    `${billing.postalCode} ${billing.city}`.trim() ||
     parseDeAddress(job.pickup_address || "").plzOrt ||
     (job.pickup_city ? `${job.pickup_city}` : "-");
+  const deliveryStreet = streetHouse(delivery.street, delivery.houseNumber);
+  const deliveryPlzOrt = `${delivery.postalCode} ${delivery.city}`.trim();
+  const showDelivery =
+    Boolean(deliveryStreet || deliveryPlzOrt) &&
+    (deliveryStreet !== addrStreet || deliveryPlzOrt !== plzOrt);
 
   tealBar(page, leftX, y, colW, 20, "RECHNUNGSEMPFÄNGER", fontBold);
   tealBar(page, rightX, y, colW, 20, "RECHNUNGSAUSSTELLER", fontBold);
@@ -235,15 +262,19 @@ export async function generateInvoicePdf(
   const labelW = 118;
   const valueW = colW - labelW - 8;
   const leftPairs: [string, string][] = [
-    ["Kundenname / Firma:", pdfPrintableOrFallback(recipient.company, job.company_name)],
-    ["Telefon Empfaenger:", recipient.phone || job.phone || ""],
+    ["Kundenname / Firma:", pdfPrintableOrFallback(billing.company, job.company_name)],
+    ["Telefon Empfaenger:", billing.phone || job.phone || ""],
     ["Straße Hausnummer:", addrStreet],
     ["PLZ Ort:", plzOrt],
-    ["", recipient.country || "Deutschland"],
-    ["Kundennummer (optional):", formatKundennummer(job) === "-" ? "" : formatKundennummer(job)],
+    ["", billing.country || "Deutschland"],
   ];
-  if (recipient.notes.trim()) {
-    leftPairs.push(["Hinweis Entladung:", recipient.notes]);
+  if (showDelivery) {
+    leftPairs.push(["Lieferadresse:", deliveryStreet || "-"]);
+    leftPairs.push(["PLZ Ort Lieferung:", deliveryPlzOrt || "-"]);
+  }
+  leftPairs.push(["Kundennummer (optional):", formatKundennummer(job) === "-" ? "" : formatKundennummer(job)]);
+  if (delivery.notes.trim()) {
+    leftPairs.push(["Hinweis Entladung:", delivery.notes]);
   }
   const rightPairs: [string, string][] = [
     ["", PDF_COMPANY.name],
@@ -277,7 +308,7 @@ export async function generateInvoicePdf(
     {
       pos: 1,
       art: "",
-      name: type === "driver" ? "Fahrerleistung" : "Transportdienstleistung",
+      name: type === "driver" ? "Fahrerleistung" : customerInvoiceServiceName(job),
       qty: "1",
       unit: "Stück",
       unitCents: customerVat ? customerVat.netCents : amountCents,
@@ -295,13 +326,13 @@ export async function generateInvoicePdf(
   }
 
   const cols = [
-    { w: 32, align: "center" as const },
-    { w: 52, align: "left" as const },
-    { w: 188, align: "left" as const },
-    { w: 48, align: "center" as const },
-    { w: 50, align: "center" as const },
-    { w: 72, align: "right" as const },
-    { w: 73, align: "right" as const },
+    { w: 28, align: "center" as const },
+    { w: 42, align: "left" as const },
+    { w: 228, align: "left" as const },
+    { w: 42, align: "center" as const },
+    { w: 46, align: "center" as const },
+    { w: 64, align: "right" as const },
+    { w: 65, align: "right" as const },
   ];
   const tableW = cols.reduce((s, c) => s + c.w, 0);
   const headers = ["Pos.", "Art.-Nr.", "Bezeichnung", "Anzahl", "Einheit", "Einzelpreis", "Gesamtpreis"];
@@ -319,7 +350,8 @@ export async function generateInvoicePdf(
   y -= 22;
 
   items.forEach((item, idx) => {
-    const rowH = 32;
+    const nameLines = wrapLines(item.name, font, 8, cols[2].w - 8);
+    const rowH = Math.max(36, 12 + nameLines.length * 11);
     page.drawRectangle({
       x: margin,
       y: y - rowH,
@@ -339,14 +371,22 @@ export async function generateInvoicePdf(
       formatEur(item.unitCents),
     ];
     let cx = margin;
+    const firstLineY = y - 14;
     cells.forEach((val, i) => {
       const c = cols[i];
+      if (i === 2) {
+        nameLines.forEach((line, li) => {
+          drawSafe(page, font, line, cx + 4, firstLineY - li * 11, 8);
+        });
+        cx += c.w;
+        return;
+      }
       const f = i >= 5 ? fontBold : font;
       const safe = sanitizeTextForStandardPdfFont(val);
-      const tw = f.widthOfTextAtSize(safe, 9);
+      const tw = f.widthOfTextAtSize(safe, 8);
       const tx =
         c.align === "right" ? cx + c.w - 5 - tw : c.align === "center" ? cx + (c.w - tw) / 2 : cx + 4;
-      drawSafe(page, f, val, tx, y - 20, 9);
+      drawSafe(page, f, val, tx, firstLineY, 8);
       cx += c.w;
     });
     y -= rowH;

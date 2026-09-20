@@ -10,7 +10,11 @@ import {
 import { formatAuftragNumber, formatKundennummer } from "./order-ref";
 import { splitGermanVatFromGross } from "./pricing";
 import { formatCargoLoadsPlainDe } from "./cargo";
-import { pdfPrintableOrFallback, sanitizeTextForStandardPdfFont } from "./invoice-pdf";
+import {
+  customerInvoiceServiceName,
+  pdfPrintableOrFallback,
+  sanitizeTextForStandardPdfFont,
+} from "./invoice-pdf";
 
 const TEAL = rgb(24 / 255, 63 / 255, 104 / 255);
 const ORANGE = rgb(0.95, 0.48, 0.12);
@@ -358,19 +362,24 @@ export async function generateUmzugsvertragPdf(job: Job): Promise<Uint8Array> {
   drawSafe(page, fontBold, "Bezeichnung", margin + 44, y - 14, 8, WHITE);
   drawRight(page, fontBold, "Gesamtpreis", margin + tableW - 8, y - 14, 8, WHITE);
   y -= 22;
+  const serviceName = customerInvoiceServiceName(job);
+  const serviceLines = wrapLines(serviceName, font, 8, tableW - 160);
+  const rowH = Math.max(28, 10 + serviceLines.length * 11);
   page.drawRectangle({
     x: margin,
-    y: y - 28,
+    y: y - rowH,
     width: tableW,
-    height: 28,
+    height: rowH,
     color: ROW_BG,
     borderColor: LINE,
     borderWidth: 0.5,
   });
-  drawSafe(page, font, "1", margin + 8, y - 18, 9);
-  drawSafe(page, font, "Transportdienstleistung laut diesem Vertrag", margin + 44, y - 18, 9);
-  drawRight(page, fontBold, formatEur(vat.netCents), margin + tableW - 8, y - 18, 9);
-  y -= 40;
+  drawSafe(page, font, "1", margin + 8, y - 14, 9);
+  serviceLines.forEach((line, li) => {
+    drawSafe(page, font, line, margin + 44, y - 14 - li * 11, 8);
+  });
+  drawRight(page, fontBold, formatEur(vat.netCents), margin + tableW - 8, y - 14, 9);
+  y -= rowH + 12;
   drawSafe(page, font, "Netto", margin + tableW - 210, y, 9, MUTED);
   drawRight(page, font, formatEur(vat.netCents), margin + tableW - 4, y, 9);
   y -= 16;

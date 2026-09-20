@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { sanitizeTextForStandardPdfFont } from "./invoice-pdf";
+import type { Job } from "./supabase";
+import { customerInvoiceServiceName, sanitizeTextForStandardPdfFont } from "./invoice-pdf";
 
 describe("sanitizeTextForStandardPdfFont", () => {
   it("keeps German umlauts and digits", () => {
@@ -11,5 +12,46 @@ describe("sanitizeTextForStandardPdfFont", () => {
   });
   it("maps Euro sign", () => {
     expect(sanitizeTextForStandardPdfFont("99 €")).toBe("99 EUR");
+  });
+});
+
+describe("customerInvoiceServiceName", () => {
+  it("includes route, date, and Auftragsnummer", () => {
+    const job = {
+      company_name: "Aqeed Fallah Hassan",
+      pickup_address: "Hohenzollernstr. 83B, 75177 Pforzheim, Deutschland",
+      pickup_city: "Pforzheim",
+      delivery_address: "Roseneggweg 5, 78244 Gottmadingen, Deutschland",
+      delivery_city: "Gottmadingen",
+      preferred_pickup_at: "2026-09-30T12:00:00.000Z",
+      created_at: "2026-09-20T08:00:00.000Z",
+      order_number: 1,
+      cargo_details: {
+        printedAuftragNumber: "TP-2026-0001",
+        senderAddress: {
+          company: "Aqeed Fallah Hassan",
+          phone: "",
+          street: "Hohenzollernstr.",
+          houseNumber: "83B",
+          postalCode: "75177",
+          city: "Pforzheim",
+          country: "Deutschland",
+          notes: "",
+        },
+        recipientAddress: {
+          company: "Aqeed Fallah Hassan",
+          phone: "",
+          street: "Roseneggweg",
+          houseNumber: "5",
+          postalCode: "78244",
+          city: "Gottmadingen",
+          country: "Deutschland",
+          notes: "",
+        },
+      },
+    } as unknown as Job;
+    expect(customerInvoiceServiceName(job)).toBe(
+      "Umzugsservice von Pforzheim (Hohenzollernstr. 83B) nach Gottmadingen am 30.09.2026 (gemäß Auftragsbestätigung Nr. TP-2026-0001)",
+    );
   });
 });

@@ -134,6 +134,7 @@ export const ADMIN_PAGES_DE: Record<string, string> = {
   "reports.serviceDate": "Leistungsdatum",
   "reports.extractNeedName": "Kundenname erforderlich",
   "reports.extractNeedPrice": "Gültigen Gesamtbetrag eingeben",
+  "reports.billingHeading": "Aktuelle Adresse / Rechnungsempfänger (Abholung)",
   "reports.deliveryHeading": "Lieferadresse (Zustellung)",
 
   "drivers.title": "Fahrer",
@@ -375,6 +376,7 @@ export const ADMIN_PAGES_AR: Record<string, string> = {
   "reports.serviceDate": "تاريخ الخدمة",
   "reports.extractNeedName": "اسم العميل مطلوب",
   "reports.extractNeedPrice": "أدخل مبلغاً إجمالياً صالحاً",
+  "reports.billingHeading": "العنوان الحالي / مستلم الفاتورة (مكان الاستلام)",
   "reports.deliveryHeading": "إلى أين التسليم",
 
   "drivers.title": "السائقون",

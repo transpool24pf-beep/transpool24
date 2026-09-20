@@ -120,6 +120,9 @@ export function AdminManualInvoiceForm() {
           className="w-full rounded-xl border-2 border-[#0d2137]/15 px-3 py-2 text-[#0d2137]"
         />
       </label>
+      <p className="sm:col-span-2 lg:col-span-3 mt-2 text-sm font-semibold text-[#0d2137]">
+        {t("reports.billingHeading")}
+      </p>
       <label className="block text-sm">
         <span className="mb-1 block font-medium text-[#0d2137]">{t("reports.street")}</span>
         <input
