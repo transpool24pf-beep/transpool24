@@ -418,7 +418,7 @@ export async function generateUmzugsvertragPdf(job: Job): Promise<Uint8Array> {
   bullet(
     `Die Zahlung des vereinbarten Betrags von ${gross} erfolgt vereinbarungsgemäß unmittelbar nach vollständiger Durchführung am ${formatDeDate(workDate)} und nach Erhalt einer korrekten Rechnung. Ein davon abweichendes Leistungsdatum auf der Rechnung wird entsprechend korrigiert.`
   );
-  subhead("Umsatzsteuer (§ 19 UStG):");
+  subhead("Umsatzsteuer:");
   bullet(
     `Der Festpreis von ${gross} gilt brutto. Auf der Rechnung werden die enthaltenen 19 % MwSt. (${vatAmt}) ausgewiesen. Der Festpreis bleibt unverändert bei ${gross}.`
   );

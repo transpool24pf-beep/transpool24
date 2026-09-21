@@ -227,14 +227,24 @@ export default function AdminReportsPage() {
                         {t("reports.driverSheet")}
                       </a>
                       {paid ? (
+                        <>
                         <a
-                          href={`/api/admin/invoice?job_id=${encodeURIComponent(o.id)}&type=customer`}
+                          href={`/api/admin/invoice?job_id=${encodeURIComponent(o.id)}&type=customer&doc=rechnung`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="rounded-lg bg-teal-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-teal-800"
                         >
                           {t("reports.invoicePdf")}
                         </a>
+                        <a
+                          href={`/api/admin/invoice?job_id=${encodeURIComponent(o.id)}&type=customer&doc=auftrag`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="rounded-lg border border-teal-700 bg-white px-3 py-1.5 text-xs font-semibold text-teal-800 hover:bg-teal-50"
+                        >
+                          {t("reports.auftragPdf")}
+                        </a>
+                        </>
                       ) : null}
                     </div>
                   </div>

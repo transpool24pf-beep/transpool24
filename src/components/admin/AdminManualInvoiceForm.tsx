@@ -77,16 +77,28 @@ export function AdminManualInvoiceForm() {
             const j = (await res.json().catch(() => ({}))) as { error?: string };
             throw new Error(j.error || t("common.requestFailed"));
           }
-          const blob = await res.blob();
-          const cd = res.headers.get("Content-Disposition") || "";
-          const m = cd.match(/filename="([^"]+)"/);
-          const filename = m?.[1] || "TransPool24-Rechnung.pdf";
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement("a");
-          a.href = url;
-          a.download = filename;
-          a.click();
-          URL.revokeObjectURL(url);
+          const pack = (await res.json()) as {
+            rechnung?: string;
+            auftrag?: string;
+            rechnungFilename?: string;
+            auftragFilename?: string;
+          };
+          const savePdf = (b64: string, filename: string) => {
+            const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+            const url = URL.createObjectURL(new Blob([bytes], { type: "application/pdf" }));
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+          };
+          if (pack.rechnung) {
+            savePdf(pack.rechnung, pack.rechnungFilename || "TransPool24-Rechnung.pdf");
+          }
+          await new Promise((r) => setTimeout(r, 450));
+          if (pack.auftrag) {
+            savePdf(pack.auftrag, pack.auftragFilename || "TransPool24-Auftragsbestaetigung.pdf");
+          }
         } catch (err) {
           setInvError(err instanceof Error ? err.message : t("common.requestFailed"));
         } finally {

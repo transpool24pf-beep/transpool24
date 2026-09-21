@@ -435,9 +435,11 @@ export default function AdminOrderDetailPage({
     window.open(`https://wa.me/${digits}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
   };
 
-  const downloadInvoice = (type: "customer" | "driver") => {
+  const downloadInvoice = (type: "customer" | "driver", doc: "rechnung" | "auftrag" = "rechnung") => {
     if (!order) return;
-    window.open(`/api/admin/invoice?job_id=${encodeURIComponent(order.id)}&type=${type}`, "_blank");
+    const q = new URLSearchParams({ job_id: order.id, type });
+    if (type === "customer") q.set("doc", doc);
+    window.open(`/api/admin/invoice?${q.toString()}`, "_blank");
   };
 
   const printDriverSheet = () => {
@@ -944,10 +946,17 @@ export default function AdminOrderDetailPage({
             <p className="text-sm font-medium text-[#0d2137]">{odMailT(locale, "invoicesTitle")}</p>
             <button
               type="button"
-              onClick={() => downloadInvoice("customer")}
+              onClick={() => downloadInvoice("customer", "rechnung")}
               className="rounded-xl border-2 border-blue-200 bg-blue-50 px-4 py-2.5 text-sm font-medium text-blue-800 hover:bg-blue-100"
             >
               {odMailT(locale, "invoiceCustomer", { eur: customerPriceEur })}
+            </button>
+            <button
+              type="button"
+              onClick={() => downloadInvoice("customer", "auftrag")}
+              className="rounded-xl border-2 border-teal-200 bg-teal-50 px-4 py-2.5 text-sm font-medium text-teal-900 hover:bg-teal-100"
+            >
+              {odMailT(locale, "invoiceAuftrag", { eur: customerPriceEur })}
             </button>
             </div>
           </div>

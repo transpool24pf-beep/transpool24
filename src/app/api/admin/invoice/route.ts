@@ -3,7 +3,7 @@ import { createServerSupabase } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/admin-api";
 import { generateInvoicePdf, invoiceNumberForJob } from "@/lib/invoice-pdf";
 import type { InvoiceType } from "@/lib/invoice-pdf";
-import { generateUmzugsvertragPdf, mergeInvoiceAndVertrag } from "@/lib/umzugsvertrag-pdf";
+import { generateUmzugsvertragPdf } from "@/lib/umzugsvertrag-pdf";
 
 export async function GET(req: Request) {
   const err = await requireAdmin();
@@ -11,6 +11,7 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const jobId = searchParams.get("job_id");
   const type = (searchParams.get("type") ?? "customer") as InvoiceType;
+  const doc = (searchParams.get("doc") ?? "rechnung").toLowerCase();
   if (!jobId || !["customer", "driver"].includes(type)) {
     return NextResponse.json({ error: "Missing job_id or invalid type" }, { status: 400 });
   }
@@ -24,22 +25,22 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
   }
   try {
-    const invoicePdf = await generateInvoicePdf(job, { type });
     const invoiceNo = invoiceNumberForJob(job);
-    let pdf = invoicePdf;
-    let filename = type === "driver"
+    if (type === "customer" && doc === "auftrag") {
+      const vertrag = await generateUmzugsvertragPdf(job);
+      const filename = `TransPool24-Auftragsbestaetigung-${invoiceNo}.pdf`;
+      return new NextResponse(Buffer.from(vertrag), {
+        headers: {
+          "Content-Type": "application/pdf",
+          "Content-Disposition": `attachment; filename="${filename}"`,
+        },
+      });
+    }
+    const invoicePdf = await generateInvoicePdf(job, { type });
+    const filename = type === "driver"
       ? `TransPool24-Gruppe-${invoiceNo}.pdf`
       : `TransPool24-Rechnung-${invoiceNo}.pdf`;
-    if (type === "customer") {
-      try {
-        const vertrag = await generateUmzugsvertragPdf(job);
-        pdf = await mergeInvoiceAndVertrag(invoicePdf, vertrag);
-        filename = `TransPool24-Rechnung-Umzugsvertrag-${invoiceNo}.pdf`;
-      } catch (ve) {
-        console.error("[admin/invoice] Umzugsvertrag failed, sending invoice only:", ve);
-      }
-    }
-    return new NextResponse(Buffer.from(pdf), {
+    return new NextResponse(Buffer.from(invoicePdf), {
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": `attachment; filename="${filename}"`,

@@ -5,7 +5,7 @@ import {
   buildManualCustomerInvoiceJob,
   generateInvoicePdf,
 } from "@/lib/invoice-pdf";
-import { generateUmzugsvertragPdf, mergeInvoiceAndVertrag } from "@/lib/umzugsvertrag-pdf";
+import { generateUmzugsvertragPdf } from "@/lib/umzugsvertrag-pdf";
 import { formatAuftragNumber } from "@/lib/order-ref";
 import { addGermanVat19 } from "@/lib/pricing";
 import type { Job } from "@/lib/supabase";
@@ -83,14 +83,14 @@ export async function POST(req: Request) {
     const job = buildManualCustomerInvoiceJob(input) as Job;
     const invoicePdf = await generateInvoicePdf(job, { type: "customer" });
     const vertragPdf = await generateUmzugsvertragPdf(job);
-    const pdf = await mergeInvoiceAndVertrag(invoicePdf, vertragPdf);
     const invoiceNo = formatAuftragNumber(job);
     const safeFile = invoiceNo.replace(/[^\w.-]+/g, "_");
-    return new NextResponse(Buffer.from(pdf), {
-      headers: {
-        "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="TransPool24-Rechnung-Umzugsvertrag-${safeFile}.pdf"`,
-      },
+    return NextResponse.json({
+      invoiceNo,
+      rechnungFilename: `TransPool24-Rechnung-${safeFile}.pdf`,
+      auftragFilename: `TransPool24-Auftragsbestaetigung-${safeFile}.pdf`,
+      rechnung: Buffer.from(invoicePdf).toString("base64"),
+      auftrag: Buffer.from(vertragPdf).toString("base64"),
     });
   } catch (e) {
     console.error("[admin/manual-invoice]", e);

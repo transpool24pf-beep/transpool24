@@ -13,7 +13,6 @@ const TEAL_DARK = rgb(24 / 255, 63 / 255, 104 / 255);
 const ORANGE = rgb(0.95, 0.48, 0.12);
 const LINE = rgb(0.82, 0.86, 0.90);
 const ROW_BG = rgb(0.94, 0.95, 0.97);
-const GREEN_BG = rgb(0.89, 0.96, 0.89);
 const TEXT = rgb(0.12, 0.14, 0.18);
 const MUTED = rgb(0.32, 0.38, 0.42);
 const WHITE = rgb(1, 1, 1);
@@ -470,24 +469,7 @@ export async function generateInvoicePdf(
       thickness: 1.4,
       color: TEAL,
     });
-    y -= 36;
-    page.drawRectangle({
-      x: margin,
-      y: y - 28,
-      width: contentW,
-      height: 28,
-      color: GREEN_BG,
-    });
-    drawSafe(
-      page,
-      font,
-      "Gemäß § 19 UStG wird keine Umsatzsteuer berechnet.",
-      margin + 10,
-      y - 17,
-      9,
-      TEAL_DARK
-    );
-    y -= 48;
+    y -= 28;
   }
 
   tealBar(page, margin, y, contentW, 20, "ZAHLUNGSBEDINGUNGEN", fontBold);
