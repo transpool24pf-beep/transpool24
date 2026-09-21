@@ -1,7 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAdminLocale } from "@/contexts/AdminLocaleContext";
+import {
+  loadExtractInvoiceDraft,
+  saveExtractInvoiceDraft,
+} from "@/lib/admin-extract-invoice-draft";
 import { addGermanVat19, formatPrice } from "@/lib/pricing";
 
 export function AdminManualInvoiceForm() {
@@ -26,6 +30,74 @@ export function AdminManualInvoiceForm() {
   const [delCountry, setDelCountry] = useState("Deutschland");
   const [invBusy, setInvBusy] = useState(false);
   const [invError, setInvError] = useState<string | null>(null);
+  const [draftReady, setDraftReady] = useState(false);
+
+  useEffect(() => {
+    const d = loadExtractInvoiceDraft();
+    setInvName(d.name);
+    setInvEmail(d.email);
+    setInvPhone(d.phone);
+    setInvStreet(d.street);
+    setInvHouse(d.house);
+    setInvPlz(d.plz);
+    setInvCity(d.city);
+    setInvCountry(d.country || "Deutschland");
+    setInvCustomerNo(d.customerNo);
+    setInvNet(d.net);
+    setInvServiceDate(d.serviceDate);
+    setInvPickup(d.pickup);
+    setInvDelivery(d.delivery);
+    setDelStreet(d.delStreet);
+    setDelHouse(d.delHouse);
+    setDelPlz(d.delPlz);
+    setDelCity(d.delCity);
+    setDelCountry(d.delCountry || "Deutschland");
+    setDraftReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!draftReady) return;
+    saveExtractInvoiceDraft({
+      name: invName,
+      email: invEmail,
+      phone: invPhone,
+      street: invStreet,
+      house: invHouse,
+      plz: invPlz,
+      city: invCity,
+      country: invCountry,
+      customerNo: invCustomerNo,
+      net: invNet,
+      serviceDate: invServiceDate,
+      pickup: invPickup,
+      delivery: invDelivery,
+      delStreet,
+      delHouse,
+      delPlz,
+      delCity,
+      delCountry,
+    });
+  }, [
+    draftReady,
+    invName,
+    invEmail,
+    invPhone,
+    invStreet,
+    invHouse,
+    invPlz,
+    invCity,
+    invCountry,
+    invCustomerNo,
+    invNet,
+    invServiceDate,
+    invPickup,
+    invDelivery,
+    delStreet,
+    delHouse,
+    delPlz,
+    delCity,
+    delCountry,
+  ]);
 
   const invVat = useMemo(() => {
     const n = Number(invNet.replace(/\s/g, "").replace(",", "."));
