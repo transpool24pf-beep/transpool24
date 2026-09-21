@@ -7,6 +7,7 @@ import {
 } from "@/lib/invoice-pdf";
 import { generateUmzugsvertragPdf, mergeInvoiceAndVertrag } from "@/lib/umzugsvertrag-pdf";
 import { formatAuftragNumber } from "@/lib/order-ref";
+import { addGermanVat19 } from "@/lib/pricing";
 import type { Job } from "@/lib/supabase";
 
 function str(v: unknown, max = 200): string {
@@ -68,7 +69,7 @@ export async function POST(req: Request) {
       country: str(body.country, 80) || "Deutschland",
       orderNumber,
       printedAuftragNumber: customerNumber,
-      amountCents: netCents,
+      amountCents: addGermanVat19(netCents).grossCents,
       serviceDateIso: isoOrNull(body.serviceDate),
       printedInvoiceDate: ymdFrom(body.serviceDate) || ymdFrom(body.pickupAt),
       pickupAtIso: isoOrNull(body.pickupAt),

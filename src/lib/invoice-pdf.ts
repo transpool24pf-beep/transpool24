@@ -300,11 +300,16 @@ export async function generateInvoicePdf(
   const valueW = colW - labelW - 8;
   const leftPairs: [string, string][] = [
     ["Kundenname / Firma:", pdfPrintableOrFallback(billing.company, job.company_name)],
-    ["Telefon Empfaenger:", billing.phone || job.phone || ""],
+  ];
+  const billingPhone = (billing.phone || job.phone || "").trim();
+  if (billingPhone) leftPairs.push(["Telefon Empfaenger:", billingPhone]);
+  const billingEmail = (job.customer_email || "").trim();
+  if (billingEmail) leftPairs.push(["E-Mail:", billingEmail]);
+  leftPairs.push(
     ["Straße Hausnummer:", addrStreet],
     ["PLZ Ort:", plzOrt],
     ["", billing.country || "Deutschland"],
-  ];
+  );
   if (showDelivery) {
     leftPairs.push(["Lieferadresse:", deliveryStreet || "-"]);
     leftPairs.push(["PLZ Ort Lieferung:", deliveryPlzOrt || "-"]);

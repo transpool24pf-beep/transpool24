@@ -122,10 +122,10 @@ export const ADMIN_PAGES_DE: Record<string, string> = {
   "reports.colDriverPay": "Fahrerhonorar (Saldo)",
   "reports.extractInvoice": "Rechnung erstellen",
   "reports.extractInvoiceDesc":
-    "Kundendaten und Gesamtbetrag eingeben. Netto und 19 % MwSt. werden daraus berechnet. Rechnungs- und Auftragsnummer entsprechen der eingegebenen Nummer. Firma, Bank und Zahlungsbedingungen bleiben unverändert.",
+    "Kundendaten und Nettobetrag eingeben. 19 % MwSt. werden oben drauf gerechnet (Netto 1000 € → Gesamt 1190 €). Rechnungs- und Auftragsnummer entsprechen der eingegebenen Nummer.",
   "reports.extractInvoiceDownload": "Rechnung-PDF herunterladen",
   "reports.customerName": "Kundenname / Firma",
-  "reports.netPrice": "Gesamtbetrag (€)",
+  "reports.netPrice": "Netto (€)",
   "reports.street": "Straße",
   "reports.houseNumber": "Hausnummer",
   "reports.postalCode": "PLZ",
@@ -133,7 +133,7 @@ export const ADMIN_PAGES_DE: Record<string, string> = {
   "reports.customerNo": "Kundennummer (optional, wird Rechnungsnummer)",
   "reports.serviceDate": "Rechnungsdatum / Leistungsdatum",
   "reports.extractNeedName": "Kundenname erforderlich",
-  "reports.extractNeedPrice": "Gültigen Gesamtbetrag eingeben",
+  "reports.extractNeedPrice": "Gültigen Nettobetrag eingeben",
   "reports.billingHeading": "Aktuelle Adresse / Rechnungsempfänger (Abholung)",
   "reports.deliveryHeading": "Lieferadresse (Zustellung)",
 
@@ -364,10 +364,10 @@ export const ADMIN_PAGES_AR: Record<string, string> = {
   "reports.colDriverPay": "مبلغ السائق (الرصيد)",
   "reports.extractInvoice": "استخراج فاتورة",
   "reports.extractInvoiceDesc":
-    "أدخل بيانات العميل والمبلغ الإجمالي. يُحسب الصافي و19٪ MwSt. من هذا المبلغ. رقم الفاتورة والطلب هو نفس الرقم الذي تكتبه.",
+    "أدخل بيانات العميل والمبلغ الصافي. تُضاف 19٪ MwSt. فوقه (مثال: 1000 € صافي → 1190 € إجمالي). رقم الفاتورة والطلب هو نفس الرقم الذي تكتبه.",
   "reports.extractInvoiceDownload": "تنزيل فاتورة PDF",
   "reports.customerName": "اسم العميل / الشركة",
-  "reports.netPrice": "المبلغ الإجمالي Gesamtbetrag (€)",
+  "reports.netPrice": "الصافي Netto (€)",
   "reports.street": "الشارع",
   "reports.houseNumber": "رقم المنزل",
   "reports.postalCode": "الرمز البريدي",
@@ -375,7 +375,7 @@ export const ADMIN_PAGES_AR: Record<string, string> = {
   "reports.customerNo": "رقم العميل (اختياري، يصبح رقم الفاتورة)",
   "reports.serviceDate": "تاريخ الفاتورة / تاريخ الخدمة",
   "reports.extractNeedName": "اسم العميل مطلوب",
-  "reports.extractNeedPrice": "أدخل مبلغاً إجمالياً صالحاً",
+  "reports.extractNeedPrice": "أدخل مبلغاً صافياً صالحاً",
   "reports.billingHeading": "العنوان الحالي / مستلم الفاتورة (مكان الاستلام)",
   "reports.deliveryHeading": "إلى أين التسليم",
 

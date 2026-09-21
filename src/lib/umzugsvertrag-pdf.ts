@@ -283,10 +283,12 @@ export async function generateUmzugsvertragPdf(job: Job): Promise<Uint8Array> {
 
   const leftPairs: [string, string][] = [
     ["Name / Firma:", customerName],
-    ["E-Mail:", job.customer_email || "-"],
-    ["Telefon:", job.phone || sender.phone || "-"],
-    ["Kundennummer:", formatKundennummer(job)],
   ];
+  const kundeEmail = (job.customer_email || "").trim();
+  if (kundeEmail) leftPairs.push(["E-Mail:", kundeEmail]);
+  const kundePhone = (job.phone || sender.phone || "").trim();
+  if (kundePhone) leftPairs.push(["Telefon:", kundePhone]);
+  leftPairs.push(["Kundennummer:", formatKundennummer(job)]);
   const rightPairs: [string, string][] = [
     ["", PDF_COMPANY.name],
     ["Inhaber:", PDF_COMPANY.legalOwner],
