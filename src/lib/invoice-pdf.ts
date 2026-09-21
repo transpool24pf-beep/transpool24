@@ -1,8 +1,9 @@
 import { PDFDocument, rgb, StandardFonts, type PDFFont, type PDFPage } from "pdf-lib";
+import QRCode from "qrcode";
 import type { Job } from "./supabase";
 import { getPdfLogoBytes, PDF_COMPANY } from "./pdf-company";
 import { jobPreferredDeliveryAt, jobRecipientAddress, jobSenderAddress } from "./structured-address";
-import { formatAuftragNumber, formatKundennummer } from "./order-ref";
+import { formatAuftragNumber } from "./order-ref";
 import { splitGermanVatFromGross } from "./pricing";
 
 export type InvoiceType = "customer" | "driver";
@@ -194,6 +195,62 @@ function tealBar(page: PDFPage, x: number, yTop: number, w: number, h: number, t
   drawSafe(page, fontBold, title, x + 10, yTop - h + 7, 9, WHITE);
 }
 
+function looksLikeCompanyName(name: string): boolean {
+  return /\b(gmbh|mbh|ug|ag|kg|gbr|ohg|e\.?\s*k\.?|ltd|inc|co\.)\b/i.test(name);
+}
+
+/** DIN 5008 window: Anrede, Name, optional Zusatz, Straße, PLZ Ort — no field labels. */
+export function din5008AddressLines(opts: {
+  name: string;
+  street: string;
+  plzOrt: string;
+  zusatz?: string;
+}): string[] {
+  const name = pdfPrintableOrFallback(opts.name, "");
+  const lines: string[] = [];
+  if (name && name !== "-" && !looksLikeCompanyName(name)) lines.push("Herrn");
+  if (name && name !== "-") lines.push(name);
+  const zusatz = sanitizeTextForStandardPdfFont((opts.zusatz || "").trim());
+  if (zusatz) lines.push(zusatz);
+  if (opts.street.trim()) lines.push(sanitizeTextForStandardPdfFont(opts.street.trim()));
+  if (opts.plzOrt.trim()) lines.push(sanitizeTextForStandardPdfFont(opts.plzOrt.trim()));
+  return lines;
+}
+
+function drawPostMark(
+  page: PDFPage,
+  font: PDFFont,
+  fontBold: PDFFont,
+  x: number,
+  yTop: number
+): void {
+  const boxH = 20;
+  const boxW = 15;
+  const y = yTop - boxH;
+  page.drawRectangle({
+    x,
+    y,
+    width: boxW,
+    height: boxH,
+    borderColor: TEXT,
+    borderWidth: 1.5,
+  });
+  drawSafe(page, fontBold, "P", x + 3, y + 4.5, 14, TEXT);
+  drawSafe(page, fontBold, "DV", x + boxW + 5, y + 10, 10, TEXT);
+  drawSafe(page, font, "Post", x + boxW + 5, y + 1, 8, TEXT);
+}
+
+async function embedAddressQr(doc: PDFDocument, payload: string) {
+  const png = await QRCode.toBuffer(payload, {
+    type: "png",
+    margin: 0,
+    width: 180,
+    errorCorrectionLevel: "M",
+    color: { dark: "#111111", light: "#ffffff" },
+  });
+  return doc.embedPng(png);
+}
+
 export async function generateInvoicePdf(
   job: Job & { driver_price_cents?: number | null; order_number?: number | null },
   options?: { type?: InvoiceType }
@@ -295,28 +352,48 @@ export async function generateInvoicePdf(
   tealBar(page, rightX, y, colW, 20, "RECHNUNGSAUSSTELLER", fontBold);
   y -= 32;
 
-  const labelW = 118;
-  const valueW = colW - labelW - 8;
-  const leftPairs: [string, string][] = [
-    ["Kundenname / Firma:", pdfPrintableOrFallback(billing.company, job.company_name)],
-  ];
-  const billingPhone = (billing.phone || job.phone || "").trim();
-  if (billingPhone) leftPairs.push(["Telefon Empfaenger:", billingPhone]);
-  const billingEmail = (job.customer_email || "").trim();
-  if (billingEmail) leftPairs.push(["E-Mail:", billingEmail]);
-  leftPairs.push(
-    ["Straße Hausnummer:", addrStreet],
-    ["PLZ Ort:", plzOrt],
-    ["", billing.country || "Deutschland"],
-  );
+  const recipientName = pdfPrintableOrFallback(billing.company, job.company_name);
+  const recipientZusatz = billing.notes.trim();
+  const postalLines = din5008AddressLines({
+    name: recipientName,
+    street: addrStreet,
+    plzOrt,
+    zusatz: recipientZusatz,
+  });
+  const qrPayload = [recipientName, addrStreet, plzOrt].filter((s) => s && s !== "-").join("\n");
+  const qrSize = 54;
+  const blockTop = y;
+  drawPostMark(page, font, fontBold, leftX, blockTop);
+  try {
+    const qrImg = await embedAddressQr(doc, qrPayload || recipientName);
+    page.drawImage(qrImg, {
+      x: leftX + colW - qrSize,
+      y: blockTop - qrSize,
+      width: qrSize,
+      height: qrSize,
+    });
+  } catch {
+    /* invoice still valid without QR */
+  }
+  let leftY = blockTop - qrSize - 10;
+  for (const ln of postalLines) {
+    drawSafe(page, font, ln, leftX, leftY, 10, TEXT);
+    leftY -= 13;
+  }
   if (showDelivery) {
-    leftPairs.push(["Lieferadresse:", deliveryStreet || "-"]);
-    leftPairs.push(["PLZ Ort Lieferung:", deliveryPlzOrt || "-"]);
+    leftY -= 4;
+    drawSafe(page, fontBold, "Lieferadresse", leftX, leftY, 8, MUTED);
+    leftY -= 13;
+    if (deliveryStreet) {
+      drawSafe(page, font, deliveryStreet, leftX, leftY, 10, TEXT);
+      leftY -= 13;
+    }
+    if (deliveryPlzOrt) {
+      drawSafe(page, font, deliveryPlzOrt, leftX, leftY, 10, TEXT);
+      leftY -= 13;
+    }
   }
-  leftPairs.push(["Kundennummer (optional):", formatKundennummer(job) === "-" ? "" : formatKundennummer(job)]);
-  if (delivery.notes.trim()) {
-    leftPairs.push(["Hinweis Entladung:", delivery.notes]);
-  }
+
   const rightPairs: [string, string][] = [
     ["", PDF_COMPANY.name],
     ["", PDF_COMPANY.street],
@@ -324,13 +401,12 @@ export async function generateInvoicePdf(
     ["", PDF_COMPANY.country],
     ["Steuernummer:", PDF_COMPANY.taxNumber],
   ];
-  for (let i = 0; i < leftPairs.length; i++) {
-    const h1 = drawLabelValue(page, font, fontBold, leftX, y, leftPairs[i][0], leftPairs[i][1], labelW, valueW);
-    const rp = rightPairs[i] ?? ["", ""];
-    const h2 = drawLabelValue(page, font, fontBold, rightX, y, rp[0], rp[1], 90, colW - 98);
-    y -= Math.max(h1, h2) + 6;
+  let rightY = blockTop;
+  for (const rp of rightPairs) {
+    const h2 = drawLabelValue(page, font, fontBold, rightX, rightY, rp[0], rp[1], 90, colW - 98);
+    rightY -= h2 + 6;
   }
-  y -= 20;
+  y = Math.min(leftY, rightY) - 16;
 
   drawSafe(
     page,

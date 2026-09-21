@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { Job } from "./supabase";
 import {
   customerInvoiceServiceName,
+  din5008AddressLines,
   formatDeDateYmd,
   sanitizeTextForStandardPdfFont,
 } from "./invoice-pdf";
@@ -22,6 +23,18 @@ describe("sanitizeTextForStandardPdfFont", () => {
 describe("formatDeDateYmd", () => {
   it("formats YYYY-MM-DD as German invoice date without timezone shift", () => {
     expect(formatDeDateYmd("2026-09-30")).toBe("30.09.2026");
+  });
+});
+
+describe("din5008AddressLines", () => {
+  it("prints a letter window with Herrn, name, street, and PLZ Ort", () => {
+    expect(
+      din5008AddressLines({
+        name: "Aqeed Fallah Hassan",
+        street: "Hohenzollernstr 83B",
+        plzOrt: "75177 Pforzheim",
+      }),
+    ).toEqual(["Herrn", "Aqeed Fallah Hassan", "Hohenzollernstr 83B", "75177 Pforzheim"]);
   });
 });
 
