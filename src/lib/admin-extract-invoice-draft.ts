@@ -14,6 +14,7 @@ export type ExtractInvoiceDraft = {
   serviceDate: string;
   pickup: string;
   delivery: string;
+  paymentDays: string;
   delStreet: string;
   delHouse: string;
   delPlz: string;
@@ -35,6 +36,7 @@ export const EMPTY_EXTRACT_INVOICE_DRAFT: ExtractInvoiceDraft = {
   serviceDate: "",
   pickup: "",
   delivery: "",
+  paymentDays: "7",
   delStreet: "",
   delHouse: "",
   delPlz: "",
@@ -67,6 +69,7 @@ export function loadExtractInvoiceDraft(): ExtractInvoiceDraft {
       serviceDate: str(o.serviceDate),
       pickup: str(o.pickup),
       delivery: str(o.delivery),
+      paymentDays: str(o.paymentDays, "7") || "7",
       delStreet: str(o.delStreet),
       delHouse: str(o.delHouse),
       delPlz: str(o.delPlz),

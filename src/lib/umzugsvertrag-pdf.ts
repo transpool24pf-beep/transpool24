@@ -12,6 +12,7 @@ import { splitGermanVatFromGross } from "./pricing";
 import { formatCargoLoadsPlainDe } from "./cargo";
 import {
   customerInvoiceServiceName,
+  paymentDueDaysForJob,
   pdfPrintableOrFallback,
   sanitizeTextForStandardPdfFont,
 } from "./invoice-pdf";
@@ -357,16 +358,17 @@ export async function generateUmzugsvertragPdf(job: Job): Promise<Uint8Array> {
   bullet("Alle Möbelstücke müssen transportfertig demontiert und verpackt bereitstehen.");
   y -= 8;
 
-  section("4. VERGÜTUNG & ZAHLUNGSBEDINGUNGEN");
   const tableW = contentW;
-  page.drawRectangle({ x: margin, y: y - 22, width: tableW, height: 22, color: TEAL });
-  drawSafe(page, fontBold, "Pos.", margin + 8, y - 14, 8, WHITE);
-  drawSafe(page, fontBold, "Bezeichnung", margin + 44, y - 14, 8, WHITE);
-  drawRight(page, fontBold, "Gesamtpreis", margin + tableW - 8, y - 14, 8, WHITE);
-  y -= 22;
   const serviceName = customerInvoiceServiceName(job);
   const serviceLines = wrapLines(serviceName, font, 8, tableW - 160);
-  const rowH = Math.max(28, 10 + serviceLines.length * 11);
+  const rowH = Math.max(26, 8 + serviceLines.length * 10);
+  ensure(22 + rowH + 78);
+  section("4. VERGÜTUNG & ZAHLUNGSBEDINGUNGEN");
+  page.drawRectangle({ x: margin, y: y - 20, width: tableW, height: 20, color: TEAL });
+  drawSafe(page, fontBold, "Pos.", margin + 8, y - 13, 8, WHITE);
+  drawSafe(page, fontBold, "Bezeichnung", margin + 44, y - 13, 8, WHITE);
+  drawRight(page, fontBold, "Gesamtpreis", margin + tableW - 8, y - 13, 8, WHITE);
+  y -= 20;
   page.drawRectangle({
     x: margin,
     y: y - rowH,
@@ -376,26 +378,28 @@ export async function generateUmzugsvertragPdf(job: Job): Promise<Uint8Array> {
     borderColor: LINE,
     borderWidth: 0.5,
   });
-  drawSafe(page, font, "1", margin + 8, y - 14, 9);
+  drawSafe(page, font, "1", margin + 8, y - 12, 8);
   serviceLines.forEach((line, li) => {
-    drawSafe(page, font, line, margin + 44, y - 14 - li * 11, 8);
+    drawSafe(page, font, line, margin + 44, y - 12 - li * 10, 8);
   });
-  drawRight(page, fontBold, formatEur(vat.netCents), margin + tableW - 8, y - 14, 9);
-  y -= rowH + 12;
-  drawSafe(page, font, "Netto", margin + tableW - 210, y, 9, MUTED);
-  drawRight(page, font, formatEur(vat.netCents), margin + tableW - 4, y, 9);
-  y -= 16;
-  drawSafe(page, font, "zzgl. 19 % MwSt.", margin + tableW - 210, y, 9, MUTED);
-  drawRight(page, font, vatAmt, margin + tableW - 4, y, 9);
+  drawRight(page, fontBold, formatEur(vat.netCents), margin + tableW - 8, y - 12, 8);
+  y -= rowH + 10;
+  drawSafe(page, font, "Netto", margin + tableW - 200, y, 8, MUTED);
+  drawRight(page, font, formatEur(vat.netCents), margin + tableW - 4, y, 8);
+  y -= 13;
+  drawSafe(page, font, "zzgl. 19 % MwSt.", margin + tableW - 200, y, 8, MUTED);
+  drawRight(page, font, vatAmt, margin + tableW - 4, y, 8);
+  y -= 15;
+  drawSafe(page, fontBold, "Vereinbarter Brutto-Festpreis", margin + tableW - 200, y, 9, TEAL);
+  drawRight(page, fontBold, gross, margin + tableW - 4, y, 9, TEAL);
   y -= 18;
-  drawSafe(page, fontBold, "Vereinbarter Brutto-Festpreis", margin + tableW - 210, y, 10, TEAL);
-  drawRight(page, fontBold, gross, margin + tableW - 4, y, 10, TEAL);
-  y -= 22;
+  const dueDays = paymentDueDaysForJob(job);
+  const dueUnit = dueDays === 1 ? "Tag" : "Tagen";
   para(
     "Zusatzkosten: Es entstehen am Umzugstag keine versteckten Zusatzkosten für die vereinbarten Leistungen und Güter laut Listung."
   );
   para(
-    "Zahlungsbedingungen: Rechnungsstellung erfolgt direkt nach Durchführung. Der Rechnungsbetrag ist innerhalb von 7 Tagen nach Rechnungserhalt ohne Abzug per Überweisung fällig."
+    `Zahlungsbedingungen: Rechnungsstellung erfolgt direkt nach Durchführung. Der Rechnungsbetrag ist innerhalb von ${dueDays} ${dueUnit} nach Rechnungserhalt ohne Abzug per Überweisung fällig.`
   );
   para(`Bankverbindung für die Überweisung: IBAN ${PDF_COMPANY.iban}`);
   y -= 8;

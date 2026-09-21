@@ -23,6 +23,7 @@ export function AdminManualInvoiceForm() {
   const [invServiceDate, setInvServiceDate] = useState("");
   const [invPickup, setInvPickup] = useState("");
   const [invDelivery, setInvDelivery] = useState("");
+  const [paymentDays, setPaymentDays] = useState("7");
   const [delStreet, setDelStreet] = useState("");
   const [delHouse, setDelHouse] = useState("");
   const [delPlz, setDelPlz] = useState("");
@@ -35,7 +36,7 @@ export function AdminManualInvoiceForm() {
   useEffect(() => {
     const d = loadExtractInvoiceDraft();
     setInvName(d.name);
-    setInvEmail(d.email);
+    setInvEmail(d.email.replace(/\s/g, ""));
     setInvPhone(d.phone);
     setInvStreet(d.street);
     setInvHouse(d.house);
@@ -47,6 +48,7 @@ export function AdminManualInvoiceForm() {
     setInvServiceDate(d.serviceDate);
     setInvPickup(d.pickup);
     setInvDelivery(d.delivery);
+    setPaymentDays(d.paymentDays || "7");
     setDelStreet(d.delStreet);
     setDelHouse(d.delHouse);
     setDelPlz(d.delPlz);
@@ -71,6 +73,7 @@ export function AdminManualInvoiceForm() {
       serviceDate: invServiceDate,
       pickup: invPickup,
       delivery: invDelivery,
+      paymentDays,
       delStreet,
       delHouse,
       delPlz,
@@ -92,6 +95,7 @@ export function AdminManualInvoiceForm() {
     invServiceDate,
     invPickup,
     invDelivery,
+    paymentDays,
     delStreet,
     delHouse,
     delPlz,
@@ -138,6 +142,7 @@ export function AdminManualInvoiceForm() {
               serviceDate: invServiceDate || null,
               pickupAt: invPickup || null,
               deliveryAt: invDelivery || null,
+              paymentDays,
               deliveryStreet: delStreet,
               deliveryHouseNumber: delHouse,
               deliveryPostalCode: delPlz,
@@ -321,6 +326,19 @@ export function AdminManualInvoiceForm() {
           lang="de"
           value={invServiceDate}
           onChange={(e) => setInvServiceDate(e.target.value)}
+          className="w-full rounded-xl border-2 border-[#0d2137]/15 px-3 py-2 text-[#0d2137]"
+        />
+      </label>
+      <label className="block text-sm">
+        <span className="mb-1 block font-medium text-[#0d2137]">{t("reports.paymentDays")}</span>
+        <input
+          required
+          inputMode="numeric"
+          dir="ltr"
+          lang="de"
+          value={paymentDays}
+          onChange={(e) => setPaymentDays(e.target.value.replace(/[^\d]/g, "").slice(0, 2))}
+          placeholder="7"
           className="w-full rounded-xl border-2 border-[#0d2137]/15 px-3 py-2 text-[#0d2137]"
         />
       </label>

@@ -72,6 +72,7 @@ export async function POST(req: Request) {
       amountCents: addGermanVat19(netCents).grossCents,
       serviceDateIso: isoOrNull(body.serviceDate),
       printedInvoiceDate: ymdFrom(body.serviceDate) || ymdFrom(body.pickupAt),
+      paymentDueDays: Number(String(body.paymentDays ?? body.paymentDueDays ?? "7").replace(",", ".")),
       pickupAtIso: isoOrNull(body.pickupAt),
       deliveryAtIso: isoOrNull(body.deliveryAt),
       deliveryStreet: str(body.deliveryStreet, 120),

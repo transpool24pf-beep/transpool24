@@ -79,6 +79,20 @@ function printedInvoiceYmd(job: Job): string {
   return "";
 }
 
+export function paymentDueDaysForJob(job: Job): number {
+  const raw =
+    job.cargo_details && typeof job.cargo_details === "object"
+      ? (job.cargo_details as Record<string, unknown>).paymentDueDays
+      : null;
+  const n = typeof raw === "number" ? raw : typeof raw === "string" ? Number(String(raw).replace(",", ".")) : 7;
+  if (!Number.isFinite(n)) return 7;
+  return Math.min(90, Math.max(1, Math.round(n)));
+}
+
+function paymentDueUnit(days: number): string {
+  return days === 1 ? "Tag" : "Tagen";
+}
+
 function formatDeDate(iso: string | Date | null | undefined): string {
   const ymd = ymdFromValue(iso);
   if (ymd) return formatDeDateYmd(ymd);
@@ -335,18 +349,12 @@ export async function generateInvoicePdf(
   const rightX = margin + colW + colGap;
 
   const billing = jobSenderAddress(job);
-  const delivery = jobRecipientAddress(job);
   const addrStreet =
     streetHouse(billing.street, billing.houseNumber) || parseDeAddress(job.pickup_address || "").street;
   const plzOrt =
     `${billing.postalCode} ${billing.city}`.trim() ||
     parseDeAddress(job.pickup_address || "").plzOrt ||
     (job.pickup_city ? `${job.pickup_city}` : "-");
-  const deliveryStreet = streetHouse(delivery.street, delivery.houseNumber);
-  const deliveryPlzOrt = `${delivery.postalCode} ${delivery.city}`.trim();
-  const showDelivery =
-    Boolean(deliveryStreet || deliveryPlzOrt) &&
-    (deliveryStreet !== addrStreet || deliveryPlzOrt !== plzOrt);
 
   tealBar(page, leftX, y, colW, 20, "RECHNUNGSEMPFÄNGER", fontBold);
   tealBar(page, rightX, y, colW, 20, "RECHNUNGSAUSSTELLER", fontBold);
@@ -360,12 +368,11 @@ export async function generateInvoicePdf(
     plzOrt,
     zusatz: recipientZusatz,
   });
-  const qrPayload = [recipientName, addrStreet, plzOrt].filter((s) => s && s !== "-").join("\n");
   const qrSize = 54;
   const blockTop = y;
   drawPostMark(page, font, fontBold, leftX, blockTop);
   try {
-    const qrImg = await embedAddressQr(doc, qrPayload || recipientName);
+    const qrImg = await embedAddressQr(doc, PDF_COMPANY.websiteUrl);
     page.drawImage(qrImg, {
       x: leftX + colW - qrSize,
       y: blockTop - qrSize,
@@ -379,19 +386,6 @@ export async function generateInvoicePdf(
   for (const ln of postalLines) {
     drawSafe(page, font, ln, leftX, leftY, 10, TEXT);
     leftY -= 13;
-  }
-  if (showDelivery) {
-    leftY -= 4;
-    drawSafe(page, fontBold, "Lieferadresse", leftX, leftY, 8, MUTED);
-    leftY -= 13;
-    if (deliveryStreet) {
-      drawSafe(page, font, deliveryStreet, leftX, leftY, 10, TEXT);
-      leftY -= 13;
-    }
-    if (deliveryPlzOrt) {
-      drawSafe(page, font, deliveryPlzOrt, leftX, leftY, 10, TEXT);
-      leftY -= 13;
-    }
   }
 
   const rightPairs: [string, string][] = [
@@ -550,8 +544,9 @@ export async function generateInvoicePdf(
 
   tealBar(page, margin, y, contentW, 20, "ZAHLUNGSBEDINGUNGEN", fontBold);
   y -= 38;
+  const dueDays = paymentDueDaysForJob(job);
   const payLines = wrapLines(
-    "Bitte überweisen Sie den Gesamtbetrag innerhalb von 7 Tagen nach Rechnungserhalt auf das unten angegebene Konto.",
+    `Bitte überweisen Sie den Gesamtbetrag innerhalb von ${dueDays} ${paymentDueUnit(dueDays)} nach Rechnungserhalt auf das unten angegebene Konto.`,
     font,
     9,
     contentW
@@ -606,6 +601,7 @@ export type ManualCustomerInvoiceInput = {
   amountCents: number;
   serviceDateIso: string | null;
   printedInvoiceDate: string;
+  paymentDueDays: number;
   pickupAtIso: string | null;
   deliveryAtIso: string | null;
   deliveryStreet: string;
@@ -669,6 +665,7 @@ export function buildManualCustomerInvoiceJob(input: ManualCustomerInvoiceInput)
       recipientAddress,
       printedAuftragNumber: input.printedAuftragNumber.trim(),
       printedInvoiceDate: ymdFromValue(input.printedInvoiceDate || input.serviceDateIso || input.pickupAtIso),
+      paymentDueDays: Math.min(90, Math.max(1, Math.round(Number(input.paymentDueDays) || 7))),
     },
     service_type: "driver_car" as const,
     distance_km: null,
