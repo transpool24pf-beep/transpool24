@@ -190,9 +190,13 @@ export function AdminManualInvoiceForm() {
       <label className="block text-sm">
         <span className="mb-1 block font-medium text-[#0d2137]">{t("common.email")}</span>
         <input
-          type="email"
+          type="text"
+          inputMode="email"
+          autoComplete="email"
+          dir="ltr"
+          lang="de"
           value={invEmail}
-          onChange={(e) => setInvEmail(e.target.value)}
+          onChange={(e) => setInvEmail(e.target.value.replace(/\s/g, ""))}
           className="w-full rounded-xl border-2 border-[#0d2137]/15 px-3 py-2 text-[#0d2137]"
         />
       </label>

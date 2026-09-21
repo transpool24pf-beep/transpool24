@@ -60,7 +60,7 @@ export async function POST(req: Request) {
       : randomInt(100000, 1000000);
     const input = {
       customerName,
-      customerEmail: str(body.customerEmail, 160),
+              customerEmail: str(body.customerEmail, 160).replace(/\s/g, ""),
       phone: str(body.phone, 40),
       street: str(body.street, 120),
       houseNumber: str(body.houseNumber, 20),
