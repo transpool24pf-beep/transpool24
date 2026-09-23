@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { Header } from "@/components/Header";
+import { HomeWhatsAppButton } from "@/components/HomeWhatsAppButton";
 import { Footer } from "@/components/Footer";
 import { DriversCarousel } from "@/components/DriversCarousel";
 import { HomeTransportOperations } from "@/components/HomeTransportOperations";
@@ -252,6 +253,7 @@ export default async function HomePage({
         <ContentAdBanner region="home-footer-banner" className="bg-[#f8f9fb]" />
       </main>
       <Footer />
+      <HomeWhatsAppButton />
     </>
   );
 }

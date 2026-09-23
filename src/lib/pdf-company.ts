@@ -17,9 +17,9 @@ export const PDF_COMPANY = {
   website: "www.transpool24.com",
   websiteUrl: "https://www.transpool24.com/de",
   email: "transpool24pf@gmail.com",
-  phone: "+49 176 22624264",
+  phone: "+49 179 6923602",
   /** Same as phone; used on invoice/contract contact block */
-  invoicePhone: "+49 176 22624264",
+  invoicePhone: "+49 179 6923602",
   bankName: "Targobank",
   iban: "DE64 3002 0900 5321 0926 15",
   bic: "CMCIDEDD",

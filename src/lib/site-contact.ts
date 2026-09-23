@@ -1,7 +1,7 @@
 /** Public contact shown on the website (mailto, tel, privacy, support sidebar). */
 
 export const DEFAULT_PUBLIC_CONTACT_EMAIL = "transpool24pf@gmail.com";
-export const DEFAULT_PUBLIC_CONTACT_PHONE = "+49 176 22624264";
+export const DEFAULT_PUBLIC_CONTACT_PHONE = "+49 179 6923602";
 
 function parseBareEmail(raw: string | undefined): string | null {
   const s = (raw ?? "").trim().replace(/^["']|["']$/g, "");
@@ -31,4 +31,15 @@ export function getPublicContactPhone(): string {
 
 export function getPublicContactTelHref(): string {
   return `tel:${getPublicContactPhone().replace(/[\s-]/g, "")}`;
+}
+
+export function getPublicContactPhoneDigits(): string {
+  return getPublicContactPhone().replace(/\D/g, "");
+}
+
+/** Opens WhatsApp chat with the public TransPool24 number. */
+export function getPublicContactWhatsAppHref(prefill?: string): string {
+  const digits = getPublicContactPhoneDigits();
+  const q = prefill?.trim() ? `?text=${encodeURIComponent(prefill.trim())}` : "";
+  return `https://wa.me/${digits}${q}`;
 }

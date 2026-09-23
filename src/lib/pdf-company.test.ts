@@ -13,7 +13,7 @@ describe("pdf-company", () => {
     expect(pdfCompanyFooterLine()).toContain(PDF_COMPANY.addressLine);
     expect(pdfCompanyFooterLine()).toContain(PDF_COMPANY.phone);
     expect(PDF_COMPANY.bankName).toBe("Targobank");
-    expect(PDF_COMPANY.phone).toBe("+49 176 22624264");
-    expect(PDF_COMPANY.invoicePhone).toBe("+49 176 22624264");
+    expect(PDF_COMPANY.phone).toBe("+49 179 6923602");
+    expect(PDF_COMPANY.invoicePhone).toBe("+49 179 6923602");
   });
 });
