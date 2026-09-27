@@ -259,19 +259,15 @@ export function DriverPageClient({ locale }: { locale: string }) {
       ) : (
         <section
           id="driver-form"
-          className="relative overflow-hidden bg-gradient-to-br from-[#f4f9ff] via-white to-[#fff7f1] px-1 py-6 sm:px-2 sm:py-10 lg:py-14"
+          className="relative min-h-[calc(100dvh-4.75rem)] overflow-hidden bg-white px-4 py-6 sm:px-6 lg:py-8"
         >
-          <div className="pointer-events-none absolute inset-0 opacity-[0.4]" aria-hidden>
-            <div className="absolute start-0 top-0 h-96 w-96 rounded-full bg-sky-100 blur-3xl" />
-            <div className="absolute end-10 bottom-10 h-72 w-72 rounded-full bg-[#e85d04]/10 blur-3xl" />
-          </div>
-          <div className="relative mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14" dir="ltr">
-            <div dir={rtl ? "rtl" : "ltr"}>
-              <h1 className="text-[2.15rem] font-extrabold leading-[1.18] tracking-tight text-[#152033] sm:text-5xl lg:text-[3.15rem]">
+          <div className="relative mx-auto grid h-full min-h-[calc(100dvh-6.5rem)] w-full max-w-6xl items-stretch gap-8 lg:grid-cols-2 lg:gap-12 lg:items-start" dir="ltr">
+            <div className="flex min-h-0 flex-col" dir={rtl ? "rtl" : "ltr"}>
+              <h1 className="text-[1.85rem] font-extrabold leading-[1.2] tracking-tight text-[#152033] sm:text-4xl lg:text-[2.65rem]">
                 <span className="text-[var(--accent)]">{t("partnerTitleAccent")}</span>
                 <span> {t("partnerTitleRest")}</span>
               </h1>
-              <div className="mt-7 space-y-5 rounded-2xl bg-[#d4ebff] px-6 py-7 text-[1.05rem] leading-9 text-[#1b2c44] sm:px-8 sm:py-8 sm:text-[1.125rem] sm:leading-10">
+              <div className="mt-5 space-y-4 text-[15px] leading-8 text-[#243044] sm:mt-6 sm:text-base sm:leading-8">
                 <p>
                   {t.rich("partnerBody1", {
                     brand: (chunks) => <strong className="font-bold">{chunks}</strong>,
@@ -283,18 +279,18 @@ export function DriverPageClient({ locale }: { locale: string }) {
                   })}
                 </p>
               </div>
-              <div className="mt-10 flex justify-center lg:justify-start">
+              <div className="mt-8 flex flex-1 items-end justify-center lg:mt-10 lg:justify-start">
                 <Image
                   src={TRANSPOOL24_VAN_IMAGE}
                   alt={t("vanAlt")}
                   width={720}
                   height={430}
-                  className="h-auto w-full max-w-xl object-contain drop-shadow-2xl"
+                  className="h-auto w-full max-h-[min(42vh,22rem)] object-contain object-bottom drop-shadow-2xl"
                 />
               </div>
             </div>
-            <div dir={rtl ? "rtl" : "ltr"}>
-              <div className="rounded-2xl border border-[#0d2137]/8 bg-white p-5 shadow-[0_24px_60px_-28px_rgba(13,33,55,0.28)] sm:p-8">
+            <div className="lg:sticky lg:top-24" dir={rtl ? "rtl" : "ltr"}>
+              <div className="rounded-2xl border border-[#edf0f4] bg-white p-5 shadow-[0_18px_50px_-24px_rgba(13,33,55,0.22)] sm:p-7">
                 <DriverWizardForm onBack={() => setShowForm(false)} initialCity="" />
               </div>
             </div>

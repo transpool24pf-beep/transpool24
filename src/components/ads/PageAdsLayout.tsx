@@ -31,18 +31,20 @@ export function PageAdsLayout({ children, className = "", placement = "sides" }:
     return (
       <>
         <AdSenseScript enabled={adsEnabled} />
-        <div className={`mx-auto w-full max-w-7xl px-4 sm:px-6 ${className}`}>
-          <OrderBookingWideBanner
-            slot={ADSENSE_SLOT_BANNER}
-            label={adsLabel}
-            enabled={adsEnabled}
-          />
+        <div className={`w-full ${className}`}>
           {children}
-          <OrderBookingWideBanner
-            slot={showDesktopAds ? ADSENSE_SLOT_SIDEBAR_RIGHT : ADSENSE_SLOT_SIDEBAR_LEFT}
-            label={adsLabel}
-            enabled={adsEnabled}
-          />
+          <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
+            <OrderBookingWideBanner
+              slot={ADSENSE_SLOT_BANNER}
+              label={adsLabel}
+              enabled={adsEnabled}
+            />
+            <OrderBookingWideBanner
+              slot={showDesktopAds ? ADSENSE_SLOT_SIDEBAR_RIGHT : ADSENSE_SLOT_SIDEBAR_LEFT}
+              label={adsLabel}
+              enabled={adsEnabled}
+            />
+          </div>
         </div>
       </>
     );
