@@ -6,13 +6,14 @@ import { useTranslations } from "next-intl";
 import { shouldOpenDriverFormFromDraft } from "@/lib/driver-wizard-storage";
 import { DriverWizardForm } from "./DriverWizardForm";
 import { OrderRouteLottie } from "./OrderRouteLottie";
-import { TRANSPOOL24_VAN_IMAGE } from "@/lib/brand-assets";
+import { CITY_PARCEL_DELIVERY_VIDEO, TRANSPOOL24_VAN_IMAGE } from "@/lib/brand-assets";
 import { PageAdsLayout } from "@/components/ads/PageAdsLayout";
 
 export function DriverPageClient({ locale }: { locale: string }) {
   const t = useTranslations("driver.landing");
   const [showForm, setShowForm] = useState(false);
   const [faqOpen, setFaqOpen] = useState<number | null>(null);
+  const [workFocus, setWorkFocus] = useState("");
   const rtl = locale === "ar";
 
   useEffect(() => {
@@ -280,18 +281,35 @@ export function DriverPageClient({ locale }: { locale: string }) {
                 </p>
               </div>
               <div className="mt-8 flex flex-1 items-end justify-center lg:mt-10 lg:justify-start">
-                <Image
-                  src={TRANSPOOL24_VAN_IMAGE}
-                  alt={t("vanAlt")}
-                  width={720}
-                  height={430}
-                  className="h-auto w-full max-h-[min(42vh,22rem)] object-contain object-bottom drop-shadow-2xl"
-                />
+                {workFocus === "city_parcels" ? (
+                  <video
+                    key={CITY_PARCEL_DELIVERY_VIDEO}
+                    src={CITY_PARCEL_DELIVERY_VIDEO}
+                    className="h-auto w-full max-h-[min(42vh,22rem)] object-contain object-bottom"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    aria-label={t("vanAlt")}
+                  />
+                ) : (
+                  <Image
+                    src={TRANSPOOL24_VAN_IMAGE}
+                    alt={t("vanAlt")}
+                    width={720}
+                    height={430}
+                    className="h-auto w-full max-h-[min(42vh,22rem)] object-contain object-bottom drop-shadow-2xl"
+                  />
+                )}
               </div>
             </div>
             <div className="lg:sticky lg:top-24" dir={rtl ? "rtl" : "ltr"}>
               <div className="rounded-2xl border border-[#edf0f4] bg-white p-5 shadow-[0_18px_50px_-24px_rgba(13,33,55,0.22)] sm:p-7">
-                <DriverWizardForm onBack={() => setShowForm(false)} initialCity="" />
+                <DriverWizardForm
+                  onBack={() => setShowForm(false)}
+                  initialCity=""
+                  onWorkFocusChange={setWorkFocus}
+                />
               </div>
             </div>
           </div>

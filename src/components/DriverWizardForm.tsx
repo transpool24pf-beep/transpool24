@@ -164,9 +164,11 @@ function FileUploadBox({
 export function DriverWizardForm({
   onBack,
   initialCity,
+  onWorkFocusChange,
 }: {
   onBack: () => void;
   initialCity?: string;
+  onWorkFocusChange?: (workFocus: string) => void;
 }) {
   const t = useTranslations("driver");
   const [step, setStep] = useState(1);
@@ -207,6 +209,10 @@ export function DriverWizardForm({
       setForm((f) => ({ ...f, city: f.city?.trim() ? f.city : initialCity }));
     }
   }, [initialCity]);
+
+  useEffect(() => {
+    onWorkFocusChange?.(form.workFocus);
+  }, [form.workFocus, onWorkFocusChange]);
 
   useEffect(() => {
     function close(e: MouseEvent) {
