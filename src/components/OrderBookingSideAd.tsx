@@ -47,6 +47,8 @@ export function OrderBookingWideBanner({ slot, label, enabled }: Props) {
     </div>
   );
 }
+
+export function useIsDesktopLg(): { isDesktop: boolean; ready: boolean } {
   const [isLg, setIsLg] = useState(false);
   const [ready, setReady] = useState(false);
   useEffect(() => {
