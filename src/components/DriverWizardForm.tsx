@@ -113,8 +113,8 @@ function FileUploadBox({
   };
 
   return (
-    <div className="rounded-xl border-2 border-dashed border-[#0d2137]/20 bg-[#f8f9fa] p-4">
-      <p className="mb-2 text-sm font-medium text-[#0d2137]">{label}</p>
+    <div className="rounded-2xl border-2 border-[#0d2137]/35 bg-[#eef2f6] p-4 shadow-sm">
+      <p className="mb-3 text-sm font-semibold text-[#0d2137]">{label}</p>
       {exampleSrc && (
         <div className="mb-3 flex flex-col items-center">
           {exampleLabel && (
@@ -122,7 +122,7 @@ function FileUploadBox({
               {exampleLabel}
             </span>
           )}
-          <div className="relative h-28 w-28 overflow-hidden rounded-xl border-2 border-[#0d2137]/15 bg-white shadow-md ring-2 ring-[#0d2137]/5">
+          <div className="relative h-28 w-28 overflow-hidden rounded-xl border-2 border-[#0d2137]/25 bg-white shadow-md">
             <Image src={exampleSrc} alt="" fill className="object-cover" sizes="112px" />
           </div>
         </div>
@@ -136,14 +136,14 @@ function FileUploadBox({
         id={inputHtmlId}
       />
       {value ? (
-        <div className="flex items-center justify-between gap-2">
-          <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg border-2 border-[#0d2137]/10 bg-white shadow-sm">
+        <div className="flex items-center justify-between gap-2 rounded-xl border-2 border-[#0d2137]/25 bg-white px-3 py-3">
+          <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-lg border-2 border-[#0d2137]/20 bg-white shadow-sm">
             <img src={value} alt="" className="h-full w-full object-cover" />
           </div>
           <button
             type="button"
             onClick={() => onChange("")}
-            className="text-sm text-red-600 hover:underline"
+            className="text-sm font-medium text-red-600 hover:underline"
           >
             {remove}
           </button>
@@ -151,8 +151,11 @@ function FileUploadBox({
       ) : (
         <label
           htmlFor={inputHtmlId}
-          className="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-[#0d2137]/15 bg-white py-5 text-sm text-[#0d2137]/70 transition hover:border-[var(--accent)]/30 hover:bg-[#0d2137]/5"
+          className="flex min-h-[7.5rem] cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-[2.5px] border-dashed border-[#0d2137]/55 bg-white px-4 py-6 text-center text-sm font-medium text-[#0d2137] shadow-[inset_0_0_0_1px_rgba(13,33,55,0.06)] transition hover:border-[var(--accent)] hover:bg-[#fff8f0] hover:text-[#0d2137]"
         >
+          <span className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#0d2137]/30 bg-[#f4f6f8] text-lg" aria-hidden>
+            {loading ? "…" : "↑"}
+          </span>
           {loading ? uploading : chooseFileOrDrag}
         </label>
       )}
