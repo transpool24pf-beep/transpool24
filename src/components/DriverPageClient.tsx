@@ -309,7 +309,7 @@ export function DriverPageClient({ locale }: { locale: string }) {
               </div>
             </div>
             <div dir={rtl ? "rtl" : "ltr"}>
-              <div className="rounded-2xl border border-[#edf0f4] bg-white p-5 shadow-[0_18px_50px_-24px_rgba(13,33,55,0.22)] sm:p-7">
+              <div className="rounded-2xl border-2 border-[#0d2137]/45 bg-white p-5 shadow-[0_18px_50px_-24px_rgba(13,33,55,0.22)] sm:p-7">
                 <DriverWizardForm
                   onBack={() => setShowForm(false)}
                   initialCity=""

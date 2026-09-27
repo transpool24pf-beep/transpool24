@@ -79,7 +79,7 @@ export function DriverCityMap({ city }: { city: string }) {
     (geo?.city === trimmed ? geo.label : null) ?? (trimmed && !isPlaceholder ? trimmed : "Pforzheim");
 
   return (
-    <div className="h-[320px] w-full overflow-hidden rounded-xl border border-[#0d2137]/15 bg-[#f8f9fa]">
+    <div className="h-[320px] w-full overflow-hidden rounded-xl border-2 border-[#0d2137]/45 bg-[#f8f9fa] shadow-sm">
       <MapContainer center={position} zoom={11} className="h-full w-full" scrollWheelZoom>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'

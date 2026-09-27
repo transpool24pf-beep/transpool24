@@ -106,7 +106,7 @@ export function DriverCitySelect({
         <ul
           id="driver-city-list"
           role="listbox"
-          className="absolute z-30 mt-1 max-h-72 w-full overflow-auto rounded-xl border border-[#0d2137]/15 bg-white py-1 shadow-lg"
+          className="absolute z-30 mt-1 max-h-72 w-full overflow-auto rounded-xl border-2 border-[#0d2137]/45 bg-white py-1 shadow-lg"
         >
           {matches.length === 0 ? (
             <li className="px-4 py-2 text-sm text-[#0d2137]/55">{noResults}</li>

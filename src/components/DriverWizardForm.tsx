@@ -28,6 +28,16 @@ const STEP_ICONS = ["📋", "🪪", "✓"];
 
 const FIELD_INPUT_CLASS =
   "w-full rounded-xl border-2 border-[#0d2137]/45 bg-white px-4 py-3.5 text-[#0d2137] shadow-sm outline-none placeholder:text-[#0d2137]/40 focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20";
+const FIELD_CARD_IDLE =
+  "flex cursor-pointer flex-col rounded-xl border-2 border-[#0d2137]/45 bg-white p-4 shadow-sm transition hover:border-[#0d2137]/70";
+const FIELD_CARD_ACTIVE =
+  "flex cursor-pointer flex-col rounded-xl border-2 border-[var(--accent)] bg-[#fff8f0] p-4 shadow-sm transition";
+const FIELD_NOTICE_CLASS =
+  "rounded-xl border-2 border-[#0d2137]/45 bg-[#fff8f0] p-4 shadow-sm";
+const FIELD_CHECK_CLASS =
+  "mt-1 h-5 w-5 shrink-0 rounded border-2 border-[#0d2137]/55 text-[var(--accent)]";
+const BTN_BACK_CLASS =
+  "rounded-xl border-2 border-[#0d2137]/45 bg-white px-6 py-3 font-medium text-[#0d2137] shadow-sm";
 
 type FormData = {
   city: string;
@@ -304,7 +314,7 @@ export function DriverWizardForm({
     missing.length > 0 ? (
       <div
         ref={missingBoxRef}
-        className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+        className="rounded-xl border-2 border-red-400 bg-red-50 px-4 py-3 text-sm text-red-800 shadow-sm"
         role="alert"
       >
         <p className="font-semibold">{t("missingFieldsIntro")}</p>
@@ -373,7 +383,7 @@ export function DriverWizardForm({
 
   if (step === 4) {
     return (
-      <div className="rounded-2xl border border-[#0d2137]/10 bg-white p-8 text-center shadow-lg">
+      <div className="rounded-2xl border-2 border-[#0d2137]/45 bg-white p-8 text-center shadow-lg">
         <OrderSuccessHandshake
           className="mb-2"
           webmSrc="/videos/driver-success-handshake.webm"
@@ -391,7 +401,7 @@ export function DriverWizardForm({
   return (
     <div className="space-y-8">
       {/* Step indicator: icons + names + animated connecting line */}
-      <div className="rounded-2xl border-2 border-[#0d2137]/10 bg-white px-4 py-6 shadow-sm">
+      <div className="rounded-2xl border-2 border-[#0d2137]/45 bg-white px-4 py-6 shadow-sm">
         <div className="flex items-stretch gap-0">
           {stepLabels.map((name, i) => (
             <div key={i} className="flex flex-1 items-center min-w-0">
@@ -467,11 +477,7 @@ export function DriverWizardForm({
               <p className="mb-3 text-sm text-[#0d2137]/70">{t("workFocusHint")}</p>
               <div className="grid gap-3 sm:grid-cols-2">
                 <label
-                  className={`flex cursor-pointer flex-col rounded-xl border-2 p-4 transition ${
-                    form.workFocus === "city_parcels"
-                      ? "border-[var(--accent)] bg-[#fff8f0]"
-                      : "border-[#0d2137]/15 bg-white hover:border-[#0d2137]/30"
-                  }`}
+                  className={form.workFocus === "city_parcels" ? FIELD_CARD_ACTIVE : FIELD_CARD_IDLE}
                 >
                   <span className="flex items-start gap-2">
                     <input
@@ -490,11 +496,7 @@ export function DriverWizardForm({
                   </span>
                 </label>
                 <label
-                  className={`flex cursor-pointer flex-col rounded-xl border-2 p-4 transition ${
-                    form.workFocus === "b2b_intercity"
-                      ? "border-[var(--accent)] bg-[#fff8f0]"
-                      : "border-[#0d2137]/15 bg-white hover:border-[#0d2137]/30"
-                  }`}
+                  className={form.workFocus === "b2b_intercity" ? FIELD_CARD_ACTIVE : FIELD_CARD_IDLE}
                 >
                   <span className="flex items-start gap-2">
                     <input
@@ -546,7 +548,7 @@ export function DriverWizardForm({
                     {DRIVER_COUNTRY_CODES.find((c) => c.code === form.phoneCountryCode)?.flag ?? "🇩🇪"} {form.phoneCountryCode} ▾
                   </button>
                   {countryCodeOpen && (
-                    <ul className="absolute left-0 top-full z-20 mt-1 max-h-52 w-44 overflow-auto rounded-lg border bg-white py-1 shadow-lg">
+                    <ul className="absolute left-0 top-full z-20 mt-1 max-h-52 w-44 overflow-auto rounded-xl border-2 border-[#0d2137]/45 bg-white py-1 shadow-lg">
                       {DRIVER_COUNTRY_CODES.map((c) => (
                         <li key={c.code}>
                           <button
@@ -573,13 +575,13 @@ export function DriverWizardForm({
                 />
               </div>
             </div>
-            <div className="rounded-xl border-2 border-[var(--accent)]/30 bg-[#fff8f0] p-4">
+            <div className={FIELD_NOTICE_CLASS}>
               <label className="flex cursor-pointer items-start gap-3">
                 <input
                   type="checkbox"
                   checked={form.servicePolicyAccepted}
                   onChange={(e) => update("servicePolicyAccepted", e.target.checked)}
-                  className="mt-1 h-5 w-5 shrink-0 rounded border-[#0d2137]/20 text-[var(--accent)]"
+                  className={FIELD_CHECK_CLASS}
                 />
                 <span className="text-sm text-[#0d2137]">{t("servicePolicy")}</span>
               </label>
@@ -590,7 +592,7 @@ export function DriverWizardForm({
           </div>
           {missingBox}
           <div className="mt-8 flex justify-between gap-4">
-            <button type="button" onClick={onBack} className="rounded-xl border border-[#0d2137]/20 bg-white px-6 py-3 font-medium text-[#0d2137]">
+            <button type="button" onClick={onBack} className={BTN_BACK_CLASS}>
               {t("back")}
             </button>
             <button
@@ -733,7 +735,7 @@ export function DriverWizardForm({
           </div>
           {missingBox}
           <div className="mt-8 flex justify-between gap-4">
-            <button type="button" onClick={() => setStep(1)} className="rounded-xl border border-[#0d2137]/20 bg-white px-6 py-3 font-medium text-[#0d2137]">
+            <button type="button" onClick={() => setStep(1)} className={BTN_BACK_CLASS}>
               {t("back")}
             </button>
             <button
@@ -757,7 +759,7 @@ export function DriverWizardForm({
       {step === 3 && (
         <>
           <h2 className="text-xl font-bold text-[#0d2137]">{t("step4Title")}</h2>
-          <div className="rounded-xl border border-[#0d2137]/15 bg-[#f8f9fa] p-4 text-sm">
+          <div className="rounded-xl border-2 border-[#0d2137]/45 bg-[#f8f9fa] p-4 text-sm shadow-sm">
             <p><strong>{t("reviewName")}:</strong> {form.fullName}</p>
             <p><strong>{t("reviewEmail")}:</strong> {form.email}</p>
             <p><strong>{t("reviewWhatsapp")}:</strong> {form.phoneCountryCode} {form.phone}</p>
@@ -774,9 +776,9 @@ export function DriverWizardForm({
             <p><strong>{t("reviewLanguages")}:</strong> {form.languagesSpoken || "-"}</p>
             <p><strong>{t("reviewVehiclePlate")}:</strong> {form.vehiclePlate || "-"}</p>
           </div>
-          <div className="rounded-xl border-2 border-[var(--accent)]/40 bg-[#fff8f0] p-4">
+          <div className={FIELD_NOTICE_CLASS}>
             <p className="mb-2 font-semibold text-[#0d2137]">{WORK_POLICY_TITLE}</p>
-            <div className="max-h-48 overflow-y-auto rounded bg-white p-3 text-xs text-[#0d2137]/90 whitespace-pre-wrap">
+            <div className="max-h-48 overflow-y-auto rounded-xl border-2 border-[#0d2137]/45 bg-white p-3 text-xs text-[#0d2137]/90 whitespace-pre-wrap">
               {WORK_POLICY_TEXT}
             </div>
             <label className="mt-3 flex cursor-pointer items-start gap-3">
@@ -784,7 +786,7 @@ export function DriverWizardForm({
                 type="checkbox"
                 checked={form.workPolicyAccepted}
                 onChange={(e) => update("workPolicyAccepted", e.target.checked)}
-                className="mt-1 h-5 w-5 shrink-0 rounded border-[#0d2137]/20 text-[var(--accent)]"
+                className={FIELD_CHECK_CLASS}
               />
               <span className="text-sm text-[#0d2137]">{t("workPolicyAgree")}</span>
             </label>
@@ -792,7 +794,7 @@ export function DriverWizardForm({
           {missingBox}
           {submitError && <p className="text-red-600 text-sm">{submitError}</p>}
           <div className="mt-8 flex justify-between gap-4">
-            <button type="button" onClick={() => setStep(2)} className="rounded-xl border border-[#0d2137]/20 bg-white px-6 py-3 font-medium text-[#0d2137]">
+            <button type="button" onClick={() => setStep(2)} className={BTN_BACK_CLASS}>
               {t("back")}
             </button>
             <button
