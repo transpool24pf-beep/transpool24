@@ -39,7 +39,7 @@ function loadDotLottieScript(): Promise<void> {
   return loadPromise;
 }
 
-function DotLottieOne({ src }: { src: string }) {
+function DotLottieOne({ src, size = 280 }: { src: string; size?: number }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -60,7 +60,7 @@ function DotLottieOne({ src }: { src: string }) {
     return (
       <div
         className="mx-auto rounded-2xl bg-gradient-to-br from-[#eef0f3] to-[#e85d04]/[0.08] ring-1 ring-black/[0.06]"
-        style={{ width: 280, height: 280 }}
+        style={{ width: size, height: size }}
         aria-hidden
       />
     );
@@ -68,7 +68,7 @@ function DotLottieOne({ src }: { src: string }) {
 
   return createElement("dotlottie-wc", {
     src,
-    style: { width: "280px", height: "280px", maxWidth: "100%" },
+    style: { width: `${size}px`, height: `${size}px`, maxWidth: "100%" },
     autoplay: true,
     loop: true,
   });
@@ -77,19 +77,24 @@ function DotLottieOne({ src }: { src: string }) {
 type Props = {
   primarySrc: string;
   secondarySrc: string;
+  compact?: boolean;
 };
 
-export function DotLottieRow({ primarySrc, secondarySrc }: Props) {
+export function DotLottieRow({ primarySrc, secondarySrc, compact = false }: Props) {
   return (
     <div
-      className="my-12 grid grid-cols-1 gap-8 rounded-[1.35rem] bg-gradient-to-br from-[#0d2137]/[0.04] via-white to-[#e85d04]/[0.07] p-6 ring-1 ring-black/[0.06] sm:grid-cols-2 sm:p-8"
+      className={
+        compact
+          ? "grid grid-cols-2 gap-2 rounded-[1.35rem] bg-gradient-to-br from-[#0d2137]/[0.04] via-white to-[#e85d04]/[0.07] p-3 ring-1 ring-black/[0.06] sm:gap-3 sm:p-4"
+          : "my-12 grid grid-cols-1 gap-8 rounded-[1.35rem] bg-gradient-to-br from-[#0d2137]/[0.04] via-white to-[#e85d04]/[0.07] p-6 ring-1 ring-black/[0.06] sm:grid-cols-2 sm:p-8"
+      }
       dir="ltr"
     >
       <div className="flex items-center justify-center">
-        <DotLottieOne src={primarySrc} />
+        <DotLottieOne src={primarySrc} size={compact ? 168 : 280} />
       </div>
       <div className="flex items-center justify-center">
-        <DotLottieOne src={secondarySrc} />
+        <DotLottieOne src={secondarySrc} size={compact ? 168 : 280} />
       </div>
     </div>
   );

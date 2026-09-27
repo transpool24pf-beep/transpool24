@@ -13,3 +13,9 @@ export const DOTLOTTIE_HOME_DRIVER_LOGISTICS =
 /** Blue smile loading, global overlay when navigation or first paint is slow. */
 export const DOTLOTTIE_PAGE_LOADING_BLUE =
   "https://lottie.host/67f13904-b750-42a2-bb1d-75c357e3ace1/Q8ZXiEU1wi.lottie";
+
+/** City delivery pair (scooter/truck + parcel courier) used on blog about and join-us. */
+export const DOTLOTTIE_CITY_DELIVERY_SCOOTER =
+  "https://lottie.host/2b45c4cf-8d1b-4aff-b2a9-b2051fdcfaa7/y9NIyXNNR2.lottie";
+export const DOTLOTTIE_CITY_DELIVERY_COURIER =
+  "https://lottie.host/458c62f4-7371-43f1-b3b7-c3e39d87883a/TUdNTQ1KvT.lottie";

@@ -4,11 +4,10 @@ import { getTranslations } from "next-intl/server";
 import { DotLottieRow } from "@/components/blog/DotLottieRow";
 import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
-
-const LOTTIE_1 =
-  "https://lottie.host/2b45c4cf-8d1b-4aff-b2a9-b2051fdcfaa7/y9NIyXNNR2.lottie";
-const LOTTIE_2 =
-  "https://lottie.host/458c62f4-7371-43f1-b3b7-c3e39d87883a/TUdNTQ1KvT.lottie";
+import {
+  DOTLOTTIE_CITY_DELIVERY_COURIER,
+  DOTLOTTIE_CITY_DELIVERY_SCOOTER,
+} from "@/lib/dotlottie-assets";
 
 type Props = {
   locale: string;
@@ -57,7 +56,7 @@ export async function AboutUsWhyNarrative({ locale, embedded = false }: Props) {
       </div>
 
       <div className="mx-auto max-w-4xl">
-        <DotLottieRow primarySrc={LOTTIE_1} secondarySrc={LOTTIE_2} />
+        <DotLottieRow primarySrc={DOTLOTTIE_CITY_DELIVERY_SCOOTER} secondarySrc={DOTLOTTIE_CITY_DELIVERY_COURIER} />
       </div>
 
       <div className="mx-auto max-w-3xl space-y-8 text-[var(--foreground)]">

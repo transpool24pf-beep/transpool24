@@ -6,8 +6,13 @@ import { useTranslations } from "next-intl";
 import { shouldOpenDriverFormFromDraft } from "@/lib/driver-wizard-storage";
 import { DriverWizardForm } from "./DriverWizardForm";
 import { OrderRouteLottie } from "./OrderRouteLottie";
-import { CITY_PARCEL_DELIVERY_VIDEO, TRANSPOOL24_VAN_IMAGE } from "@/lib/brand-assets";
+import { TRANSPOOL24_VAN_IMAGE } from "@/lib/brand-assets";
 import { PageAdsLayout } from "@/components/ads/PageAdsLayout";
+import { DotLottieRow } from "@/components/blog/DotLottieRow";
+import {
+  DOTLOTTIE_CITY_DELIVERY_COURIER,
+  DOTLOTTIE_CITY_DELIVERY_SCOOTER,
+} from "@/lib/dotlottie-assets";
 
 export function DriverPageClient({ locale }: { locale: string }) {
   const t = useTranslations("driver.landing");
@@ -280,26 +285,23 @@ export function DriverPageClient({ locale }: { locale: string }) {
                   })}
                 </p>
               </div>
-              <div className="mt-8 flex flex-1 items-end justify-center lg:mt-10 lg:justify-start">
+              <div className="mt-8 w-full lg:mt-10">
                 {workFocus === "city_parcels" ? (
-                  <video
-                    key={CITY_PARCEL_DELIVERY_VIDEO}
-                    src={CITY_PARCEL_DELIVERY_VIDEO}
-                    className="h-auto w-full max-h-[min(42vh,22rem)] object-contain object-bottom"
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    aria-label={t("vanAlt")}
+                  <DotLottieRow
+                    compact
+                    primarySrc={DOTLOTTIE_CITY_DELIVERY_SCOOTER}
+                    secondarySrc={DOTLOTTIE_CITY_DELIVERY_COURIER}
                   />
                 ) : (
-                  <Image
-                    src={TRANSPOOL24_VAN_IMAGE}
-                    alt={t("vanAlt")}
-                    width={720}
-                    height={430}
-                    className="h-auto w-full max-h-[min(42vh,22rem)] object-contain object-bottom drop-shadow-2xl"
-                  />
+                  <div className="flex justify-center lg:justify-start">
+                    <Image
+                      src={TRANSPOOL24_VAN_IMAGE}
+                      alt={t("vanAlt")}
+                      width={720}
+                      height={430}
+                      className="h-auto w-full max-h-[min(42vh,22rem)] object-contain object-bottom drop-shadow-2xl"
+                    />
+                  </div>
                 )}
               </div>
             </div>
