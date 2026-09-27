@@ -90,7 +90,7 @@ export function DriverCitySelect({
             inputRef.current?.blur();
           }
         }}
-        className="w-full rounded-xl border border-[#0d2137]/20 bg-white px-4 py-3 pe-10"
+        className="w-full rounded-xl border-2 border-[#0d2137]/45 bg-white px-4 py-3.5 pe-10 text-[#0d2137] shadow-sm outline-none placeholder:text-[#0d2137]/40 focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20"
       />
       <span className="pointer-events-none absolute inset-y-0 end-3 flex items-center text-[#0d2137]/40" aria-hidden>
         <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">

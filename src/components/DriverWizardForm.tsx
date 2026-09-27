@@ -26,6 +26,9 @@ const DriverCityMap = dynamic(
 /** 3 steps: basics → documents + vehicle → review */
 const STEP_ICONS = ["📋", "🪪", "✓"];
 
+const FIELD_INPUT_CLASS =
+  "w-full rounded-xl border-2 border-[#0d2137]/45 bg-white px-4 py-3.5 text-[#0d2137] shadow-sm outline-none placeholder:text-[#0d2137]/40 focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/20";
+
 type FormData = {
   city: string;
   cityCustom: string;
@@ -454,7 +457,7 @@ export function DriverWizardForm({
                   value={form.cityCustom}
                   onChange={(e) => update("cityCustom", e.target.value)}
                   placeholder={t("cityCustomPlaceholder")}
-                  className="w-full rounded-xl border border-[#0d2137]/20 px-4 py-3"
+                  className={FIELD_INPUT_CLASS}
                   required
                 />
               </div>
@@ -518,7 +521,7 @@ export function DriverWizardForm({
                 value={form.fullName}
                 onChange={(e) => update("fullName", e.target.value)}
                 placeholder={t("fullNamePlaceholder")}
-                className="w-full rounded-xl border border-[#0d2137]/20 px-4 py-3"
+                className={FIELD_INPUT_CLASS}
               />
             </div>
             <div>
@@ -528,7 +531,7 @@ export function DriverWizardForm({
                 value={form.email}
                 onChange={(e) => update("email", e.target.value)}
                 placeholder={t("emailPlaceholder")}
-                className="w-full rounded-xl border border-[#0d2137]/20 px-4 py-3"
+                className={FIELD_INPUT_CLASS}
               />
             </div>
             <div>
@@ -538,7 +541,7 @@ export function DriverWizardForm({
                   <button
                     type="button"
                     onClick={() => setCountryCodeOpen((o) => !o)}
-                    className="flex min-w-[4.5rem] items-center gap-1 rounded-lg border border-[#0d2137]/20 bg-[#0d2137]/5 px-3 py-2 text-sm"
+                    className="flex min-w-[4.5rem] items-center gap-1 rounded-xl border-2 border-[#0d2137]/45 bg-white px-3 py-3.5 text-sm shadow-sm"
                   >
                     {DRIVER_COUNTRY_CODES.find((c) => c.code === form.phoneCountryCode)?.flag ?? "🇩🇪"} {form.phoneCountryCode} ▾
                   </button>
@@ -566,7 +569,7 @@ export function DriverWizardForm({
                   value={form.phone}
                   onChange={(e) => update("phone", e.target.value)}
                   placeholder={t("whatsappPlaceholder")}
-                  className="min-w-0 flex-1 rounded-xl border border-[#0d2137]/20 px-4 py-3"
+                  className={`min-w-0 flex-1 ${FIELD_INPUT_CLASS}`}
                 />
               </div>
             </div>
@@ -673,7 +676,7 @@ export function DriverWizardForm({
                 value={form.languagesSpoken}
                 onChange={(e) => update("languagesSpoken", e.target.value)}
                 placeholder={t("languagesPlaceholder")}
-                className="w-full rounded-xl border border-[#0d2137]/20 px-4 py-3"
+                className={FIELD_INPUT_CLASS}
               />
             </div>
             <div className="sm:col-span-2">
@@ -683,7 +686,7 @@ export function DriverWizardForm({
                 value={form.taxOrCommercialNumber}
                 onChange={(e) => update("taxOrCommercialNumber", e.target.value)}
                 placeholder={t("taxPlaceholder")}
-                className="w-full rounded-xl border border-[#0d2137]/20 px-4 py-3"
+                className={FIELD_INPUT_CLASS}
               />
             </div>
             <div className="sm:col-span-2 mt-2 border-t border-[#0d2137]/10 pt-6">
@@ -697,7 +700,7 @@ export function DriverWizardForm({
                 value={form.vehiclePlate}
                 onChange={(e) => update("vehiclePlate", e.target.value)}
                 placeholder={t("vehiclePlatePlaceholder")}
-                className="w-full rounded-xl border border-[#0d2137]/20 px-4 py-3"
+                className={FIELD_INPUT_CLASS}
               />
             </div>
             <div className="sm:col-span-2">
