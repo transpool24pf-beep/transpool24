@@ -9,6 +9,7 @@ import { OrderRouteLottie } from "./OrderRouteLottie";
 import { TRANSPOOL24_VAN_IMAGE } from "@/lib/brand-assets";
 import { PageAdsLayout } from "@/components/ads/PageAdsLayout";
 import { DotLottieRow } from "@/components/blog/DotLottieRow";
+import { HomepageDriverLogisticsLottie } from "@/components/HomepageDriverLogisticsLottie";
 import {
   DOTLOTTIE_CITY_DELIVERY_COURIER,
   DOTLOTTIE_CITY_DELIVERY_SCOOTER,
@@ -292,6 +293,8 @@ export function DriverPageClient({ locale }: { locale: string }) {
                     primarySrc={DOTLOTTIE_CITY_DELIVERY_SCOOTER}
                     secondarySrc={DOTLOTTIE_CITY_DELIVERY_COURIER}
                   />
+                ) : workFocus === "b2b_intercity" ? (
+                  <HomepageDriverLogisticsLottie compact />
                 ) : (
                   <div className="flex justify-center lg:justify-start">
                     <Image
