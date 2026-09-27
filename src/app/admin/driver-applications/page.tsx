@@ -13,6 +13,7 @@ type DriverApp = {
   status: string;
   vehicle_plate: string | null;
   languages_spoken: string | null;
+  work_focus?: string | null;
   created_at: string;
 };
 
@@ -88,6 +89,7 @@ export default function AdminDriverApplicationsPage() {
                 <th className="p-3 text-sm font-semibold text-[#0d2137]">{t("common.email")}</th>
                 <th className="p-3 text-sm font-semibold text-[#0d2137]">{t("common.phone")}</th>
                 <th className="p-3 text-sm font-semibold text-[#0d2137]">{t("driverApps.colCity")}</th>
+                <th className="p-3 text-sm font-semibold text-[#0d2137]">{t("driverApps.colWork")}</th>
                 <th className="p-3 text-sm font-semibold text-[#0d2137]">{t("common.status")}</th>
                 <th className="p-3 text-sm font-semibold text-[#0d2137]">{t("common.date")}</th>
                 <th className="p-3 text-sm font-semibold text-[#0d2137]"></th>
@@ -104,6 +106,13 @@ export default function AdminDriverApplicationsPage() {
                     {app.phone}
                   </td>
                   <td className="p-3 text-sm text-[#0d2137]/80">{app.city}</td>
+                  <td className="p-3 text-sm text-[#0d2137]/80">
+                    {app.work_focus === "city_parcels"
+                      ? t("drivers.filterCityParcels")
+                      : app.work_focus === "b2b_intercity"
+                        ? t("drivers.filterB2b")
+                        : "—"}
+                  </td>
                   <td className="p-3 text-sm text-[#0d2137]/80">{statusLabel(app.status)}</td>
                   <td className="p-3 text-sm text-[#0d2137]/70">
                     {new Date(app.created_at).toLocaleDateString(dateLocale)}

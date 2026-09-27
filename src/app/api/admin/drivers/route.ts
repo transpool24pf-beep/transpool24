@@ -80,18 +80,32 @@ export async function GET() {
       source: "profile" as const,
       driver_number: null as number | null,
       city: null as string | null,
+      work_focus: null as string | null,
       stats,
       suspended_at: (p as { suspended_at?: string | null }).suspended_at ?? null,
     };
   });
 
-  const { data: approvedApps } = await supabase
+  let approvedQuery = await supabase
     .from("driver_applications")
-    .select("id, full_name, email, phone, city, driver_number, vehicle_plate, personal_photo_url, approved_at, created_at, suspended_at, star_rating, desired_note")
+    .select("id, full_name, email, phone, city, driver_number, vehicle_plate, personal_photo_url, approved_at, created_at, suspended_at, star_rating, desired_note, work_focus")
     .eq("status", "approved")
     .order("driver_number", { ascending: true });
-  const fromApplications = (approvedApps ?? []).map((a) => {
+  if (approvedQuery.error && /work_focus/i.test(approvedQuery.error.message)) {
+    approvedQuery = await supabase
+      .from("driver_applications")
+      .select("id, full_name, email, phone, city, driver_number, vehicle_plate, personal_photo_url, approved_at, created_at, suspended_at, star_rating, desired_note")
+      .eq("status", "approved")
+      .order("driver_number", { ascending: true });
+  } else if (approvedQuery.error) {
+    console.error("[admin/drivers applications]", approvedQuery.error);
+  }
+  const fromApplications = (approvedQuery.data ?? []).map((a) => {
     const stats = appStats[a.id] ?? { jobs_count: 0, total_paid_cents: 0, customer_rating_avg: null };
+    const workFocus =
+      "work_focus" in a && typeof (a as { work_focus?: string | null }).work_focus === "string"
+        ? (a as { work_focus: string }).work_focus
+        : null;
     return {
       id: a.id,
       email: a.email,
@@ -108,6 +122,7 @@ export async function GET() {
       city: (a.city ?? "").trim() || null,
       suspended_at: a.suspended_at ?? null,
       desired_note: a.desired_note ?? null,
+      work_focus: workFocus,
       stats,
     };
   });

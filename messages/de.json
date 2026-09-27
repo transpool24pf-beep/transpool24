@@ -764,14 +764,28 @@
       "faq4q": "Brauche ich ein eigenes Fahrzeug?",
       "faq4a": "Sie können als reiner Fahrer, mit Fahrzeug oder mit Fahrzeug und Helfer arbeiten – je nach Einsatz.",
       "faq5q": "Wie erreiche ich Sie?",
-      "faq5a": "Nach Ihrer Bewerbung prüfen wir Ihre Daten und kontaktieren Sie per E-Mail oder Telefon."
+      "faq5a": "Nach Ihrer Bewerbung prüfen wir Ihre Daten und kontaktieren Sie per E-Mail oder Telefon.",
+      "workTypesTitle": "Was möchten Sie tun?",
+      "workTypesLead": "Wählen Sie bei der Bewerbung, ob Sie innerorts Pakete zustellen oder B2B-Fahrten zwischen Städten übernehmen.",
+      "workTypeParcelsTitle": "Paketzustellung innerorts",
+      "workTypeParcelsBody": "Verteilen Sie Pakete in Ihrer Stadt – kurze Touren, viele Stopps, Zustellung vor Ort.",
+      "workTypeB2bTitle": "B2B – Arbeit außerhalb der Städte",
+      "workTypeB2bBody": "Firmenfahrten zwischen Städten: Paletten, Teilladungen und regionale B2B-Touren.",
+      "workTypesFormHint": "Im Formular unten wählen Sie genau eine dieser Optionen."
     },
     "cityOther": "Sonstige",
     "cityCustom": "Name der Stadt, in der Sie leben",
     "cityCustomPlaceholder": "z. B. Heilbronn",
     "missingFieldsIntro": "Bitte füllen Sie noch aus:",
     "citySearchPlaceholder": "Stadt oder Ort suchen…",
-    "cityNoResults": "Keine Treffer, bitte anders suchen oder Sonstige wählen."
+    "cityNoResults": "Keine Treffer, bitte anders suchen oder Sonstige wählen.",
+    "workFocus": "Was möchten Sie tun?",
+    "workFocusHint": "Bitte eine Option wählen.",
+    "workFocusCityParcels": "Paketzustellung innerorts",
+    "workFocusCityParcelsHint": "Pakete in Ihrer Stadt verteilen.",
+    "workFocusB2b": "B2B / Arbeit außerhalb der Städte",
+    "workFocusB2bHint": "Firmenfahrten zwischen Städten.",
+    "reviewWorkFocus": "Einsatz"
   },
   "driverShare": {
     "pageTitle": "Standort teilen",

@@ -53,7 +53,7 @@ const DE: Record<string, string> = {
   "nav.cityParcels": "Stadt-Pakete",
   "cityParcels.title": "Stadtzustellung – Pakete",
   "cityParcels.subtitle":
-    "Fahrer nach Stadt suchen und offene lokale Paketaufträge zuweisen. Innerorts, z. B. Pforzheim.",
+    "Nur Fahrer, die innerörtliche Paketzustellung gewählt haben. Nach Stadt filtern und per WhatsApp anfragen.",
   "cityParcels.searchCity": "Stadt suchen",
   "cityParcels.searchPlaceholder": "Pforzheim",
   "cityParcels.drivers": "Fahrer in dieser Stadt",
@@ -251,7 +251,7 @@ const AR: Record<string, string> = {
   "nav.cityParcels": "طرود المدينة",
   "cityParcels.title": "توزيع الطرود داخل المدينة",
   "cityParcels.subtitle":
-    "ابحث عن السائقين حسب المدينة وعيّن طلبات الطرود المحلية المفتوحة. داخل المدينة، مثلاً بفورتسهايم.",
+    "السائقون الذين اختاروا توزيع الطرود داخل المدينة. ابحث بالمدينة وتواصل عبر واتساب.",
   "cityParcels.searchCity": "البحث عن مدينة",
   "cityParcels.searchPlaceholder": "Pforzheim",
   "cityParcels.drivers": "السائقون في هذه المدينة",

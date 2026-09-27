@@ -45,6 +45,7 @@ type FormData = {
   vehicleDocumentsUrl: string;
   vehiclePhotoUrl: string;
   workPolicyAccepted: boolean;
+  workFocus: string;
 };
 
 async function uploadFile(base64: string, filename: string): Promise<string> {
@@ -246,6 +247,7 @@ export function DriverWizardForm({
     if (!form.fullName.trim()) m.push(t("fullName"));
     if (!form.email.trim()) m.push(t("email"));
     if (!form.phone.trim()) m.push(t("whatsapp"));
+    if (!form.workFocus) m.push(t("workFocus"));
     if (!form.servicePolicyAccepted) m.push(t("servicePolicy"));
     return m;
   };
@@ -337,6 +339,7 @@ export function DriverWizardForm({
           vehicleDocumentsUrl: form.vehicleDocumentsUrl || null,
           vehiclePhotoUrl: form.vehiclePhotoUrl || null,
           workPolicyAccepted: form.workPolicyAccepted,
+          workFocus: form.workFocus,
         }),
       });
       const data = await res.json();
@@ -447,6 +450,58 @@ export function DriverWizardForm({
                 />
               </div>
             )}
+            <fieldset>
+              <legend className="mb-2 block text-sm font-medium text-[#0d2137]">{t("workFocus")} *</legend>
+              <p className="mb-3 text-sm text-[#0d2137]/70">{t("workFocusHint")}</p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label
+                  className={`flex cursor-pointer flex-col rounded-xl border-2 p-4 transition ${
+                    form.workFocus === "city_parcels"
+                      ? "border-[var(--accent)] bg-[#fff8f0]"
+                      : "border-[#0d2137]/15 bg-white hover:border-[#0d2137]/30"
+                  }`}
+                >
+                  <span className="flex items-start gap-2">
+                    <input
+                      type="radio"
+                      name="workFocus"
+                      className="mt-1 h-4 w-4 shrink-0"
+                      checked={form.workFocus === "city_parcels"}
+                      onChange={() => update("workFocus", "city_parcels")}
+                    />
+                    <span>
+                      <span className="block font-semibold text-[#0d2137]">{t("workFocusCityParcels")}</span>
+                      <span className="mt-1 block text-xs leading-relaxed text-[#0d2137]/70">
+                        {t("workFocusCityParcelsHint")}
+                      </span>
+                    </span>
+                  </span>
+                </label>
+                <label
+                  className={`flex cursor-pointer flex-col rounded-xl border-2 p-4 transition ${
+                    form.workFocus === "b2b_intercity"
+                      ? "border-[var(--accent)] bg-[#fff8f0]"
+                      : "border-[#0d2137]/15 bg-white hover:border-[#0d2137]/30"
+                  }`}
+                >
+                  <span className="flex items-start gap-2">
+                    <input
+                      type="radio"
+                      name="workFocus"
+                      className="mt-1 h-4 w-4 shrink-0"
+                      checked={form.workFocus === "b2b_intercity"}
+                      onChange={() => update("workFocus", "b2b_intercity")}
+                    />
+                    <span>
+                      <span className="block font-semibold text-[#0d2137]">{t("workFocusB2b")}</span>
+                      <span className="mt-1 block text-xs leading-relaxed text-[#0d2137]/70">
+                        {t("workFocusB2bHint")}
+                      </span>
+                    </span>
+                  </span>
+                </label>
+              </div>
+            </fieldset>
             <div>
               <label className="mb-1 block text-sm font-medium text-[#0d2137]">{t("fullName")}</label>
               <input
@@ -695,6 +750,14 @@ export function DriverWizardForm({
             <p><strong>{t("reviewEmail")}:</strong> {form.email}</p>
             <p><strong>{t("reviewWhatsapp")}:</strong> {form.phoneCountryCode} {form.phone}</p>
             <p><strong>{t("reviewCity")}:</strong> {resolvedCity()}</p>
+            <p>
+              <strong>{t("reviewWorkFocus")}:</strong>{" "}
+              {form.workFocus === "city_parcels"
+                ? t("workFocusCityParcels")
+                : form.workFocus === "b2b_intercity"
+                  ? t("workFocusB2b")
+                  : "—"}
+            </p>
             <p><strong>{t("reviewTax")}:</strong> {form.taxOrCommercialNumber || "-"}</p>
             <p><strong>{t("reviewLanguages")}:</strong> {form.languagesSpoken || "-"}</p>
             <p><strong>{t("reviewVehiclePlate")}:</strong> {form.vehiclePlate || "-"}</p>

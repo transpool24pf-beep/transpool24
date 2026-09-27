@@ -196,9 +196,6 @@ export function Header({ hideLogo }: HeaderProps) {
 
   const navLinks = (
     <nav className="flex shrink-0 flex-nowrap items-center gap-2 sm:gap-2.5 md:gap-3">
-      <Link href={`/${locale}/parcel-delivery`} className={navLinkClass}>
-        {t("parcels")}
-      </Link>
       <Link href={`/${locale}/driver`} className={navLinkClass}>
         {t("drivers")}
       </Link>

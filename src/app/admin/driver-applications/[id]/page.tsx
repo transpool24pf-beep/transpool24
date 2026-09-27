@@ -42,6 +42,7 @@ type DriverApp = {
   tax_or_commercial_number: string | null;
   personal_photo_url: string | null;
   languages_spoken: string | null;
+  work_focus?: string | null;
   vehicle_plate: string | null;
   vehicle_documents_url: string | null;
   vehicle_photo_url: string | null;
@@ -272,6 +273,14 @@ export default function AdminDriverApplicationDetailPage({
           <p><strong>{t("da.email")}:</strong> <span dir="ltr">{app.email}</span></p>
           <p><strong>{t("da.phone")}:</strong> <span dir="ltr">{app.phone}</span></p>
           <p><strong>{t("da.city")}:</strong> {app.city}</p>
+          <p>
+            <strong>{t("da.workFocus")}:</strong>{" "}
+            {app.work_focus === "city_parcels"
+              ? t("da.workFocusCity")
+              : app.work_focus === "b2b_intercity"
+                ? t("da.workFocusB2b")
+                : "—"}
+          </p>
           <p><strong>{t("da.tax")}:</strong> {app.tax_or_commercial_number || "-"}</p>
           <p><strong>{t("da.languages")}:</strong> {app.languages_spoken || "-"}</p>
           <p><strong>{t("da.plate")}:</strong> {app.vehicle_plate || "-"}</p>

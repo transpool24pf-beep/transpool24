@@ -44,12 +44,6 @@ export function HomeCargoTypes() {
             {t("titleAfter") ? ` ${t("titleAfter")}` : ""}
           </h2>
           <p className="mt-4 text-sm leading-relaxed text-[#5c5c5c] sm:text-[15px]">{t("subtitle")}</p>
-          <Link
-            href={`/${locale}/parcel-delivery`}
-            className="mt-6 inline-flex items-center justify-center rounded-full bg-[#e85d04] px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#cf5100]"
-          >
-            {locale === "ar" ? "احجز توصيل طرد محلي" : locale === "de" ? "Lokale Paketzustellung buchen" : "Book local parcel delivery"}
-          </Link>
         </div>
 
         <ul className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-7">

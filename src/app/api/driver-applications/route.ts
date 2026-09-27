@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 import { rateLimitResponse } from "@/lib/rate-limit";
+import { parseDriverWorkFocus } from "@/lib/driver-work-focus";
 
 export async function POST(req: Request) {
   const limited = rateLimitResponse(req, "driverApply");
@@ -27,6 +28,7 @@ export async function POST(req: Request) {
   const vehicle_documents_url = body.vehicleDocumentsUrl ? String(body.vehicleDocumentsUrl).trim() : null;
   const vehicle_photo_url = body.vehiclePhotoUrl ? String(body.vehiclePhotoUrl).trim() : null;
   const work_policy_accepted = Boolean(body.workPolicyAccepted);
+  const work_focus = parseDriverWorkFocus(body.workFocus);
   const license = body.license ? String(body.license).trim() : "";
   const vehicle_type = body.vehicleType ? String(body.vehicleType).trim() : "";
   const availability = body.availability ? String(body.availability).trim() : "";
@@ -40,6 +42,7 @@ export async function POST(req: Request) {
   if (!city) missing.push("city");
   else if (/^(sonstige|other|__other__)$/i.test(city)) missing.push("cityCustom");
   if (!tax_or_commercial_number) missing.push("taxOrCommercialNumber");
+  if (!work_focus) missing.push("workFocus");
   if (missing.length) {
     return NextResponse.json(
       { error: "Please fill in the missing required fields", missing },
@@ -60,35 +63,43 @@ export async function POST(req: Request) {
   }
 
   const supabase = createServerSupabase();
-  const { data, error } = await supabase
-    .from("driver_applications")
-    .insert({
-      full_name,
-      email,
-      phone,
-      city,
-      service_policy_accepted,
-      id_document_url: id_document_url || null,
-      id_document_front_url: id_document_front_url || null,
-      id_document_back_url: id_document_back_url || null,
-      license_front_url: license_front_url || null,
-      license_back_url: license_back_url || null,
-      tax_or_commercial_number,
-      personal_photo_url: personal_photo_url || null,
-      languages_spoken: languages_spoken || null,
-      vehicle_plate: vehicle_plate || null,
-      vehicle_documents_url: vehicle_documents_url || null,
-      vehicle_photo_url: vehicle_photo_url || null,
-      work_policy_accepted,
-      license: license || null,
-      vehicle_type: vehicle_type || null,
-      availability: availability || null,
-      experience: experience || null,
-      note: note || null,
-      status: "new",
-    })
-    .select()
-    .single();
+  const row = {
+    full_name,
+    email,
+    phone,
+    city,
+    service_policy_accepted,
+    id_document_url: id_document_url || null,
+    id_document_front_url: id_document_front_url || null,
+    id_document_back_url: id_document_back_url || null,
+    license_front_url: license_front_url || null,
+    license_back_url: license_back_url || null,
+    tax_or_commercial_number,
+    personal_photo_url: personal_photo_url || null,
+    languages_spoken: languages_spoken || null,
+    vehicle_plate: vehicle_plate || null,
+    vehicle_documents_url: vehicle_documents_url || null,
+    vehicle_photo_url: vehicle_photo_url || null,
+    work_policy_accepted,
+    work_focus,
+    license: license || null,
+    vehicle_type: vehicle_type || null,
+    availability: availability || null,
+    experience: experience || null,
+    note: note || null,
+    status: "new",
+  };
+  let { data, error } = await supabase.from("driver_applications").insert(row).select().single();
+  if (error && /work_focus/i.test(error.message)) {
+    const { work_focus: _wf, ...withoutFocus } = row;
+    const fallback = {
+      ...withoutFocus,
+      note: [`work_focus=${work_focus}`, withoutFocus.note].filter(Boolean).join("\n"),
+    };
+    const retry = await supabase.from("driver_applications").insert(fallback).select().single();
+    data = retry.data;
+    error = retry.error;
+  }
 
   if (error) {
     console.error("[driver-applications]", error);

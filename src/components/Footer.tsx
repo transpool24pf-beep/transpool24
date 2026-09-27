@@ -247,11 +247,6 @@ export function Footer() {
                     </Link>
                   </li>
                   <li>
-                    <Link href={`/${locale}/parcel-delivery`} className="text-white/90 transition hover:text-white hover:underline">
-                      {t("linkParcels")}
-                    </Link>
-                  </li>
-                  <li>
                     <Link href={`/${locale}/why`} className="text-white/90 transition hover:text-white hover:underline">
                       {t("linkWhy")}
                     </Link>

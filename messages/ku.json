@@ -618,14 +618,28 @@
       "faq4q": "Ma ez hewceyê wesayîta xweya xwe me?",
       "faq4a": "Hûn dikarin wekî ajoker-tenê, bi wesayit, an bi wesayit û arîkar re bixebitin - li gorî kar.",
       "faq5q": "Ez çawa dikarim xwe bigihînim te?",
-      "faq5a": "Piştî serlêdana we em hûrguliyên we dinirxînin û bi e-name an têlefonê bi we re têkilî daynin."
+      "faq5a": "Piştî serlêdana we em hûrguliyên we dinirxînin û bi e-name an têlefonê bi we re têkilî daynin.",
+      "workTypesTitle": "What do you want to do?",
+      "workTypesLead": "When you apply, choose inner-city parcel distribution or B2B work between cities.",
+      "workTypeParcelsTitle": "Inner-city parcel delivery",
+      "workTypeParcelsBody": "Deliver parcels in your city – short routes, many stops, local distribution.",
+      "workTypeB2bTitle": "B2B – work outside cities",
+      "workTypeB2bBody": "Business runs between cities: pallets, part loads and regional B2B tours.",
+      "workTypesFormHint": "In the form below you pick exactly one of these options."
     },
     "cityOther": "Yên din",
     "cityCustom": "Navê bajêr ê ku hûn lê dijîn",
     "cityCustomPlaceholder": "mînak Heilbronn",
     "missingFieldsIntro": "Ji kerema xwe van qadan tijî bikin:",
     "citySearchPlaceholder": "Bajar an bajarok bigere…",
-    "cityNoResults": "Encamek nîne, nivîsê biguherînin an Din hilbijêrin."
+    "cityNoResults": "Encamek nîne, nivîsê biguherînin an Din hilbijêrin.",
+    "workFocus": "What do you want to do?",
+    "workFocusHint": "Please choose one option.",
+    "workFocusCityParcels": "Inner-city parcel delivery",
+    "workFocusCityParcelsHint": "Distribute parcels in your city.",
+    "workFocusB2b": "B2B / work outside cities",
+    "workFocusB2bHint": "Business transport between cities.",
+    "reviewWorkFocus": "Work type"
   },
   "driverShare": {
     "pageTitle": "Cihê xwe parve bikin",

@@ -113,6 +113,35 @@ export function DriverPageClient({ locale }: { locale: string }) {
           </section>
 
           <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
+            <h2 className="text-center text-2xl font-bold text-[#0d2137]">{t("workTypesTitle")}</h2>
+            <p className="mx-auto mt-3 max-w-2xl text-center text-sm leading-relaxed text-[#0d2137]/75">
+              {t("workTypesLead")}
+            </p>
+            <div className="mt-8 grid gap-6 md:grid-cols-2">
+              <div className="rounded-2xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
+                <div className="mb-3 text-3xl">📦</div>
+                <h3 className="text-lg font-semibold text-[#0d2137]">{t("workTypeParcelsTitle")}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-[#0d2137]/80">{t("workTypeParcelsBody")}</p>
+              </div>
+              <div className="rounded-2xl border border-[#0d2137]/10 bg-white p-6 shadow-sm">
+                <div className="mb-3 text-3xl">🚚</div>
+                <h3 className="text-lg font-semibold text-[#0d2137]">{t("workTypeB2bTitle")}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-[#0d2137]/80">{t("workTypeB2bBody")}</p>
+              </div>
+            </div>
+            <p className="mt-6 text-center text-sm font-medium text-[#0d2137]/70">{t("workTypesFormHint")}</p>
+            <div className="mt-4 flex justify-center">
+              <button
+                type="button"
+                onClick={scrollToApply}
+                className="rounded-xl bg-[var(--accent)] px-8 py-3 font-semibold text-white shadow-lg transition hover:opacity-90"
+              >
+                {t("heroCta")}
+              </button>
+            </div>
+          </section>
+
+          <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
             <h2 className="text-center text-2xl font-bold text-[#0d2137]">{t("requirementsTitle")}</h2>
             <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               <div>

@@ -23,6 +23,8 @@ export type DriverWizardFormSnapshot = {
   vehicleDocumentsUrl: string;
   vehiclePhotoUrl: string;
   workPolicyAccepted: boolean;
+  /** city_parcels | b2b_intercity | "" */
+  workFocus: string;
 };
 
 export const initialDriverWizardForm = (): DriverWizardFormSnapshot => ({
@@ -44,6 +46,7 @@ export const initialDriverWizardForm = (): DriverWizardFormSnapshot => ({
   vehicleDocumentsUrl: "",
   vehiclePhotoUrl: "",
   workPolicyAccepted: false,
+  workFocus: "",
 });
 
 type DraftFile = {
@@ -98,6 +101,7 @@ export function mergeDriverWizardForm(
       saved.cityCustom != null && String(saved.cityCustom).trim() !== "" ? saved.cityCustom : base.cityCustom,
     servicePolicyAccepted: Boolean(saved.servicePolicyAccepted),
     workPolicyAccepted: Boolean(saved.workPolicyAccepted),
+    workFocus: saved.workFocus != null && String(saved.workFocus).trim() !== "" ? String(saved.workFocus) : base.workFocus,
     phoneCountryCode:
       saved.phoneCountryCode != null && String(saved.phoneCountryCode).trim() !== ""
         ? saved.phoneCountryCode
@@ -137,6 +141,7 @@ export function driverWizardHasProgress(form: DriverWizardFormSnapshot, step: nu
       form.fullName.trim() ||
       form.email.trim() ||
       form.phone.trim() ||
+      form.workFocus.trim() ||
       form.servicePolicyAccepted
   );
 }

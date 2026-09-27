@@ -618,14 +618,28 @@
       "faq4q": "Ai-je besoin de mon propre véhicule ?",
       "faq4a": "Vous pouvez travailler chauffeur seul, avec véhicule, ou avec véhicule et assistant – selon la mission.",
       "faq5q": "Comment vous joindre ?",
-      "faq5a": "Après votre candidature nous vérifions vos données et vous contactons par e-mail ou téléphone."
+      "faq5a": "Après votre candidature nous vérifions vos données et vous contactons par e-mail ou téléphone.",
+      "workTypesTitle": "What do you want to do?",
+      "workTypesLead": "When you apply, choose inner-city parcel distribution or B2B work between cities.",
+      "workTypeParcelsTitle": "Inner-city parcel delivery",
+      "workTypeParcelsBody": "Deliver parcels in your city – short routes, many stops, local distribution.",
+      "workTypeB2bTitle": "B2B – work outside cities",
+      "workTypeB2bBody": "Business runs between cities: pallets, part loads and regional B2B tours.",
+      "workTypesFormHint": "In the form below you pick exactly one of these options."
     },
     "cityOther": "Autre",
     "cityCustom": "Nom de la ville où vous habitez",
     "cityCustomPlaceholder": "ex. Heilbronn",
     "missingFieldsIntro": "Veuillez encore renseigner :",
     "citySearchPlaceholder": "Rechercher une ville…",
-    "cityNoResults": "Aucun résultat, essayez une autre orthographe ou choisissez Autre."
+    "cityNoResults": "Aucun résultat, essayez une autre orthographe ou choisissez Autre.",
+    "workFocus": "What do you want to do?",
+    "workFocusHint": "Please choose one option.",
+    "workFocusCityParcels": "Inner-city parcel delivery",
+    "workFocusCityParcelsHint": "Distribute parcels in your city.",
+    "workFocusB2b": "B2B / work outside cities",
+    "workFocusB2bHint": "Business transport between cities.",
+    "reviewWorkFocus": "Work type"
   },
   "driverShare": {
     "pageTitle": "Partager votre position",

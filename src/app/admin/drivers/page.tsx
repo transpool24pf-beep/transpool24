@@ -21,6 +21,8 @@ type Driver = {
   vehicle_plate?: string | null;
   suspended_at?: string | null;
   desired_note?: string | null;
+  work_focus?: string | null;
+  city?: string | null;
   stats?: { jobs_count: number; total_paid_cents: number; customer_rating_avg: number | null };
 };
 
@@ -30,6 +32,7 @@ export default function AdminDriversPage() {
   const [drivers, setDrivers] = useState<Driver[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingStar, setEditingStar] = useState<string | null>(null);
+  const [workFilter, setWorkFilter] = useState<"all" | "city_parcels" | "b2b_intercity">("all");
 
   const docLabel = (type: string) => t(`drivers.doc.${type}`) || type;
 
@@ -63,6 +66,28 @@ export default function AdminDriversPage() {
   return (
     <div>
       <h1 className="mb-6 text-2xl font-semibold text-[#0d2137]">{t("drivers.title")}</h1>
+      <div className="mb-4 flex flex-wrap gap-2">
+        {(
+          [
+            ["all", t("drivers.filterAll")],
+            ["city_parcels", t("drivers.filterCityParcels")],
+            ["b2b_intercity", t("drivers.filterB2b")],
+          ] as const
+        ).map(([id, label]) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => setWorkFilter(id)}
+            className={`rounded-full px-3 py-1.5 text-sm font-semibold ${
+              workFilter === id
+                ? "bg-[var(--accent)] text-white"
+                : "border border-[#0d2137]/15 bg-white text-[#0d2137]"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
       <div className="mb-6 rounded-xl border border-[var(--accent)]/30 bg-[#fff8f0] p-4">
         <p className="text-sm text-[#0d2137]/90">
           {t("drivers.hintBefore")}{" "}
@@ -78,7 +103,9 @@ export default function AdminDriversPage() {
         </div>
       ) : (
         <div className="space-y-4">
-          {drivers.map((d) => (
+          {drivers
+            .filter((d) => (workFilter === "all" ? true : d.work_focus === workFilter))
+            .map((d) => (
             <div
               key={d.id}
               className={`rounded-xl border border-[#0d2137]/10 bg-white p-5 shadow-sm ${d.source === "application" ? "cursor-pointer transition hover:border-[var(--accent)]/30 hover:shadow-md" : ""}`}
@@ -112,6 +139,16 @@ export default function AdminDriversPage() {
                     {d.suspended_at && (
                       <span className="rounded bg-red-100 px-2 py-0.5 text-sm font-medium text-red-700">
                         {t("drivers.suspended")}
+                      </span>
+                    )}
+                    {d.work_focus === "city_parcels" && (
+                      <span className="rounded bg-sky-100 px-2 py-0.5 text-sm font-medium text-sky-800">
+                        {t("drivers.filterCityParcels")}
+                      </span>
+                    )}
+                    {d.work_focus === "b2b_intercity" && (
+                      <span className="rounded bg-indigo-100 px-2 py-0.5 text-sm font-medium text-indigo-800">
+                        {t("drivers.filterB2b")}
                       </span>
                     )}
                     {d.source === "application" && (
