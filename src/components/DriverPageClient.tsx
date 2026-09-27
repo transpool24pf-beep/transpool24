@@ -266,7 +266,7 @@ export function DriverPageClient({ locale }: { locale: string }) {
       ) : (
         <section
           id="driver-form"
-          className="relative min-h-[calc(100dvh-4.75rem)] overflow-hidden bg-white px-4 py-6 sm:px-6 lg:py-8"
+          className="relative min-h-[calc(100dvh-4.75rem)] bg-white px-4 py-6 sm:px-6 lg:py-8"
         >
           <div className="relative mx-auto grid h-full min-h-[calc(100dvh-6.5rem)] w-full max-w-6xl items-stretch gap-8 lg:grid-cols-2 lg:gap-12 lg:items-start" dir="ltr">
             <div className="flex min-h-0 flex-col" dir={rtl ? "rtl" : "ltr"}>
@@ -308,7 +308,7 @@ export function DriverPageClient({ locale }: { locale: string }) {
                 )}
               </div>
             </div>
-            <div className="lg:sticky lg:top-24" dir={rtl ? "rtl" : "ltr"}>
+            <div dir={rtl ? "rtl" : "ltr"}>
               <div className="rounded-2xl border border-[#edf0f4] bg-white p-5 shadow-[0_18px_50px_-24px_rgba(13,33,55,0.22)] sm:p-7">
                 <DriverWizardForm
                   onBack={() => setShowForm(false)}

@@ -650,16 +650,6 @@ export function DriverWizardForm({
               uploadFailed={t("uploadFailed")}
             />
             <div className="sm:col-span-2">
-              <label className="mb-1 block text-sm font-medium text-[#0d2137]">{t("taxNumber")} *</label>
-              <input
-                type="text"
-                value={form.taxOrCommercialNumber}
-                onChange={(e) => update("taxOrCommercialNumber", e.target.value)}
-                placeholder={t("taxPlaceholder")}
-                className="w-full rounded-xl border border-[#0d2137]/20 px-4 py-3"
-              />
-            </div>
-            <div className="sm:col-span-2">
               <FileUploadBox
                 fieldId="driver-personal-photo"
                 label={t("personalPhoto")}
@@ -680,6 +670,16 @@ export function DriverWizardForm({
                 value={form.languagesSpoken}
                 onChange={(e) => update("languagesSpoken", e.target.value)}
                 placeholder={t("languagesPlaceholder")}
+                className="w-full rounded-xl border border-[#0d2137]/20 px-4 py-3"
+              />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="mb-1 block text-sm font-medium text-[#0d2137]">{t("taxNumber")} *</label>
+              <input
+                type="text"
+                value={form.taxOrCommercialNumber}
+                onChange={(e) => update("taxOrCommercialNumber", e.target.value)}
+                placeholder={t("taxPlaceholder")}
                 className="w-full rounded-xl border border-[#0d2137]/20 px-4 py-3"
               />
             </div>
