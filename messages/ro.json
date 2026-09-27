@@ -2,6 +2,7 @@
   "common": {
     "language": "Limbă",
     "order": "Rezervă transport",
+    "parcels": "Colete",
     "drivers": "Șoferii",
     "contact": "Contact",
     "slogan": "Activ în Pforzheim – conectat la nivel global",
@@ -502,6 +503,7 @@
     "colInfo": "Informaţii",
     "colSocial": "Rețelele de socializare",
     "linkHome": "Acasă",
+    "linkParcels": "Livrare colete",
     "linkWhy": "De ce TransPool24?",
     "linkContact": "Contact",
     "linkPrivacy": "Confidențialitate",

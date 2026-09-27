@@ -2,6 +2,7 @@
   "common": {
     "language": "اللغة",
     "order": "حجز طلب",
+    "parcels": "طرود",
     "drivers": "السائقين",
     "contact": "اتصل",
     "slogan": "نشطون في بفورتسهايم – متصلون عالمياً",
@@ -509,6 +510,7 @@
     "colInfo": "معلومات",
     "colSocial": "وسائل التواصل",
     "linkHome": "الرئيسية",
+    "linkParcels": "توصيل الطرود",
     "linkWhy": "لماذا TransPool24؟",
     "linkContact": "اتصل بنا",
     "linkPrivacy": "الخصوصية",

@@ -2,6 +2,7 @@
   "common": {
     "language": "Language",
     "order": "Book transport",
+    "parcels": "Parcels",
     "drivers": "Drivers",
     "contact": "Contact",
     "slogan": "Active in Pforzheim – Globally connected",
@@ -642,6 +643,7 @@
     "colInfo": "Information",
     "colSocial": "Social media",
     "linkHome": "Home",
+    "linkParcels": "Parcel delivery",
     "linkWhy": "Why TransPool24?",
     "linkBlog": "Magazine",
     "linkContact": "Contact",

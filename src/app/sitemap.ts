@@ -3,7 +3,7 @@ import { defaultLocale, locales } from "@/i18n/routing";
 import { listLocalesWithNativeBlogPosts, listPublishedPostsForSitemap } from "@/lib/blog";
 import { getPublicSiteUrl } from "@/lib/public-site-url";
 
-const STATIC_SUFFIXES = ["", "/why", "/driver", "/privacy", "/terms", "/support"] as const;
+const STATIC_SUFFIXES = ["", "/why", "/driver", "/parcel-delivery", "/privacy", "/terms", "/support"] as const;
 
 /** Real content date for static locale pages — do not use `new Date()` per request. */
 const STATIC_LASTMOD = new Date("2026-09-20T18:00:00.000Z");

@@ -90,6 +90,7 @@ const nextConfig: NextConfig = {
       { source: "/privacy", destination: "/de/privacy", permanent: true },
       { source: "/terms", destination: "/de/terms", permanent: true },
       { source: "/driver", destination: "/de/driver", permanent: true },
+      { source: "/parcel-delivery", destination: "/de/parcel-delivery", permanent: true },
       { source: "/blog", destination: "/de/blog", permanent: true },
       {
         source: "/blog/willkommen-transpool24-magazin",

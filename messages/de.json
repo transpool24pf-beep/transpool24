@@ -2,6 +2,7 @@
   "common": {
     "language": "Sprache",
     "order": "Auftrag buchen",
+    "parcels": "Pakete",
     "drivers": "Fahrer",
     "contact": "Kontakt",
     "slogan": "Aktiv in Pforzheim – Weltweit verbunden",
@@ -648,6 +649,7 @@
     "colInfo": "Informationen",
     "colSocial": "Social Media",
     "linkHome": "Startseite",
+    "linkParcels": "Paketzustellung",
     "linkWhy": "Warum TransPool24?",
     "linkBlog": "Magazin",
     "linkContact": "Kontakt",

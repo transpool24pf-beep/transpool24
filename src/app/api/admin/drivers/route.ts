@@ -79,6 +79,7 @@ export async function GET() {
       documents: byDriver[p.id] ?? [],
       source: "profile" as const,
       driver_number: null as number | null,
+      city: null as string | null,
       stats,
       suspended_at: (p as { suspended_at?: string | null }).suspended_at ?? null,
     };
@@ -104,6 +105,7 @@ export async function GET() {
       source: "application" as const,
       driver_number: a.driver_number ?? null,
       vehicle_plate: a.vehicle_plate ?? null,
+      city: (a.city ?? "").trim() || null,
       suspended_at: a.suspended_at ?? null,
       desired_note: a.desired_note ?? null,
       stats,

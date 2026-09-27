@@ -2,6 +2,7 @@
   "common": {
     "language": "Язык",
     "order": "Забронировать транспорт",
+    "parcels": "Посылки",
     "drivers": "Водители",
     "contact": "Контакты",
     "slogan": "Работаем в Пфорцхайме – глобально",
@@ -500,6 +501,7 @@
     "colInfo": "Информация",
     "colSocial": "Социальные сети",
     "linkHome": "Дом",
+    "linkParcels": "Доставка посылок",
     "linkWhy": "Почему ТрансПул24?",
     "linkContact": "Contact",
     "linkPrivacy": "Конфиденциальность",

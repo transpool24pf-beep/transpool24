@@ -467,6 +467,11 @@ export default function AdminOrdersPage() {
                           <p className="font-mono text-sm font-bold text-[#0d2137]">
                             #{o.order_number ?? o.id.slice(0, 8)}
                           </p>
+                          {(o.cargo_details as { orderKind?: unknown } | null)?.orderKind === "parcel_delivery" && (
+                            <span className="mt-1 inline-flex rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-900">
+                              {locale === "ar" ? "توصيل طرد" : "Paketzustellung"}
+                            </span>
+                          )}
                           <span
                             className={`mt-1 inline-flex items-center gap-1 rounded-full bg-violet-100 px-2 py-0.5 text-xs font-medium ${st.color}`}
                           >
@@ -589,6 +594,11 @@ export default function AdminOrdersPage() {
                           <p className="font-mono text-sm font-bold text-[#0d2137]">
                             #{o.order_number ?? o.id.slice(0, 8)}
                           </p>
+                          {(o.cargo_details as { orderKind?: unknown } | null)?.orderKind === "parcel_delivery" && (
+                            <span className="mt-1 inline-flex rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-900">
+                              {locale === "ar" ? "توصيل طرد" : "Paketzustellung"}
+                            </span>
+                          )}
                           <p className="text-xs text-emerald-800">{t("orders.deliveredBadge")}</p>
                           {podAt && (
                             <p className="mt-0.5 text-[11px] text-[#0d2137]/65">

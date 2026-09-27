@@ -2,6 +2,7 @@
   "common": {
     "language": "Język",
     "order": "Zarezerwuj transport",
+    "parcels": "Paczki",
     "drivers": "Kierowcy",
     "contact": "Kontakt",
     "slogan": "Aktywni w Pforzheim – powiązani z całym światem",
@@ -501,6 +502,7 @@
     "colInfo": "Informacja",
     "colSocial": "Media społecznościowe",
     "linkHome": "Dom",
+    "linkParcels": "Dostawa paczek",
     "linkWhy": "Dlaczego TransPool24?",
     "linkContact": "Kontakt",
     "linkPrivacy": "Prywatność",

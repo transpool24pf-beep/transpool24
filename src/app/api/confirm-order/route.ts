@@ -52,7 +52,9 @@ export async function POST(req: Request) {
       deliveryTime,
       cargoSize,
       cargoDetails,
+      orderKind,
     } = body;
+    const isParcelDelivery = orderKind === "parcel_delivery";
 
     if (
       !companyName ||
@@ -89,7 +91,7 @@ export async function POST(req: Request) {
     if (!Number.isFinite(packageCountRaw) || packageCountRaw < 1) {
       return NextResponse.json({ error: "CARGO_PACKAGES_REQUIRED" }, { status: 400 });
     }
-    if (photoUrls.length < 1) {
+    if (!isParcelDelivery && photoUrls.length < 1) {
       return NextResponse.json({ error: "CARGO_PHOTOS_REQUIRED" }, { status: 400 });
     }
 
@@ -165,6 +167,7 @@ export async function POST(req: Request) {
         ? (() => {
             const stored = {
               ...cargoDetails,
+              orderKind: isParcelDelivery ? "parcel_delivery" : cargoDetails.orderKind,
               loads,
               cargoCategory: cargoCat || cargoDetails.cargoCategory || null,
               weightKg,

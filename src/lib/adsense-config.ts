@@ -25,7 +25,7 @@ export function adsenseManualUnitsConfigured(): boolean {
 /** Legal pages stay ad-free. Driver apply, order, why, and blog use in-page units. */
 const AD_FREE_SECTIONS = new Set(["privacy", "terms", "rate-driver"]);
 
-const IN_PAGE_AD_SECTIONS = new Set(["order", "driver", "why", "blog"]);
+const IN_PAGE_AD_SECTIONS = new Set(["order", "driver", "why", "blog", "parcel-delivery"]);
 
 /**
  * Manual AdSense on marketing pages, booking, driver apply, why, and blog.

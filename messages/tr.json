@@ -2,6 +2,7 @@
   "common": {
     "language": "Dil",
     "order": "Sipariş ver",
+    "parcels": "Paketler",
     "drivers": "Sürücüler",
     "contact": "İletişim",
     "slogan": "Pforzheim'da aktif – Dünyaya bağlı",
@@ -501,6 +502,7 @@
     "colInfo": "Bilgi",
     "colSocial": "Sosyal medya",
     "linkHome": "Ana sayfa",
+    "linkParcels": "Paket teslimatı",
     "linkWhy": "Neden TransPool24?",
     "linkContact": "İletişim",
     "linkPrivacy": "Gizlilik",

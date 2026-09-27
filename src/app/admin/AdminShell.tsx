@@ -15,6 +15,7 @@ const NAV_DEF: { href: string; msgKey: string; badge: AdminNavItem["badge"] }[] 
   { href: "/admin/extract-invoice", msgKey: "nav.extractInvoice", badge: null },
   { href: "/admin/driver-applications", msgKey: "nav.driverApplications", badge: "drivers" },
   { href: "/admin/drivers", msgKey: "nav.drivers", badge: null },
+  { href: "/admin/city-parcels", msgKey: "nav.cityParcels", badge: null },
   { href: "/admin/blog", msgKey: "nav.blog", badge: null },
   { href: "/admin/email-social", msgKey: "nav.emailSocial", badge: null },
   { href: "/admin/settings", msgKey: "nav.settings", badge: null },
@@ -220,6 +221,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             pathname === "/admin/in-progress" ||
             pathname?.startsWith("/admin/driver-applications") ||
             pathname === "/admin/reports" ||
+            pathname === "/admin/city-parcels" ||
             pathname?.startsWith("/admin/blog")
               ? "max-w-[98%] xl:max-w-7xl"
               : "max-w-4xl"

@@ -2,6 +2,7 @@
   "common": {
     "language": "Ziman",
     "order": "Transportê rezerve bike",
+    "parcels": "Paket",
     "drivers": "Ajokan",
     "contact": "Têkelî",
     "slogan": "Li Pforzheim çalak - Bi gerdûnî ve girêdayî ye",
@@ -502,6 +503,7 @@
     "colInfo": "Agahî",
     "colSocial": "Medyaya civakî",
     "linkHome": "Xane",
+    "linkParcels": "Gihastina paketan",
     "linkWhy": "Çima TransPool24?",
     "linkContact": "Têkelî",
     "linkPrivacy": "Taybetî",

@@ -122,6 +122,9 @@ function buildWhatsAppMessage(o: Job): string {
     `${IC.megaphone} TransPool24 – Transportauftrag`,
     "",
     `${IC.clipboard} Auftrag-Nr.: ${orderRef}`,
+    ...((o.cargo_details as { orderKind?: unknown } | null)?.orderKind === "parcel_delivery"
+      ? [`${IC.package} Lokale Paketzustellung`]
+      : []),
     `${IC.clipboard} Sendung-Nr.: ${formatSendungNumber(o)}`,
     "",
     `${IC.phone} Telefon: ${o.phone}`,
@@ -683,6 +686,12 @@ export default function AdminOrderDetailPage({
               <dt className="text-[#0d2137]/60">{odT(locale, "od.cargoSize")}</dt>
               <dd>{order.cargo_size}</dd>
             </div>
+            {(order.cargo_details as { orderKind?: unknown } | null)?.orderKind === "parcel_delivery" && (
+              <div>
+                <dt className="text-[#0d2137]/60">Service</dt>
+                <dd className="font-semibold text-[#c54e00]">{locale === "ar" ? "توصيل طرد محلي" : "Lokale Paketzustellung"}</dd>
+              </div>
+            )}
             {(() => {
               const loadsText = formatCargoLoadsPlainDe(order.cargo_details);
               if (!loadsText) return null;

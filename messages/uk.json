@@ -2,6 +2,7 @@
   "common": {
     "language": "Мова",
     "order": "Замовляйте транспорт",
+    "parcels": "Посилки",
     "drivers": "Водії",
     "contact": "Зв'язок",
     "slogan": "Активний у Пфорцгаймі – глобальний зв’язок",
@@ -501,6 +502,7 @@
     "colInfo": "Інформація",
     "colSocial": "Соціальні мережі",
     "linkHome": "додому",
+    "linkParcels": "Доставка посилок",
     "linkWhy": "Чому TransPool24?",
     "linkContact": "контакт",
     "linkPrivacy": "Конфіденційність",
