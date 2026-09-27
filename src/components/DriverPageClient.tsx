@@ -44,7 +44,7 @@ export function DriverPageClient({ locale }: { locale: string }) {
 
   return (
     <main className="bg-[#f6f7fb]" lang={locale} dir={rtl ? "rtl" : "ltr"}>
-      <PageAdsLayout>
+      <PageAdsLayout placement="banners">
       {!showForm ? (
         <>
           <section className="overflow-hidden bg-[#f6f4ef]">
@@ -259,42 +259,42 @@ export function DriverPageClient({ locale }: { locale: string }) {
       ) : (
         <section
           id="driver-form"
-          className="relative overflow-hidden bg-gradient-to-br from-[#eef6ff] via-[#f6f7fb] to-white px-4 py-8 sm:px-6 sm:py-12"
+          className="relative overflow-hidden bg-gradient-to-br from-[#f4f9ff] via-white to-[#fff7f1] px-1 py-6 sm:px-2 sm:py-10 lg:py-14"
         >
-          <div className="pointer-events-none absolute inset-0 opacity-[0.35]" aria-hidden>
-            <div className="absolute -start-20 top-10 h-72 w-72 rounded-full bg-sky-200/50 blur-3xl" />
-            <div className="absolute -end-10 bottom-0 h-80 w-80 rounded-full bg-[#e85d04]/15 blur-3xl" />
+          <div className="pointer-events-none absolute inset-0 opacity-[0.4]" aria-hidden>
+            <div className="absolute start-0 top-0 h-96 w-96 rounded-full bg-sky-100 blur-3xl" />
+            <div className="absolute end-10 bottom-10 h-72 w-72 rounded-full bg-[#e85d04]/10 blur-3xl" />
           </div>
-          <div className="relative mx-auto grid max-w-7xl items-start gap-8 lg:grid-cols-2 lg:gap-12" dir="ltr">
-            <div className="lg:sticky lg:top-24" dir={rtl ? "rtl" : "ltr"}>
-              <h1 className="text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl lg:text-[2.35rem]">
+          <div className="relative mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14" dir="ltr">
+            <div dir={rtl ? "rtl" : "ltr"}>
+              <h1 className="text-[2.15rem] font-extrabold leading-[1.18] tracking-tight text-[#152033] sm:text-5xl lg:text-[3.15rem]">
                 <span className="text-[var(--accent)]">{t("partnerTitleAccent")}</span>
-                <span className="text-[#152033]"> {t("partnerTitleRest")}</span>
+                <span> {t("partnerTitleRest")}</span>
               </h1>
-              <div className="mt-6 rounded-2xl bg-[#d7ecff] px-5 py-5 text-sm leading-8 text-[#1a2a44] shadow-sm ring-1 ring-sky-200/80 sm:px-6 sm:py-6 sm:text-[15px]">
+              <div className="mt-7 space-y-5 rounded-2xl bg-[#d4ebff] px-6 py-7 text-[1.05rem] leading-9 text-[#1b2c44] sm:px-8 sm:py-8 sm:text-[1.125rem] sm:leading-10">
                 <p>
                   {t.rich("partnerBody1", {
                     brand: (chunks) => <strong className="font-bold">{chunks}</strong>,
                   })}
                 </p>
-                <p className="mt-4">
+                <p>
                   {t.rich("partnerBody2", {
                     brand: (chunks) => <strong className="font-bold">{chunks}</strong>,
                   })}
                 </p>
               </div>
-              <div className="mt-8 hidden justify-center lg:flex">
+              <div className="mt-10 flex justify-center lg:justify-start">
                 <Image
                   src={TRANSPOOL24_VAN_IMAGE}
                   alt={t("vanAlt")}
-                  width={640}
-                  height={380}
-                  className="h-auto w-full max-w-md object-contain drop-shadow-xl"
+                  width={720}
+                  height={430}
+                  className="h-auto w-full max-w-xl object-contain drop-shadow-2xl"
                 />
               </div>
             </div>
             <div dir={rtl ? "rtl" : "ltr"}>
-              <div className="rounded-2xl border border-[#0d2137]/10 bg-white p-5 shadow-[0_24px_60px_-28px_rgba(13,33,55,0.35)] sm:p-8">
+              <div className="rounded-2xl border border-[#0d2137]/8 bg-white p-5 shadow-[0_24px_60px_-28px_rgba(13,33,55,0.28)] sm:p-8">
                 <DriverWizardForm onBack={() => setShowForm(false)} initialCity="" />
               </div>
             </div>

@@ -36,7 +36,17 @@ export function OrderBookingBannerAd({ slot, label, enabled }: Props) {
   );
 }
 
-export function useIsDesktopLg(): { isDesktop: boolean; ready: boolean } {
+/** Full-width horizontal unit (leaderboard), used instead of tall side rails. */
+export function OrderBookingWideBanner({ slot, label, enabled }: Props) {
+  if (!slot) return null;
+  return (
+    <div className="my-4 w-full">
+      <AdFrame label={label} className="!p-1.5">
+        <AdSenseUnit slot={slot} variant="banner" enabled={enabled} />
+      </AdFrame>
+    </div>
+  );
+}
   const [isLg, setIsLg] = useState(false);
   const [ready, setReady] = useState(false);
   useEffect(() => {

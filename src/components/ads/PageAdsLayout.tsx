@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale } from "next-intl";
-import { OrderBookingBannerAd, OrderBookingSideAd, useIsDesktopLg } from "@/components/OrderBookingSideAd";
+import { OrderBookingBannerAd, OrderBookingSideAd, OrderBookingWideBanner, useIsDesktopLg } from "@/components/OrderBookingSideAd";
 import { adLabel } from "@/components/ads/AdSensePlacements";
 import { AdSenseScript } from "@/components/ads/AdSenseScript";
 import {
@@ -14,16 +14,39 @@ import {
 type Props = {
   children: React.ReactNode;
   className?: string;
+  /** sides = tall rails. banners = full-width ads above/below (Join us / driver page). */
+  placement?: "sides" | "banners";
 };
 
 /** Desktop: large side units. Phone: compact 90px banners above and below the page. */
-export function PageAdsLayout({ children, className = "" }: Props) {
+export function PageAdsLayout({ children, className = "", placement = "sides" }: Props) {
   const locale = useLocale();
   const adsEnabled = adsenseManualUnitsConfigured();
   const adsLabel = adLabel(locale);
   const { isDesktop, ready } = useIsDesktopLg();
   const showMobileAds = ready && !isDesktop;
   const showDesktopAds = ready && isDesktop;
+
+  if (placement === "banners") {
+    return (
+      <>
+        <AdSenseScript enabled={adsEnabled} />
+        <div className={`mx-auto w-full max-w-7xl px-4 sm:px-6 ${className}`}>
+          <OrderBookingWideBanner
+            slot={ADSENSE_SLOT_BANNER}
+            label={adsLabel}
+            enabled={adsEnabled}
+          />
+          {children}
+          <OrderBookingWideBanner
+            slot={showDesktopAds ? ADSENSE_SLOT_SIDEBAR_RIGHT : ADSENSE_SLOT_SIDEBAR_LEFT}
+            label={adsLabel}
+            enabled={adsEnabled}
+          />
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
