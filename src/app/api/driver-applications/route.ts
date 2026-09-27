@@ -31,7 +31,6 @@ export async function POST(req: Request) {
   const work_focus = parseDriverWorkFocus(body.workFocus);
   const license = body.license ? String(body.license).trim() : "";
   const vehicle_type = body.vehicleType ? String(body.vehicleType).trim() : "";
-  const availability = body.availability ? String(body.availability).trim() : "";
   const experience = body.experience ? String(body.experience).trim() : null;
   const note = body.note ? String(body.note).trim() : null;
 
@@ -84,19 +83,16 @@ export async function POST(req: Request) {
     work_focus,
     license: license || null,
     vehicle_type: vehicle_type || null,
-    availability: availability || null,
+    availability: work_focus,
     experience: experience || null,
-    note: note || null,
+    note: [`work_focus=${work_focus}`, note].filter(Boolean).join("\n"),
     status: "new",
   };
   let { data, error } = await supabase.from("driver_applications").insert(row).select().single();
   if (error && /work_focus/i.test(error.message)) {
-    const { work_focus: _wf, ...withoutFocus } = row;
-    const fallback = {
-      ...withoutFocus,
-      note: [`work_focus=${work_focus}`, withoutFocus.note].filter(Boolean).join("\n"),
-    };
-    const retry = await supabase.from("driver_applications").insert(fallback).select().single();
+    const withoutFocus = { ...row };
+    delete (withoutFocus as { work_focus?: string }).work_focus;
+    const retry = await supabase.from("driver_applications").insert(withoutFocus).select().single();
     data = retry.data;
     error = retry.error;
   }

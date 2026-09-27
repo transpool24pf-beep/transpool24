@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/admin-api";
+import { resolveDriverWorkFocus } from "@/lib/driver-work-focus";
 
 export async function GET() {
   const err = await requireAdmin();
@@ -14,5 +15,9 @@ export async function GET() {
     console.error("[admin/driver-applications]", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
-  return NextResponse.json(data ?? []);
+  const rows = (data ?? []).map((row) => ({
+    ...row,
+    work_focus: resolveDriverWorkFocus(row),
+  }));
+  return NextResponse.json(rows);
 }

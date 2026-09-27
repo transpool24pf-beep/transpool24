@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/admin-api";
+import { resolveDriverWorkFocus } from "@/lib/driver-work-focus";
 
 export async function GET() {
   const err = await requireAdmin();
@@ -86,13 +87,41 @@ export async function GET() {
     };
   });
 
-  const { data: approvedApps, error: appsError } = await supabase
+  let approvedApps: {
+    id: string;
+    full_name: string | null;
+    email: string | null;
+    phone: string | null;
+    city: string | null;
+    driver_number: number | null;
+    vehicle_plate: string | null;
+    personal_photo_url: string | null;
+    approved_at: string | null;
+    created_at: string;
+    suspended_at: string | null;
+    star_rating: number | null;
+    desired_note: string | null;
+    work_focus?: string | null;
+    availability?: string | null;
+    note?: string | null;
+  }[] | null = null;
+  const withFocus = await supabase
     .from("driver_applications")
-    .select("id, full_name, email, phone, city, driver_number, vehicle_plate, personal_photo_url, approved_at, created_at, suspended_at, star_rating, desired_note, work_focus")
+    .select("id, full_name, email, phone, city, driver_number, vehicle_plate, personal_photo_url, approved_at, created_at, suspended_at, star_rating, desired_note, work_focus, availability, note")
     .eq("status", "approved")
     .order("driver_number", { ascending: true });
-  if (appsError) {
-    console.error("[admin/drivers applications]", appsError);
+  if (withFocus.error && /work_focus/i.test(withFocus.error.message)) {
+    const retry = await supabase
+      .from("driver_applications")
+      .select("id, full_name, email, phone, city, driver_number, vehicle_plate, personal_photo_url, approved_at, created_at, suspended_at, star_rating, desired_note, availability, note")
+      .eq("status", "approved")
+      .order("driver_number", { ascending: true });
+    if (retry.error) console.error("[admin/drivers applications]", retry.error);
+    approvedApps = retry.data;
+  } else if (withFocus.error) {
+    console.error("[admin/drivers applications]", withFocus.error);
+  } else {
+    approvedApps = withFocus.data;
   }
   const fromApplications = (approvedApps ?? []).map((a) => {
     const stats = appStats[a.id] ?? { jobs_count: 0, total_paid_cents: 0, customer_rating_avg: null };
@@ -112,7 +141,7 @@ export async function GET() {
       city: (a.city ?? "").trim() || null,
       suspended_at: a.suspended_at ?? null,
       desired_note: a.desired_note ?? null,
-      work_focus: a.work_focus ?? null,
+      work_focus: resolveDriverWorkFocus(a),
       stats,
     };
   });

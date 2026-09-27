@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase";
 import { requireAdmin } from "@/lib/admin-api";
 import { sendDriverApprovalEmail } from "@/lib/email";
+import { resolveDriverWorkFocus } from "@/lib/driver-work-focus";
 import { generateDriverApprovalPdf } from "@/lib/driver-approval-pdf";
 
 export async function GET(
@@ -47,6 +48,7 @@ export async function GET(
   }));
   return NextResponse.json({
     ...data,
+    work_focus: resolveDriverWorkFocus(data),
     stats: { jobs_count, total_paid_cents, customer_rating_avg },
     last_jobs,
   });

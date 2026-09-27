@@ -106,7 +106,7 @@ export default function AdminDriverApplicationsPage() {
                     {app.phone}
                   </td>
                   <td className="p-3 text-sm text-[#0d2137]/80">{app.city}</td>
-                  <td className="p-3 text-sm text-[#0d2137]/80">
+                  <td className="p-3 text-sm font-semibold text-[#0d2137]">
                     {app.work_focus === "city_parcels"
                       ? t("drivers.filterCityParcels")
                       : app.work_focus === "b2b_intercity"

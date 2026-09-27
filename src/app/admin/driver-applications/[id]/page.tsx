@@ -273,13 +273,15 @@ export default function AdminDriverApplicationDetailPage({
           <p><strong>{t("da.email")}:</strong> <span dir="ltr">{app.email}</span></p>
           <p><strong>{t("da.phone")}:</strong> <span dir="ltr">{app.phone}</span></p>
           <p><strong>{t("da.city")}:</strong> {app.city}</p>
-          <p>
-            <strong>{t("da.workFocus")}:</strong>{" "}
-            {app.work_focus === "city_parcels"
-              ? t("da.workFocusCity")
-              : app.work_focus === "b2b_intercity"
-                ? t("da.workFocusB2b")
-                : "—"}
+          <p className="sm:col-span-2 rounded-xl border-2 border-[var(--accent)]/35 bg-[#fff8f0] px-4 py-3">
+            <strong className="block text-sm text-[#0d2137]">{t("da.workFocus")}</strong>
+            <span className="mt-1 inline-block text-base font-semibold text-[var(--accent)]">
+              {app.work_focus === "city_parcels"
+                ? t("da.workFocusCity")
+                : app.work_focus === "b2b_intercity"
+                  ? t("da.workFocusB2b")
+                  : "—"}
+            </span>
           </p>
           <p><strong>{t("da.tax")}:</strong> {app.tax_or_commercial_number || "-"}</p>
           <p><strong>{t("da.languages")}:</strong> {app.languages_spoken || "-"}</p>
