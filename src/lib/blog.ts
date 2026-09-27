@@ -8,6 +8,7 @@ import {
   type BlogCardSourceFields,
   type SourcePostFields,
 } from "@/lib/blog-translate";
+import { mergeCareerSeedPosts } from "@/lib/blog-career-seed";
 
 export type BlogPost = {
   id: string;
@@ -219,7 +220,7 @@ export async function listPublishedPosts(locale: string, limit = 80): Promise<Bl
     return [];
   }
 
-  const rows = (data ?? []) as CardRow[];
+  const rows = mergeCareerSeedPosts((data ?? []) as CardRow[]);
   const bySlug = new Map<string, CardRow[]>();
   for (const r of rows) {
     const g = bySlug.get(r.slug) ?? [];
@@ -292,7 +293,9 @@ export async function getPublishedPostBySlug(
     console.error("[blog] getPublishedPostBySlug siblings", sErr);
     return null;
   }
-  const group = (siblings ?? []) as BlogPost[];
+  const group = mergeCareerSeedPosts((siblings ?? []) as BlogPost[]);
+  const native = group.find((r) => r.locale === loc);
+  if (native) return native;
   const source = pickTranslationSource(group);
   if (!source) return null;
 
@@ -339,7 +342,7 @@ export async function getPublishedPostSeo(locale: string, slug: string): Promise
     console.error("[blog] getPublishedPostSeo", error);
     return empty;
   }
-  const group = (siblings ?? []) as BlogPost[];
+  const group = mergeCareerSeedPosts((siblings ?? []) as BlogPost[]);
   const hreflangLocales = [
     ...new Set(
       group.map((r) => r.locale).filter((l): l is Locale => locales.includes(l as Locale)),
@@ -396,8 +399,11 @@ export async function listPublishedPostsForSitemap(): Promise<
     console.error("[blog] listPublishedPostsForSitemap", error);
     return [];
   }
+  const merged = mergeCareerSeedPosts(
+    (data ?? []) as { locale: string; slug: string; published_at?: string | null; updated_at?: string | null }[],
+  );
   const out: { locale: Locale; slug: string; lastModified: Date }[] = [];
-  for (const row of data ?? []) {
+  for (const row of merged) {
     const locale = (row as { locale: string }).locale;
     const slug = (row as { slug: string }).slug;
     if (!locales.includes(locale as Locale) || !slug) continue;

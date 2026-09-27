@@ -1,6 +1,6 @@
 "use client";
 
-import type { ImgHTMLAttributes } from "react";
+import type { ImgHTMLAttributes, ReactNode } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -23,6 +23,25 @@ function ArticleFigureImg(props: ImgHTMLAttributes<HTMLImageElement>) {
   );
 }
 
+function ArticleCtaLink({
+  href,
+  children,
+}: {
+  href: string;
+  children: ReactNode;
+}) {
+  return (
+    <span className="my-10 flex justify-center">
+      <a
+        href={href}
+        className="inline-flex min-h-[3.25rem] items-center justify-center rounded-full bg-[#e85d04] px-8 py-3.5 text-center text-base font-bold tracking-wide text-white no-underline shadow-[0_16px_40px_-12px_rgba(232,93,4,0.85)] ring-2 ring-[#e85d04]/25 transition hover:bg-[#cf5100] hover:opacity-100 hover:shadow-[0_20px_48px_-10px_rgba(232,93,4,0.95)] sm:min-w-[16rem] sm:text-lg"
+      >
+        {children}
+      </a>
+    </span>
+  );
+}
+
 export function BlogMarkdown({ markdown, className = "" }: Props) {
   return (
     <div
@@ -32,6 +51,17 @@ export function BlogMarkdown({ markdown, className = "" }: Props) {
         remarkPlugins={[remarkGfm]}
         components={{
           img: ArticleFigureImg,
+          a: ({ href, title, children }) => {
+            const url = typeof href === "string" ? href : "";
+            if ((title === "cta" || title === "button") && url) {
+              return <ArticleCtaLink href={url}>{children}</ArticleCtaLink>;
+            }
+            return (
+              <a href={url || undefined} title={title}>
+                {children}
+              </a>
+            );
+          },
         }}
       >
         {markdown}

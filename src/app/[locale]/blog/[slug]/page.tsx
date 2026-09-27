@@ -7,6 +7,7 @@ import { getPublishedPostSeo } from "@/lib/blog";
 import { IconCalendar, IconUser } from "@/components/blog/BlogNewsIcons";
 import type { Locale } from "@/i18n/routing";
 import { routing } from "@/i18n/routing";
+import { CAREER_POST_SLUG } from "@/lib/blog-career-seed";
 import { localeAlternatesAndSocial } from "@/lib/locale-seo-metadata";
 import { seoDocumentTitle } from "@/lib/seo-document-title";
 
@@ -88,9 +89,45 @@ export default async function BlogPostPage({ params }: Props) {
     headline: post.title,
     datePublished: post.published_at ?? undefined,
     author: { "@type": "Organization", name: post.author_name },
-    image: post.featured_image_url ?? undefined,
+    image: post.featured_image_url
+      ? post.featured_image_url.startsWith("http")
+        ? post.featured_image_url
+        : `https://www.transpool24.com${post.featured_image_url}`
+      : undefined,
     description: post.excerpt ?? undefined,
   };
+
+  const jobLd =
+    post.slug === CAREER_POST_SLUG
+      ? {
+          "@context": "https://schema.org",
+          "@type": "JobPosting",
+          title: post.title,
+          description: post.excerpt || post.title,
+          datePosted: post.published_at ?? undefined,
+          employmentType: "FULL_TIME",
+          hiringOrganization: {
+            "@type": "Organization",
+            name: "TransPool24",
+            sameAs: "https://www.transpool24.com",
+          },
+          jobLocation: {
+            "@type": "Place",
+            address: {
+              "@type": "PostalAddress",
+              addressLocality: "Pforzheim",
+              addressRegion: "Baden-Württemberg",
+              addressCountry: "DE",
+            },
+          },
+          applicantLocationRequirements: {
+            "@type": "Country",
+            name: "Germany",
+          },
+          directApply: true,
+          url: `https://www.transpool24.com/${locale}/driver`,
+        }
+      : null;
 
   return (
     <main className="bg-[#f5f6f8] px-4 py-12 sm:px-6 sm:py-16">
@@ -98,6 +135,12 @@ export default async function BlogPostPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+      {jobLd ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jobLd) }}
+        />
+      ) : null}
       <article className="mx-auto max-w-3xl rounded-2xl bg-white p-6 shadow-[0_20px_50px_-24px_rgba(0,0,0,0.12)] ring-1 ring-black/[0.05] sm:p-10">
         <nav className="mb-8">
           <Link
