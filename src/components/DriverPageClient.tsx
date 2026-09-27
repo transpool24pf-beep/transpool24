@@ -257,9 +257,47 @@ export function DriverPageClient({ locale }: { locale: string }) {
           </section>
         </>
       ) : (
-        <section id="driver-form" className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
-          <div className="rounded-2xl border border-[#0d2137]/10 bg-white p-6 shadow-lg sm:p-8">
-            <DriverWizardForm onBack={() => setShowForm(false)} initialCity="" />
+        <section
+          id="driver-form"
+          className="relative overflow-hidden bg-gradient-to-br from-[#eef6ff] via-[#f6f7fb] to-white px-4 py-8 sm:px-6 sm:py-12"
+        >
+          <div className="pointer-events-none absolute inset-0 opacity-[0.35]" aria-hidden>
+            <div className="absolute -start-20 top-10 h-72 w-72 rounded-full bg-sky-200/50 blur-3xl" />
+            <div className="absolute -end-10 bottom-0 h-80 w-80 rounded-full bg-[#e85d04]/15 blur-3xl" />
+          </div>
+          <div className="relative mx-auto grid max-w-7xl items-start gap-8 lg:grid-cols-2 lg:gap-12" dir="ltr">
+            <div className="lg:sticky lg:top-24" dir={rtl ? "rtl" : "ltr"}>
+              <h1 className="text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl lg:text-[2.35rem]">
+                <span className="text-[var(--accent)]">{t("partnerTitleAccent")}</span>
+                <span className="text-[#152033]"> {t("partnerTitleRest")}</span>
+              </h1>
+              <div className="mt-6 rounded-2xl bg-[#d7ecff] px-5 py-5 text-sm leading-8 text-[#1a2a44] shadow-sm ring-1 ring-sky-200/80 sm:px-6 sm:py-6 sm:text-[15px]">
+                <p>
+                  {t.rich("partnerBody1", {
+                    brand: (chunks) => <strong className="font-bold">{chunks}</strong>,
+                  })}
+                </p>
+                <p className="mt-4">
+                  {t.rich("partnerBody2", {
+                    brand: (chunks) => <strong className="font-bold">{chunks}</strong>,
+                  })}
+                </p>
+              </div>
+              <div className="mt-8 hidden justify-center lg:flex">
+                <Image
+                  src={TRANSPOOL24_VAN_IMAGE}
+                  alt={t("vanAlt")}
+                  width={640}
+                  height={380}
+                  className="h-auto w-full max-w-md object-contain drop-shadow-xl"
+                />
+              </div>
+            </div>
+            <div dir={rtl ? "rtl" : "ltr"}>
+              <div className="rounded-2xl border border-[#0d2137]/10 bg-white p-5 shadow-[0_24px_60px_-28px_rgba(13,33,55,0.35)] sm:p-8">
+                <DriverWizardForm onBack={() => setShowForm(false)} initialCity="" />
+              </div>
+            </div>
           </div>
         </section>
       )}

@@ -771,7 +771,11 @@
       "workTypeParcelsBody": "Verteilen Sie Pakete in Ihrer Stadt – kurze Touren, viele Stopps, Zustellung vor Ort.",
       "workTypeB2bTitle": "B2B – Arbeit außerhalb der Städte",
       "workTypeB2bBody": "Firmenfahrten zwischen Städten: Paletten, Teilladungen und regionale B2B-Touren.",
-      "workTypesFormHint": "Im Formular unten wählen Sie genau eine dieser Optionen."
+      "workTypesFormHint": "Im Formular unten wählen Sie genau eine dieser Optionen.",
+      "partnerTitleAccent": "Werde Erfolgspartner",
+      "partnerTitleRest": "im Netzwerk von TransPool24",
+      "partnerBody1": "<brand>TransPool24</brand> öffnet die Zusammenarbeit mit jungen Transportunternehmen, selbstständigen Fahrern und Zustellpartnern in Deutschland. Wenn Sie eigene Fahrzeuge haben und einen verlässlichen Logistikpartner suchen, laden wir Sie ein, unserem wachsenden Netz beizutreten – für regelmäßige tägliche Transport- und Verteiltouren.",
+      "partnerBody2": "Mit klaren Tourenplänen, fairer und pünktlicher Bezahlung und professioneller Disposition bietet Ihnen <brand>TransPool24</brand> ein stabiles Umfeld und eine Partnerschaft auf Transparenz und nachhaltiges Wachstum Ihrer Flotte."
     },
     "cityOther": "Sonstige",
     "cityCustom": "Name der Stadt, in der Sie leben",

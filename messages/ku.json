@@ -625,7 +625,11 @@
       "workTypeParcelsBody": "Deliver parcels in your city – short routes, many stops, local distribution.",
       "workTypeB2bTitle": "B2B – work outside cities",
       "workTypeB2bBody": "Business runs between cities: pallets, part loads and regional B2B tours.",
-      "workTypesFormHint": "In the form below you pick exactly one of these options."
+      "workTypesFormHint": "In the form below you pick exactly one of these options.",
+      "partnerTitleAccent": "Join as a success partner",
+      "partnerTitleRest": "in the TransPool24 network",
+      "partnerBody1": "<brand>TransPool24</brand> is opening partnership with emerging transport companies, independent drivers and delivery contractors in Germany. If you own your vehicles and want a reliable logistics partner, we invite you to join our growing network for regular daily transport and distribution tours.",
+      "partnerBody2": "With organised work plans, fair and reliable pay, and professional dispatch, <brand>TransPool24</brand> offers a stable working environment and a partnership based on transparency and sustainable growth for your fleet."
     },
     "cityOther": "Yên din",
     "cityCustom": "Navê bajêr ê ku hûn lê dijîn",
