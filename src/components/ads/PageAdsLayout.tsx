@@ -14,8 +14,8 @@ import {
 type Props = {
   children: React.ReactNode;
   className?: string;
-  /** sides = tall rails. banners = full-width ads above/below (Join us / driver page). */
-  placement?: "sides" | "banners";
+  /** sides = tall rails. banners = full-width ads below. content = script only, page places its own banners. */
+  placement?: "sides" | "banners" | "content";
 };
 
 /** Desktop: large side units. Phone: compact 90px banners above and below the page. */
@@ -26,6 +26,15 @@ export function PageAdsLayout({ children, className = "", placement = "sides" }:
   const { isDesktop, ready } = useIsDesktopLg();
   const showMobileAds = ready && !isDesktop;
   const showDesktopAds = ready && isDesktop;
+
+  if (placement === "content") {
+    return (
+      <>
+        <AdSenseScript enabled={adsEnabled} />
+        <div className={`w-full ${className}`}>{children}</div>
+      </>
+    );
+  }
 
   if (placement === "banners") {
     return (

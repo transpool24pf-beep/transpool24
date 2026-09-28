@@ -8,6 +8,14 @@ import { DriverWizardForm } from "./DriverWizardForm";
 import { OrderRouteLottie } from "./OrderRouteLottie";
 import { TRANSPOOL24_VAN_IMAGE } from "@/lib/brand-assets";
 import { PageAdsLayout } from "@/components/ads/PageAdsLayout";
+import { OrderBookingWideBanner } from "@/components/OrderBookingSideAd";
+import { adLabel } from "@/components/ads/AdSensePlacements";
+import {
+  ADSENSE_SLOT_BANNER,
+  ADSENSE_SLOT_SIDEBAR_LEFT,
+  ADSENSE_SLOT_SIDEBAR_RIGHT,
+  adsenseManualUnitsConfigured,
+} from "@/lib/adsense-config";
 import { DotLottieRow } from "@/components/blog/DotLottieRow";
 import { HomepageDriverLogisticsLottie } from "@/components/HomepageDriverLogisticsLottie";
 import {
@@ -40,6 +48,15 @@ export function DriverPageClient({ locale }: { locale: string }) {
     setTimeout(() => document.getElementById("driver-form")?.scrollIntoView({ behavior: "smooth" }), 50);
   };
 
+  const adsEnabled = adsenseManualUnitsConfigured();
+  const adsLabel = adLabel(locale);
+
+  const landingAd = (slot: string) => (
+    <div className="mx-auto w-full max-w-6xl px-4 py-2 sm:px-6">
+      <OrderBookingWideBanner slot={slot} label={adsLabel} enabled={adsEnabled} />
+    </div>
+  );
+
   const applyBtn = (
     <span className="inline-flex items-center gap-2">
       <span className={rtl ? "rotate-180" : ""} aria-hidden>
@@ -51,7 +68,7 @@ export function DriverPageClient({ locale }: { locale: string }) {
 
   return (
     <main className="bg-[#f6f7fb]" lang={locale} dir={rtl ? "rtl" : "ltr"}>
-      <PageAdsLayout placement="banners">
+      <PageAdsLayout placement={showForm ? "banners" : "content"}>
       {!showForm ? (
         <>
           <section className="overflow-hidden bg-[#f6f4ef]">
@@ -98,6 +115,8 @@ export function DriverPageClient({ locale }: { locale: string }) {
               </div>
             </div>
           </section>
+
+          {landingAd(ADSENSE_SLOT_BANNER)}
 
           <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
             <div className="grid gap-6 md:grid-cols-3">
@@ -147,6 +166,8 @@ export function DriverPageClient({ locale }: { locale: string }) {
               </button>
             </div>
           </section>
+
+          {landingAd(ADSENSE_SLOT_SIDEBAR_LEFT)}
 
           <section className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
             <h2 className="text-center text-2xl font-bold text-[#0d2137]">{t("requirementsTitle")}</h2>
@@ -208,6 +229,8 @@ export function DriverPageClient({ locale }: { locale: string }) {
               </div>
             </div>
           </section>
+
+          {landingAd(ADSENSE_SLOT_SIDEBAR_RIGHT)}
 
           <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
             <h2 className="text-center text-2xl font-bold text-[#0d2137]">{t("testimonialTitle")}</h2>
