@@ -12,9 +12,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "driver.landing" });
+  const rawKw = t.raw("keywords");
+  const keywords = Array.isArray(rawKw)
+    ? (rawKw as unknown[]).filter((k): k is string => typeof k === "string")
+    : [];
   return localeAlternatesAndSocial(locale, "/driver", {
     title: t("metaTitle"),
     description: t("metaDescription"),
+    keywords,
   });
 }
 
