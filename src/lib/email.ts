@@ -519,17 +519,17 @@ export async function sendDeliveryConfirmationEmail(
 function thankYouEmailSignoffHtml(): string {
   const name = process.env.EMAIL_SIGNOFF_NAME?.trim() || "Omar Mdeik";
   return `
-        <p dir="rtl" lang="ar" style="margin:0 0 14px 0; font-size:15px; line-height:1.85; color:#334155; text-align:right;">
-          إذا كانت لديكم أي أسئلة أخرى، فلا تترددوا في الاتصال بي.
+        <p style="margin:0 0 14px 0; font-size:15px; line-height:1.75; color:#334155;">
+          Falls Sie noch Fragen haben, können Sie mich gerne kontaktieren.
         </p>
-        <p dir="rtl" lang="ar" style="margin:0 0 8px 0; font-size:15px; line-height:1.85; color:#334155; text-align:right;">
-          وأخيرًا وليس آخرًا: حافظوا على صحتكم!
+        <p style="margin:0 0 8px 0; font-size:15px; line-height:1.75; color:#334155;">
+          Und last but not least: Bleiben Sie gesund!
         </p>
-        <p dir="rtl" lang="ar" style="margin:0 0 16px 0; font-size:16px; font-weight:700; color:#0d2137; text-align:right;">
-          #حافظ_على_صحتك
+        <p style="margin:0 0 16px 0; font-size:16px; font-weight:700; color:#0d2137;">
+          #BleibenSieGesund
         </p>
-        <p dir="rtl" lang="ar" style="margin:0 0 18px 0; font-size:15px; line-height:1.85; color:#334155; text-align:right;">
-          بكل حب وصدق، مع أطيب التحيات
+        <p style="margin:0 0 18px 0; font-size:15px; line-height:1.75; color:#334155;">
+          Mit Liebe und Aufrichtigkeit, mit freundlichen Grüßen
         </p>
         <p style="margin:0; font-size:15px; line-height:1.6; color:#334155;">
           <strong>${escapeHtml(name)}</strong><br />
@@ -555,9 +555,9 @@ function buildThankYouDeliveryHtml(
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px; margin:0 auto; padding:28px 18px 40px;">
     <tr><td>
       <div style="background:#fff; border-radius:14px; padding:26px; border:1px solid #e2e8f0; box-shadow:0 2px 10px rgba(0,0,0,0.06);">
-        <p dir="rtl" lang="ar" style="margin:0 0 16px 0; font-size:15px; line-height:1.6; color:#334155; text-align:right;">السيد حسن،</p>
+        <p style="margin:0 0 16px 0; font-size:15px; line-height:1.6; color:#334155;">Hallo Herr Hassan,</p>
         <p style="margin:0 0 14px 0; font-size:15px; line-height:1.65; color:#334155;">
-          im Namen des gesamten Teams von TransPool24 möchten wir uns herzlich bei Ihnen für die angenehme Zusammenarbeit bedanken.
+          Im Namen des gesamten Teams von TransPool24 möchten wir uns herzlich bei Ihnen für die angenehme Zusammenarbeit bedanken.
         </p>
         <p style="margin:0 0 14px 0; font-size:15px; line-height:1.65; color:#334155;">
           Es war uns eine Freude, Ihren <strong>Transport</strong> mit Effizienz und Sorgfalt auszuführen.
