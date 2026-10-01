@@ -520,26 +520,23 @@ export async function sendDeliveryConfirmationEmail(
 function thankYouEmailSignoffHtml(): string {
   const name = process.env.EMAIL_SIGNOFF_NAME?.trim() || "Omar Mdeik";
   return `
-        <p style="margin:0 0 14px 0; font-size:15px; line-height:1.75; color:#334155;">
+        <p style="margin:16px 0 10px 0; font-size:15px; line-height:1.6; color:#334155;">
           Falls Sie noch Fragen haben, können Sie mich gerne kontaktieren.
         </p>
-        <p style="margin:0 0 8px 0; font-size:15px; line-height:1.75; color:#334155;">
+        <p style="margin:0 0 6px 0; font-size:15px; line-height:1.6; color:#334155;">
           Und last but not least: Bleiben Sie gesund!
         </p>
-        <p style="margin:0 0 16px 0; font-size:16px; font-weight:700; color:#0d2137;">
-          #BleibenSieGesund
-        </p>
-        <p style="margin:0 0 18px 0; font-size:15px; line-height:1.75; color:#334155;">
+        <p style="margin:0 0 14px 0; font-size:15px; font-weight:700; color:#0d2137;">#BleibenSieGesund</p>
+        <p style="margin:0 0 12px 0; font-size:15px; line-height:1.6; color:#334155;">
           Mit Liebe und Aufrichtigkeit, mit freundlichen Grüßen
         </p>
-        <p style="margin:0; font-size:15px; line-height:1.6; color:#334155;">
+        <p style="margin:0; font-size:15px; line-height:1.55; color:#334155;">
           <strong>${escapeHtml(name)}</strong><br />
-          Inhaber, TransPool24<br />
-          Ihr digitaler Logistikpartner in Pforzheim &amp; Region
+          Inhaber, TransPool24
         </p>`;
 }
 
-/** Thank-you after delivery: same header/banner style as other transactional mail (German). */
+/** Compact thank-you after delivery (German). Google review link works on phones (no #hash). */
 function buildThankYouDeliveryHtml(
   branding: TransactionalEmailBranding,
   footer: ResolvedEmailFooter
@@ -552,34 +549,23 @@ function buildThankYouDeliveryHtml(
 <head><meta charset="utf-8" />${emailDeHeadMeta()}<title>Vielen Dank – TransPool24</title></head>
 <body style="margin:0; font-family:'Segoe UI',Tahoma,sans-serif; background:#f1f5f9; direction:ltr; text-align:left;">
   ${branding.headerHtml}
-  <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px; margin:0 auto; padding:28px 18px 40px;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px; margin:0 auto; padding:16px 12px 24px;">
     <tr><td>
-      <div style="background:#fff; border-radius:14px; padding:26px; border:1px solid #e2e8f0; box-shadow:0 2px 10px rgba(0,0,0,0.06);">
-        <p style="margin:0 0 16px 0; font-size:15px; line-height:1.6; color:#334155;">Hallo Herr Hassan,</p>
-        <p style="margin:0 0 14px 0; font-size:15px; line-height:1.65; color:#334155;">
-          Im Namen des gesamten Teams von TransPool24 möchten wir uns herzlich bei Ihnen für die angenehme Zusammenarbeit bedanken.
+      <div style="background:#fff; border-radius:14px; padding:20px 20px 8px 20px; border:1px solid #e2e8f0;">
+        <p style="margin:0 0 12px 0; font-size:16px; line-height:1.5; color:#334155;">Hallo Herr Hassan,</p>
+        <p style="margin:0 0 14px 0; font-size:15px; line-height:1.6; color:#334155;">
+          vielen Dank für Ihren <strong>Transport</strong> mit TransPool24. Wir schätzen Ihr Vertrauen und helfen Ihnen gerne wieder in Pforzheim und Umgebung.
         </p>
-        <p style="margin:0 0 14px 0; font-size:15px; line-height:1.65; color:#334155;">
-          Es war uns eine Freude, Ihren <strong>Transport</strong> mit Effizienz und Sorgfalt auszuführen.
-          Wir schätzen Ihr Vertrauen in unsere digitalen Logistiklösungen sehr.
-        </p>
-        <p style="margin:0 0 20px 0; font-size:15px; line-height:1.65; color:#334155;">
-          Wir freuen uns darauf, Sie auch bei Ihren zukünftigen Lieferungen in Pforzheim und Umgebung mit unserem Service zu unterstützen.
-        </p>
-        <div style="margin:24px 0; padding:20px; background:#fffbeb; border-radius:12px; border:1px solid #fde68a;">
-          <p style="margin:0 0 8px 0; font-size:16px; font-weight:700; color:#0d2137;">Wie zufrieden waren Sie mit unserer Zustellung?</p>
-          <p style="margin:0 0 12px 0; font-size:32px; line-height:1.2; letter-spacing:6px; color:#f59e0b;" aria-hidden="true" title="5 Sterne">★★★★★</p>
-          <p style="margin:0 0 14px 0; font-size:14px; color:#78350f; line-height:1.5;">
-            Ihre Meinung hilft uns, als zuverlässiger regionaler Partner für Sie da zu sein. Bitte nehmen Sie sich einen kurzen Moment für eine Bewertung.
-          </p>
+        <div style="margin:0 0 8px 0; padding:16px; background:#fffbeb; border-radius:12px; border:1px solid #fde68a; text-align:center;">
+          <p style="margin:0 0 8px 0; font-size:16px; font-weight:700; color:#0d2137;">Wie zufrieden waren Sie?</p>
+          <p style="margin:0 0 12px 0; font-size:28px; line-height:1.2; letter-spacing:4px; color:#f59e0b;" aria-hidden="true">★★★★★</p>
           <p style="margin:0;">
-            <a href="${rateSafe}" style="display:inline-block; padding:14px 26px; background:linear-gradient(135deg,#0d2137 0%,#1e3a5f 100%); color:#fff !important; text-decoration:none; border-radius:10px; font-weight:700; font-size:15px;">
+            <a href="${rateSafe}" style="display:inline-block; padding:14px 22px; background:#0d2137; color:#fff !important; text-decoration:none; border-radius:10px; font-weight:700; font-size:15px;">
               Bei Google bewerten
             </a>
           </p>
         </div>
-        <div style="margin:20px 0 0 0;">${thankYouEmailSignoffHtml()}</div>
-        <p style="margin:28px 0 0 0; font-size:13px; color:#94a3b8;">TransPool24 · Pforzheim</p>
+        <div>${thankYouEmailSignoffHtml()}</div>
         ${buildEmailFooterOrderBlock(footer)}
       </div>
     </td></tr>
@@ -611,7 +597,7 @@ export async function sendThankYouDeliveryEmail(
     const { error } = await resend.emails.send({
       ...transactionalEmailSendOptions(),
       to: [to],
-      subject: "Vielen Dank für Ihr Vertrauen in TransPool24",
+      subject: "Bitte bewerten Sie TransPool24 bei Google",
       html: buildThankYouDeliveryHtml(branding, footer),
       ...(mergedAtt?.length ? { attachments: mergedAtt } : {}),
     });
