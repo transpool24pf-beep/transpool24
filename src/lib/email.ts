@@ -152,7 +152,7 @@ function buildConfirmationHtml(
         <p style="margin: 16px 0 0 0; font-size: 14px; color: #64748b;">Die Zahlung erfolgt nach der Zustellung per ordnungsgemäßer Rechnung. Eine Vorauszahlung ist nicht erforderlich.</p>
         <p style="margin: 12px 0 0 0; font-size: 14px; color: #64748b;">Im Anhang finden Sie die Rechnung und den Umzugsvertrag (Auftragsbestätigung) mit Ihrem Namen, Datum, Adressen und der Ladung.</p>
         ${rateBlock}
-        <p style="margin-top: 24px; font-size: 13px; color: #94a3b8;">,  TransPool24</p>
+        <p style="margin-top: 24px; font-size: 13px; color: #94a3b8;">TransPool24 · Pforzheim</p>
         ${buildEmailFooterOrderBlock(footer)}
       </div>
     </td></tr>
@@ -441,7 +441,7 @@ function buildDeliveryConfirmationHtml(
         ${podBlock}
         ${trackBlock}
         ${rateBlock}
-        <p style="margin:28px 0 0 0; font-size:13px; color:#94a3b8;">,  TransPool24</p>
+        <p style="margin:28px 0 0 0; font-size:13px; color:#94a3b8;">TransPool24 · Pforzheim</p>
         ${buildEmailFooterOrderBlock(footer)}
       </div>
     </td></tr>
@@ -533,14 +533,10 @@ function thankYouCargoDescriptionDe(job: Job): string {
 }
 
 function thankYouEmailSignoffHtml(): string {
-  const name = process.env.EMAIL_SIGNOFF_NAME?.trim();
-  if (name) {
-    return `Mit freundlichen Grüßen,<br /><br />
+  const name = process.env.EMAIL_SIGNOFF_NAME?.trim() || "Omar Mdeik";
+  return `Mit freundlichen Grüßen<br /><br />
 <strong>${escapeHtml(name)}</strong><br />
-TransPool24 – Ihr digitaler Logistikpartner`;
-  }
-  return `Mit freundlichen Grüßen,<br /><br />
-<strong>TransPool24</strong><br />
+Inhaber, TransPool24<br />
 Ihr digitaler Logistikpartner in Pforzheim &amp; Region`;
 }
 
@@ -571,7 +567,7 @@ function buildThankYouDeliveryHtml(
       <div style="background:#fff; border-radius:14px; padding:26px; border:1px solid #e2e8f0; box-shadow:0 2px 10px rgba(0,0,0,0.06);">
         <p style="margin:0 0 16px 0; font-size:15px; line-height:1.6; color:#334155;">${greeting}</p>
         <p style="margin:0 0 14px 0; font-size:15px; line-height:1.65; color:#334155;">
-          im Namen des gesamten Teams von TransPool24 möchte ich mich herzlich bei Ihnen für die angenehme Zusammenarbeit bedanken.
+          im Namen des gesamten Teams von TransPool24 möchten wir uns herzlich bei Ihnen für die angenehme Zusammenarbeit bedanken.
         </p>
         <p style="margin:0 0 14px 0; font-size:15px; line-height:1.65; color:#334155;">
           Es war uns eine Freude, Ihren Transportauftrag <strong>${cargoDesc}</strong> mit Effizienz und Sorgfalt auszuführen.
@@ -597,7 +593,7 @@ function buildThankYouDeliveryHtml(
           </p>
         </div>
         <p style="margin:20px 0 0 0; font-size:15px; line-height:1.6; color:#334155;">${thankYouEmailSignoffHtml()}</p>
-        <p style="margin:28px 0 0 0; font-size:13px; color:#94a3b8;">,  TransPool24</p>
+        <p style="margin:28px 0 0 0; font-size:13px; color:#94a3b8;">TransPool24 · Pforzheim</p>
         ${buildEmailFooterOrderBlock(footer)}
       </div>
     </td></tr>
@@ -1115,7 +1111,7 @@ function buildCustomCustomerEmailHtml(
     <tr><td style="text-align:left;">
       <div style="background: #fff; border-radius: 12px; padding: 28px 28px 0 28px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); direction:ltr; text-align:left;">
         <p style="margin: 0; font-size: 16px; line-height: 1.65; color: #334155;">${bodyHtml}</p>
-        <p style="margin-top: 24px; font-size: 13px; color: #94a3b8;">,  TransPool24</p>
+        <p style="margin-top: 24px; font-size: 13px; color: #94a3b8;">TransPool24 · Pforzheim</p>
         ${buildEmailFooterOrderBlock(footer)}
       </div>
     </td></tr>
