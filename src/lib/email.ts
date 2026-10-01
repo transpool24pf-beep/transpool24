@@ -516,45 +516,35 @@ export async function sendDeliveryConfirmationEmail(
   }
 }
 
-/** German phrase for thank-you email (category or cargo size). */
-function thankYouCargoDescriptionDe(job: Job): string {
-  const cd = job.cargo_details as Record<string, unknown> | null;
-  const loads = parseCargoLoads(cd).filter((l) => l.quantity >= 1);
-  if (loads.length > 0) {
-    const first = cargoCategoryLabelDe(loads[0].loadCarrier || null);
-    if (first && first !== "-") return `im Bereich „${escapeHtml(first)}“`;
-  }
-  const cat = cd?.cargoCategory != null ? String(cd.cargoCategory) : "";
-  if (cat) {
-    const label = cargoCategoryLabelDe(cat);
-    if (label && label !== "-") return `im Bereich „${escapeHtml(label)}“`;
-  }
-  return `für Ihre Sendung (Größe ${escapeHtml(job.cargo_size || "XS")})`;
-}
-
 function thankYouEmailSignoffHtml(): string {
   const name = process.env.EMAIL_SIGNOFF_NAME?.trim() || "Omar Mdeik";
-  return `Mit freundlichen Grüßen<br /><br />
-<strong>${escapeHtml(name)}</strong><br />
-Inhaber, TransPool24<br />
-Ihr digitaler Logistikpartner in Pforzheim &amp; Region`;
+  return `
+        <p dir="rtl" lang="ar" style="margin:0 0 14px 0; font-size:15px; line-height:1.85; color:#334155; text-align:right;">
+          إذا كانت لديكم أي أسئلة أخرى، فلا تترددوا في الاتصال بي.
+        </p>
+        <p dir="rtl" lang="ar" style="margin:0 0 8px 0; font-size:15px; line-height:1.85; color:#334155; text-align:right;">
+          وأخيرًا وليس آخرًا: حافظوا على صحتكم!
+        </p>
+        <p dir="rtl" lang="ar" style="margin:0 0 16px 0; font-size:16px; font-weight:700; color:#0d2137; text-align:right;">
+          #حافظ_على_صحتك
+        </p>
+        <p dir="rtl" lang="ar" style="margin:0 0 18px 0; font-size:15px; line-height:1.85; color:#334155; text-align:right;">
+          بكل حب وصدق، مع أطيب التحيات
+        </p>
+        <p style="margin:0; font-size:15px; line-height:1.6; color:#334155;">
+          <strong>${escapeHtml(name)}</strong><br />
+          Inhaber, TransPool24<br />
+          Ihr digitaler Logistikpartner in Pforzheim &amp; Region
+        </p>`;
 }
 
 /** Thank-you after delivery: same header/banner style as other transactional mail (German). */
 function buildThankYouDeliveryHtml(
-  job: Job,
-  options: { deliveryPhotoUrl: string; rateDriverUrl: string },
+  options: { rateDriverUrl: string },
   branding: TransactionalEmailBranding,
   footer: ResolvedEmailFooter
 ): string {
-  const company = (job.company_name || "").trim();
-  const greeting = company
-    ? `Sehr geehrte Damen und Herren der Firma <strong>${escapeHtml(company)}</strong>,`
-    : `Sehr geehrte Damen und Herren,`;
-  const cargoDesc = thankYouCargoDescriptionDe(job);
-  const photoSafe = escapeHtml(options.deliveryPhotoUrl);
   const rateSafe = escapeHtml(options.rateDriverUrl);
-  const orderRef = job.order_number != null ? String(job.order_number) : job.id.slice(0, 8);
 
   return `
 <!DOCTYPE html>
@@ -565,20 +555,16 @@ function buildThankYouDeliveryHtml(
   <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px; margin:0 auto; padding:28px 18px 40px;">
     <tr><td>
       <div style="background:#fff; border-radius:14px; padding:26px; border:1px solid #e2e8f0; box-shadow:0 2px 10px rgba(0,0,0,0.06);">
-        <p style="margin:0 0 16px 0; font-size:15px; line-height:1.6; color:#334155;">${greeting}</p>
+        <p dir="rtl" lang="ar" style="margin:0 0 16px 0; font-size:15px; line-height:1.6; color:#334155; text-align:right;">السيد حسن،</p>
         <p style="margin:0 0 14px 0; font-size:15px; line-height:1.65; color:#334155;">
           im Namen des gesamten Teams von TransPool24 möchten wir uns herzlich bei Ihnen für die angenehme Zusammenarbeit bedanken.
         </p>
         <p style="margin:0 0 14px 0; font-size:15px; line-height:1.65; color:#334155;">
-          Es war uns eine Freude, Ihren Transportauftrag <strong>${cargoDesc}</strong> mit Effizienz und Sorgfalt auszuführen.
+          Es war uns eine Freude, Ihren <strong>Transport</strong> mit Effizienz und Sorgfalt auszuführen.
           Wir schätzen Ihr Vertrauen in unsere digitalen Logistiklösungen sehr.
         </p>
         <p style="margin:0 0 20px 0; font-size:15px; line-height:1.65; color:#334155;">
           Wir freuen uns darauf, Sie auch bei Ihren zukünftigen Lieferungen in Pforzheim und Umgebung mit unserem Service zu unterstützen.
-        </p>
-        <p style="margin:0 0 8px 0; font-size:13px; color:#64748b;">Auftrag <strong>#${escapeHtml(orderRef)}</strong> · Liefernachweis (Foto)</p>
-        <p style="margin:0 0 20px 0;">
-          <img src="${photoSafe}" alt="Liefernachweis" width="560" style="display:block;max-width:100%;height:auto;border-radius:12px;border:1px solid #e2e8f0;" />
         </p>
         <div style="margin:24px 0; padding:20px; background:#fffbeb; border-radius:12px; border:1px solid #fde68a;">
           <p style="margin:0 0 8px 0; font-size:16px; font-weight:700; color:#0d2137;">Wie zufrieden waren Sie mit unserer Zustellung?</p>
@@ -592,7 +578,7 @@ function buildThankYouDeliveryHtml(
             </a>
           </p>
         </div>
-        <p style="margin:20px 0 0 0; font-size:15px; line-height:1.6; color:#334155;">${thankYouEmailSignoffHtml()}</p>
+        <div style="margin:20px 0 0 0;">${thankYouEmailSignoffHtml()}</div>
         <p style="margin:28px 0 0 0; font-size:13px; color:#94a3b8;">TransPool24 · Pforzheim</p>
         ${buildEmailFooterOrderBlock(footer)}
       </div>
@@ -619,20 +605,14 @@ export async function sendThankYouDeliveryEmail(
     return { success: false, error: "RESEND_API_KEY not set" };
   }
   const resend = new Resend(apiKey);
-  const att = options.photoAttachment;
   try {
     const [branding, footer] = await Promise.all([loadTransactionalEmailBranding(), loadEmailFooterSocial()]);
-    const photoAtt: Attachment[] | undefined =
-      att && att.contentBase64.length > 0
-        ? [{ filename: att.filename, content: att.contentBase64 }]
-        : undefined;
-    const mergedAtt = mergeAttachmentsWithLogo(branding.logoAttachment, photoAtt);
+    const mergedAtt = mergeAttachmentsWithLogo(branding.logoAttachment);
     const { error } = await resend.emails.send({
       ...transactionalEmailSendOptions(),
       to: [to],
       subject: "Vielen Dank für Ihr Vertrauen in TransPool24",
-      html: buildThankYouDeliveryHtml(job, {
-        deliveryPhotoUrl: options.deliveryPhotoUrl,
+      html: buildThankYouDeliveryHtml({
         rateDriverUrl: options.rateDriverUrl,
       }, branding, footer),
       ...(mergedAtt?.length ? { attachments: mergedAtt } : {}),
