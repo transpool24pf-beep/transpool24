@@ -20,6 +20,7 @@ import {
   jobSenderAddress,
 } from "./structured-address";
 import { manualCustomerEmailSendOptions, transactionalEmailSendOptions } from "@/lib/email-addresses";
+import { GOOGLE_WRITE_REVIEW_URL } from "@/lib/google-review";
 
 /** Driver info for order confirmation email (from driver_applications) */
 export type OrderEmailDriverInfo = {
@@ -540,11 +541,10 @@ function thankYouEmailSignoffHtml(): string {
 
 /** Thank-you after delivery: same header/banner style as other transactional mail (German). */
 function buildThankYouDeliveryHtml(
-  options: { rateDriverUrl: string },
   branding: TransactionalEmailBranding,
   footer: ResolvedEmailFooter
 ): string {
-  const rateSafe = escapeHtml(options.rateDriverUrl);
+  const rateSafe = escapeHtml(GOOGLE_WRITE_REVIEW_URL);
 
   return `
 <!DOCTYPE html>
@@ -574,7 +574,7 @@ function buildThankYouDeliveryHtml(
           </p>
           <p style="margin:0;">
             <a href="${rateSafe}" style="display:inline-block; padding:14px 26px; background:linear-gradient(135deg,#0d2137 0%,#1e3a5f 100%); color:#fff !important; text-decoration:none; border-radius:10px; font-weight:700; font-size:15px;">
-              Jetzt bewerten
+              Bei Google bewerten
             </a>
           </p>
         </div>
@@ -612,9 +612,7 @@ export async function sendThankYouDeliveryEmail(
       ...transactionalEmailSendOptions(),
       to: [to],
       subject: "Vielen Dank für Ihr Vertrauen in TransPool24",
-      html: buildThankYouDeliveryHtml({
-        rateDriverUrl: options.rateDriverUrl,
-      }, branding, footer),
+      html: buildThankYouDeliveryHtml(branding, footer),
       ...(mergedAtt?.length ? { attachments: mergedAtt } : {}),
     });
     if (error) {
