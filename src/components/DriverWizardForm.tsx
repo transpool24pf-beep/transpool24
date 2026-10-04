@@ -538,7 +538,7 @@ export function DriverWizardForm({
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium text-[#0d2137]">{t("whatsapp")}</label>
-              <div className="flex gap-2" ref={countryCodeRef}>
+              <div className="relative z-30 flex gap-2" ref={countryCodeRef}>
                 <div className="relative shrink-0">
                   <button
                     type="button"
@@ -548,7 +548,7 @@ export function DriverWizardForm({
                     {DRIVER_COUNTRY_CODES.find((c) => c.code === form.phoneCountryCode)?.flag ?? "🇩🇪"} {form.phoneCountryCode} ▾
                   </button>
                   {countryCodeOpen && (
-                    <ul className="absolute left-0 top-full z-20 mt-1 max-h-52 w-44 overflow-auto rounded-xl border-2 border-[#0d2137]/45 bg-white py-1 shadow-lg">
+                    <ul className="absolute bottom-full start-0 z-[80] mb-1 max-h-52 w-44 overflow-auto rounded-xl border-2 border-[#0d2137]/45 bg-white py-1 shadow-lg">
                       {DRIVER_COUNTRY_CODES.map((c) => (
                         <li key={c.code}>
                           <button
@@ -691,7 +691,7 @@ export function DriverWizardForm({
                 className={FIELD_INPUT_CLASS}
               />
             </div>
-            <div className="sm:col-span-2 mt-2 border-t border-[#0d2137]/10 pt-6">
+            <div className="sm:col-span-2 mt-2 border-t-2 border-[#0d2137]/25 pt-6">
               <h3 className="mb-1 text-lg font-semibold text-[#0d2137]">{t("step3Title")}</h3>
               <p className="text-sm text-[#0d2137]/65">{t("vehicleSectionHint")}</p>
             </div>
