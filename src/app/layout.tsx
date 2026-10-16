@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Suspense } from "react";
 import { GlobalPageLoadingOverlay } from "@/components/GlobalPageLoadingOverlay";
+import { ADSENSE_CLIENT } from "@/lib/adsense-config";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -58,7 +59,7 @@ export default function RootLayout({
         <link rel="icon" href={`${SITE}/favicon-48.png`} type="image/png" sizes="48x48" />
         <link rel="apple-touch-icon" href={`${SITE}/apple-touch-icon.png`} sizes="180x180" />
         {/* AdSense account verification; ads load via manual units after cookie consent */}
-        <meta name="google-adsense-account" content="ca-pub-9998186124580672" />
+        <meta name="google-adsense-account" content={ADSENSE_CLIENT} />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
+import { ADSENSE_ADS_TXT } from "@/lib/adsense-config";
 
-const ADS_TXT =
-  "google.com, pub-9998186124580672, DIRECT, f08c47fec0942fa0\n";
+const ADS_TXT = `${ADSENSE_ADS_TXT}\n`;
 
 export async function GET() {
   return new NextResponse(ADS_TXT, {

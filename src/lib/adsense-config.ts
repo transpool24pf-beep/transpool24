@@ -1,6 +1,11 @@
 /** Google AdSense publisher ID (site-wide). */
 export const ADSENSE_CLIENT =
-  process.env.NEXT_PUBLIC_ADSENSE_CLIENT ?? "ca-pub-9998186124580672";
+  process.env.NEXT_PUBLIC_ADSENSE_CLIENT ?? "ca-pub-7400919002829882";
+
+/** ads.txt line for the same publisher (root /ads.txt). */
+export const ADSENSE_ADS_TXT =
+  process.env.NEXT_PUBLIC_ADSENSE_ADS_TXT?.trim() ||
+  "google.com, pub-7400919002829882, DIRECT, f08c47fec0942fa0";
 
 /** Fixed sidebar rail dimensions (px), matches classic skyscraper slot. */
 export const ADSENSE_SIDEBAR_WIDTH = 160;

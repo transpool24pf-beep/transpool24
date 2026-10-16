@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { type Locale, routing } from "@/i18n/routing";
+import { ADSENSE_CLIENT } from "@/lib/adsense-config";
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.transpool24.com";
 
@@ -20,7 +21,7 @@ function ampDocument(locale: Locale): string {
   <noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
 </head>
 <body>
-<amp-auto-ads type="adsense" data-ad-client="ca-pub-9998186124580672"></amp-auto-ads>
+<amp-auto-ads type="adsense" data-ad-client="${ADSENSE_CLIENT}"></amp-auto-ads>
 <main>
   <h1>TransPool24</h1>
   <p>Digital logistics &amp; road transport, <a href="${canonical}">View full site</a>.</p>
