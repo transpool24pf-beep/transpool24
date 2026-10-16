@@ -15,7 +15,12 @@ type Props = { enabled: boolean };
 export function AdSenseScript({ enabled }: Props) {
   useEffect(() => {
     if (!enabled) return;
-    if (document.querySelector('script[data-tp24-adsense="1"]')) return;
+    if (
+      document.querySelector('script[data-tp24-adsense="1"]') ||
+      document.querySelector('script[src*="adsbygoogle.js"]')
+    ) {
+      return;
+    }
 
     const script = document.createElement("script");
     script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(ADSENSE_CLIENT)}`;
