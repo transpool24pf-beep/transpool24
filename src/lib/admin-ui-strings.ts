@@ -200,7 +200,7 @@ const DE: Record<string, string> = {
   "service.driver_car_assistant": "Fahrer mit Fahrzeug + Helfer",
   "bk.title": "Monatliche Buchhaltung",
   "bk.subtitle":
-    "Beleg fotografieren, Betrag eintragen, speichern. Alle Fotos dieses Monats landen in einer PDF. Nächster Monat = neue PDF.",
+    "Beleg fotografieren, Betrag eintragen, speichern. Die Monats-PDF enthält nur die Fotos. Nächster Monat = neue PDF.",
   "bk.month": "Monat",
   "bk.upload": "Beleg fotografieren / hochladen",
   "bk.camera": "Kamera",
@@ -432,7 +432,7 @@ const AR: Record<string, string> = {
   "service.driver_car_assistant": "شوفير مع سيارة ومعاون",
   "bk.title": "المحاسبة الشهرية",
   "bk.subtitle":
-    "صوّر الفاتورة واكتب السعر واحفظ. كل صور هذا الشهر تدخل نفس ملف PDF. الشهر القادم يكون PDF جديد.",
+    "صوّر الفاتورة واكتب السعر واحفظ. ملف PDF للشهر يحتوي الصور فقط. الشهر القادم PDF جديد.",
   "bk.month": "الشهر",
   "bk.upload": "تصوير / رفع فاتورة",
   "bk.camera": "الكاميرا",
