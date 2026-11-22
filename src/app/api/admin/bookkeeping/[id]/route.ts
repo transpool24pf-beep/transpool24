@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin-api";
-import { BOOKKEEPING_BUCKET, eurosToCents, isBookkeepingCategory } from "@/lib/bookkeeping";
+import { BOOKKEEPING_BUCKET, eurosToCents } from "@/lib/bookkeeping";
 import { createServerSupabase } from "@/lib/supabase";
 
 export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }> }) {
@@ -11,14 +11,7 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
   if (!body) return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
 
   const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
-  if (typeof body.vendor_name === "string") patch.vendor_name = body.vendor_name.trim() || null;
-  if (typeof body.document_date === "string") patch.document_date = body.document_date.trim() || null;
-  if (typeof body.invoice_number === "string") patch.invoice_number = body.invoice_number.trim() || null;
-  if (typeof body.notes === "string") patch.notes = body.notes.trim() || null;
-  if (typeof body.category === "string" && isBookkeepingCategory(body.category)) patch.category = body.category;
   if (body.gross_eur != null) patch.gross_cents = eurosToCents(body.gross_eur);
-  if (body.net_eur != null) patch.net_cents = eurosToCents(body.net_eur);
-  if (body.vat_eur != null) patch.vat_cents = eurosToCents(body.vat_eur);
 
   const supabase = createServerSupabase();
   const { data, error } = await supabase

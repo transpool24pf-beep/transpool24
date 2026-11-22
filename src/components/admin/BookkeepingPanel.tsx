@@ -2,11 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAdminLocale } from "@/contexts/AdminLocaleContext";
-import {
-  BOOKKEEPING_CATEGORIES,
-  formatEurFromCents,
-  type BookkeepingReceipt,
-} from "@/lib/bookkeeping";
+import { formatEurFromCents, type BookkeepingReceipt } from "@/lib/bookkeeping";
 
 type ListPayload = {
   year: number;
@@ -31,9 +27,7 @@ export function BookkeepingPanel() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [savingId, setSavingId] = useState<string | null>(null);
-  const [drafts, setDrafts] = useState<Record<string, Partial<BookkeepingReceipt> & { gross?: string; net?: string; vat?: string }>>(
-    {},
-  );
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
   const camRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -64,7 +58,7 @@ export function BookkeepingPanel() {
       const fd = new FormData();
       fd.append("file", file);
       const res = await fetch("/api/admin/bookkeeping", { method: "POST", body: fd });
-      const json = (await res.json()) as { error?: string; ocr_status?: string };
+      const json = (await res.json()) as { error?: string };
       if (!res.ok) throw new Error(json.error || res.statusText);
       await load();
     } catch (e) {
@@ -77,10 +71,7 @@ export function BookkeepingPanel() {
   };
 
   const receipts = data?.receipts ?? [];
-  const monthValue = useMemo(
-    () => `${year}-${String(month).padStart(2, "0")}`,
-    [year, month],
-  );
+  const monthValue = useMemo(() => `${year}-${String(month).padStart(2, "0")}`, [year, month]);
 
   return (
     <div className="space-y-6">
@@ -113,8 +104,7 @@ export function BookkeepingPanel() {
         </a>
         {data ? (
           <p className="text-sm text-[#0d2137]/70">
-            {t("bk.totals")}: {formatEurFromCents(data.totals.gross_cents)} · USt{" "}
-            {formatEurFromCents(data.totals.vat_cents)}
+            {t("bk.totals")}: {formatEurFromCents(data.totals.gross_cents)}
           </p>
         ) : null}
       </div>
@@ -163,9 +153,7 @@ export function BookkeepingPanel() {
       </div>
 
       {error ? (
-        <p className="rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
-          {error}
-        </p>
+        <p className="rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">{error}</p>
       ) : null}
 
       {loading ? <p className="text-sm text-[#0d2137]/60">{t("bk.uploading")}</p> : null}
@@ -175,98 +163,35 @@ export function BookkeepingPanel() {
 
       <div className="space-y-4">
         {receipts.map((r) => {
-          const d = drafts[r.id] ?? {};
-          const vendor = d.vendor_name ?? r.vendor_name ?? "";
-          const date = (d.document_date ?? r.document_date ?? "").slice(0, 10);
-          const invoice = d.invoice_number ?? r.invoice_number ?? "";
-          const category = d.category ?? r.category ?? "sonstiges";
-          const gross = d.gross ?? centsToInput(r.gross_cents);
-          const net = d.net ?? centsToInput(r.net_cents);
-          const vat = d.vat ?? centsToInput(r.vat_cents);
+          const gross = drafts[r.id] ?? centsToInput(r.gross_cents);
           return (
-            <article key={r.id} className="grid gap-4 rounded-2xl border-2 border-[#0d2137]/15 bg-white p-4 shadow-sm md:grid-cols-[160px_1fr]">
+            <article
+              key={r.id}
+              className="grid gap-4 rounded-2xl border-2 border-[#0d2137]/15 bg-white p-4 shadow-sm md:grid-cols-[160px_1fr]"
+            >
               {r.file_url && r.mime_type?.startsWith("image/") ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={r.file_url} alt="" className="h-40 w-full rounded-xl object-cover" />
               ) : (
-                <a href={r.file_url ?? "#"} className="flex h-40 items-center justify-center rounded-xl bg-[#f1f5f9] text-sm text-[#0d2137]">
+                <a
+                  href={r.file_url ?? "#"}
+                  className="flex h-40 items-center justify-center rounded-xl bg-[#f1f5f9] text-sm text-[#0d2137]"
+                >
                   PDF
                 </a>
               )}
-              <div className="grid gap-2 sm:grid-cols-2">
-                <label className="text-xs font-medium text-[#0d2137]/70">
-                  {t("bk.vendor")}
+              <div className="flex flex-col justify-center gap-3">
+                <label className="text-sm font-medium text-[#0d2137]">
+                  {t("bk.price")}
                   <input
-                    className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
-                    value={vendor}
-                    onChange={(e) => setDrafts((s) => ({ ...s, [r.id]: { ...s[r.id], vendor_name: e.target.value } }))}
-                  />
-                </label>
-                <label className="text-xs font-medium text-[#0d2137]/70">
-                  {t("bk.date")}
-                  <input
-                    type="date"
-                    className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
-                    value={date}
-                    onChange={(e) => setDrafts((s) => ({ ...s, [r.id]: { ...s[r.id], document_date: e.target.value } }))}
-                  />
-                </label>
-                <label className="text-xs font-medium text-[#0d2137]/70">
-                  {t("bk.invoiceNo")}
-                  <input
-                    className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
-                    value={invoice}
-                    onChange={(e) =>
-                      setDrafts((s) => ({ ...s, [r.id]: { ...s[r.id], invoice_number: e.target.value } }))
-                    }
-                  />
-                </label>
-                <label className="text-xs font-medium text-[#0d2137]/70">
-                  {t("bk.category")}
-                  <select
-                    className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
-                    value={category}
-                    onChange={(e) => setDrafts((s) => ({ ...s, [r.id]: { ...s[r.id], category: e.target.value } }))}
-                  >
-                    {BOOKKEEPING_CATEGORIES.map((c) => (
-                      <option key={c} value={c}>
-                        {t(`bk.cat.${c}`)}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="text-xs font-medium text-[#0d2137]/70">
-                  {t("bk.gross")}
-                  <input
-                    className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
+                    inputMode="decimal"
+                    placeholder="0,00"
+                    className="mt-1 w-full max-w-xs rounded-lg border-2 border-[#0d2137]/25 px-3 py-2.5 text-base"
                     value={gross}
-                    onChange={(e) => setDrafts((s) => ({ ...s, [r.id]: { ...s[r.id], gross: e.target.value } }))}
+                    onChange={(e) => setDrafts((s) => ({ ...s, [r.id]: e.target.value }))}
                   />
                 </label>
-                <label className="text-xs font-medium text-[#0d2137]/70">
-                  {t("bk.net")}
-                  <input
-                    className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
-                    value={net}
-                    onChange={(e) => setDrafts((s) => ({ ...s, [r.id]: { ...s[r.id], net: e.target.value } }))}
-                  />
-                </label>
-                <label className="text-xs font-medium text-[#0d2137]/70">
-                  {t("bk.vat")}
-                  <input
-                    className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
-                    value={vat}
-                    onChange={(e) => setDrafts((s) => ({ ...s, [r.id]: { ...s[r.id], vat: e.target.value } }))}
-                  />
-                </label>
-                <p className="self-end text-xs text-[#0d2137]/55">
-                  {r.ocr_status === "done"
-                    ? t("bk.ocrDone")
-                    : r.ocr_status === "failed"
-                      ? t("bk.ocrFail")
-                      : t("bk.ocrSkip")}
-                </p>
-                <div className="flex gap-2 sm:col-span-2">
+                <div className="flex gap-2">
                   <button
                     type="button"
                     disabled={savingId === r.id}
@@ -277,15 +202,7 @@ export function BookkeepingPanel() {
                         const res = await fetch(`/api/admin/bookkeeping/${r.id}`, {
                           method: "PATCH",
                           headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({
-                            vendor_name: vendor,
-                            document_date: date,
-                            invoice_number: invoice,
-                            category,
-                            gross_eur: gross,
-                            net_eur: net,
-                            vat_eur: vat,
-                          }),
+                          body: JSON.stringify({ gross_eur: drafts[r.id] ?? centsToInput(r.gross_cents) }),
                         });
                         if (!res.ok) {
                           const j = (await res.json()) as { error?: string };

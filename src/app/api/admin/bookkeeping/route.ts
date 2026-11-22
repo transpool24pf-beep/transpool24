@@ -1,13 +1,7 @@
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin-api";
-import {
-  BOOKKEEPING_BUCKET,
-  isBookkeepingCategory,
-  monthRangeUtc,
-  type BookkeepingReceipt,
-} from "@/lib/bookkeeping";
-import { extractReceiptWithAi } from "@/lib/bookkeeping-ocr";
+import { BOOKKEEPING_BUCKET, monthRangeUtc, type BookkeepingReceipt } from "@/lib/bookkeeping";
 import { createServerSupabase } from "@/lib/supabase";
 
 const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp", "application/pdf"]);
@@ -118,15 +112,15 @@ export async function POST(req: Request) {
     );
   }
 
-  const notes = String(form.get("notes") ?? "").trim() || null;
+  const today = new Date().toISOString().slice(0, 10);
   const { data: inserted, error: insErr } = await supabase
     .from("bookkeeping_receipts")
     .insert({
       original_filename: file.name || null,
       storage_path: path,
       mime_type: type,
-      notes,
-      ocr_status: "pending",
+      document_date: today,
+      ocr_status: "skipped",
     })
     .select(
       "id, original_filename, storage_path, mime_type, vendor_name, document_date, gross_cents, net_cents, vat_cents, vat_rate, currency, category, invoice_number, notes, ocr_status, created_at, updated_at",
@@ -143,44 +137,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: insErr?.message ?? "Insert failed" }, { status: 500 });
   }
 
-  const ocr = await extractReceiptWithAi({ mimeType: type, bytes: buf });
-  let row = inserted as BookkeepingReceipt;
-  if (ocr.extract) {
-    const patch = {
-      vendor_name: ocr.extract.vendor_name,
-      document_date: ocr.extract.document_date,
-      invoice_number: ocr.extract.invoice_number,
-      gross_cents: ocr.extract.gross_cents,
-      net_cents: ocr.extract.net_cents,
-      vat_cents: ocr.extract.vat_cents,
-      vat_rate: ocr.extract.vat_rate,
-      currency: ocr.extract.currency,
-      category: isBookkeepingCategory(ocr.extract.category) ? ocr.extract.category : "sonstiges",
-      notes: notes || ocr.extract.notes,
-      ocr_raw: ocr.extract.raw,
-      ocr_status: ocr.status,
-      updated_at: new Date().toISOString(),
-    };
-    const { data: updated } = await supabase
-      .from("bookkeeping_receipts")
-      .update(patch)
-      .eq("id", row.id)
-      .select(
-        "id, original_filename, storage_path, mime_type, vendor_name, document_date, gross_cents, net_cents, vat_cents, vat_rate, currency, category, invoice_number, notes, ocr_status, created_at, updated_at",
-      )
-      .single();
-    if (updated) row = updated as BookkeepingReceipt;
-  } else {
-    await supabase
-      .from("bookkeeping_receipts")
-      .update({ ocr_status: ocr.status, updated_at: new Date().toISOString() })
-      .eq("id", row.id);
-    row = { ...row, ocr_status: ocr.status };
-  }
-
   return NextResponse.json({
-    receipt: await withFileUrl(supabase, row),
-    ocr_status: row.ocr_status,
-    ocr_error: ocr.error ?? null,
+    receipt: await withFileUrl(supabase, inserted as BookkeepingReceipt),
   });
 }
