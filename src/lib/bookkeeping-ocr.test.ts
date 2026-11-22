@@ -32,3 +32,10 @@ describe("monthRangeUtc", () => {
     expect(monthRangeUtc(2026, 11)).toEqual({ from: "2026-11-01", to: "2026-12-01" });
   });
 });
+
+describe("documentDateForMonth", () => {
+  it("uses the first day when the selected month is not current", async () => {
+    const { documentDateForMonth } = await import("./bookkeeping");
+    expect(documentDateForMonth(2024, 1)).toBe("2024-01-01");
+  });
+});

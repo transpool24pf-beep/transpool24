@@ -1,7 +1,13 @@
 import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin-api";
-import { BOOKKEEPING_BUCKET, monthRangeUtc, type BookkeepingReceipt } from "@/lib/bookkeeping";
+import {
+  BOOKKEEPING_BUCKET,
+  documentDateForMonth,
+  monthRangeUtc,
+  type BookkeepingReceipt,
+} from "@/lib/bookkeeping";
+import { toPdfEmbeddableImage } from "@/lib/bookkeeping-image";
 import { createServerSupabase } from "@/lib/supabase";
 
 const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp", "application/pdf"]);
@@ -86,18 +92,34 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Missing file" }, { status: 400 });
   }
   const type = file.type || "image/jpeg";
-  if (!ALLOWED.has(type)) {
+  if (!ALLOWED.has(type) && !type.startsWith("image/")) {
     return NextResponse.json({ error: "Nur JPG, PNG, WebP oder PDF" }, { status: 400 });
   }
-  const buf = Buffer.from(await file.arrayBuffer());
-  if (buf.length > MAX_BYTES) {
+  const raw = Buffer.from(await file.arrayBuffer());
+  if (raw.length > MAX_BYTES) {
     return NextResponse.json({ error: "Datei zu groß (max. 4,5 MB)" }, { status: 400 });
   }
 
+  const year = Number(form.get("year") || new Date().getFullYear());
+  const month = Number(form.get("month") || new Date().getMonth() + 1);
+  if (!Number.isInteger(year) || !Number.isInteger(month) || month < 1 || month > 12) {
+    return NextResponse.json({ error: "Invalid month" }, { status: 400 });
+  }
+
+  let storeType = type;
+  let buf: Buffer = raw;
+  if (type !== "application/pdf") {
+    const converted = await toPdfEmbeddableImage(new Uint8Array(raw), type);
+    if (converted) {
+      storeType = converted.mime;
+      buf = Buffer.from(converted.bytes);
+    }
+  }
+
   const supabase = createServerSupabase();
-  const path = `${new Date().getFullYear()}/${randomUUID()}.${extFor(type)}`;
+  const path = `${year}/${String(month).padStart(2, "0")}/${randomUUID()}.${extFor(storeType)}`;
   const { error: upErr } = await supabase.storage.from(BOOKKEEPING_BUCKET).upload(path, buf, {
-    contentType: type,
+    contentType: storeType,
     upsert: false,
   });
   if (upErr) {
@@ -112,14 +134,13 @@ export async function POST(req: Request) {
     );
   }
 
-  const today = new Date().toISOString().slice(0, 10);
   const { data: inserted, error: insErr } = await supabase
     .from("bookkeeping_receipts")
     .insert({
       original_filename: file.name || null,
       storage_path: path,
-      mime_type: type,
-      document_date: today,
+      mime_type: storeType,
+      document_date: documentDateForMonth(year, month),
       ocr_status: "skipped",
     })
     .select(

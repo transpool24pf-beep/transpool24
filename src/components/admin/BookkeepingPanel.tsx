@@ -17,6 +17,29 @@ function centsToInput(cents: number | null): string {
   return (cents / 100).toFixed(2).replace(".", ",");
 }
 
+async function receiptToUploadFile(file: File): Promise<File> {
+  if (file.type === "application/pdf") return file;
+  try {
+    const bitmap = await createImageBitmap(file);
+    const max = 1600;
+    const scale = Math.min(1, max / Math.max(bitmap.width, bitmap.height));
+    const w = Math.max(1, Math.round(bitmap.width * scale));
+    const h = Math.max(1, Math.round(bitmap.height * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return file;
+    ctx.drawImage(bitmap, 0, 0, w, h);
+    bitmap.close();
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.82));
+    if (!blob) return file;
+    return new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" });
+  } catch {
+    return file;
+  }
+}
+
 export function BookkeepingPanel() {
   const { t } = useAdminLocale();
   const now = new Date();
@@ -56,7 +79,9 @@ export function BookkeepingPanel() {
     setError(null);
     try {
       const fd = new FormData();
-      fd.append("file", file);
+      fd.append("file", await receiptToUploadFile(file));
+      fd.append("year", String(year));
+      fd.append("month", String(month));
       const res = await fetch("/api/admin/bookkeeping", { method: "POST", body: fd });
       const json = (await res.json()) as { error?: string };
       if (!res.ok) throw new Error(json.error || res.statusText);
@@ -167,18 +192,24 @@ export function BookkeepingPanel() {
           return (
             <article
               key={r.id}
-              className="grid gap-4 rounded-2xl border-2 border-[#0d2137]/15 bg-white p-4 shadow-sm md:grid-cols-[160px_1fr]"
+              className="grid gap-4 rounded-2xl border-2 border-[#0d2137]/15 bg-white p-4 shadow-sm md:grid-cols-[180px_1fr]"
             >
-              {r.file_url && r.mime_type?.startsWith("image/") ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={r.file_url} alt="" className="h-40 w-full rounded-xl object-cover" />
-              ) : (
+              {r.mime_type === "application/pdf" ? (
                 <a
-                  href={r.file_url ?? "#"}
-                  className="flex h-40 items-center justify-center rounded-xl bg-[#f1f5f9] text-sm text-[#0d2137]"
+                  href={`/api/admin/bookkeeping/file/${r.id}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex h-40 items-center justify-center rounded-xl bg-[#f1f5f9] text-sm font-semibold text-[#0d2137]"
                 >
                   PDF
                 </a>
+              ) : (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={`/api/admin/bookkeeping/file/${r.id}`}
+                  alt=""
+                  className="h-40 w-full rounded-xl object-contain bg-[#f8fafc]"
+                />
               )}
               <div className="flex flex-col justify-center gap-3">
                 <label className="text-sm font-medium text-[#0d2137]">

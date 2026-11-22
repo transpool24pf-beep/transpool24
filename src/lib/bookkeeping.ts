@@ -63,3 +63,21 @@ export function monthRangeUtc(year: number, month: number): { from: string; to: 
   const to = new Date(Date.UTC(year, month, 1));
   return { from: from.toISOString().slice(0, 10), to: to.toISOString().slice(0, 10) };
 }
+
+/** Calendar date in Europe/Berlin as YYYY-MM-DD. */
+export function berlinYmd(date = new Date()): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Berlin",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
+}
+
+/** Store a receipt on the selected month so it lands in that month's PDF. */
+export function documentDateForMonth(year: number, month: number): string {
+  const today = berlinYmd();
+  const [ty, tm] = today.split("-").map(Number);
+  if (ty === year && tm === month) return today;
+  return `${year}-${String(month).padStart(2, "0")}-01`;
+}
